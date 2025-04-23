@@ -5,6 +5,8 @@ import { Center, CentersData } from './types';
 let centersData: CentersData | null = null;
 const stateCentersCache: Record<string, Center[]> = {};
 const districtCentersCache: Record<string, Record<string, Center[]>> = {};
+const regionStatesCache: Record<string, string[]> = {};
+const stateRegionCache: Record<string, string> = {}; // Cache to store which region a state belongs to
 
 // Function to fetch data from API only
 async function fetchCentersData(): Promise<CentersData> {
@@ -117,15 +119,23 @@ async function fetchCentersByDistrict(state: string, district: string): Promise<
 
 export async function getAllCenters(): Promise<Center[]> {
   const data = await fetchCentersData();
+  
+  // Update the state-region cache when we fetch all centers
+  data.data.forEach(center => {
+    if (center.state && center.region) {
+      stateRegionCache[center.state] = center.region;
+    }
+  });
+  
   return data.data || [];
 }
 
-export async function getStatesList(): Promise<string[]> {
+export async function getStatesList(region?: string): Promise<string[]> {
   const centers = await getAllCenters();
   const states = new Set<string>();
   
   centers.forEach(center => {
-    if (center.state) {
+    if (center.state && (!region || center.region === region)) {
       states.add(center.state);
     }
   });
@@ -226,7 +236,6 @@ export async function getStateData(state: string): Promise<{
 }
 
 // Add this function to get state summaries with counts
-
 export async function getStatesSummary(): Promise<{
   state: string;
   centerCount: number;
@@ -258,4 +267,88 @@ export async function getStatesSummary(): Promise<{
     centerCount: data.centerCount,
     districtCount: data.districts.size
   }));
+}
+
+// Get list of available regions
+export async function getRegions(): Promise<string[]> {
+  const centers = await getAllCenters();
+  const regions = new Set<string>();
+  
+  centers.forEach(center => {
+    if (center.region) {
+      regions.add(center.region);
+    }
+  });
+  
+  return Array.from(regions).sort();
+}
+
+// Get states for a specific region
+export async function getStatesByRegion(region: string): Promise<{
+  name: string;
+  centerCount: number;
+  districtCount: number;
+}[]> {
+  // Check cache first
+  if (regionStatesCache[region]) {
+    const states = regionStatesCache[region];
+    const statesSummary = await getStatesSummary();
+    
+    return statesSummary
+      .filter(state => states.includes(state.state))
+      .map(state => ({
+        name: state.state,
+        centerCount: state.centerCount,
+        districtCount: state.districtCount
+      }));
+  }
+  
+  const allCenters = await getAllCenters();
+  
+  // Find states in this region
+  const states = new Set<string>();
+  allCenters.forEach(center => {
+    if (center.region === region && center.state) {
+      states.add(center.state);
+    }
+  });
+  
+  // Cache the result
+  regionStatesCache[region] = Array.from(states);
+  
+  // Get summary data for these states
+  const statesSummary = await getStatesSummary();
+  
+  return statesSummary
+    .filter(state => states.has(state.state))
+    .map(state => ({
+      name: state.state,
+      centerCount: state.centerCount,
+      districtCount: state.districtCount
+    }));
+}
+
+// Get all centers for a state
+export async function getCentersByState(state: string): Promise<Center[]> {
+  return fetchCentersByState(state);
+}
+
+// Get region for a specific state
+export async function getRegionForState(state: string): Promise<string> {
+  // Check cache first
+  if (stateRegionCache[state]) {
+    return stateRegionCache[state];
+  }
+  
+  // If not in cache, get all centers to populate cache
+  await getAllCenters();
+  
+  // Check cache again
+  if (stateRegionCache[state]) {
+    return stateRegionCache[state];
+  }
+  
+  // If still not found, return default
+  console.warn(`No region found for state: ${state}`);
+  return 'INDIA';
 } 

@@ -8,6 +8,7 @@ interface CenterMapProps {
   centers: Center[];
   initialLat?: number;
   initialLng?: number;
+  initialZoom?: number;
   height?: string;
   onCenterSelect?: (center: Center) => void;
   isDistrictView?: boolean;
@@ -21,6 +22,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
   centers,
   initialLat,
   initialLng,
+  initialZoom,
   height = '500px',
   onCenterSelect,
   isDistrictView = false,
@@ -148,6 +150,13 @@ const CenterMap: React.FC<CenterMapProps> = ({
     }
   }, [highlightCenter, centers, selectedCenter, showInfoWindowOnLoad, markersReady]);
 
+  // Apply zoom level from initialZoom prop if provided
+  useEffect(() => {
+    if (mapRef && initialZoom && !autoZoom) {
+      mapRef.setZoom(initialZoom);
+    }
+  }, [mapRef, initialZoom, autoZoom]);
+
   const handleMarkerClick = (center: Center) => {
     setSelectedCenter(center);
     if (onCenterSelect) {
@@ -173,28 +182,28 @@ const CenterMap: React.FC<CenterMapProps> = ({
     return (
       <div 
         style={{ height, position: 'relative' }} 
-        className="bg-gray-100 rounded-lg flex flex-col items-center justify-center"
+        className="bg-spirit-purple-50 rounded-lg flex flex-col items-center justify-center border border-spirit-purple-100"
       >
         <div className="text-center p-4">
-          <p className="text-gray-500 mb-2">Map unavailable</p>
-          <p className="text-sm text-gray-400 mb-4">Google Maps API key required</p>
+          <p className="text-neutral-500 mb-2">Map unavailable</p>
+          <p className="text-sm text-neutral-400 mb-4">Google Maps API key required</p>
           
           {centers.map(center => (
             <div 
               key={center.branch_code} 
-              className="bg-white p-3 mb-2 rounded-md shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+              className="bg-light p-3 mb-2 rounded-md shadow-sm cursor-pointer hover:shadow-md transition-shadow border border-neutral-200"
               onClick={() => handleMarkerClick(center)}
             >
-              <p className="font-medium">{center.name}</p>
-              <p className="text-sm text-gray-500">
+              <p className="font-medium text-primary">{center.name}</p>
+              <p className="text-sm text-neutral-500">
                 {center.coords ? `${center.coords[0]}, ${center.coords[1]}` : 'No coordinates'}
               </p>
             </div>
           ))}
           
-          <div className="mt-4 text-xs text-gray-400">
+          <div className="mt-4 text-xs text-neutral-400">
             <p>To enable maps, add a Google Maps API key to your .env.local file:</p>
-            <code className="bg-gray-200 p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here</code>
+            <code className="bg-neutral-200 p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here</code>
           </div>
         </div>
       </div>
@@ -203,7 +212,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
   // Loading placeholder
   if (!isLoaded || !centerPosition || !GoogleMap || !Marker || !InfoWindow) {
-    return <div className="animate-pulse bg-gray-200 rounded-lg" style={{ height }}></div>;
+    return <div className="animate-pulse bg-spirit-blue-100 rounded-lg" style={{ height }}></div>;
   }
 
   const containerStyle = {
@@ -221,7 +230,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
       // Calculate color intensity based on center count
       // Higher count = more intense color (darker orange)
       // Lower count = lighter color
-      const baseColor = '#FF7F50'; // Coral
+      const baseColor = '#7E57C2'; // Primary purple
       let opacity = 0.5 + Math.min(count / 50, 0.5); // Scale opacity between 0.5 and 1.0
       
       // For very small numbers, ensure they're still visible
@@ -242,15 +251,23 @@ const CenterMap: React.FC<CenterMapProps> = ({
     if (highlightCenter && center.is_highlighted) {
       return {
         path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-        fillColor: '#FF7F50',
+        fillColor: '#7E57C2', // Primary purple
         fillOpacity: 1,
         strokeColor: '#FFFFFF',
         strokeWeight: 2,
         scale: 1.2
       };
     }
-    
-    return undefined;
+
+    // Default marker
+    return {
+      path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+      fillColor: center.is_district_summary ? '#4FC3F7' : '#7E57C2', // Secondary blue for districts, primary purple for centers
+      fillOpacity: 0.9,
+      strokeColor: '#FFFFFF',
+      strokeWeight: 2,
+      scale: center.is_district_summary ? 1 : 0.8
+    };
   };
 
   // Custom label for district markers

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { getStatesSummary, getNearestCenters, getAllCenters } from '@/lib/centerData';
+import { getStatesSummary, getNearestCenters, getAllCenters, getRegions, getRegionForState } from '@/lib/centerData';
 import SearchBar from '@/components/SearchBar';
 import CenterCard from '@/components/CenterCard';
 import CenterMap from '@/components/CenterMap';
@@ -26,6 +26,7 @@ export default function CentersPage() {
   const [nearestCenters, setNearestCenters] = useState<(Center & { distance?: number })[]>([]);
   const [statesSummary, setStatesSummary] = useState<StateSummary[]>([]);
   const [allCenters, setAllCenters] = useState<Center[]>([]);
+  const [regions, setRegions] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('alpha');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
@@ -45,7 +46,9 @@ export default function CentersPage() {
           summary: `${state.centerCount} ${state.centerCount === 1 ? 'center' : 'centers'} across ${state.districtCount} districts`,
           district_total: state.centerCount,
           is_district_summary: true,
-          is_state_summary: true
+          is_state_summary: true,
+          // Keep the actual region from the center data
+          region: stateCenter.region
         };
       }
       return null;
@@ -76,6 +79,10 @@ export default function CentersPage() {
         // Get all centers for map markers
         const centers = await getAllCenters();
         setAllCenters(centers);
+        
+        // Get all available regions
+        const availableRegions = await getRegions();
+        setRegions(availableRegions);
         
         setLoading(false);
       } catch (error) {
@@ -134,7 +141,8 @@ export default function CentersPage() {
   const handleCenterSelect = (center: Center) => {
     // Handle state selection from map
     if (center.is_state_summary) {
-      window.location.href = `/centers/${encodeURIComponent(center.state)}`;
+      // Use the center's actual region from data
+      window.location.href = `/centers/${encodeURIComponent(center.region)}/${encodeURIComponent(center.state)}`;
       return;
     }
     
@@ -148,8 +156,25 @@ export default function CentersPage() {
       }, 2000);
     }
   };
+  
+  // Get actual region for a state from centers data
+  const getRegionForStateLocal = (stateName: string): string => {
+    // Find a center in this state to get its region
+    const stateCenter = allCenters.find(center => center.state === stateName);
+    return stateCenter?.region || 'INDIA';
+  };
 
   const sortedStates = getSortedStates();
+
+  // Group states by region
+  const statesByRegion: Record<string, StateSummary[]> = {};
+  sortedStates.forEach(state => {
+    const region = getRegionForStateLocal(state.state);
+    if (!statesByRegion[region]) {
+      statesByRegion[region] = [];
+    }
+    statesByRegion[region].push(state);
+  });
   
   // Stats summary box
   const StatsSummary = () => {
@@ -157,22 +182,22 @@ export default function CentersPage() {
     const totalStates = statesSummary.length;
     
     return (
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <h3 className="font-semibold text-lg mb-3">Meditation Centers Overview</h3>
+      <div className="bg-light rounded-lg shadow-md p-4 mb-6 border border-neutral-200">
+        <h3 className="font-semibold text-lg mb-3 text-primary">Meditation Centers Overview</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <div className="text-[#FF7F50] text-2xl font-bold">{totalCenters}</div>
-            <div className="text-gray-600 text-sm">Total Centers</div>
+          <div className="bg-spirit-purple-50 p-3 rounded-lg border border-spirit-purple-100">
+            <div className="text-primary text-2xl font-bold">{totalCenters}</div>
+            <div className="text-neutral-600 text-sm">Total Centers</div>
           </div>
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <div className="text-[#FF7F50] text-2xl font-bold">{totalStates}</div>
-            <div className="text-gray-600 text-sm">States</div>
+          <div className="bg-spirit-blue-50 p-3 rounded-lg border border-spirit-blue-100">
+            <div className="text-secondary text-2xl font-bold">{totalStates}</div>
+            <div className="text-neutral-600 text-sm">States</div>
           </div>
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <div className="text-[#FF7F50] text-2xl font-bold">
+          <div className="bg-spirit-gold-50 p-3 rounded-lg border border-spirit-gold-100">
+            <div className="text-accent text-2xl font-bold">
               {statesSummary.reduce((sum, state) => sum + state.districtCount, 0)}
             </div>
-            <div className="text-gray-600 text-sm">Districts</div>
+            <div className="text-neutral-600 text-sm">Districts</div>
           </div>
         </div>
       </div>
@@ -181,7 +206,7 @@ export default function CentersPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Find Meditation Centers</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center spiritual-text-gradient">Find Meditation Centers</h1>
       
       <div className="mb-8 max-w-2xl mx-auto">
         <SearchBar onSearchResult={handleSearchResult} />
@@ -189,13 +214,13 @@ export default function CentersPage() {
 
       {loading ? (
         <div className="flex justify-center my-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF7F50]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       ) : (
         <>
           {lat && lng && nearestCenters.length > 0 ? (
             <div className="mb-12">
-              <h2 className="text-2xl font-semibold mb-4">Nearest Centers to {address}</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-spirit-teal-600">Nearest Centers to {address}</h2>
               
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
@@ -219,16 +244,16 @@ export default function CentersPage() {
           ) : (
             <div className="mb-12">
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                <h2 className="text-2xl font-semibold">Browse by State</h2>
+                <h2 className="text-2xl font-semibold text-spirit-purple-700">Browse by State</h2>
                 
                 <div className="flex flex-wrap gap-4 items-center">
-                  <div className="flex rounded-md overflow-hidden border border-gray-300">
+                  <div className="flex rounded-md overflow-hidden border border-neutral-300">
                     <button
                       onClick={() => handleViewModeChange('list')}
                       className={`px-3 py-1 text-sm flex items-center ${
                         viewMode === 'list' 
-                          ? 'bg-[#FF7F50] text-white' 
-                          : 'bg-white text-gray-700 hover:bg-gray-100'
+                          ? 'bg-primary text-white' 
+                          : 'bg-light text-neutral-700 hover:bg-neutral-100'
                       }`}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -240,8 +265,8 @@ export default function CentersPage() {
                       onClick={() => handleViewModeChange('map')}
                       className={`px-3 py-1 text-sm flex items-center ${
                         viewMode === 'map' 
-                          ? 'bg-[#FF7F50] text-white' 
-                          : 'bg-white text-gray-700 hover:bg-gray-100'
+                          ? 'bg-primary text-white' 
+                          : 'bg-light text-neutral-700 hover:bg-neutral-100'
                       }`}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -250,109 +275,69 @@ export default function CentersPage() {
                       Map View
                     </button>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Sort by:</span>
-                    <div className="flex rounded-md overflow-hidden border border-gray-300">
-                      <button
-                        onClick={() => handleSortChange('alpha')}
-                        className={`px-3 py-1 text-sm ${
-                          sortBy === 'alpha' 
-                            ? 'bg-[#FF7F50] text-white' 
-                            : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
-                      >
-                        A-Z
-                      </button>
-                      <button
-                        onClick={() => handleSortChange('centers')}
-                        className={`px-3 py-1 text-sm ${
-                          sortBy === 'centers' 
-                            ? 'bg-[#FF7F50] text-white' 
-                            : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
-                      >
-                        Center Count
-                      </button>
-                    </div>
+
+                  <div className="flex rounded-md overflow-hidden border border-neutral-300">
+                    <button
+                      onClick={() => handleSortChange('alpha')}
+                      className={`px-3 py-1 text-sm ${
+                        sortBy === 'alpha' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-light text-neutral-700 hover:bg-neutral-100'
+                      }`}
+                    >
+                      A-Z
+                    </button>
+                    <button
+                      onClick={() => handleSortChange('centers')}
+                      className={`px-3 py-1 text-sm ${
+                        sortBy === 'centers' 
+                          ? 'bg-primary text-white' 
+                          : 'bg-light text-neutral-700 hover:bg-neutral-100'
+                      }`}
+                    >
+                      Most Centers
+                    </button>
                   </div>
                 </div>
               </div>
-              
+
+              {/* Include the stats summary component */}
+              <StatsSummary />
+
               {viewMode === 'map' ? (
-                <div className="grid md:grid-cols-5 gap-6">
-                  <div className="md:col-span-3">
-                    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-                      <h3 className="font-semibold text-lg mb-3">States Map</h3>
-                      <div className="h-[400px] mb-2">
-                        <CenterMap 
-                          centers={stateMapMarkers}
-                          height="100%"
-                          isDistrictView={true}
-                          autoZoom={true}
-                          onCenterSelect={handleCenterSelect}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-500 text-center mt-2">
-                        Color intensity indicates number of centers in each state. Click on markers for details.
-                      </p>
-                    </div>
-                    
-                    <StatsSummary />
-                  </div>
-                  
-                  <div className="md:col-span-2 h-[700px] overflow-y-auto pr-2">
-                    <div className="grid grid-cols-1 gap-4">
-                      {sortedStates.map((state) => (
-                        <Link 
-                          key={state.state} 
-                          href={`/centers/${encodeURIComponent(state.state)}`}
-                          className="card hover:shadow-md transition-shadow border border-gray-200 p-4 rounded-lg hover:border-[#FF7F50]"
-                        >
-                          <h3 className="text-lg font-medium mb-2">{state.state}</h3>
-                          <div className="flex justify-between text-sm text-gray-600 mt-2">
-                            <div className="flex items-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#FF7F50]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                              </svg>
-                              <span>{state.centerCount} Centers</span>
-                            </div>
-                            <div className="flex items-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#FF7F50]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              </svg>
-                              <span>{state.districtCount} Districts</span>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
+                <div className="mb-8 border border-neutral-200 rounded-lg overflow-hidden shadow-md">
+                  <CenterMap 
+                    centers={stateMapMarkers} 
+                    initialLat={20.5937} 
+                    initialLng={78.9629} // Center of India
+                    initialZoom={5}
+                    onCenterSelect={handleCenterSelect}
+                  />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {sortedStates.map((state) => (
-                    <Link 
-                      key={state.state} 
-                      href={`/centers/${encodeURIComponent(state.state)}`}
-                      className="card hover:shadow-md transition-shadow border border-gray-200 p-4 rounded-lg hover:border-[#FF7F50]"
-                    >
-                      <h3 className="text-lg font-medium mb-2 text-center">{state.state}</h3>
-                      <div className="flex justify-between text-sm text-gray-600 mt-2">
-                        <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#FF7F50]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
-                          <span>{state.centerCount} Centers</span>
-                        </div>
-                        <div className="flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-[#FF7F50]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
-                          <span>{state.districtCount} Districts</span>
-                        </div>
+                <div>
+                  {/* Display states grouped by region */}
+                  {Object.keys(statesByRegion).map(region => (
+                    <div key={region} className="mb-8">
+                      <h2 className="text-xl font-semibold mb-4 text-spirit-blue-700">{region}</h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {statesByRegion[region].map((state) => (
+                          <Link
+                            key={state.state}
+                            href={`/centers/${encodeURIComponent(region)}/${encodeURIComponent(state.state)}`}
+                            className="bg-light p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 flex flex-col"
+                          >
+                            <h3 className="text-lg font-semibold mb-2 text-spirit-purple-700">{state.state}</h3>
+                            <div className="text-neutral-600 text-sm">
+                              {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'} in {state.districtCount} {state.districtCount === 1 ? 'district' : 'districts'}
+                            </div>
+                            <div className="mt-auto pt-3 text-primary text-sm font-medium">
+                              View centers →
+                            </div>
+                          </Link>
+                        ))}
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               )}

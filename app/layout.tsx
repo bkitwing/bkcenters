@@ -17,25 +17,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <header className="bg-white shadow-md">
+      <body className={`${inter.className} bg-neutral-50`}>
+        <header className="bg-light shadow-md border-b border-neutral-200">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <a href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-primary">Brahma Kumaris</h1>
-              <span className="ml-2 text-gray-600">Center Locator</span>
+              <h1 className="text-2xl font-bold spiritual-text-gradient">Brahma Kumaris</h1>
+              <span className="ml-2 text-neutral-600">Center Locator</span>
             </a>
             <nav>
               <ul className="flex space-x-6">
-                <li><a href="/" className="text-gray-700 hover:text-primary">Home</a></li>
-                <li><a href="/centers" className="text-gray-700 hover:text-primary">Centers</a></li>
+                <li><a href="/" className="text-neutral-700 hover:text-primary transition-colors">Home</a></li>
+                <li><a href="/centers" className="text-neutral-700 hover:text-primary transition-colors">Centers</a></li>
               </ul>
             </nav>
           </div>
         </header>
         <main>{children}</main>
-        <footer className="bg-gray-100 mt-8">
+        <footer className="bg-spirit-purple-50 mt-8 border-t border-spirit-purple-100">
           <div className="container mx-auto px-4 py-6">
-            <div className="text-center text-gray-600">
+            <div className="text-center text-neutral-600">
               <p>© {new Date().getFullYear()} Brahma Kumaris. All rights reserved.</p>
             </div>
           </div>
