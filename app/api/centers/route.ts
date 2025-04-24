@@ -92,11 +92,12 @@ function optimizeCenter(center: Center, lightweight: boolean): Center {
       contact: center.contact || '',
       mobile: center.mobile || '',
       country: center.country,
+      // Preserve the region field for proper mapping
+      region: center.region || 'INDIA',
       // These fields can be empty but maintain type compatibility
       zone: '',
       sub_zone: '',
       section: '',
-      region: '',
       district_id: '',
       state_id: '',
       country_id: ''

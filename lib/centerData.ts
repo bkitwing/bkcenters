@@ -1,5 +1,5 @@
 // Data service for center information - client-side only
-import { Center, CentersData } from './types';
+import { Center, CentersData, RegionStateMapping, StateDistrictMapping, DistrictCentersMapping } from './types';
 import { geocodeAddress } from './geocoding';
 
 // Cache for data
@@ -8,6 +8,111 @@ const stateCentersCache: Record<string, Center[]> = {};
 const districtCentersCache: Record<string, Record<string, Center[]>> = {};
 const regionStatesCache: Record<string, string[]> = {};
 const stateRegionCache: Record<string, string> = {}; // Cache to store which region a state belongs to
+
+// Advanced mapping structures (global cache)
+let regionToStateMapping: RegionStateMapping | null = null;
+let stateToDistrictMapping: StateDistrictMapping | null = null;
+let districtToCentersMapping: DistrictCentersMapping | null = null;
+let isDataMappingInitialized = false;
+
+// Function to build all data mappings - call this once at initialization
+async function initializeDataMappings(): Promise<void> {
+  if (isDataMappingInitialized) return;
+  
+  console.log("Initializing data mappings...");
+  const centers = await getAllCenters();
+  console.log(`Loaded ${centers.length} centers for mapping`);
+  
+  // Build region to states mapping
+  const regionMap: RegionStateMapping = {};
+  
+  // Build state to districts mapping
+  const stateMap: StateDistrictMapping = {};
+  
+  // Build district to centers mapping
+  const districtMap: DistrictCentersMapping = {};
+  
+  // Check if we have any regions defined
+  const hasRegions = centers.some(center => center.region && center.region.trim() !== '');
+  
+  // If we don't have regions, we need to use the default
+  if (!hasRegions) {
+    console.warn("No regions found in data, using 'INDIA' as default region");
+  }
+  
+  // Process all centers to build mappings
+  centers.forEach(center => {
+    // Ensure region has a value - fallback to INDIA if empty or missing
+    const region = (center.region && center.region.trim() !== '') ? center.region : 'INDIA';
+    const { state, district } = center;
+    
+    // Initialize the region entry if it doesn't exist
+    if (!regionMap[region]) {
+      regionMap[region] = {
+        states: {},
+        centerCount: 0
+      };
+    }
+    
+    // Initialize the state within the region if it doesn't exist
+    if (state && !regionMap[region].states[state]) {
+      regionMap[region].states[state] = {
+        centerCount: 0,
+        districtCount: 0
+      };
+    }
+    
+    // Increment center count for region
+    regionMap[region].centerCount++;
+    
+    if (state) {
+      // Initialize state entry if it doesn't exist
+      if (!stateMap[state]) {
+        stateMap[state] = {
+          region,
+          districts: {},
+          centerCount: 0
+        };
+      }
+      
+      // Increment center count for state
+      stateMap[state].centerCount++;
+      regionMap[region].states[state].centerCount++;
+      
+      if (district) {
+        // Initialize district entry if it doesn't exist in state
+        if (!stateMap[state].districts[district]) {
+          stateMap[state].districts[district] = {
+            centerCount: 0
+          };
+          
+          // Increment district count for state and region-state
+          regionMap[region].states[state].districtCount++;
+        }
+        
+        // Increment center count for district
+        stateMap[state].districts[district].centerCount++;
+        
+        // Initialize district mapping
+        const districtKey = `${state}:${district}`;
+        if (!districtMap[districtKey]) {
+          districtMap[districtKey] = [];
+        }
+        
+        // Add center to district mapping
+        districtMap[districtKey].push(center);
+      }
+    }
+  });
+  
+  console.log(`Mapping complete: ${Object.keys(regionMap).length} regions, ${Object.keys(stateMap).length} states`);
+  
+  // Store in global cache
+  regionToStateMapping = regionMap;
+  stateToDistrictMapping = stateMap;
+  districtToCentersMapping = districtMap;
+  isDataMappingInitialized = true;
+}
 
 // Function to fetch data from API only
 async function fetchCentersData(): Promise<CentersData> {
@@ -19,7 +124,7 @@ async function fetchCentersData(): Promise<CentersData> {
   
   try {
     // Try to load from API endpoint with absolute URL - with lightweight parameter to reduce response size
-    const response = await fetch(`${origin}/api/centers?lightweight=true`);
+    const response = await fetch(`${origin}/api/centers?lightweight=false`);
     
     if (response.ok) {
       const data = await response.json() as CentersData;
@@ -384,4 +489,82 @@ export async function getRegionForState(state: string): Promise<string> {
   // If still not found, return default
   console.warn(`No region found for state: ${state}`);
   return 'INDIA';
+}
+
+// Get full region to state mapping - much faster than individual lookups
+export async function getRegionToStateMapping(): Promise<RegionStateMapping> {
+  if (!isDataMappingInitialized) {
+    await initializeDataMappings();
+  }
+  return regionToStateMapping || {};
+}
+
+// Get full state to district mapping
+export async function getStateToDistrictMapping(): Promise<StateDistrictMapping> {
+  if (!isDataMappingInitialized) {
+    await initializeDataMappings();
+  }
+  return stateToDistrictMapping || {};
+}
+
+// Fast function to get all regions with their details
+export async function getRegionsWithDetails(): Promise<{
+  name: string;
+  stateCount: number;
+  centerCount: number;
+}[]> {
+  if (!isDataMappingInitialized) {
+    await initializeDataMappings();
+  }
+  
+  return Object.entries(regionToStateMapping || {}).map(([name, data]) => ({
+    name,
+    stateCount: Object.keys(data.states).length,
+    centerCount: data.centerCount
+  })).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Fast function to get states by region
+export async function getStatesByRegionFast(region: string): Promise<{
+  name: string;
+  centerCount: number;
+  districtCount: number;
+}[]> {
+  if (!isDataMappingInitialized) {
+    await initializeDataMappings();
+  }
+  
+  const regionData = regionToStateMapping?.[region];
+  if (!regionData) return [];
+  
+  return Object.entries(regionData.states).map(([stateName, stateData]) => ({
+    name: stateName,
+    centerCount: stateData.centerCount,
+    districtCount: stateData.districtCount
+  })).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Force reinitialization of data mappings
+export async function reinitializeDataMappings(): Promise<boolean> {
+  // Clear all caches
+  centersData = null;
+  regionToStateMapping = null;
+  stateToDistrictMapping = null;
+  districtToCentersMapping = null;
+  isDataMappingInitialized = false;
+  
+  // Clear all other caches
+  Object.keys(stateCentersCache).forEach(key => delete stateCentersCache[key]);
+  Object.keys(districtCentersCache).forEach(key => delete districtCentersCache[key]);
+  Object.keys(regionStatesCache).forEach(key => delete regionStatesCache[key]);
+  Object.keys(stateRegionCache).forEach(key => delete stateRegionCache[key]);
+  
+  try {
+    // Re-initialize mappings
+    await initializeDataMappings();
+    return true;
+  } catch (error) {
+    console.error("Failed to reinitialize data mappings:", error);
+    return false;
+  }
 } 

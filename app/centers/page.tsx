@@ -3,11 +3,21 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getStatesSummary, getNearestCenters, getAllCenters, getRegions, getRegionForState } from '@/lib/centerData';
+import { 
+  getStatesSummary, 
+  getNearestCenters, 
+  getAllCenters, 
+  getRegions, 
+  getRegionForState,
+  getRegionsWithDetails,
+  getRegionToStateMapping,
+  getStatesByRegionFast,
+  reinitializeDataMappings
+} from '@/lib/centerData';
 import SearchBar from '@/components/SearchBar';
 import CenterCard from '@/components/CenterCard';
 import CenterMap from '@/components/CenterMap';
-import { Center } from '@/lib/types';
+import { Center, RegionStateMapping } from '@/lib/types';
 
 type StateSummary = {
   state: string;
@@ -29,6 +39,8 @@ export default function CentersPage() {
   const [statesSummary, setStatesSummary] = useState<StateSummary[]>([]);
   const [allCenters, setAllCenters] = useState<Center[]>([]);
   const [regions, setRegions] = useState<string[]>([]);
+  const [regionDetails, setRegionDetails] = useState<{name: string; stateCount: number; centerCount: number}[]>([]);
+  const [regionToStates, setRegionToStates] = useState<RegionStateMapping>({});
   const [sortBy, setSortBy] = useState<SortOption>('alpha');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
@@ -78,17 +90,47 @@ export default function CentersPage() {
           setAddress(addressParam);
         }
 
-        // Get states summary with counts
-        const summary = await getStatesSummary();
+        // Load data using the new optimized mapping structure
+        const [
+          summary, 
+          centers, 
+          availableRegions, 
+          regionsWithDetails,
+          regionStateMapping
+        ] = await Promise.all([
+          getStatesSummary(),
+          getAllCenters(),
+          getRegions(),
+          getRegionsWithDetails(),
+          getRegionToStateMapping()
+        ]);
+        
         setStatesSummary(summary);
-        
-        // Get all centers for map markers
-        const centers = await getAllCenters();
         setAllCenters(centers);
-        
-        // Get all available regions
-        const availableRegions = await getRegions();
         setRegions(availableRegions);
+        setRegionDetails(regionsWithDetails);
+        setRegionToStates(regionStateMapping);
+        
+        // If no regions found or empty regions, reinitialize the data
+        if (regionsWithDetails.length === 0 || Object.keys(regionStateMapping).length === 0) {
+          console.log("No regions found, attempting to reinitialize data mappings...");
+          const success = await reinitializeDataMappings();
+          
+          if (success) {
+            // Load the data again after reinitialization
+            const [
+              updatedRegionsWithDetails,
+              updatedRegionStateMapping
+            ] = await Promise.all([
+              getRegionsWithDetails(),
+              getRegionToStateMapping()
+            ]);
+            
+            setRegionDetails(updatedRegionsWithDetails);
+            setRegionToStates(updatedRegionStateMapping);
+            console.log(`Data reinitialized. Found ${Object.keys(updatedRegionStateMapping).length} regions`);
+          }
+        }
         
         setLoading(false);
       } catch (error) {
@@ -254,20 +296,25 @@ export default function CentersPage() {
     statesByRegion[region].push(state);
   });
   
-  // Stats summary box
+  // Modify the Stats summary to show more accurate information
   const StatsSummary = () => {
-    const totalCenters = statesSummary.reduce((sum, state) => sum + state.centerCount, 0);
+    const totalCenters = regionDetails.reduce((sum, region) => sum + region.centerCount, 0);
     const totalStates = statesSummary.length;
+    const totalRegions = regionDetails.length;
     
     return (
       <div className="bg-light rounded-lg shadow-md p-4 mb-6 border border-neutral-200">
         <h3 className="font-semibold text-lg mb-3 text-primary">Meditation Centers Overview</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-spirit-purple-50 p-3 rounded-lg border border-spirit-purple-100">
             <div className="text-primary text-2xl font-bold">{totalCenters}</div>
             <div className="text-neutral-600 text-sm">Total Centers</div>
           </div>
           <div className="bg-spirit-blue-50 p-3 rounded-lg border border-spirit-blue-100">
+            <div className="text-secondary text-2xl font-bold">{totalRegions}</div>
+            <div className="text-neutral-600 text-sm">Regions</div>
+          </div>
+          <div className="bg-spirit-teal-50 p-3 rounded-lg border border-spirit-teal-100">
             <div className="text-secondary text-2xl font-bold">{totalStates}</div>
             <div className="text-neutral-600 text-sm">States</div>
           </div>
@@ -378,7 +425,7 @@ export default function CentersPage() {
           ) : (
             <div className="mb-12">
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                <h2 className="text-2xl font-semibold text-spirit-purple-700">Browse by State</h2>
+                <h2 className="text-2xl font-semibold text-spirit-purple-700">Browse Centers by Region</h2>
                 
                 <div className="flex flex-wrap gap-4 items-center">
                   <div className="flex rounded-md overflow-hidden border border-neutral-300">
@@ -450,29 +497,50 @@ export default function CentersPage() {
                 </div>
               ) : (
                 <div>
-                  {/* Display states grouped by region */}
-                  {Object.keys(statesByRegion).map(region => (
-                    <div key={region} className="mb-8">
-                      <h2 className="text-xl font-semibold mb-4 text-spirit-blue-700">{region}</h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {statesByRegion[region].map((state) => (
-                          <Link
-                            key={state.state}
-                            href={`/centers/${encodeURIComponent(region)}/${encodeURIComponent(state.state)}`}
-                            className="bg-light p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 flex flex-col"
-                          >
-                            <h3 className="text-lg font-semibold mb-2 text-spirit-purple-700">{state.state}</h3>
-                            <div className="text-neutral-600 text-sm">
-                              {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'} in {state.districtCount} {state.districtCount === 1 ? 'district' : 'districts'}
+                  {/* Display regions */}
+                  {Object.keys(regionToStates).length > 0 ? (
+                    Object.entries(regionToStates)
+                      .sort(([regionA], [regionB]) => regionA.localeCompare(regionB))
+                      .map(([region, regionData]) => (
+                        <div key={region} className="mb-12">
+                          <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-semibold text-spirit-blue-700">{region}</h2>
+                            <div className="text-sm text-neutral-500">
+                              {Object.keys(regionData.states).length} states, {regionData.centerCount} centers
                             </div>
-                            <div className="mt-auto pt-3 text-primary text-sm font-medium">
-                              View centers →
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {Object.entries(regionData.states)
+                              .sort(([stateA], [stateB]) => 
+                                sortBy === 'alpha' 
+                                  ? stateA.localeCompare(stateB) 
+                                  : regionData.states[stateB].centerCount - regionData.states[stateA].centerCount
+                              )
+                              .map(([state, stateData]) => (
+                                <Link
+                                  key={state}
+                                  href={`/centers/${encodeURIComponent(region)}/${encodeURIComponent(state)}`}
+                                  className="bg-light p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 flex flex-col"
+                                >
+                                  <h3 className="text-lg font-semibold mb-2 text-spirit-purple-700">{state}</h3>
+                                  <div className="text-neutral-600 text-sm">
+                                    {stateData.centerCount} {stateData.centerCount === 1 ? 'center' : 'centers'} in {stateData.districtCount} {stateData.districtCount === 1 ? 'district' : 'districts'}
+                                  </div>
+                                  <div className="mt-auto pt-3 text-primary text-sm font-medium">
+                                    View centers →
+                                  </div>
+                                </Link>
+                              ))
+                            }
+                          </div>
+                        </div>
+                      ))
+                  ) : (
+                    <div className="text-center py-8 text-neutral-500">
+                      No regions found
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>

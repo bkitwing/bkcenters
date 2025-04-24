@@ -43,4 +43,43 @@ export interface CentersData {
   state: string;
   city: string;
   data: Center[];
+}
+
+// New mapping data structures for efficient access
+
+// State data within a region
+export interface RegionStateData {
+  centerCount: number;
+  districtCount: number;
+}
+
+// Region to state mapping
+export interface RegionStateMapping {
+  [region: string]: {
+    states: {
+      [state: string]: RegionStateData;
+    };
+    centerCount: number;
+  };
+}
+
+// District data within a state
+export interface StateDistrictData {
+  centerCount: number;
+}
+
+// State to district mapping
+export interface StateDistrictMapping {
+  [state: string]: {
+    region: string;
+    districts: {
+      [district: string]: StateDistrictData;
+    };
+    centerCount: number;
+  };
+}
+
+// District to centers mapping (key format: "state:district")
+export interface DistrictCentersMapping {
+  [districtKey: string]: Center[];
 } 
