@@ -316,7 +316,7 @@ export default function CentersPage() {
           </div>
           <div className="bg-spirit-teal-50 p-3 rounded-lg border border-spirit-teal-100">
             <div className="text-secondary text-2xl font-bold">{totalStates}</div>
-            <div className="text-neutral-600 text-sm">States</div>
+            <div className="text-neutral-600 text-sm">States & UT</div>
           </div>
           <div className="bg-spirit-gold-50 p-3 rounded-lg border border-spirit-gold-100">
             <div className="text-accent text-2xl font-bold">

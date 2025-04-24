@@ -110,37 +110,18 @@ function optimizeCenter(center: Center, lightweight: boolean): Center {
 
 // Load centers data from file system
 async function loadCentersData(): Promise<CentersData> {
-  // Try to load the main data file first
+  // Load only from the main data file
   const mainFilePath = path.join(process.cwd(), 'Center Locatore.json');
   if (fs.existsSync(mainFilePath)) {
     try {
       const fileContents = fs.readFileSync(mainFilePath, 'utf8');
       return JSON.parse(fileContents) as CentersData;
     } catch (error) {
-      console.error('Error reading main centers data:', error);
-      // Continue to fallback if main file fails
+      console.error('Error reading centers data:', error);
+      throw new Error('Failed to load centers data');
     }
+  } else {
+    console.error('Centers data file not found at:', mainFilePath);
+    throw new Error('Centers data file not found');
   }
-
-  // Fallback to mock data
-  const mockFilePath = path.join(process.cwd(), 'public/mock-centers.json');
-  if (fs.existsSync(mockFilePath)) {
-    try {
-      const mockContents = fs.readFileSync(mockFilePath, 'utf8');
-      return JSON.parse(mockContents) as CentersData;
-    } catch (mockError) {
-      console.error('Error reading mock centers data:', mockError);
-    }
-  }
-
-  // If both fail, return an empty data structure
-  return { 
-    total: 0, 
-    zone: '', 
-    subzone: '', 
-    country: 'INDIA', 
-    state: '', 
-    city: '', 
-    data: [] 
-  };
 } 

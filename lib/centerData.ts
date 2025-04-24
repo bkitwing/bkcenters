@@ -42,9 +42,15 @@ async function initializeDataMappings(): Promise<void> {
   
   // Process all centers to build mappings
   centers.forEach(center => {
-    // Ensure region has a value - fallback to INDIA if empty or missing
-    const region = (center.region && center.region.trim() !== '') ? center.region : 'INDIA';
+    // Use the actual region as is - do not assign a default
+    const region = center.region || '';
     const { state, district } = center;
+    
+    // Skip entries without a region
+    if (!region) {
+      console.warn(`Center ${center.name} (${center.branch_code}) has no region assigned, skipping from mappings`);
+      return;
+    }
     
     // Initialize the region entry if it doesn't exist
     if (!regionMap[region]) {
@@ -73,6 +79,11 @@ async function initializeDataMappings(): Promise<void> {
           districts: {},
           centerCount: 0
         };
+      }
+      
+      // Check if this state is already assigned to a different region
+      if (stateMap[state].region !== region) {
+        console.warn(`State "${state}" is assigned to multiple regions: "${stateMap[state].region}" and "${region}"`);
       }
       
       // Increment center count for state
@@ -106,6 +117,9 @@ async function initializeDataMappings(): Promise<void> {
   });
   
   console.log(`Mapping complete: ${Object.keys(regionMap).length} regions, ${Object.keys(stateMap).length} states`);
+  Object.keys(regionMap).forEach(region => {
+    console.log(`Region "${region}": ${regionMap[region].centerCount} centers, ${Object.keys(regionMap[region].states).length} states`);
+  });
   
   // Store in global cache
   regionToStateMapping = regionMap;
@@ -123,35 +137,20 @@ async function fetchCentersData(): Promise<CentersData> {
   const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   
   try {
-    // Try to load from API endpoint with absolute URL - with lightweight parameter to reduce response size
+    // Try to load from API endpoint with absolute URL
     const response = await fetch(`${origin}/api/centers?lightweight=false`);
     
     if (response.ok) {
       const data = await response.json() as CentersData;
       centersData = data;
       return data;
+    } else {
+      throw new Error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
     }
-  } catch (apiError) {
-    console.error('API data loading error:', apiError);
-    
-    // Fallback: Try to load mock data directly
-    try {
-      console.log('Attempting to load mock data...');
-      const mockResponse = await fetch(`${origin}/mock-centers.json`);
-      
-      if (mockResponse.ok) {
-        const mockData = await mockResponse.json() as CentersData;
-        centersData = mockData;
-        return mockData;
-      }
-    } catch (fallbackError) {
-      console.error('Mock data loading failed:', fallbackError);
-    }
+  } catch (error) {
+    console.error('API data loading error:', error);
+    throw error;
   }
-  
-  // Return empty data structure as last resort
-  console.warn('Using empty centers data as fallback');
-  return { total: 0, zone: '', subzone: '', country: '', state: '', city: '', data: [] };
 }
 
 // Get centers for a specific state
@@ -567,4 +566,11 @@ export async function reinitializeDataMappings(): Promise<boolean> {
     console.error("Failed to reinitialize data mappings:", error);
     return false;
   }
+}
+
+// Get centers for a region by filtering the data
+export async function getCentersByRegion(region: string): Promise<Center[]> {
+  const centers = await getAllCenters();
+  // Filter centers to only include those from the specified region
+  return centers.filter(center => center.region === region);
 } 
