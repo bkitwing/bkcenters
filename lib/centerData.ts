@@ -1,5 +1,6 @@
 // Data service for center information - client-side only
 import { Center, CentersData } from './types';
+import { geocodeAddress } from './geocoding';
 
 // Cache for data
 let centersData: CentersData | null = null;
@@ -189,18 +190,49 @@ export async function getNearestCenters(latitude: number, longitude: number, lim
     return R * c; // Distance in km
   };
 
-  // Add distance to each center and sort by distance
-  const centersWithDistance = centers
-    .filter(center => center.coords && center.coords.length === 2)
-    .map(center => {
-      const lat = parseFloat(center.coords[0]);
-      const lng = parseFloat(center.coords[1]);
+  // Process centers and calculate distances
+  const processedCenters = await Promise.all(centers.map(async (center) => {
+    // Try to get coordinates from the center
+    let lat: number | null = null;
+    let lng: number | null = null;
+
+    // First check if center has valid coordinates
+    if (center.coords && center.coords.length === 2) {
+      const parsedLat = parseFloat(center.coords[0]);
+      const parsedLng = parseFloat(center.coords[1]);
+      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+        lat = parsedLat;
+        lng = parsedLng;
+      }
+    }
+
+    // If no valid coordinates, try to geocode the address
+    if (lat === null || lng === null) {
+      try {
+        const geocodedCoords = await geocodeAddress(center);
+        if (geocodedCoords) {
+          lat = parseFloat(geocodedCoords[0]);
+          lng = parseFloat(geocodedCoords[1]);
+        }
+      } catch (error) {
+        console.warn(`Failed to geocode address for center ${center.name}:`, error);
+      }
+    }
+
+    // Calculate distance if we have valid coordinates
+    if (lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng)) {
       const distance = getDistance(latitude, longitude, lat, lng);
       return { ...center, distance };
-    })
-    .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+    }
 
-  return centersWithDistance.slice(0, limit);
+    // If still no valid coordinates, return center with Infinity distance
+    return { ...center, distance: Infinity };
+  }));
+
+  // Sort centers by distance and return the requested number
+  return processedCenters
+    .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity))
+    .slice(0, limit);
 }
 
 export async function getStateData(state: string): Promise<{ 
