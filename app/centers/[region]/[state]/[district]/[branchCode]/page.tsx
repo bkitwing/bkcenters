@@ -290,6 +290,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     autoZoom={true}
                     defaultZoom={13}
                     highlightCenter={true}
+                    showInfoWindowOnLoad={false}
                   />
                 </div>
               </div>

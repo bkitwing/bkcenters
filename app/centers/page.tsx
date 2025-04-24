@@ -506,7 +506,7 @@ export default function CentersPage() {
                           <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-semibold text-spirit-blue-700">{region}</h2>
                             <div className="text-sm text-neutral-500">
-                              {Object.keys(regionData.states).length} states, {regionData.centerCount} centers
+                              {Object.keys(regionData.states).length} states & UTs, {regionData.centerCount} centers
                             </div>
                           </div>
                           

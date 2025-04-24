@@ -30,7 +30,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
   autoZoom = false,
   highlightCenter = false,
   defaultZoom = 5,
-  showInfoWindowOnLoad = true
+  showInfoWindowOnLoad = false
 }) => {
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
@@ -469,7 +469,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
                           </p>
                           <div className="mt-2">
                             <a
-                              href={`/centers/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}`}
+                              href={`/centers/${encodeURIComponent(selectedCenter.region)}/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}`}
                               className="text-[#FF7F50] text-sm font-medium"
                             >
                               View Centers in {selectedCenter.district}
@@ -483,7 +483,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
                           </p>
                           <div className="mt-2">
                             <a
-                              href={`/centers/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}/${encodeURIComponent(selectedCenter.branch_code)}`}
+                              href={`/centers/${encodeURIComponent(selectedCenter.region)}/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}/${encodeURIComponent(selectedCenter.branch_code)}`}
                               className="text-[#FF7F50] text-sm font-medium"
                             >
                               View Details

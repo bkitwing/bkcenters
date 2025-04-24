@@ -111,7 +111,7 @@ function optimizeCenter(center: Center, lightweight: boolean): Center {
 // Load centers data from file system
 async function loadCentersData(): Promise<CentersData> {
   // Load only from the main data file
-  const mainFilePath = path.join(process.cwd(), 'Center Locatore.json');
+  const mainFilePath = path.join(process.cwd(), 'Center-Processed.json');
   if (fs.existsSync(mainFilePath)) {
     try {
       const fileContents = fs.readFileSync(mainFilePath, 'utf8');
