@@ -142,12 +142,16 @@ export default async function CenterPage({ params }: CenterPageProps) {
     };
     
     const getGoogleMapsUrl = () => {
-      if (!center.coords || center.coords.length !== 2) return '';
-      
-      const [lat, lng] = center.coords;
-      const address = encodeURIComponent(formatAddress());
-      
-      return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${address}`;
+      if (center.coords && center.coords.length === 2) {
+        const [lat, lng] = center.coords;
+        const address = encodeURIComponent(formatAddress());
+        
+        return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${address}`;
+      } else {
+        // If no coordinates, just use the address
+        const address = encodeURIComponent(formatAddress());
+        return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
+      }
     };
     
     const hasMobileOrContact = center.mobile || center.contact;
@@ -268,46 +272,33 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   </div>
                 )}
                 
-                {center.coords && center.coords.length === 2 && (
-                  <div className="mt-8">
-                    <a
-                      href={getGoogleMapsUrl()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-primary inline-flex items-center"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      Get Directions
-                    </a>
-                  </div>
-                )}
+                {/* Always show Get Directions button */}
+                <div className="mt-8">
+                  <a
+                    href={getGoogleMapsUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary inline-flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Get Directions
+                  </a>
+                </div>
               </div>
               
               <div>
-                {center.coords && center.coords.length === 2 ? (
-                  <div className="h-[300px] md:h-[400px] lg:h-[450px] border border-neutral-200 rounded-lg overflow-hidden">
-                    <CenterMap 
-                      centers={[centerForMap]} 
-                      height="100%" 
-                      autoZoom={true}
-                      defaultZoom={13}
-                      highlightCenter={true}
-                    />
-                  </div>
-                ) : (
-                  <div className="h-[300px] md:h-[400px] lg:h-[450px] bg-spirit-purple-50 flex items-center justify-center border border-spirit-purple-100 rounded-lg">
-                    <div className="text-center p-6">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-neutral-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                      </svg>
-                      <p className="text-neutral-500">Map coordinates not available</p>
-                      <p className="text-sm text-neutral-400 mt-2">Please use the address information for directions</p>
-                    </div>
-                  </div>
-                )}
+                <div className="h-[300px] md:h-[400px] lg:h-[450px] border border-neutral-200 rounded-lg overflow-hidden">
+                  <CenterMap 
+                    centers={[centerForMap]} 
+                    height="100%" 
+                    autoZoom={true}
+                    defaultZoom={13}
+                    highlightCenter={true}
+                  />
+                </div>
               </div>
             </div>
             

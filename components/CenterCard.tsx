@@ -32,12 +32,16 @@ const CenterCard: React.FC<CenterCardProps> = ({
   };
   
   const getGoogleMapsUrl = (center: Center) => {
-    if (!center.coords || center.coords.length !== 2) return '';
-    
-    const [lat, lng] = center.coords;
-    const address = encodeURIComponent(formatAddress(center));
-    
-    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${address}`;
+    if (center.coords && center.coords.length === 2) {
+      const [lat, lng] = center.coords;
+      const address = encodeURIComponent(formatAddress(center));
+      
+      return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${address}`;
+    } else {
+      // If no coordinates, just use the address
+      const address = encodeURIComponent(formatAddress(center));
+      return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
+    }
   };
   
   const handleShare = async () => {
@@ -66,6 +70,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
   };
   
   const formattedAddress = formatAddress(center);
+  const hasAddress = formattedAddress.length > 0;
   const fullUrl = `/centers/${encodeURIComponent(center.region)}/${encodeURIComponent(center.state)}/${encodeURIComponent(center.district)}/${encodeURIComponent(center.branch_code)}`;
   const hasContactInfo = center.contact || center.mobile || center.email;
   
@@ -143,18 +148,20 @@ const CenterCard: React.FC<CenterCardProps> = ({
           View Details
         </Link>
         
-        <a 
-          href={getGoogleMapsUrl(center)} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="bg-spirit-blue-50 text-spirit-blue-700 border border-spirit-blue-200 px-3 py-1.5 rounded-md text-sm hover:bg-spirit-blue-100 transition-colors flex items-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          Directions
-        </a>
+        {hasAddress && (
+          <a 
+            href={getGoogleMapsUrl(center)} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-spirit-blue-50 text-spirit-blue-700 border border-spirit-blue-200 px-3 py-1.5 rounded-md text-sm hover:bg-spirit-blue-100 transition-colors flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Directions
+          </a>
+        )}
         
         <button
           onClick={handleShare}

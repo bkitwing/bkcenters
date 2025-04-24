@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Center } from '@/lib/types';
 import { useGoogleMaps } from '@/lib/useGoogleMaps';
+import { geocodeAddress, hasValidCoordinates } from '@/lib/geocoding';
 
 interface CenterMapProps {
   centers: Center[];
@@ -35,6 +36,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [markersReady, setMarkersReady] = useState(false);
+  const [geocodedCenters, setGeocodedCenters] = useState<Map<string, [string, string]>>(new Map());
   
   // Use our custom Google Maps hook
   const { isLoaded, loadError, hasValidKey } = useGoogleMaps();
@@ -83,6 +85,41 @@ const CenterMap: React.FC<CenterMapProps> = ({
     }
   }, [centers, initialLat, initialLng]);
 
+  // Geocode addresses for centers without coordinates when Google Maps is loaded
+  useEffect(() => {
+    async function geocodeCenters() {
+      if (!isLoaded || !window.google?.maps?.Geocoder) return;
+      
+      const updatedGeocodedCenters = new Map(geocodedCenters);
+      let hasNewGeocodedCenters = false;
+
+      // Process centers that don't have valid coordinates
+      for (const center of centers) {
+        // Skip if already geocoded or if it has valid coordinates
+        if (geocodedCenters.has(center.branch_code) || hasValidCoordinates(center)) {
+          continue;
+        }
+
+        try {
+          const coords = await geocodeAddress(center);
+          if (coords) {
+            updatedGeocodedCenters.set(center.branch_code, coords);
+            hasNewGeocodedCenters = true;
+            console.log(`Geocoded center ${center.name}: ${coords[0]}, ${coords[1]}`);
+          }
+        } catch (error) {
+          console.error(`Failed to geocode center ${center.name}:`, error);
+        }
+      }
+
+      if (hasNewGeocodedCenters) {
+        setGeocodedCenters(updatedGeocodedCenters);
+      }
+    }
+
+    geocodeCenters();
+  }, [isLoaded, centers, geocodedCenters]);
+
   // Auto-zoom to fit all markers
   const fitBounds = useCallback(() => {
     if (!mapRef || !centers.length || !google?.maps) return;
@@ -91,10 +128,17 @@ const CenterMap: React.FC<CenterMapProps> = ({
     let hasValidCoords = false;
 
     centers.forEach(center => {
-      if (center.coords && center.coords.length === 2) {
+      // Use original coordinates if valid, otherwise use geocoded coordinates
+      let coords = center.coords;
+      const geocodedCoords = geocodedCenters.get(center.branch_code);
+      if (!hasValidCoordinates(center) && geocodedCoords) {
+        coords = geocodedCoords;
+      }
+      
+      if (coords && coords.length === 2) {
         try {
-          const lat = parseFloat(center.coords[0]);
-          const lng = parseFloat(center.coords[1]);
+          const lat = parseFloat(coords[0]);
+          const lng = parseFloat(coords[1]);
           if (!isNaN(lat) && !isNaN(lng)) {
             bounds.extend({ lat, lng });
             hasValidCoords = true;
@@ -124,7 +168,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
         };
       }
     }
-  }, [mapRef, centers, defaultZoom, highlightCenter]);
+  }, [mapRef, centers, defaultZoom, highlightCenter, geocodedCenters]);
 
   // Apply auto-zoom when map and centers are available
   useEffect(() => {
@@ -203,7 +247,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
           
           <div className="mt-4 text-xs text-neutral-400">
             <p>To enable maps, add a Google Maps API key to your .env.local file:</p>
-            <code className="bg-neutral-200 p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here</code>
+            <code className="bg-neutral-200 p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyDSwjt-hN-yrKevn0_-Fa5U1RrP0kLLSf0</code>
           </div>
         </div>
       </div>
@@ -314,16 +358,23 @@ const CenterMap: React.FC<CenterMapProps> = ({
           onLoad={onMapLoad}
         >
           {markersReady && centers.map((center) => {
-            if (!center.coords || center.coords.length !== 2) return null;
+            // Use original coordinates if valid, otherwise use geocoded coordinates
+            let coords = center.coords;
+            const geocodedCoords = geocodedCenters.get(center.branch_code);
+            if (!hasValidCoordinates(center) && geocodedCoords) {
+              coords = geocodedCoords;
+            }
+            
+            if (!coords || coords.length !== 2) return null;
             
             try {
               const position = {
-                lat: parseFloat(center.coords[0]),
-                lng: parseFloat(center.coords[1])
+                lat: parseFloat(coords[0]),
+                lng: parseFloat(coords[1])
               };
               
               if (isNaN(position.lat) || isNaN(position.lng)) {
-                console.warn(`Invalid coordinates for center ${center.name}:`, center.coords);
+                console.warn(`Invalid coordinates for center ${center.name}:`, coords);
                 return null;
               }
               
@@ -344,50 +395,72 @@ const CenterMap: React.FC<CenterMapProps> = ({
             }
           })}
 
-          {selectedCenter && selectedCenter.coords && selectedCenter.coords.length === 2 && (
-            <InfoWindow
-              position={{
-                lat: parseFloat(selectedCenter.coords[0]),
-                lng: parseFloat(selectedCenter.coords[1])
-              }}
-              onCloseClick={() => setSelectedCenter(null)}
-            >
-              <div className="max-w-xs">
-                <h3 className="font-semibold text-base">{selectedCenter.name}</h3>
-                {isDistrictView && selectedCenter.is_district_summary ? (
-                  <div>
-                    <p className="text-sm text-gray-700 mt-1">
-                      <span className="inline-flex items-center justify-center bg-[#FF7F50] text-white font-semibold text-sm rounded-full w-8 h-8 mr-1">
-                        {selectedCenter.district_total || 0}
-                      </span>
-                      meditation {selectedCenter.district_total === 1 ? 'center' : 'centers'} in this district
-                    </p>
-                    <div className="mt-2">
-                      <a
-                        href={`/centers/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}`}
-                        className="text-[#FF7F50] text-sm font-medium"
-                      >
-                        View Centers in {selectedCenter.district}
-                      </a>
+          {selectedCenter && (
+            (() => {
+              // Use original coordinates if valid, otherwise use geocoded coordinates
+              let coords = selectedCenter.coords;
+              const geocodedCoords = geocodedCenters.get(selectedCenter.branch_code);
+              if (!hasValidCoordinates(selectedCenter) && geocodedCoords) {
+                coords = geocodedCoords;
+              }
+              
+              if (!coords || coords.length !== 2) return null;
+              
+              try {
+                const position = {
+                  lat: parseFloat(coords[0]),
+                  lng: parseFloat(coords[1])
+                };
+                
+                if (isNaN(position.lat) || isNaN(position.lng)) return null;
+                
+                return (
+                  <InfoWindow
+                    position={position}
+                    onCloseClick={() => setSelectedCenter(null)}
+                  >
+                    <div className="max-w-xs">
+                      <h3 className="font-semibold text-base">{selectedCenter.name}</h3>
+                      {isDistrictView && selectedCenter.is_district_summary ? (
+                        <div>
+                          <p className="text-sm text-gray-700 mt-1">
+                            <span className="inline-flex items-center justify-center bg-[#FF7F50] text-white font-semibold text-sm rounded-full w-8 h-8 mr-1">
+                              {selectedCenter.district_total || 0}
+                            </span>
+                            meditation {selectedCenter.district_total === 1 ? 'center' : 'centers'} in this district
+                          </p>
+                          <div className="mt-2">
+                            <a
+                              href={`/centers/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}`}
+                              className="text-[#FF7F50] text-sm font-medium"
+                            >
+                              View Centers in {selectedCenter.district}
+                            </a>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-sm text-gray-700 mt-1">
+                            {selectedCenter.description || formatAddress(selectedCenter)}
+                          </p>
+                          <div className="mt-2">
+                            <a
+                              href={`/centers/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}/${encodeURIComponent(selectedCenter.branch_code)}`}
+                              className="text-[#FF7F50] text-sm font-medium"
+                            >
+                              View Details
+                            </a>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm text-gray-700 mt-1">
-                      {selectedCenter.description || formatAddress(selectedCenter)}
-                    </p>
-                    <div className="mt-2">
-                      <a
-                        href={`/centers/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}/${encodeURIComponent(selectedCenter.branch_code)}`}
-                        className="text-[#FF7F50] text-sm font-medium"
-                      >
-                        View Details
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </InfoWindow>
+                  </InfoWindow>
+                );
+              } catch (e) {
+                console.error(`Error creating info window for center ${selectedCenter.name}:`, e);
+                return null;
+              }
+            })()
           )}
         </GoogleMap>
       )}
