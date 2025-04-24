@@ -1,6 +1,7 @@
 // Data service for center information - client-side only
 import { Center, CentersData, RegionStateMapping, StateDistrictMapping, DistrictCentersMapping } from './types';
 import { geocodeAddress } from './geocoding';
+import { deSlugify } from './urlUtils';
 
 // Cache for data
 let centersData: CentersData | null = null;
@@ -265,10 +266,23 @@ export async function getCentersByDistrict(state: string, district: string): Pro
   return fetchCentersByDistrict(state, district);
 }
 
-export async function getCenterByCode(branchCode: string): Promise<Center | undefined> {
+export async function getCenterByCode(branchCodeOrName: string): Promise<Center | undefined> {
   // This is a relatively rare operation, so just use the full dataset
   const centers = await getAllCenters();
-  return centers.find(center => center.branch_code === branchCode);
+  
+  // First try to find by branch_code (exact match)
+  const centerByCode = centers.find(center => center.branch_code === branchCodeOrName);
+  if (centerByCode) return centerByCode;
+  
+  // If not found, try to find by name slug
+  // Convert the input to a slug format: lowercase and hyphens
+  const nameSlug = branchCodeOrName.toLowerCase().replace(/\s+/g, '-');
+  
+  // Try to find a center where the name matches the slug
+  return centers.find(center => {
+    const centerNameSlug = center.name.toLowerCase().replace(/\s+/g, '-');
+    return centerNameSlug === nameSlug;
+  });
 }
 
 export async function getCentersByCityName(cityName: string): Promise<Center[]> {
@@ -573,4 +587,64 @@ export async function getCentersByRegion(region: string): Promise<Center[]> {
   const centers = await getAllCenters();
   // Filter centers to only include those from the specified region
   return centers.filter(center => center.region === region);
+}
+
+// Helper function to find a region by its slug
+export async function getRegionBySlug(regionSlug: string): Promise<string | null> {
+  const regions = await getRegions();
+  const possibleFormats = deSlugify(regionSlug);
+  
+  // Try to find a match among possible formats
+  for (const format of possibleFormats) {
+    const match = regions.find(region => region.toLowerCase() === format.toLowerCase());
+    if (match) return match;
+  }
+  
+  // If no match found
+  console.warn(`No region found for slug: ${regionSlug}`);
+  return null;
+}
+
+// Helper function to find a state by its slug
+export async function getStateBySlug(stateSlug: string): Promise<string | null> {
+  const centers = await getAllCenters();
+  const states = new Set<string>();
+  centers.forEach(center => {
+    if (center.state) {
+      states.add(center.state);
+    }
+  });
+  
+  const possibleFormats = deSlugify(stateSlug);
+  
+  // Try to find a match among possible formats
+  for (const format of possibleFormats) {
+    const match = Array.from(states).find(state => state.toLowerCase() === format.toLowerCase());
+    if (match) return match;
+  }
+  
+  // If no match found
+  console.warn(`No state found for slug: ${stateSlug}`);
+  return null;
+}
+
+// Helper function to find a district by its slug
+export async function getDistrictBySlug(stateSlug: string, districtSlug: string): Promise<string | null> {
+  // First find the actual state name
+  const state = await getStateBySlug(stateSlug);
+  if (!state) return null;
+  
+  // Get districts for that state
+  const districts = await getDistrictsByState(state);
+  const possibleFormats = deSlugify(districtSlug);
+  
+  // Try to find a match among possible formats
+  for (const format of possibleFormats) {
+    const match = districts.find(district => district.toLowerCase() === format.toLowerCase());
+    if (match) return match;
+  }
+  
+  // If no match found
+  console.warn(`No district found for slug: ${districtSlug} in state: ${state}`);
+  return null;
 } 

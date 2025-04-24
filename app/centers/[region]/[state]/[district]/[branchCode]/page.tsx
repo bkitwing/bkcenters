@@ -6,6 +6,7 @@ import CenterMap from '@/components/CenterMap';
 import DirectionsButton from '@/components/DirectionsButton';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
+import { formatCenterUrl } from '@/lib/urlUtils';
 
 // Extended interface for centers with optional service and timing data
 interface CenterWithServices extends Center {
@@ -73,10 +74,10 @@ export async function generateStaticParams() {
           
           for (const center of limitedCenters) {
             paths.push({
-              region: center.region,
-              state: state,
-              district: district,
-              branchCode: center.branch_code,
+              region: center.region.toLowerCase(),
+              state: state.toLowerCase().replace(/\s+/g, '-'),
+              district: district.toLowerCase().replace(/\s+/g, '-'),
+              branchCode: center.name.toLowerCase().replace(/\s+/g, '-'),
             });
           }
         }
@@ -105,16 +106,17 @@ export default async function CenterPage({ params }: CenterPageProps) {
     // Check if the URL region matches the actual region
     if (urlRegion !== actualRegion && actualRegion !== 'INDIA' && center) {
       // Redirect to the correct URL
+      const formattedUrl = formatCenterUrl(actualRegion, state, district, center.name);
       return (
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl mb-4">Redirecting to correct region...</h1>
           <p>The state {state} belongs to region {actualRegion}, not {urlRegion}.</p>
           <p className="mt-4">
-            <Link href={`/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}/${encodeURIComponent(district)}/${encodeURIComponent(branchCode)}`} className="text-primary">
+            <Link href={formattedUrl} className="text-primary">
               Click here if you are not redirected automatically.
             </Link>
           </p>
-          <script dangerouslySetInnerHTML={{ __html: `window.location.href = "/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}/${encodeURIComponent(district)}/${encodeURIComponent(branchCode)}";` }} />
+          <script dangerouslySetInnerHTML={{ __html: `window.location.href = "${formattedUrl}";` }} />
         </div>
       );
     }
@@ -182,7 +184,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
               </svg>
             </li>
             <li>
-              <Link href={`/centers/${encodeURIComponent(center.region || actualRegion)}`} className="text-neutral-500 hover:text-primary">
+              <Link href={formatCenterUrl(center.region || actualRegion, "", "", "")} className="text-neutral-500 hover:text-primary">
                 {center.region || actualRegion}
               </Link>
             </li>
@@ -192,7 +194,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
               </svg>
             </li>
             <li>
-              <Link href={`/centers/${encodeURIComponent(center.region || actualRegion)}/${encodeURIComponent(center.state)}`} className="text-neutral-500 hover:text-primary">
+              <Link href={formatCenterUrl(center.region || actualRegion, center.state, "", "")} className="text-neutral-500 hover:text-primary">
                 {center.state}
               </Link>
             </li>
@@ -202,7 +204,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
               </svg>
             </li>
             <li>
-              <Link href={`/centers/${encodeURIComponent(center.region || actualRegion)}/${encodeURIComponent(center.state)}/${encodeURIComponent(center.district)}`} className="text-neutral-500 hover:text-primary">
+              <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-neutral-500 hover:text-primary">
                 {center.district}
               </Link>
             </li>
@@ -319,7 +321,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
             </div>
             
             <div className="mt-8 pt-6 border-t border-neutral-200">
-              <Link href={`/centers/${encodeURIComponent(center.region || actualRegion)}/${encodeURIComponent(center.state)}/${encodeURIComponent(center.district)}`} className="text-primary hover:underline inline-flex items-center">
+              <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-primary hover:underline inline-flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -349,7 +351,7 @@ function EmptyCenterView({ region, state, district, branchCode }: { region: stri
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href={`/centers/${encodeURIComponent(region)}/${encodeURIComponent(state)}/${encodeURIComponent(district)}`} className="btn-primary">
+          <Link href={formatCenterUrl(region, state, district, "")} className="btn-primary">
             View Other Centers in {district}
           </Link>
           <Link href="/centers" className="btn-secondary">

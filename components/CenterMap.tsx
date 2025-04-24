@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Center } from '@/lib/types';
 import { useGoogleMaps } from '@/lib/useGoogleMaps';
 import { geocodeAddress, hasValidCoordinates } from '@/lib/geocoding';
+import { formatCenterUrl } from '@/lib/urlUtils';
 
 interface CenterMapProps {
   centers: Center[];
@@ -469,7 +470,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
                           </p>
                           <div className="mt-2">
                             <a
-                              href={`/centers/${encodeURIComponent(selectedCenter.region)}/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}`}
+                              href={formatCenterUrl(selectedCenter.region, selectedCenter.state, selectedCenter.district)}
                               className="text-[#FF7F50] text-sm font-medium"
                             >
                               View Centers in {selectedCenter.district}
@@ -483,7 +484,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
                           </p>
                           <div className="mt-2">
                             <a
-                              href={`/centers/${encodeURIComponent(selectedCenter.region)}/${encodeURIComponent(selectedCenter.state)}/${encodeURIComponent(selectedCenter.district)}/${encodeURIComponent(selectedCenter.branch_code)}`}
+                              href={formatCenterUrl(selectedCenter.region, selectedCenter.state, selectedCenter.district, selectedCenter.name)}
                               className="text-[#FF7F50] text-sm font-medium"
                             >
                               View Details

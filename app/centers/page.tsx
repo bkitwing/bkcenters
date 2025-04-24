@@ -18,6 +18,7 @@ import SearchBar from '@/components/SearchBar';
 import CenterCard from '@/components/CenterCard';
 import CenterMap from '@/components/CenterMap';
 import { Center, RegionStateMapping } from '@/lib/types';
+import { formatCenterUrl } from '@/lib/urlUtils';
 
 type StateSummary = {
   state: string;
@@ -262,7 +263,7 @@ export default function CentersPage() {
     // Handle state selection from map
     if (center.is_state_summary) {
       // Use the center's actual region from data
-      window.location.href = `/centers/${encodeURIComponent(center.region)}/${encodeURIComponent(center.state)}`;
+      window.location.href = formatCenterUrl(center.region, center.state);
       return;
     }
     
@@ -520,7 +521,7 @@ export default function CentersPage() {
                               .map(([state, stateData]) => (
                                 <Link
                                   key={state}
-                                  href={`/centers/${encodeURIComponent(region)}/${encodeURIComponent(state)}`}
+                                  href={formatCenterUrl(region, state)}
                                   className="bg-light p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 flex flex-col"
                                 >
                                   <h3 className="text-lg font-semibold mb-2 text-spirit-purple-700">{state}</h3>

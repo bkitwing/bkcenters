@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Center } from '@/lib/types';
 import DirectionsButton from './DirectionsButton';
+import { formatCenterUrl } from '@/lib/urlUtils';
 
 interface CenterCardProps {
   center: Center;
@@ -48,7 +49,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
   const handleShare = async () => {
     const centerName = center.name;
     const centerAddress = formatAddress(center);
-    const shareUrl = `${window.location.origin}/centers/${encodeURIComponent(center.region)}/${encodeURIComponent(center.state)}/${encodeURIComponent(center.district)}/${encodeURIComponent(center.branch_code)}`;
+    const shareUrl = `${window.location.origin}${formatCenterUrl(center.region, center.state, center.district, center.name)}`;
     
     const shareData = {
       title: `${centerName} - Brahma Kumaris Meditation Center`,
@@ -72,7 +73,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
   
   const formattedAddress = formatAddress(center);
   const hasAddress = formattedAddress.length > 0;
-  const fullUrl = `/centers/${encodeURIComponent(center.region)}/${encodeURIComponent(center.state)}/${encodeURIComponent(center.district)}/${encodeURIComponent(center.branch_code)}`;
+  const fullUrl = formatCenterUrl(center.region, center.state, center.district, center.name);
   const hasContactInfo = center.contact || center.mobile || center.email;
   
   return (

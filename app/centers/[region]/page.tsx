@@ -6,11 +6,13 @@ import {
   getAllCenters, 
   getRegions,
   getCentersByRegion,
-  getStatesByRegionFast
+  getStatesByRegionFast,
+  getRegionBySlug
 } from '@/lib/centerData';
 import { Metadata } from 'next';
 import CenterMap from '@/components/CenterMap';
 import { Center } from '@/lib/types';
+import { formatCenterUrl } from '@/lib/urlUtils';
 
 // Define a unified type for state data
 interface StateData {
@@ -26,17 +28,19 @@ interface RegionPageProps {
 }
 
 export async function generateMetadata({ params }: RegionPageProps): Promise<Metadata> {
-  const region = decodeURIComponent(params.region);
+  const regionSlug = decodeURIComponent(params.region);
+  const actualRegion = await getRegionBySlug(regionSlug) || regionSlug;
   
   return {
-    title: `${region} Meditation Centers`,
-    description: `Find Brahma Kumaris meditation centers in ${region}. View locations by state, district, and more.`,
-    keywords: `Brahma Kumaris, meditation centers, ${region}, spiritual centers, India`,
+    title: `${actualRegion} Meditation Centers`,
+    description: `Find Brahma Kumaris meditation centers in ${actualRegion}. View locations by state, district, and more.`,
+    keywords: `Brahma Kumaris, meditation centers, ${actualRegion}, spiritual centers, India`,
   };
 }
 
 export default async function RegionPage({ params }: RegionPageProps) {
-  const region = decodeURIComponent(params.region);
+  const regionSlug = decodeURIComponent(params.region);
+  const region = await getRegionBySlug(regionSlug) || regionSlug;
   
   // If the region is INDIA, show all states grouped by their regions
   let states;
@@ -175,7 +179,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
           .map(regionName => (
             <div key={regionName} className="mb-10">
               <h2 className="text-2xl font-semibold mb-4 text-spirit-blue-700">
-                <Link href={`/centers/${encodeURIComponent(regionName)}`} className="hover:underline">
+                <Link href={formatCenterUrl(regionName)} className="hover:underline">
                   {regionName}
                 </Link>
               </h2>
@@ -183,7 +187,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
                 {statesByRegion[regionName].map(state => (
                   <Link
                     key={state.name}
-                    href={`/centers/${encodeURIComponent(regionName)}/${encodeURIComponent(state.name)}`}
+                    href={formatCenterUrl(regionName, state.name)}
                     className="bg-light p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 block"
                   >
                     <h3 className="text-xl font-semibold mb-2 text-spirit-purple-700">{state.name}</h3>
@@ -204,7 +208,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
           {states.map(state => (
             <Link
               key={state.name}
-              href={`/centers/${encodeURIComponent(region)}/${encodeURIComponent(state.name)}`}
+              href={formatCenterUrl(region, state.name)}
               className="bg-light p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 block"
             >
               <h2 className="text-xl font-semibold mb-2 text-spirit-purple-700">{state.name}</h2>

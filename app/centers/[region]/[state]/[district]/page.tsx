@@ -1,9 +1,17 @@
 import React from 'react';
 import Link from 'next/link';
-import { getCentersByDistrict, getDistrictsByState, getRegionForState } from '@/lib/centerData';
+import { 
+  getCentersByDistrict, 
+  getDistrictsByState, 
+  getRegionForState,
+  getRegionBySlug,
+  getStateBySlug,
+  getDistrictBySlug
+} from '@/lib/centerData';
 import CenterCard from '@/components/CenterCard';
 import CenterMap from '@/components/CenterMap';
 import { Metadata } from 'next';
+import { formatCenterUrl } from '@/lib/urlUtils';
 
 interface DistrictPageProps {
   params: {
@@ -14,43 +22,51 @@ interface DistrictPageProps {
 }
 
 export async function generateMetadata({ params }: DistrictPageProps): Promise<Metadata> {
-  const state = decodeURIComponent(params.state);
-  const district = decodeURIComponent(params.district);
+  const stateSlug = decodeURIComponent(params.state);
+  const districtSlug = decodeURIComponent(params.district);
+  
+  const actualState = await getStateBySlug(stateSlug) || stateSlug;
+  const actualDistrict = await getDistrictBySlug(stateSlug, districtSlug) || districtSlug;
   
   // Get all centers in this district to determine the correct region
-  const centers = await getCentersByDistrict(state, district);
+  const centers = await getCentersByDistrict(actualState, actualDistrict);
   const actualRegion = centers.length > 0 ? centers[0].region : decodeURIComponent(params.region);
   
   return {
-    title: `${district} Meditation Centers - ${state}, ${actualRegion}`,
-    description: `Find Brahma Kumaris meditation centers in ${district}, ${state}. View locations, contact information, and more.`,
-    keywords: `Brahma Kumaris, meditation centers, ${district}, ${state}, spiritual centers, India`,
+    title: `${actualDistrict} Meditation Centers - ${actualState}, ${actualRegion}`,
+    description: `Find Brahma Kumaris meditation centers in ${actualDistrict}, ${actualState}. View locations, contact information, and more.`,
+    keywords: `Brahma Kumaris, meditation centers, ${actualDistrict}, ${actualState}, spiritual centers, India`,
   };
 }
 
 export default async function DistrictPage({ params }: DistrictPageProps) {
-  const urlRegion = decodeURIComponent(params.region);
-  const state = decodeURIComponent(params.state);
-  const district = decodeURIComponent(params.district);
+  const regionSlug = decodeURIComponent(params.region);
+  const stateSlug = decodeURIComponent(params.state);
+  const districtSlug = decodeURIComponent(params.district);
+  
+  // Get actual names from slugs
+  const actualRegion = await getRegionBySlug(regionSlug) || regionSlug;
+  const actualState = await getStateBySlug(stateSlug) || stateSlug;
+  const actualDistrict = await getDistrictBySlug(stateSlug, districtSlug) || districtSlug;
   
   // Get the actual region for this state from our data
-  const actualRegion = await getRegionForState(state);
+  const stateRegion = await getRegionForState(actualState);
   
-  const centers = await getCentersByDistrict(state, district);
+  const centers = await getCentersByDistrict(actualState, actualDistrict);
   
   // Check if the URL region matches the actual region
-  if (urlRegion !== actualRegion && actualRegion !== 'INDIA') {
+  if (actualRegion !== stateRegion && stateRegion !== 'INDIA') {
     // Redirect to the correct URL
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl mb-4">Redirecting to correct region...</h1>
-        <p>The state {state} belongs to region {actualRegion}, not {urlRegion}.</p>
+        <p>The state {actualState} belongs to region {stateRegion}, not {actualRegion}.</p>
         <p className="mt-4">
-          <Link href={`/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}/${encodeURIComponent(district)}`} className="text-primary">
+          <Link href={formatCenterUrl(stateRegion, actualState, actualDistrict)} className="text-primary">
             Click here if you are not redirected automatically.
           </Link>
         </p>
-        <script dangerouslySetInnerHTML={{ __html: `window.location.href = "/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}/${encodeURIComponent(district)}";` }} />
+        <script dangerouslySetInnerHTML={{ __html: `window.location.href = "${formatCenterUrl(stateRegion, actualState, actualDistrict)}";` }} />
       </div>
     );
   }
@@ -71,8 +87,8 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
             </svg>
           </li>
           <li>
-            <Link href={`/centers/${encodeURIComponent(actualRegion)}`} className="text-neutral-500 hover:text-primary">
-              {actualRegion}
+            <Link href={formatCenterUrl(stateRegion)} className="text-neutral-500 hover:text-primary">
+              {stateRegion}
             </Link>
           </li>
           <li className="flex items-center">
@@ -81,8 +97,8 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
             </svg>
           </li>
           <li>
-            <Link href={`/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}`} className="text-neutral-500 hover:text-primary">
-              {state}
+            <Link href={formatCenterUrl(stateRegion, actualState)} className="text-neutral-500 hover:text-primary">
+              {actualState}
             </Link>
           </li>
           <li className="flex items-center">
@@ -92,15 +108,15 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
           </li>
           <li>
             <span className="font-medium text-primary">
-              {district}
+              {actualDistrict}
             </span>
           </li>
         </ol>
       </nav>
       
-      <h1 className="text-3xl font-bold mb-2 text-spirit-purple-700">{district} Centers</h1>
+      <h1 className="text-3xl font-bold mb-2 text-spirit-purple-700">{actualDistrict} Centers</h1>
       <p className="text-neutral-600 mb-6">
-        {centers.length} Brahma Kumaris meditation {centers.length === 1 ? 'center' : 'centers'} in {district}, {state}
+        {centers.length} Brahma Kumaris meditation {centers.length === 1 ? 'center' : 'centers'} in {actualDistrict}, {actualState}
       </p>
       
       {centers.length > 0 && (
@@ -113,7 +129,7 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
             {centers.map((center) => (
               <Link
                 key={center.branch_code}
-                href={`/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}/${encodeURIComponent(district)}/${encodeURIComponent(center.branch_code)}`}
+                href={formatCenterUrl(stateRegion, actualState, actualDistrict, center.name)}
                 className="block"
               >
                 <CenterCard center={center} />
@@ -130,12 +146,12 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
           </svg>
           <h2 className="text-2xl font-bold mb-4 text-neutral-700">No Centers Found</h2>
           <p className="text-neutral-600 mb-6">
-            We couldn't find any meditation centers in {district}, {state}.
+            We couldn't find any meditation centers in {actualDistrict}, {actualState}.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href={`/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}`} className="btn-primary">
-              View Other Districts in {state}
+            <Link href={formatCenterUrl(stateRegion, actualState)} className="btn-primary">
+              View Other Districts in {actualState}
             </Link>
             <Link href="/centers" className="btn-secondary">
               Explore All Centers
@@ -145,11 +161,11 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
       )}
       
       <div className="mt-8 pt-6 border-t border-neutral-200">
-        <Link href={`/centers/${encodeURIComponent(actualRegion)}/${encodeURIComponent(state)}`} className="text-primary hover:underline inline-flex items-center">
+        <Link href={formatCenterUrl(stateRegion, actualState)} className="text-primary hover:underline inline-flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to {state} Districts
+          Back to {actualState} Districts
         </Link>
       </div>
     </div>
