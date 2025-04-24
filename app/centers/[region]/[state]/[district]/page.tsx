@@ -114,7 +114,7 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
         </ol>
       </nav>
       
-      <h1 className="text-2xl font-bold mb-2 text-spirit-purple-700">{actualDistrict} Centers</h1>
+      <h1 className="text-3xl mb-2 font-bold spiritual-text-gradient">{actualDistrict} Centers</h1>
       <p className="text-sm text-neutral-600 mb-6">
         {centers.length} Brahma Kumaris meditation {centers.length === 1 ? 'center' : 'centers'} in {actualDistrict}, {actualState}
       </p>

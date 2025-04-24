@@ -147,11 +147,11 @@ export default async function RegionPage({ params }: RegionPageProps) {
         </ol>
       </nav>
       
-      <h1 className="text-3xl font-bold mb-2 text-spirit-purple-700">{region} Centers</h1>
+      <h1 className="text-3xl font-bold mb-4 spiritual-text-gradient">{region} Centers</h1>
       
       {/* Statistics summary for the region */}
       <div className="bg-light rounded-lg shadow-md p-4 mb-6 border border-neutral-200">
-        <h3 className="font-semibold text-lg mb-3 text-primary">Centers Overview</h3>
+        <h3 className="text-xl mb-3 font-bold spiritual-text-gradient">Centers Overview</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-spirit-purple-50 p-3 rounded-lg border border-spirit-purple-100">
             <div className="text-primary text-2xl font-bold">{totalCenters}</div>

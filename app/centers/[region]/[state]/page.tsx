@@ -126,7 +126,7 @@ export default async function StatePage({ params }: StatePageProps) {
         </ol>
       </nav>
       
-      <h1 className="text-2xl font-bold mb-2 text-spirit-purple-700">{actualState} Centers</h1>
+      <h1 className="text-3xl font-bold spiritual-text-gradient">{actualState} Centers</h1>
       <p className="text-sm text-neutral-600 mb-6">
         {centers.length} Brahma Kumaris meditation {centers.length === 1 ? 'center' : 'centers'} across {districts.length} {districts.length === 1 ? 'district' : 'districts'} in {actualState}, {stateRegion}
       </p>
@@ -146,7 +146,7 @@ export default async function StatePage({ params }: StatePageProps) {
         
         <div className="md:col-span-2">
           <div className="bg-light rounded-lg shadow-md p-4 border border-neutral-200 h-full">
-            <h2 className="text-xl font-semibold mb-4 text-spirit-blue-700">Districts in {actualState}</h2>
+            <h2 className="text-xl mb-4 font-bold spiritual-text-gradient">Districts in {actualState}</h2>
             <div className="space-y-4 max-h-[420px] overflow-y-auto pr-2">
               {districtSummary.map(item => (
                 <Link 
