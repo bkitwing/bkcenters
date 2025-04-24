@@ -21,6 +21,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -32,6 +33,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
       initAutocomplete();
     }
   }, [isLoaded]);
+  
+  useEffect(() => {
+    // Initialize from URL parameters
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const addressParam = params.get('address');
+      
+      if (addressParam) {
+        setInputValue(decodeURIComponent(addressParam));
+      }
+    }
+  }, []);
   
   const initAutocomplete = () => {
     if (!inputRef.current || !window.google?.maps?.places) return;
@@ -54,11 +67,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
         const lng = place.geometry.location.lng();
         const address = place.formatted_address;
         
+        // Update input value to match selected place
+        setInputValue(address);
+        
         if (onSearchResult) {
           onSearchResult(lat, lng, address);
         } else {
           // Navigate to results page with query params
           router.push(`/centers?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
+          
+          // Also update URL for shareability without page reload
+          const url = `/centers?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`;
+          window.history.pushState({ path: url }, '', url);
         }
       });
     } catch (error) {
@@ -97,6 +117,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
             });
             
             address = response as string;
+            
+            // Update the input field with the resolved address
+            if (inputRef.current) {
+              inputRef.current.value = address;
+              setInputValue(address);
+            }
           }
           
           if (onSearchResult) {
@@ -104,6 +130,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           } else {
             // Navigate to results page with query params
             router.push(`/centers?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent(address)}`);
+            
+            // Also update URL for shareability without page reload
+            const url = `/centers?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent(address)}`;
+            window.history.pushState({ path: url }, '', url);
           }
           
           setIsLocating(false);
@@ -140,6 +170,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
     );
   };
   
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+  
   // Show loading state while Google Maps is loading
   useEffect(() => {
     setIsLoading(!isLoaded);
@@ -152,6 +187,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <input
             ref={inputRef}
             type="text"
+            value={inputValue}
+            onChange={handleInputChange}
             className="w-full p-4 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent"
             placeholder={!hasValidKey ? "Location search unavailable (API key missing)" : placeholder}
             disabled={isLoading || !hasValidKey || !!loadError}

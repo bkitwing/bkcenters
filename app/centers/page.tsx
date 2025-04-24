@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getStatesSummary, getNearestCenters, getAllCenters, getRegions, getRegionForState } from '@/lib/centerData';
 import SearchBar from '@/components/SearchBar';
@@ -20,16 +20,22 @@ type ViewMode = 'list' | 'map';
 
 export default function CentersPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [address, setAddress] = useState<string>('');
   const [nearestCenters, setNearestCenters] = useState<(Center & { distance?: number })[]>([]);
+  const [allNearestCenters, setAllNearestCenters] = useState<(Center & { distance?: number })[]>([]);
   const [statesSummary, setStatesSummary] = useState<StateSummary[]>([]);
   const [allCenters, setAllCenters] = useState<Center[]>([]);
   const [regions, setRegions] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('alpha');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
+  const [maxDistance, setMaxDistance] = useState<number>(20);
+  const [displayLimit, setDisplayLimit] = useState<number>(10);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const resultsContainerRef = useRef<HTMLDivElement>(null);
 
   // Get summarized center data for map markers
   const stateMapMarkers = useMemo(() => {
@@ -100,8 +106,18 @@ export default function CentersPage() {
       if (lat && lng) {
         setLoading(true);
         try {
-          const centers = await getNearestCenters(lat, lng, 10);
-          setNearestCenters(centers);
+          // Fetch up to 150 centers instead of 100
+          const centers = await getNearestCenters(lat, lng, 150);
+          setAllNearestCenters(centers);
+          
+          // Apply distance filter
+          const filteredCenters = centers.filter(c => 
+            typeof c.distance === 'number' && c.distance <= maxDistance
+          );
+          
+          // Initial set of centers
+          setNearestCenters(filteredCenters.slice(0, 10));
+          setDisplayLimit(10);
         } catch (error) {
           console.error('Error fetching nearest centers:', error);
         } finally {
@@ -111,8 +127,66 @@ export default function CentersPage() {
     }
 
     fetchCenters();
-  }, [lat, lng]);
-  
+  }, [lat, lng, maxDistance]);
+
+  // Intersection observer for lazy loading
+  useEffect(() => {
+    if (!resultsContainerRef.current) return;
+    
+    const options = {
+      root: resultsContainerRef.current,
+      rootMargin: '100px',
+      threshold: 0.1
+    };
+    
+    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting && !loadingMore) {
+        const filteredCenters = allNearestCenters.filter(c => 
+          typeof c.distance === 'number' && c.distance <= maxDistance
+        );
+        
+        if (nearestCenters.length < filteredCenters.length) {
+          setLoadingMore(true);
+          
+          // Save the current scroll position
+          const scrollContainer = resultsContainerRef.current;
+          const scrollPosition = scrollContainer?.scrollTop;
+          
+          // Pre-calculate the next batch of centers to prevent flickering
+          const nextBatchSize = 10;
+          const nextCenters = [...nearestCenters, ...filteredCenters.slice(nearestCenters.length, nearestCenters.length + nextBatchSize)];
+          
+          // Update centers with the combined array to prevent re-renders
+          setNearestCenters(nextCenters);
+          
+          // Restore scroll position after state update
+          requestAnimationFrame(() => {
+            if (scrollContainer && scrollPosition !== undefined) {
+              scrollContainer.scrollTop = scrollPosition;
+            }
+            setLoadingMore(false);
+          });
+        }
+      }
+    };
+    
+    const observer = new IntersectionObserver(handleIntersect, options);
+    
+    // Target the sentinel element
+    const sentinel = document.getElementById('lazy-load-sentinel');
+    if (sentinel) {
+      observer.observe(sentinel);
+    }
+    
+    return () => {
+      if (sentinel) {
+        observer.unobserve(sentinel);
+      }
+      observer.disconnect();
+    };
+  }, [nearestCenters, allNearestCenters, maxDistance, loadingMore]);
+
   // Handle sort change
   const handleSortChange = (option: SortOption) => {
     setSortBy(option);
@@ -136,6 +210,10 @@ export default function CentersPage() {
     setLat(latitude);
     setLng(longitude);
     setAddress(searchedAddress);
+    
+    // Update URL for shareability without page reload
+    const url = `/centers?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent(searchedAddress)}`;
+    window.history.pushState({ path: url }, '', url);
   };
 
   const handleCenterSelect = (center: Center) => {
@@ -204,12 +282,51 @@ export default function CentersPage() {
     );
   };
 
+  // Handle distance filter change
+  const handleDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDistance = Number(e.target.value);
+    setMaxDistance(newDistance);
+    
+    // Apply the new distance filter smoothly
+    const filteredCenters = allNearestCenters.filter(c => 
+      typeof c.distance === 'number' && c.distance <= newDistance
+    );
+    
+    // Preserve scroll position by keeping the same centers if possible
+    if (filteredCenters.length > 0) {
+      setNearestCenters(filteredCenters.slice(0, 10));
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center spiritual-text-gradient">Find Meditation Centers</h1>
       
       <div className="mb-8 max-w-2xl mx-auto">
         <SearchBar onSearchResult={handleSearchResult} />
+        
+        {lat && lng && (
+          <div className="mt-4 px-2">
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="distance-slider" className="text-sm font-medium text-gray-700">
+                Max Distance: {maxDistance} km
+              </label>
+              <span className="text-xs text-gray-500">
+                {allNearestCenters.filter(c => typeof c.distance === 'number' && c.distance <= maxDistance).length} centers found
+              </span>
+            </div>
+            <input 
+              id="distance-slider"
+              type="range" 
+              min="5" 
+              max="150" 
+              step="5"
+              value={maxDistance}
+              onChange={handleDistanceChange}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -232,12 +349,29 @@ export default function CentersPage() {
                   />
                 </div>
                 
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                <div 
+                  ref={resultsContainerRef}
+                  className="space-y-4 max-h-[500px] overflow-y-auto pr-2 relative"
+                >
                   {nearestCenters.map((center) => (
                     <div key={center.branch_code} id={`center-${center.branch_code}`} className="transition-colors duration-300">
                       <CenterCard center={center} distance={center.distance} showDistance={true} />
                     </div>
                   ))}
+                  
+                  {/* Invisible sentinel that doesn't cause layout shifts */}
+                  <div 
+                    id="lazy-load-sentinel" 
+                    className="h-1 opacity-0"
+                    aria-hidden="true"
+                  ></div>
+                  
+                  {/* Floating loading indicator that doesn't disrupt content */}
+                  {loadingMore && (
+                    <div className="absolute bottom-0 left-0 right-0 flex justify-center py-2 bg-white/80">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

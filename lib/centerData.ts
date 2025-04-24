@@ -190,7 +190,7 @@ export async function getNearestCenters(latitude: number, longitude: number, lim
     return R * c; // Distance in km
   };
 
-  // Process centers and calculate distances
+  // Process centers and calculate distances - limit has been increased to support lazy loading
   const processedCenters = await Promise.all(centers.map(async (center) => {
     // Try to get coordinates from the center
     let lat: number | null = null;
@@ -230,9 +230,10 @@ export async function getNearestCenters(latitude: number, longitude: number, lim
   }));
 
   // Sort centers by distance and return the requested number
+  // Now supports larger limits for lazy loading and pagination
   return processedCenters
     .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity))
-    .slice(0, limit);
+    .slice(0, Math.min(limit, 1000)); // Increased upper bound to 1000 for better lazy loading
 }
 
 export async function getStateData(state: string): Promise<{ 
