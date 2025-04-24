@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Center } from '@/lib/types';
 import { useGoogleMaps } from '@/lib/useGoogleMaps';
-import { geocodeAddress, hasValidCoordinates } from '@/lib/geocoding';
+import { geocodeAddress, hasValidCoordinates, geocodeState } from '@/lib/geocoding';
 import { formatCenterUrl } from '@/lib/urlUtils';
 
 interface CenterMapProps {
@@ -123,7 +123,16 @@ const CenterMap: React.FC<CenterMapProps> = ({
         console.log(`Geocoding center ${processedCount}/${centers.length}: ${center.name}`);
         
         try {
-          const coords = await geocodeAddress(center);
+          let coords;
+          
+          // Use state-specific geocoding for state summary markers
+          if (center.is_state_summary && center.state) {
+            coords = await geocodeState(center.state);
+            console.log(`Used state-specific geocoding for ${center.state}`);
+          } else {
+            coords = await geocodeAddress(center);
+          }
+          
           if (coords) {
             updatedGeocodedCenters.set(center.branch_code, coords);
             hasNewGeocodedCenters = true;
@@ -330,6 +339,33 @@ const CenterMap: React.FC<CenterMapProps> = ({
       };
     }
     
+    // For state summary on homepage
+    if (center.is_state_summary) {
+      const count = center.district_total || 0;
+      
+      // Calculate color intensity based on center count
+      // Higher count = darker purple
+      // Lower count = lighter purple
+      let opacity = 0.4 + Math.min(count / 100, 0.6); // Scale opacity between 0.4 and 1.0
+      let scale = 12 + Math.min(count / 10, 8); // Scale size between 12 and 20
+      
+      // For very small numbers, ensure they're still visible
+      if (count <= 5) {
+        opacity = 0.4;
+        scale = 12;
+      }
+      
+      return {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#7E57C2', // Primary purple
+        fillOpacity: opacity,
+        scale: scale,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2,
+        labelOrigin: new google.maps.Point(0, 0)
+      };
+    }
+    
     // For highlighted centers (individual center view)
     if (highlightCenter && center.is_highlighted) {
       return {
@@ -367,14 +403,26 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
   // Custom label for district markers
   const getMarkerLabel = (center: Center) => {
-    if (!isDistrictView) return undefined;
+    if (isDistrictView) {
+      return {
+        text: `${center.district_total || ''}`,
+        color: 'white',
+        fontSize: '11px',
+        fontWeight: 'bold'
+      };
+    }
     
-    return {
-      text: `${center.district_total || ''}`,
-      color: 'white',
-      fontSize: '11px',
-      fontWeight: 'bold'
-    };
+    // Add labels for state summary markers on homepage
+    if (center.is_state_summary) {
+      return {
+        text: `${center.district_total || ''}`,
+        color: 'white',
+        fontSize: '11px',
+        fontWeight: 'bold'
+      };
+    }
+    
+    return undefined;
   };
 
   // Add a formatAddress helper function before the return statement

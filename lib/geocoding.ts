@@ -91,4 +91,64 @@ export function hasValidCoordinates(center: Center): boolean {
   }
   
   return isValid;
+}
+
+// Function to geocode a state name for better map placement
+export async function geocodeState(stateName: string, country: string = 'India'): Promise<[string, string] | null> {
+  // Skip if Google Maps API is not loaded
+  if (!window.google?.maps?.Geocoder) {
+    console.warn('Google Maps API not loaded, cannot geocode state - waiting for API to load');
+    
+    // Try again after a short delay if we're still loading
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!window.google?.maps?.Geocoder) {
+        console.error('Google Maps API still not loaded after waiting');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error during geocoding retry wait:', error);
+      return null;
+    }
+  }
+
+  try {
+    // Format the state query with country for better precision
+    const addressString = `${stateName}, ${country}`;
+    
+    console.log(`Geocoding state: ${addressString}`);
+
+    // Create a new geocoder instance
+    const geocoder = new window.google.maps.Geocoder();
+    
+    // Return a promise to handle the asynchronous geocoding request
+    return new Promise((resolve, reject) => {
+      geocoder.geocode(
+        { 
+          address: addressString,
+          componentRestrictions: {
+            country: 'IN', // ISO code for India
+            administrativeArea: stateName
+          } 
+        }, 
+        (results: any, status: any) => {
+          if (status === "OK" && results && results.length > 0) {
+            const location = results[0].geometry.location;
+            const coords: [string, string] = [
+              location.lat().toString(),
+              location.lng().toString()
+            ];
+            console.log(`Successfully geocoded state ${stateName}: ${coords[0]}, ${coords[1]}`);
+            resolve(coords);
+          } else {
+            console.warn(`Geocoding failed for state: ${addressString}`, status);
+            reject(null);
+          }
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Error during state geocoding:', error);
+    return null;
+  }
 } 

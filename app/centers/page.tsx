@@ -42,7 +42,7 @@ export default function CentersPage() {
   const [regions, setRegions] = useState<string[]>([]);
   const [regionDetails, setRegionDetails] = useState<{name: string; stateCount: number; centerCount: number}[]>([]);
   const [regionToStates, setRegionToStates] = useState<RegionStateMapping>({});
-  const [sortBy, setSortBy] = useState<SortOption>('alpha');
+  const [sortBy, setSortBy] = useState<SortOption>('centers');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
   const [maxDistance, setMaxDistance] = useState<number>(20);
@@ -313,7 +313,7 @@ export default function CentersPage() {
           </div>
           <div className="bg-spirit-blue-50 p-3 rounded-lg border border-spirit-blue-100">
             <div className="text-secondary text-2xl font-bold">{totalRegions}</div>
-            <div className="text-neutral-600 text-sm">Regions</div>
+            <div className="text-neutral-600 text-sm">Country</div>
           </div>
           <div className="bg-spirit-teal-50 p-3 rounded-lg border border-spirit-teal-100">
             <div className="text-secondary text-2xl font-bold">{totalStates}</div>
@@ -426,7 +426,6 @@ export default function CentersPage() {
           ) : (
             <div className="mb-12">
               <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-                <h2 className="text-2xl font-semibold text-spirit-purple-700">Browse Centers by Region</h2>
                 
                 <div className="flex flex-wrap gap-4 items-center">
                   <div className="flex rounded-md overflow-hidden border border-neutral-300">
@@ -511,7 +510,7 @@ export default function CentersPage() {
                             </div>
                           </div>
                           
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                             {Object.entries(regionData.states)
                               .sort(([stateA], [stateB]) => 
                                 sortBy === 'alpha' 
@@ -522,22 +521,37 @@ export default function CentersPage() {
                                 <Link
                                   key={state}
                                   href={formatCenterUrl(region, state)}
-                                  className="bg-light p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 flex flex-col"
+                                  className="bg-light p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-neutral-200 flex flex-col"
                                 >
-                                  <h3 className="text-lg font-semibold mb-2 text-spirit-purple-700">{state}</h3>
-                                  <div className="text-neutral-600 text-sm">
-                                    {stateData.centerCount} {stateData.centerCount === 1 ? 'center' : 'centers'} in {stateData.districtCount} {stateData.districtCount === 1 ? 'district' : 'districts'}
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h3 className="text-base font-semibold text-spirit-purple-700 truncate pr-1">{state}</h3>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0 text-spirit-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
                                   </div>
-                                  <div className="mt-auto pt-3 text-primary text-sm font-medium">
+                                  <div className="text-neutral-600 text-xs flex flex-col gap-1">
+                                    <div className="flex items-center">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-spirit-purple-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                      </svg>
+                                      <span>{stateData.centerCount} {stateData.centerCount === 1 ? 'center' : 'centers'}</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-spirit-blue-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      </svg>
+                                      <span>{stateData.districtCount} {stateData.districtCount === 1 ? 'district' : 'districts'}</span>
+                                    </div>
                                   </div>
                                 </Link>
-                              ))
-                            }
+                              ))}
                           </div>
                         </div>
                       ))
                   ) : (
-                    <div className="text-center py-8 text-neutral-500">
+                    <div className="text-center text-neutral-500">
                       No regions found
                     </div>
                   )}
@@ -549,4 +563,4 @@ export default function CentersPage() {
       )}
     </div>
   );
-} 
+}
