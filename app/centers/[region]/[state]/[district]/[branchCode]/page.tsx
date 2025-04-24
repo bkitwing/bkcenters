@@ -223,8 +223,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
         
         <div className="bg-light rounded-lg shadow-lg overflow-hidden mb-8 border border-neutral-200">
           <div className="p-6">
-            <h1 className="text-3xl font-bold mb-2 text-spirit-purple-700">{center.name}</h1>
-            <p className="text-neutral-600 text-lg">
+            <h1 className="text-2xl font-bold mb-2 text-spirit-purple-700">{center.name}</h1>
+            <p className="text-sm text-neutral-600">
               Brahma Kumaris Meditation Center
             </p>
             

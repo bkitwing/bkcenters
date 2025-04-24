@@ -348,7 +348,7 @@ export default function CentersPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center spiritual-text-gradient">Find Meditation Centers</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center spiritual-text-gradient">Find Meditation Centers</h1>
       
       <div className="mb-8 max-w-2xl mx-auto">
         <SearchBar onSearchResult={handleSearchResult} />
@@ -385,7 +385,7 @@ export default function CentersPage() {
         <>
           {lat && lng && nearestCenters.length > 0 ? (
             <div className="mb-12">
-              <h2 className="text-2xl font-semibold mb-4 text-spirit-teal-600">Nearest Centers to {address}</h2>
+              <h2 className="text-xl font-semibold mb-4 text-spirit-teal-600">Nearest Centers to {address}</h2>
               
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
@@ -441,7 +441,7 @@ export default function CentersPage() {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                       </svg>
-                      List View
+                     
                     </button>
                     <button
                       onClick={() => handleViewModeChange('map')}
@@ -454,7 +454,7 @@ export default function CentersPage() {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                       </svg>
-                      Map View
+                   
                     </button>
                   </div>
 
@@ -529,7 +529,6 @@ export default function CentersPage() {
                                     {stateData.centerCount} {stateData.centerCount === 1 ? 'center' : 'centers'} in {stateData.districtCount} {stateData.districtCount === 1 ? 'district' : 'districts'}
                                   </div>
                                   <div className="mt-auto pt-3 text-primary text-sm font-medium">
-                                    View centers →
                                   </div>
                                 </Link>
                               ))

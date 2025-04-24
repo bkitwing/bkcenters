@@ -126,8 +126,8 @@ export default async function StatePage({ params }: StatePageProps) {
         </ol>
       </nav>
       
-      <h1 className="text-3xl font-bold mb-2 text-spirit-purple-700">{actualState} Centers</h1>
-      <p className="text-neutral-600 mb-6">
+      <h1 className="text-2xl font-bold mb-2 text-spirit-purple-700">{actualState} Centers</h1>
+      <p className="text-sm text-neutral-600 mb-6">
         {centers.length} Brahma Kumaris meditation {centers.length === 1 ? 'center' : 'centers'} across {districts.length} {districts.length === 1 ? 'district' : 'districts'} in {actualState}, {stateRegion}
       </p>
       

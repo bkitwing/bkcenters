@@ -114,8 +114,8 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
         </ol>
       </nav>
       
-      <h1 className="text-3xl font-bold mb-2 text-spirit-purple-700">{actualDistrict} Centers</h1>
-      <p className="text-neutral-600 mb-6">
+      <h1 className="text-2xl font-bold mb-2 text-spirit-purple-700">{actualDistrict} Centers</h1>
+      <p className="text-sm text-neutral-600 mb-6">
         {centers.length} Brahma Kumaris meditation {centers.length === 1 ? 'center' : 'centers'} in {actualDistrict}, {actualState}
       </p>
       
@@ -125,12 +125,12 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
             <CenterMap centers={centers} autoZoom={true} />
           </div>
           
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {centers.map((center) => (
               <Link
                 key={center.branch_code}
                 href={formatCenterUrl(stateRegion, actualState, actualDistrict, center.name)}
-                className="block"
+                className="block h-full"
               >
                 <CenterCard center={center} />
               </Link>
