@@ -278,7 +278,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
           
           <div className="mt-4 text-xs text-neutral-400">
             <p>To enable maps, add a Google Maps API key to your .env.local file:</p>
-            <code className="bg-neutral-200 p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyDSwjt-hN-yrKevn0_-Fa5U1RrP0kLLSf0</code>
+            <code className="bg-neutral-200 p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here</code>
           </div>
         </div>
       </div>
