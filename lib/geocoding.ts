@@ -6,8 +6,19 @@ import { Center } from './types';
 export async function geocodeAddress(center: Center): Promise<[string, string] | null> {
   // Skip if Google Maps API is not loaded
   if (!window.google?.maps?.Geocoder) {
-    console.warn('Google Maps API not loaded, cannot geocode address');
-    return null;
+    console.warn('Google Maps API not loaded, cannot geocode address - waiting for API to load');
+    
+    // Try again after a short delay if we're still loading
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!window.google?.maps?.Geocoder) {
+        console.error('Google Maps API still not loaded after waiting');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error during geocoding retry wait:', error);
+      return null;
+    }
   }
 
   // Skip if address is missing
@@ -38,6 +49,8 @@ export async function geocodeAddress(center: Center): Promise<[string, string] |
       return null;
     }
 
+    console.log(`Geocoding address for ${center.name}: ${addressString}`);
+
     // Create a new geocoder instance
     const geocoder = new window.google.maps.Geocoder();
     
@@ -46,10 +59,12 @@ export async function geocodeAddress(center: Center): Promise<[string, string] |
       geocoder.geocode({ address: addressString }, (results: any, status: any) => {
         if (status === "OK" && results && results.length > 0) {
           const location = results[0].geometry.location;
-          resolve([
+          const coords: [string, string] = [
             location.lat().toString(),
             location.lng().toString()
-          ]);
+          ];
+          console.log(`Successfully geocoded ${center.name}: ${coords[0]}, ${coords[1]}`);
+          resolve(coords);
         } else {
           console.warn(`Geocoding failed for address: ${addressString}`, status);
           reject(null);
@@ -64,10 +79,16 @@ export async function geocodeAddress(center: Center): Promise<[string, string] |
 
 // Function to check if a center has valid coordinates
 export function hasValidCoordinates(center: Center): boolean {
-  return Boolean(
+  const isValid = Boolean(
     center.coords && 
     center.coords.length === 2 &&
     !isNaN(parseFloat(center.coords[0])) &&
     !isNaN(parseFloat(center.coords[1]))
   );
+  
+  if (!isValid && center.coords) {
+    console.warn(`Invalid coordinates detected for ${center.name}:`, center.coords);
+  }
+  
+  return isValid;
 } 

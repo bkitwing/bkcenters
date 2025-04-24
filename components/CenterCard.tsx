@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Center } from '@/lib/types';
+import DirectionsButton from './DirectionsButton';
 
 interface CenterCardProps {
   center: Center;
@@ -34,12 +35,12 @@ const CenterCard: React.FC<CenterCardProps> = ({
   const getGoogleMapsUrl = (center: Center) => {
     if (center.coords && center.coords.length === 2) {
       const [lat, lng] = center.coords;
-      const address = encodeURIComponent(formatAddress(center));
+      const address = encodeURIComponent(formattedAddress);
       
       return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${address}`;
     } else {
       // If no coordinates, just use the address
-      const address = encodeURIComponent(formatAddress(center));
+      const address = encodeURIComponent(formattedAddress);
       return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
     }
   };
@@ -136,10 +137,10 @@ const CenterCard: React.FC<CenterCardProps> = ({
         </div>
       )}
       
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-col gap-2">
         <Link 
           href={fullUrl}
-          className="bg-primary text-white px-3 py-1.5 rounded-md text-sm hover:opacity-90 transition-opacity flex items-center"
+          className="bg-primary text-white px-3 py-1.5 rounded-md text-sm hover:opacity-90 transition-opacity flex items-center w-fit"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -149,23 +150,14 @@ const CenterCard: React.FC<CenterCardProps> = ({
         </Link>
         
         {hasAddress && (
-          <a 
-            href={getGoogleMapsUrl(center)} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="bg-spirit-blue-50 text-spirit-blue-700 border border-spirit-blue-200 px-3 py-1.5 rounded-md text-sm hover:bg-spirit-blue-100 transition-colors flex items-center"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Directions
-          </a>
+          <div className="w-full">
+            <DirectionsButton center={center} address={formattedAddress} buttonStyle="card" />
+          </div>
         )}
         
         <button
           onClick={handleShare}
-          className="bg-spirit-gold-50 text-spirit-gold-700 border border-spirit-gold-200 px-3 py-1.5 rounded-md text-sm hover:bg-spirit-gold-100 transition-colors flex items-center relative"
+          className="bg-spirit-gold-50 text-spirit-gold-700 border border-spirit-gold-200 px-3 py-1.5 rounded-md text-sm hover:bg-spirit-gold-100 transition-colors flex items-center relative w-fit"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

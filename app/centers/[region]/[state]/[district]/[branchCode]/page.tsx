@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCenterByCode, getCentersByDistrict, getDistrictsByState, getStatesList, getRegions, getRegionForState } from '@/lib/centerData';
 import CenterMap from '@/components/CenterMap';
+import DirectionsButton from '@/components/DirectionsButton';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 
@@ -141,15 +142,17 @@ export default async function CenterPage({ params }: CenterPageProps) {
       return parts.join(', ');
     };
     
+    const formattedAddress = formatAddress();
+    
     const getGoogleMapsUrl = () => {
       if (center.coords && center.coords.length === 2) {
         const [lat, lng] = center.coords;
-        const address = encodeURIComponent(formatAddress());
+        const address = encodeURIComponent(formattedAddress);
         
         return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${address}`;
       } else {
         // If no coordinates, just use the address
-        const address = encodeURIComponent(formatAddress());
+        const address = encodeURIComponent(formattedAddress);
         return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
       }
     };
@@ -160,7 +163,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
     const centerForMap = {
       ...center,
       is_highlighted: true,
-      description: formatAddress()
+      description: formattedAddress
     };
     
     return (
@@ -227,7 +230,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
               <div>
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Address</h2>
-                  <p className="text-neutral-700">{formatAddress()}</p>
+                  <p className="text-neutral-700">{formattedAddress}</p>
                 </div>
                 
                 {hasMobileOrContact && (
@@ -272,20 +275,10 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   </div>
                 )}
                 
-                {/* Always show Get Directions button */}
+                {/* Replace the Get Directions button with our new component */}
                 <div className="mt-8">
-                  <a
-                    href={getGoogleMapsUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary inline-flex items-center"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Get Directions
-                  </a>
+                  <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Get Directions</h2>
+                  <DirectionsButton center={center} address={formattedAddress} />
                 </div>
               </div>
               

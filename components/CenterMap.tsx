@@ -70,13 +70,20 @@ const CenterMap: React.FC<CenterMapProps> = ({
     try {
       if (initialLat && initialLng) {
         setCenterPosition({ lat: initialLat, lng: initialLng });
+        console.log('Setting center from initialLat/initialLng:', initialLat, initialLng);
       } else if (centers.length > 0 && centers[0].coords && centers[0].coords.length === 2) {
-        setCenterPosition({
-          lat: parseFloat(centers[0].coords[0]),
-          lng: parseFloat(centers[0].coords[1])
-        });
+        const lat = parseFloat(centers[0].coords[0]);
+        const lng = parseFloat(centers[0].coords[1]);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          setCenterPosition({ lat, lng });
+          console.log('Setting center from first center coords:', lat, lng);
+        } else {
+          console.warn('Invalid coordinates in first center:', centers[0].coords);
+          setCenterPosition({ lat: 20.5937, lng: 78.9629 }); // Default to center of India
+        }
       } else {
         // Default to center of India if no position available
+        console.log('No valid coordinates found, using default center of India');
         setCenterPosition({ lat: 20.5937, lng: 78.9629 });
       }
     } catch (error) {
@@ -88,32 +95,56 @@ const CenterMap: React.FC<CenterMapProps> = ({
   // Geocode addresses for centers without coordinates when Google Maps is loaded
   useEffect(() => {
     async function geocodeCenters() {
-      if (!isLoaded || !window.google?.maps?.Geocoder) return;
+      if (!isLoaded || !window.google?.maps?.Geocoder) {
+        console.log('Cannot geocode yet - Google Maps not loaded');
+        return;
+      }
       
+      console.log('Starting geocoding for centers without coordinates');
       const updatedGeocodedCenters = new Map(geocodedCenters);
       let hasNewGeocodedCenters = false;
+      let processedCount = 0;
 
       // Process centers that don't have valid coordinates
       for (const center of centers) {
-        // Skip if already geocoded or if it has valid coordinates
-        if (geocodedCenters.has(center.branch_code) || hasValidCoordinates(center)) {
+        // Skip if already geocoded 
+        if (geocodedCenters.has(center.branch_code)) {
+          continue;
+        }
+        
+        // Skip if it has valid coordinates
+        if (hasValidCoordinates(center)) {
+          console.log(`Center ${center.name} already has valid coordinates: ${center.coords}`);
           continue;
         }
 
+        processedCount++;
+        console.log(`Geocoding center ${processedCount}/${centers.length}: ${center.name}`);
+        
         try {
           const coords = await geocodeAddress(center);
           if (coords) {
             updatedGeocodedCenters.set(center.branch_code, coords);
             hasNewGeocodedCenters = true;
-            console.log(`Geocoded center ${center.name}: ${coords[0]}, ${coords[1]}`);
+            console.log(`Successfully geocoded center ${center.name}: ${coords[0]}, ${coords[1]}`);
+          } else {
+            console.warn(`Failed to get coordinates for center ${center.name}`);
           }
         } catch (error) {
           console.error(`Failed to geocode center ${center.name}:`, error);
         }
+        
+        // Add a small delay between geocoding requests to avoid rate limits
+        if (processedCount < centers.length) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
       }
 
       if (hasNewGeocodedCenters) {
+        console.log(`Updated geocoded centers with ${updatedGeocodedCenters.size} entries`);
         setGeocodedCenters(updatedGeocodedCenters);
+      } else {
+        console.log('No new centers were geocoded');
       }
     }
 
@@ -256,6 +287,13 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
   // Loading placeholder
   if (!isLoaded || !centerPosition || !GoogleMap || !Marker || !InfoWindow) {
+    console.log('Map loading state:', { 
+      isLoaded, 
+      hasPosition: !!centerPosition, 
+      hasGoogleMap: !!GoogleMap, 
+      hasMarker: !!Marker, 
+      hasInfoWindow: !!InfoWindow 
+    });
     return <div className="animate-pulse bg-spirit-blue-100 rounded-lg" style={{ height }}></div>;
   }
 
