@@ -342,6 +342,18 @@ const CenterMap: React.FC<CenterMapProps> = ({
       };
     }
 
+    // For nearby centers
+    if ((center as any).is_nearby) {
+      return {
+        path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+        fillColor: '#4CAF50', // Green color for nearby centers
+        fillOpacity: 0.9,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2,
+        scale: 0.9
+      };
+    }
+
     // Default marker
     return {
       path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',

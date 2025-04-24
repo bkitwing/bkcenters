@@ -1,9 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCenterByCode, getCentersByDistrict, getDistrictsByState, getStatesList, getRegions, getRegionForState } from '@/lib/centerData';
+import { getCenterByCode, getCentersByDistrict, getDistrictsByState, getStatesList, getRegions, getRegionForState, getNearestCenters } from '@/lib/centerData';
 import CenterMap from '@/components/CenterMap';
 import DirectionsButton from '@/components/DirectionsButton';
+import CenterCard from '@/components/CenterCard';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
@@ -167,6 +168,32 @@ export default async function CenterPage({ params }: CenterPageProps) {
       is_highlighted: true,
       description: formattedAddress
     };
+
+    // Get nearby centers
+    let nearbyCenters: Center[] = [];
+    if (center.coords && center.coords.length === 2) {
+      const [lat, lng] = center.coords.map(parseFloat);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        // Get 7 nearest centers (including the current one)
+        const allNearbyCenters = await getNearestCenters(lat, lng, 7);
+        // Filter out the current center
+        nearbyCenters = allNearbyCenters
+          .filter(nearbyCenter => nearbyCenter.branch_code !== center.branch_code)
+          .slice(0, 6); // Limit to 6 centers
+      }
+    }
+
+    // Prepare centers for map display
+    const mapCenters = [
+      centerForMap,
+      ...nearbyCenters.map(nearby => ({
+        ...nearby,
+        is_nearby: true, // Mark as nearby for custom styling
+        description: nearby.address ? 
+          `${nearby.address.line1 || ''}, ${nearby.address.city || ''}, ${nearby.address.pincode || ''}` : 
+          'Address not available'
+      }))
+    ];
     
     return (
       <div className="container mx-auto px-4 py-8">
@@ -223,7 +250,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         
         <div className="bg-light rounded-lg shadow-lg overflow-hidden mb-8 border border-neutral-200">
           <div className="p-6">
-            <h1 className="text-2xl font-bold mb-2 text-spirit-purple-700">{center.name}</h1>
+            <h1 className="text-2xl font-bold spiritual-text-gradient">{center.name}</h1>
             <p className="text-sm text-neutral-600">
               Brahma Kumaris Meditation Center
             </p>
@@ -287,12 +314,12 @@ export default async function CenterPage({ params }: CenterPageProps) {
               <div>
                 <div className="h-[300px] md:h-[400px] lg:h-[450px] border border-neutral-200 rounded-lg overflow-hidden">
                   <CenterMap 
-                    centers={[centerForMap]} 
+                    centers={mapCenters} 
                     height="100%" 
                     autoZoom={true}
                     defaultZoom={13}
                     highlightCenter={true}
-                    showInfoWindowOnLoad={false}
+                    showInfoWindowOnLoad={true}
                   />
                 </div>
               </div>
@@ -320,21 +347,40 @@ export default async function CenterPage({ params }: CenterPageProps) {
               )}
             </div>
             
-            <div className="mt-8 pt-6 border-t border-neutral-200">
-              <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-primary hover:underline inline-flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to {center.district} Centers
-              </Link>
-            </div>
+            {/* Nearby Centers Section */}
+            {nearbyCenters.length > 0 && (
+              <div className="mt-10">
+                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Nearby Meditation Centers</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {nearbyCenters.map((nearbyCenter) => (
+                    <div key={nearbyCenter.branch_code} className="block h-full">
+                      <CenterCard 
+                        center={nearbyCenter} 
+                        distance={nearbyCenter.distance} 
+                        showDistance={true} 
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+        
+        <div className="mt-8 pt-6 border-t border-neutral-200">
+          <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-primary hover:underline inline-flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to {center.district} Centers
+          </Link>
         </div>
       </div>
     );
   } catch (error) {
-    console.error('Error fetching center details:', error);
-    return notFound();
+    console.error('Error rendering center page:', error);
+    return <EmptyCenterView region={actualRegion} state={state} district={district} branchCode={branchCode} />;
   }
 }
 

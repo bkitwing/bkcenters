@@ -17,8 +17,6 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
 }) => {
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [startLocation, setStartLocation] = useState('');
-  const [isLocating, setIsLocating] = useState(false);
-  const [locationError, setLocationError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,31 +96,12 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
     }
   };
 
-  const getDirectionsFromCurrentLocation = async () => {
-    setIsLocating(true);
-    setLocationError(null);
-    
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by your browser");
-      setIsLocating(false);
-      return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const destination = getDestinationCoords();
-        const url = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${destination}`;
-        
-        window.open(url, '_blank');
-        setIsLocating(false);
-      },
-      (error) => {
-        console.error("Error getting current location:", error);
-        setLocationError("Could not determine your current location");
-        setIsLocating(false);
-      }
-    );
+  const getDirectionsFromCurrentLocation = () => {
+    // Instead of using Geolocation API which can trigger popup blocker,
+    // directly open Google Maps with the destination and let Google handle location permission
+    const destination = getDestinationCoords();
+    const url = `https://www.google.com/maps/dir/Current+Location/${destination}`;
+    window.open(url, '_blank');
   };
 
   const getDirectionsFromInput = (address: string) => {
@@ -181,17 +160,18 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
   return (
     <div className="space-y-2" ref={containerRef}>
       <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={getDirectionsFromCurrentLocation}
-          disabled={isLocating}
+        <a
+          href={`https://www.google.com/maps/dir/Current+Location/${getDestinationCoords()}`}
+          target="_blank"
+          rel="noopener noreferrer"
           className={primaryClass}
           title="Get directions from your current location"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
           </svg>
-          {isLocating ? 'Locating...' : 'From My Location'}
-        </button>
+          From My Location
+        </a>
         
         <button
           onClick={() => setShowSearchInput(!showSearchInput)}
@@ -204,12 +184,6 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
           Custom Location
         </button>
       </div>
-      
-      {locationError && (
-        <div className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-100">
-          {locationError}
-        </div>
-      )}
       
       {showSearchInput && (
         <div className="pt-2 flex gap-2">

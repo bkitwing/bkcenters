@@ -80,7 +80,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
       <div className="mb-2">
         <h3 className="text-lg font-semibold text-spirit-purple-700">{center.name}</h3>
         {showDistance && distance && (
-          <span className="text-sm text-neutral-500">
+          <span className="text-sm font-bold mb-6 spiritual-text-gradient">
             {distance.toFixed(1)} km away
           </span>
         )}
