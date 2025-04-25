@@ -127,13 +127,9 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {centers.map((center) => (
-              <Link
-                key={center.branch_code}
-                href={formatCenterUrl(stateRegion, actualState, actualDistrict, center.name)}
-                className="block h-full"
-              >
-                <CenterCard center={center} />
-              </Link>
+              <div key={center.branch_code} className="h-full">
+                <CenterCard center={center} hideViewIcon={true} />
+              </div>
             ))}
           </div>
         </div>

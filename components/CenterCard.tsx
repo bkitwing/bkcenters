@@ -9,12 +9,14 @@ interface CenterCardProps {
   center: Center;
   distance?: number;
   showDistance?: boolean;
+  hideViewIcon?: boolean;
 }
 
 const CenterCard: React.FC<CenterCardProps> = ({ 
   center, 
   distance, 
-  showDistance = false 
+  showDistance = false,
+  hideViewIcon = false
 }) => {
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [showViewTooltip, setShowViewTooltip] = useState(false);
@@ -78,7 +80,9 @@ const CenterCard: React.FC<CenterCardProps> = ({
   return (
     <div className="card hover:shadow-md transition-shadow border border-neutral-200 p-4 rounded-lg h-full flex flex-col">
       <div className="mb-2">
-        <h3 className="text-lg font-semibold text-spirit-purple-700">{center.name}</h3>
+        <Link href={fullUrl}>
+          <h3 className="text-lg font-semibold text-spirit-purple-700 hover:underline">{center.name}</h3>
+        </Link>
         {showDistance && distance && (
           <span className="text-sm font-bold mb-6 spiritual-text-gradient">
             {distance.toFixed(1)} km away
@@ -145,7 +149,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
         )}
       </div>
       
-      <div className="mt-5 flex justify-between mt-auto">
+      <div className="mt-5 flex justify-between mt-auto pt-3 border-t border-neutral-100">
         <div className="flex gap-4">
           {/* View Details Icon */}
           <Link 
