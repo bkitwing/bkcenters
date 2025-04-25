@@ -50,6 +50,8 @@ export default function CentersPage() {
   const [displayLimit, setDisplayLimit] = useState<number>(10);
   const [loadingMore, setLoadingMore] = useState(false);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
+  const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
 
   // Get summarized center data for map markers
   const stateMapMarkers = useMemo(() => {
@@ -268,16 +270,39 @@ export default function CentersPage() {
       return;
     }
     
+    setSelectedCenter(center);
+    
     // Scroll to the corresponding card in the list (for nearest centers)
     const element = document.getElementById(`center-${center.branch_code}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      element.classList.add('bg-yellow-50');
+      element.classList.add('shadow-md', 'bg-spirit-purple-50');
       setTimeout(() => {
-        element.classList.remove('bg-yellow-50');
+        element.classList.remove('shadow-md', 'bg-spirit-purple-50');
       }, 2000);
     }
   };
+
+  // Handle card click to highlight marker on map
+  const handleCardClick = (center: Center) => {
+    setSelectedCenter(center);
+    
+    // Scroll to map if it's out of view
+    if (mapRef.current) {
+      const mapRect = mapRef.current.getBoundingClientRect();
+      if (mapRect.top < 0 || mapRect.bottom > window.innerHeight) {
+        mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+  
+  // Enhance centers with highlighting property
+  const enhancedNearestCenters = useMemo(() => {
+    return nearestCenters.map(center => ({
+      ...center,
+      is_highlighted: selectedCenter ? center.branch_code === selectedCenter.branch_code : false
+    }));
+  }, [nearestCenters, selectedCenter]);
   
   // Get actual region for a state from centers data
   const getRegionForStateLocal = (stateName: string): string => {
@@ -403,12 +428,14 @@ export default function CentersPage() {
               <h2 className="text-lg font-semibold mb-4 text-spirit-teal-600">Nearest Centers to {address}</h2>
               
               <div className="grid md:grid-cols-2 gap-8">
-                <div>
+                <div ref={mapRef}>
                   <CenterMap 
-                    centers={nearestCenters} 
+                    centers={enhancedNearestCenters} 
                     initialLat={lat} 
                     initialLng={lng}
                     onCenterSelect={handleCenterSelect}
+                    highlightCenter={true}
+                    showInfoWindowOnLoad={selectedCenter !== null}
                   />
                 </div>
                 
@@ -417,7 +444,12 @@ export default function CentersPage() {
                   className="space-y-4 max-h-[500px] overflow-y-auto pr-2 relative"
                 >
                   {nearestCenters.map((center) => (
-                    <div key={center.branch_code} id={`center-${center.branch_code}`} className="transition-colors duration-300">
+                    <div 
+                      key={center.branch_code} 
+                      id={`center-${center.branch_code}`} 
+                      className={`transition-all duration-300 ${selectedCenter?.branch_code === center.branch_code ? 'shadow-lg bg-spirit-purple-50' : 'shadow-sm'}`}
+                      onClick={() => handleCardClick(center)}
+                    >
                       <CenterCard center={center} distance={center.distance} showDistance={true} />
                     </div>
                   ))}

@@ -50,9 +50,9 @@ export default function DistrictPageClient({
     if (centerElement) {
       centerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       // Add a highlight effect
-      centerElement.classList.add('ring-2', 'ring-primary', 'ring-opacity-70');
+      centerElement.classList.add('shadow-md', 'bg-spirit-purple-50');
       setTimeout(() => {
-        centerElement.classList.remove('ring-2', 'ring-primary', 'ring-opacity-70');
+        centerElement.classList.remove('shadow-md', 'bg-spirit-purple-50');
       }, 2000);
     }
   };
@@ -161,7 +161,7 @@ export default function DistrictPageClient({
                 <div 
                   key={center.branch_code} 
                   id={`center-${center.branch_code}`}
-                  className={`h-full transition-all duration-300 ${selectedCenter?.branch_code === center.branch_code ? 'ring-2 ring-primary' : ''}`}
+                  className={`h-full transition-all duration-300 ${selectedCenter?.branch_code === center.branch_code ? 'shadow-lg bg-spirit-purple-50' : 'shadow-sm'}`}
                   onClick={() => handleCardClick(center)}
                 >
                   <CenterCard center={center} hideViewIcon={true} />
