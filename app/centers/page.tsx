@@ -12,7 +12,8 @@ import {
   getRegionsWithDetails,
   getRegionToStateMapping,
   getStatesByRegionFast,
-  reinitializeDataMappings
+  reinitializeDataMappings,
+  getRetreatCenters
 } from '@/lib/centerData';
 import SearchBar from '@/components/SearchBar';
 import CenterCard from '@/components/CenterCard';
@@ -302,6 +303,20 @@ export default function CentersPage() {
     const totalCenters = regionDetails.reduce((sum, region) => sum + region.centerCount, 0);
     const totalStates = statesSummary.length;
     const totalRegions = regionDetails.length;
+    const [retreatCentersCount, setRetreatCentersCount] = useState<number>(0);
+    
+    useEffect(() => {
+      async function fetchRetreatCentersCount() {
+        try {
+          const retreatCenters = await getRetreatCenters();
+          setRetreatCentersCount(retreatCenters.length);
+        } catch (error) {
+          console.error('Error fetching retreat centers:', error);
+        }
+      }
+      
+      fetchRetreatCentersCount();
+    }, []);
     
     return (
       <div className="bg-light rounded-lg shadow-md p-4 mb-6 border border-neutral-200">
@@ -312,8 +327,8 @@ export default function CentersPage() {
             <div className="text-neutral-600 text-sm">Total Centers</div>
           </div>
           <div className="bg-spirit-blue-50 p-3 rounded-lg border border-spirit-blue-100">
-            <div className="text-secondary text-2xl font-bold">{totalRegions}</div>
-            <div className="text-neutral-600 text-sm">Country</div>
+            <div className="text-secondary text-2xl font-bold">{retreatCentersCount}</div>
+            <div className="text-neutral-600 text-sm">Retreat Centers</div>
           </div>
           <div className="bg-spirit-teal-50 p-3 rounded-lg border border-spirit-teal-100">
             <div className="text-secondary text-2xl font-bold">{totalStates}</div>
@@ -484,33 +499,6 @@ export default function CentersPage() {
 
               {/* Include the stats summary component */}
               <StatsSummary />
-
-              {/* Retreat Centers Section */}
-              <div className="mb-8 p-5 bg-white rounded-lg shadow-md border border-spirit-purple-100">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-xl font-semibold spiritual-text-gradient">Special Centers</h2>
-                  <div className="text-sm text-neutral-500">
-                    Dedicated spaces for deeper spiritual practice
-                  </div>
-                </div>
-                
-                <Link
-                  href="/centers/retreat"
-                  className="bg-gradient-to-r from-spirit-purple-50 to-spirit-blue-50 p-4 rounded-lg hover:shadow-md transition-shadow border border-spirit-purple-100 flex justify-between items-center"
-                >
-                  <div>
-                    <h3 className="text-lg font-semibold text-spirit-purple-700">Retreat Centers</h3>
-                    <p className="text-sm text-neutral-600 mt-1">
-                      View our 16 dedicated retreat centers for spiritual renewal and intensive meditation practice
-                    </p>
-                  </div>
-                  <div className="bg-white p-2 rounded-full shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-spirit-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
-              </div>
 
               {viewMode === 'map' ? (
                 <div className="mb-8 border border-neutral-200 rounded-lg overflow-hidden shadow-md">
