@@ -5191,7 +5191,7 @@
         "pincode": "431204"
       },
       "branch_code": "02663",
-      "contact": "",
+      "contact": "02483-220443",
       "coords": [
         "19.6135395000",
         "75.7972091000"
@@ -5200,9 +5200,9 @@
       "country_id": "1",
       "district": "Jalna",
       "district_id": "281",
-      "email": "ambad@bkivv.org",
+      "email": "",
       "mobile": "9011594417",
-      "name": "AMBAD JAWAHAR COLONY",
+      "name": "AMBAD",
       "region": "INDIA",
       "section": "00603",
       "state": "MAHARASHTRA",
@@ -7791,7 +7791,7 @@
         "city": "ARNI",
         "line1": "H NO: 26",
         "line2": "PARASURAMAN STREET",
-        "line3": "NEAR BUS STAND",
+        "line3": "",
         "pincode": "632301"
       },
       "branch_code": "02689",
@@ -7806,7 +7806,7 @@
       "district_id": "2687",
       "email": "",
       "mobile": "8110878618",
-      "name": "ARNI PARASURAMAN STREET",
+      "name": "ARNI",
       "region": "INDIA",
       "section": "01619",
       "state": "TAMIL NADU",
@@ -30105,7 +30105,7 @@
     {
       "address": {
         "city": "CHAKARBHATHA",
-        "line1": "H NO:17, SHIV DARSHAN BHAWAN",
+        "line1": "H NO:17",
         "line2": "BEHIND PRIMARY SCHOOL",
         "line3": "YAGYA STHAL CHOWK",
         "pincode": "495334"
@@ -34529,7 +34529,7 @@
     {
       "address": {
         "city": "CHILKUR",
-        "line1": "OM SHANTI MUSEUM, D.NO: 6-84/4",
+        "line1": "OM SHANTI MUSEUM",
         "line2": "CHILKUR BALAJI TEMPLE ROAD",
         "line3": "TAL: MOINABAD",
         "pincode": "501504"
@@ -35117,6 +35117,34 @@
     {
       "address": {
         "city": "CHITTOOR",
+        "line1": "CAPTAIN STREET",
+        "line2": "GODUGUMURU",
+        "line3": "GREAMSPET",
+        "pincode": "517001"
+      },
+      "branch_code": "02492",
+      "contact": "",
+      "coords": [
+        "13.1999687000",
+        "79.0959067000"
+      ],
+      "country": "INDIA",
+      "country_id": "1",
+      "district": "CHITTOOR",
+      "district_id": "4175",
+      "email": "",
+      "mobile": "6301342828, 9908758887",
+      "name": "CHITTOOR GREAMSPET",
+      "region": "INDIA",
+      "section": "00389",
+      "state": "ANDHRA PRADESH",
+      "state_id": "1",
+      "sub_zone": "KTC",
+      "zone": "KARNATAKA BENGALURU CITY"
+    },
+    {
+      "address": {
+        "city": "CHITTOOR",
         "line1": "H NO: 20-183, OPP RANKERS SCHOOL",
         "line2": "RANGA REDDY STREET",
         "line3": "MITTOOR",
@@ -35219,34 +35247,6 @@
       "email": "mgrstreet.cto@bkivv.org",
       "mobile": "9441051289",
       "name": "CHITTOOR M.G.R.STREET",
-      "region": "INDIA",
-      "section": "00389",
-      "state": "ANDHRA PRADESH",
-      "state_id": "1",
-      "sub_zone": "KTC",
-      "zone": "KARNATAKA BENGALURU CITY"
-    },
-    {
-      "address": {
-        "city": "CHITTOOR",
-        "line1": "SURVEY NO: 122-1, PLOT NO: 3",
-        "line2": "CAPTAIN STREET, GODUGUMURU",
-        "line3": "GREAMSPET",
-        "pincode": "517001"
-      },
-      "branch_code": "02492",
-      "contact": "",
-      "coords": [
-        "13.1999687000",
-        "79.0959067000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "CHITTOOR",
-      "district_id": "4175",
-      "email": "",
-      "mobile": "9908758887",
-      "name": "CHITTOOR GREAMSPET",
       "region": "INDIA",
       "section": "00389",
       "state": "ANDHRA PRADESH",
@@ -36159,7 +36159,7 @@
         "pincode": "754001"
       },
       "branch_code": "02417",
-      "contact": "",
+      "contact": "0671- 2356086, 2356411",
       "coords": [
         "20.3410060000",
         "85.9126478000"
@@ -36169,7 +36169,7 @@
       "district": "Cuttack",
       "district_id": "991",
       "email": "vishwashantisarovar@bkivv.org",
-      "mobile": "8280213969, 7978128881",
+      "mobile": "8280213969",
       "name": "CUTTACK VISHWA SHANTI SAROVAR",
       "region": "INDIA",
       "section": "02417",
@@ -56565,7 +56565,7 @@
     {
       "address": {
         "city": "HASSAN",
-        "line1": "A.R.NO: 322, DIAMOND HOUSE, RANGOLI HALLA",
+        "line1": "DIAMOND HOUSE, RANGOLI HALLA",
         "line2": "NORTHERN EXTENSION",
         "line3": "PARK ROAD",
         "pincode": "573201"
@@ -75184,7 +75184,7 @@
     },
     {
       "address": {
-        "city": "KARUNAGAPPALLY",
+        "city": "KARUNAGAPALLY",
         "line1": "H NO: 36, KAROTTUMUKKU STREET",
         "line2": "SOUMYA SNEHATHEERAM",
         "line3": "KAROTU MUKKU EAST",
@@ -75202,7 +75202,7 @@
       "district_id": "1637",
       "email": "karunagapally@bkivv.org",
       "mobile": "9567847986, 8289967986",
-      "name": "KARUNAGAPPALLY",
+      "name": "KARUNAGAPALLY",
       "region": "INDIA",
       "section": "00845",
       "state": "KERALA",
@@ -79766,7 +79766,7 @@
       "district_id": "228",
       "email": "",
       "mobile": "7804860319",
-      "name": "KOD KOTESHWAR ROAD",
+      "name": "KOD",
       "region": "INDIA",
       "section": "00341",
       "state": "MADHYA PRADESH",
@@ -81922,7 +81922,7 @@
       "district_id": "139",
       "email": "kosli@bkivv.org",
       "mobile": "9466277763",
-      "name": "KOSLI (REWARI)",
+      "name": "KOSLI",
       "region": "INDIA",
       "section": "00072",
       "state": "HARYANA",
@@ -109821,13 +109821,13 @@
     {
       "address": {
         "city": "OLPAD",
-        "line1": "H NO: 2842, BHATT FALIYA",
+        "line1": "H NO: 2842, BHATT STREET",
         "line2": "KARSANPURA, M.S. HIGH SCHOOL ROAD",
         "line3": "NR. VERAI MATA TEMPLE, OLPAD",
         "pincode": "394540"
       },
       "branch_code": "02780",
-      "contact": "",
+      "contact": "-",
       "coords": [
         "21.3382176000",
         "72.7501003000"
@@ -109838,7 +109838,7 @@
       "district_id": "112",
       "email": "olpad@Bkivv.org",
       "mobile": "9429898900, 9016378615",
-      "name": "OLPAD BHATT FALIYA",
+      "name": "OLPAD",
       "region": "INDIA",
       "section": "00305",
       "state": "GUJARAT",
@@ -117017,7 +117017,7 @@
     {
       "address": {
         "city": "PITHORA",
-        "line1": "KHASRA NO: 15/4, BHAGYA VIDHATA BHAWAN, BEHIND MEGHA CREATION",
+        "line1": "BHAGYA VIDHATA BHAWAN, BEHIND MEGHA CREATION",
         "line2": "THANA CHOWK, WARD.NO:13,  N.H-53",
         "line3": "TAL: LAKHAGARH",
         "pincode": "493551"
@@ -117243,7 +117243,7 @@
         "city": "POLUR",
         "line1": "H.NO: 20/18",
         "line2": "NARASIMMAN STREET",
-        "line3": "NEAR THUMANACHIYA AMMAN",
+        "line3": "",
         "pincode": "606803"
       },
       "branch_code": "02688",
@@ -117258,7 +117258,7 @@
       "district_id": "2687",
       "email": "",
       "mobile": "9894087296, 9994236617",
-      "name": "POLUR NARASIMMAN STREET",
+      "name": "POLUR",
       "region": "INDIA",
       "section": "01619",
       "state": "TAMIL NADU",
@@ -136185,8 +136185,8 @@
       "district": "Raipur",
       "district_id": "2297",
       "email": "",
-      "mobile": "9752298774",
-      "name": "SIMGA BRAHMAN COLONY",
+      "mobile": "7746038774, 9752298774",
+      "name": "SIMGA",
       "region": "INDIA",
       "section": "00343",
       "state": "CHHATTISGARH",

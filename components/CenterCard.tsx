@@ -138,7 +138,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
         )}
         
         {center.email && (
-          <div className="flex items-center text-neutral-600 mb-1">
+          <div className="flex items-center text-neutral-600 mb-3">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>

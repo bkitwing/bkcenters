@@ -1,0 +1,14 @@
+Metric,Value
+timestamp,2025-04-25 21:46:50
+source_file,Centers_Raw.json
+target_file,Center Locatore.json
+source_file_size,2720128
+differences,74
+status,Success
+target_file_size,3974125
+total_changes,74
+key_added,0
+key_removed,0
+value_change,74
+type_change,0
+list_length_change,0

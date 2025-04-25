@@ -647,4 +647,24 @@ export async function getDistrictBySlug(stateSlug: string, districtSlug: string)
   // If no match found
   console.warn(`No district found for slug: ${districtSlug} in state: ${state}`);
   return null;
+}
+
+export async function getRetreatCenters(): Promise<Center[]> {
+  const allCenters = await getAllCenters();
+  
+  // For now, we'll manually select retreat centers
+  // In a production environment, you would typically use a flag in the database
+  
+  // List of branch codes or names for retreat centers
+  const retreatCenterBranchCodes: string[] = ['90001','90007','90006','04543','01758','04195','03793','03724','03180','02755','02417','02284','01758','00858','00510','00386','00346','00182'
+    // For example: 'RET001', 'RET002', etc.
+    // You should replace these with your actual retreat center codes
+  ];
+  
+  // Filter centers that are retreat centers
+  const retreatCenters = allCenters.filter(center => 
+    retreatCenterBranchCodes.includes(center.branch_code)
+  );
+  
+  return retreatCenters;
 } 

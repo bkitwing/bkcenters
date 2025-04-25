@@ -485,6 +485,33 @@ export default function CentersPage() {
               {/* Include the stats summary component */}
               <StatsSummary />
 
+              {/* Retreat Centers Section */}
+              <div className="mb-8 p-5 bg-white rounded-lg shadow-md border border-spirit-purple-100">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-xl font-semibold spiritual-text-gradient">Special Centers</h2>
+                  <div className="text-sm text-neutral-500">
+                    Dedicated spaces for deeper spiritual practice
+                  </div>
+                </div>
+                
+                <Link
+                  href="/centers/retreat"
+                  className="bg-gradient-to-r from-spirit-purple-50 to-spirit-blue-50 p-4 rounded-lg hover:shadow-md transition-shadow border border-spirit-purple-100 flex justify-between items-center"
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-spirit-purple-700">Retreat Centers</h3>
+                    <p className="text-sm text-neutral-600 mt-1">
+                      View our 16 dedicated retreat centers for spiritual renewal and intensive meditation practice
+                    </p>
+                  </div>
+                  <div className="bg-white p-2 rounded-full shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-spirit-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </Link>
+              </div>
+
               {viewMode === 'map' ? (
                 <div className="mb-8 border border-neutral-200 rounded-lg overflow-hidden shadow-md">
                   <CenterMap 

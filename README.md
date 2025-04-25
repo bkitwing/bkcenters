@@ -75,3 +75,10 @@ vercel
 /lib                   # Utility functions and data processing
 /public                # Static assets
 ``` 
+
+
+
+Copy Content from api to Centers_Raw.json
+Run python3 compare_json_files.py
+change madhuban concern to INDIA
+node process-centers.js
