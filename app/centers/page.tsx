@@ -365,7 +365,7 @@ export default function CentersPage() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 mt-6 text-center spiritual-text-gradient">Find Meditation Centers</h1>
       
-      <div className="mb-20 max-w-2xl mx-auto">
+      <div className="mb-5 max-w-2xl mx-auto">
         <SearchBar onSearchResult={handleSearchResult} />
         
         {lat && lng && (

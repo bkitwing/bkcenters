@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import CenterMap from '@/components/CenterMap';
 import CenterCard from '@/components/CenterCard';
@@ -23,6 +23,8 @@ export default function DistrictPageClient({
   centers,
 }: DistrictPageClientProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
   
   // Filter centers based on search query
   const filteredCenters = useMemo(() => {
@@ -38,6 +40,43 @@ export default function DistrictPageClient({
       (center.address?.pincode && center.address.pincode.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [centers, searchQuery]);
+
+  // Handle center selection from map
+  const handleCenterSelect = (center: Center) => {
+    setSelectedCenter(center);
+    
+    // Find the card element and scroll to it
+    const centerElement = document.getElementById(`center-${center.branch_code}`);
+    if (centerElement) {
+      centerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Add a highlight effect
+      centerElement.classList.add('ring-2', 'ring-primary', 'ring-opacity-70');
+      setTimeout(() => {
+        centerElement.classList.remove('ring-2', 'ring-primary', 'ring-opacity-70');
+      }, 2000);
+    }
+  };
+
+  // Handle card click to highlight marker
+  const handleCardClick = (center: Center) => {
+    setSelectedCenter(center);
+    
+    // Scroll to map if it's out of view
+    if (mapRef.current) {
+      const mapRect = mapRef.current.getBoundingClientRect();
+      if (mapRect.top < 0 || mapRect.bottom > window.innerHeight) {
+        mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  // Create an enhanced version of centers with highlighting property
+  const enhancedCenters = useMemo(() => {
+    return filteredCenters.map(center => ({
+      ...center,
+      is_highlighted: selectedCenter ? center.branch_code === selectedCenter.branch_code : false
+    }));
+  }, [filteredCenters, selectedCenter]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -89,11 +128,14 @@ export default function DistrictPageClient({
       
       {centers.length > 0 && (
         <div className="mb-10">
-          <div className="h-[400px] border border-neutral-200 rounded-lg overflow-hidden shadow-md mb-8">
+          <div ref={mapRef} className="h-[400px] border border-neutral-200 rounded-lg overflow-hidden shadow-md mb-8">
             <CenterMap 
-              centers={filteredCenters} 
+              centers={enhancedCenters} 
               autoZoom={filteredCenters.length > 0}
               initialZoom={filteredCenters.length === 0 ? 13 : undefined}
+              onCenterSelect={handleCenterSelect}
+              highlightCenter={true}
+              showInfoWindowOnLoad={selectedCenter !== null}
             />
           </div>
           
@@ -116,7 +158,12 @@ export default function DistrictPageClient({
           {filteredCenters.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCenters.map((center) => (
-                <div key={center.branch_code} className="h-full">
+                <div 
+                  key={center.branch_code} 
+                  id={`center-${center.branch_code}`}
+                  className={`h-full transition-all duration-300 ${selectedCenter?.branch_code === center.branch_code ? 'ring-2 ring-primary' : ''}`}
+                  onClick={() => handleCardClick(center)}
+                >
                   <CenterCard center={center} hideViewIcon={true} />
                 </div>
               ))}
