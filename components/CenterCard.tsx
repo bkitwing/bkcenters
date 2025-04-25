@@ -81,7 +81,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
     <div className="card hover:shadow-md transition-shadow border border-neutral-200 p-4 rounded-lg h-full flex flex-col">
       <div className="mb-2">
         <Link href={fullUrl}>
-          <h3 className="text-lg font-semibold text-spirit-purple-700 hover:underline">{center.name}</h3>
+          <h3 className="text-2xl font-bold spiritual-text-gradient">{center.name}</h3>
         </Link>
         {showDistance && distance && (
           <span className="text-sm font-bold mb-6 spiritual-text-gradient">
