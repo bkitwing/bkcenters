@@ -425,7 +425,7 @@ export default function CentersPage() {
         <>
           {lat && lng && nearestCenters.length > 0 ? (
             <div className="mb-12">
-              <h2 className="text-lg font-semibold mb-4 text-spirit-teal-600">Nearest Centers to {address}</h2>
+              <h2 className="text-sm font-semibold mb-4 text-spirit-teal-600">Nearest Centers to {address}</h2>
               
               <div className="grid md:grid-cols-2 gap-8">
                 <div ref={mapRef}>
