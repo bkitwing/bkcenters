@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Header from '../components/Header';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,20 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-neutral-50`}>
-        <header className="bg-light shadow-md border-b border-neutral-200">
-          <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold spiritual-text-gradient">Brahma Kumaris</h1>
-              <span className="ml-2 text-neutral-600">Center Locator</span>
-            </a>
-            <nav>
-              <ul className="flex space-x-6">
-                <li><a href="/" className="text-neutral-700 hover:text-primary transition-colors">Home</a></li>
-                <li><a href="/centers" className="text-neutral-700 hover:text-primary transition-colors">Centers</a></li>
-              </ul>
-            </nav>
-          </div>
-        </header>
+        <Header />
         <main>{children}</main>
         <footer className="bg-spirit-purple-50 mt-8 border-t border-spirit-purple-100">
           <div className="container mx-auto px-4 py-6">
