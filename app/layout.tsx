@@ -5,9 +5,9 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Brahma Kumaris Meditation Center Locator',
+  title: 'Brahma Kumaris - Rajyog Meditation Center Locator',
   description: 'Find the nearest Brahma Kumaris meditation center in your area across India',
-  keywords: 'Brahma Kumaris, meditation, center locator, spiritual centers, India',
+  keywords: 'Brahma Kumaris, meditation, center locator, Nearby Meditation Centers, Brahma Kumaris Rajyog Meditation Centers, Learn Meditation, Om Shanti, Seva Kendra, 7 day courses, meditation retreats',
 };
 
 export default function RootLayout({

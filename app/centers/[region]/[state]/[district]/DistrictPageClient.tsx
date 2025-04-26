@@ -183,7 +183,7 @@ export default function DistrictPageClient({
           </svg>
           <h2 className="text-2xl font-bold mb-4 text-neutral-700">No Centers Found</h2>
           <p className="text-neutral-600 mb-6">
-            We couldn't find any meditation centers in {actualDistrict}, {actualState}.
+            We couldn't find any Rajyog meditation centers in {actualDistrict}, {actualState}.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

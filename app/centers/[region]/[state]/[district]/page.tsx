@@ -32,9 +32,9 @@ export async function generateMetadata({ params }: DistrictPageProps): Promise<M
   const actualRegion = centers.length > 0 ? centers[0].region : decodeURIComponent(params.region);
   
   return {
-    title: `${actualDistrict} Meditation Centers - ${actualState}, ${actualRegion}`,
-    description: `Find Brahma Kumaris meditation centers in ${actualDistrict}, ${actualState}. View locations, contact information, and more.`,
-    keywords: `Brahma Kumaris, meditation centers, ${actualDistrict}, ${actualState}, spiritual centers, India`,
+    title: `${actualDistrict} - Rajyog Meditation Centers - ${actualState}, ${actualRegion} - Brahma Kumaris`,
+    description: `Find Brahma Kumaris Rajyog Meditation centers in ${actualDistrict}, ${actualState}. View locations, contact information, and more.`,
+    keywords: `Brahma Kumaris, Rajyog Meditation centers, ${actualDistrict}, ${actualState}, spiritual centers, 7 day courses, meditation retreats`,
   };
 }
 

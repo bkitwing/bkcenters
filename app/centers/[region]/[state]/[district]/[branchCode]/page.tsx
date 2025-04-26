@@ -5,9 +5,11 @@ import { getCenterByCode, getCentersByDistrict, getDistrictsByState, getStatesLi
 import CenterMap from '@/components/CenterMap';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
+import ContactForm from '@/components/ContactForm';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
+import { headers } from 'next/headers';
 
 // Extended interface for centers with optional service and timing data
 interface CenterWithServices extends Center {
@@ -40,8 +42,8 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       'Address not available';
     
     return {
-      title: `${center.name} - Brahma Kumaris Meditation Center`,
-      description: `Visit the Brahma Kumaris meditation center at ${address}. Contact information, directions, and more.`,
+      title: `${center.name} - Brahma Kumaris Rajyog Meditation Center - ${center.state}`,
+      description: `Visit the Brahma Kumaris Rajyog Meditation center at ${address} - ${center.state}, Contact information, Nearby Meditation Centers, directions, and more.`,
       keywords: `Brahma Kumaris, meditation, ${center.name}, ${center.address?.city || ''}, ${center.state}, spiritual center`,
     };
   } catch (error) {
@@ -97,9 +99,14 @@ export default async function CenterPage({ params }: CenterPageProps) {
   const state = decodeURIComponent(params.state);
   const district = decodeURIComponent(params.district);
   const branchCode = decodeURIComponent(params.branchCode);
-
+  
   // Get the actual region for this state from our data
   const actualRegion = await getRegionForState(state);
+  
+  // Get the host from headers for constructing absolute URLs
+  const headersList = headers();
+  const host = headersList.get('host') || 'brahmakumaris.org';
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
 
   try {
     const center = await getCenterByCode(branchCode) as CenterWithServices;
@@ -194,6 +201,22 @@ export default async function CenterPage({ params }: CenterPageProps) {
           'Address not available'
       }))
     ];
+    
+    // Calculate the page URL for sharing in email
+    let absoluteUrl = `${protocol}://${host}`;
+    
+    if (center) {
+      const centerUrl = formatCenterUrl(
+        center.region || actualRegion, 
+        center.state || state, 
+        center.district || district, 
+        center.name
+      );
+      absoluteUrl = `${protocol}://${host}${centerUrl}`;
+    } else {
+      // Fallback if center is not found
+      absoluteUrl = `${protocol}://${host}/centers`;
+    }
     
     return (
       <div className="container mx-auto px-4 py-8">
@@ -350,7 +373,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
             {/* Nearby Centers Section */}
             {nearbyCenters.length > 0 && (
               <div className="mt-10">
-                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Nearby Meditation Centers</h2>
+                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Nearby RajyogMeditation Centers</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {nearbyCenters.map((nearbyCenter) => (
@@ -362,6 +385,59 @@ export default async function CenterPage({ params }: CenterPageProps) {
                       />
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Contact Form Section - Add only if the center has an email */}
+            {center.email && center.email.includes('@') && (
+              <div className="mt-10">
+                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Contact {center.name}</h2>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="lg:order-2">
+                    <div className="bg-light rounded-lg shadow-md p-6 border border-neutral-200">
+                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">About Contacting Us</h3>
+                      <p className="text-neutral-700 mb-4">
+                        You can use this form to send a message directly to the {center.name} meditation center. 
+                        Whether you want to provide feedback, have a query, or are interested in learning meditation, 
+                        we're here to help.
+                      </p>
+                      
+                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">What to Expect</h3>
+                      <ul className="list-disc list-inside text-neutral-700 space-y-2 mb-4">
+                        <li>Our team will respond to your inquiry as soon as possible</li>
+                        <li>For urgent matters, consider calling the center directly</li>
+                        <li>Free meditation sessions are available for beginners</li>
+                        <li>All our programs are offered free of charge</li>
+                      </ul>
+                      
+                      {(center.services || center.timings) && (
+                        <>
+                          <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">Available Services</h3>
+                          {center.services && (
+                            <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-4">
+                              {center.services.map((service: string, idx: number) => (
+                                <li key={idx}>{service}</li>
+                              ))}
+                            </ul>
+                          )}
+                          
+                          {center.timings && (
+                            <div className="text-neutral-700 mb-4">
+                              <p><strong>Timings:</strong> {center.timings}</p>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="lg:order-1">
+                    <ContactForm 
+                      center={center} 
+                      pageUrl={absoluteUrl} 
+                    />
+                  </div>
                 </div>
               </div>
             )}
