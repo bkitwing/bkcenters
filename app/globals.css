@@ -40,36 +40,34 @@ body {
   /* Improved highlight animation for center cards when clicked - more subtle */
   .highlight-card {
     animation: pulse-highlight 1.5s ease-in-out;
-    will-change: transform, box-shadow;
-    z-index: 10;
     position: relative;
+    z-index: 10;
+    background-color: rgba(126, 87, 194, 0.1); /* Light purple background */
   }
   
   @keyframes pulse-highlight {
     0% {
       transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(79, 129, 189, 0.3);
+      box-shadow: 0 0 0 0 rgba(126, 87, 194, 0.4);
     }
-    20% {
+    50% {
       transform: scale(1.02);
-      box-shadow: 0 0 12px 5px rgba(79, 129, 189, 0.4);
-    }
-    40% {
-      transform: scale(1.01);
-      box-shadow: 0 0 8px 3px rgba(79, 129, 189, 0.3);
-    }
-    70% {
-      transform: scale(1.005);
-      box-shadow: 0 0 4px 2px rgba(79, 129, 189, 0.2);
+      box-shadow: 0 0 0 10px rgba(126, 87, 194, 0);
     }
     100% {
       transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(79, 129, 189, 0);
+      box-shadow: 0 0 0 0 rgba(126, 87, 194, 0);
     }
   }
   
   /* Style for the active/selected card */
   .selected-card {
     @apply shadow-md bg-spirit-blue-50;
+  }
+  
+  /* Ensure proper stacking context for cards container */
+  .centers-list-container {
+    position: relative;
+    z-index: 1;
   }
 } 

@@ -20,6 +20,14 @@ import CenterCard from '@/components/CenterCard';
 import CenterMap from '@/components/CenterMap';
 import { Center, RegionStateMapping } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
+import { Loader } from '@googlemaps/js-api-loader';
+
+// Declare the google namespace globally
+declare global {
+  interface Window {
+    google: any; // Using any since we can't reference google namespace before it's loaded
+  }
+}
 
 type StateSummary = {
   state: string;
@@ -29,6 +37,13 @@ type StateSummary = {
 
 type SortOption = 'alpha' | 'centers';
 type ViewMode = 'list' | 'map';
+
+interface MapRef extends HTMLDivElement {
+  map?: google.maps.Map;
+}
+
+const defaultZoom = 12;
+const markers = new Map<string, google.maps.Marker>();
 
 export default function HomePage() {
   const searchParams = useSearchParams();
@@ -53,7 +68,7 @@ export default function HomePage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
-  const mapRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<MapRef>(null);
   const regionMapRef = useRef<HTMLDivElement>(null);
 
   // Get summarized center data for map markers
@@ -352,6 +367,27 @@ export default function HomePage() {
             centerElement.classList.remove('highlight-card');
           }, 1500);
         }
+        
+        // Center the map on the selected marker with animation
+        const marker = markers.get(center.branch_code);
+        if (marker) {
+          // Apply bounce animation to the marker
+          marker.setAnimation(google.maps.Animation.BOUNCE);
+          
+          // Stop animation after 1.5 seconds
+          setTimeout(() => {
+            marker.setAnimation(null);
+          }, 1500);
+          
+          // Pan to marker location
+          mapRef.current.map?.panTo({ lat, lng });
+          
+          // Zoom in slightly if we're zoomed out too far
+          const currentZoom = mapRef.current.map?.getZoom() || defaultZoom;
+          if (currentZoom < 14) {
+            mapRef.current.map?.setZoom(14);
+          }
+        }
       }
     }
   };
@@ -523,7 +559,7 @@ export default function HomePage() {
             </div>
             
             {/* Centers list - full width on mobile, 6 columns on desktop */}
-            <div className="order-2 md:col-span-6 bg-light rounded-lg shadow-md border border-neutral-200 p-4">
+            <div className="order-2 md:col-span-6 bg-light rounded-lg shadow-md border border-neutral-200 p-4 centers-list-container">
               <div ref={resultsContainerRef} className="h-[50vh] sm:h-[55vh] md:h-[calc(100vh-64px)] overflow-y-auto pr-2">
                 {nearestCenters.length > 0 ? (
                   <>
@@ -534,7 +570,11 @@ export default function HomePage() {
                           key={center.branch_code}
                           id={`center-card-${center.branch_code}`}
                           onClick={() => handleCardClick(center)}
-                          className={`cursor-pointer rounded-lg ${selectedCenter?.branch_code === center.branch_code ? 'shadow-md bg-spirit-blue-50' : 'hover:shadow-sm hover:bg-neutral-50'}`}
+                          className={`cursor-pointer rounded-lg transition-all duration-200 ${
+                            selectedCenter?.branch_code === center.branch_code 
+                              ? 'shadow-md bg-spirit-blue-50' 
+                              : 'hover:shadow-sm hover:bg-neutral-50'
+                          }`}
                         >
                           <CenterCard 
                             center={center} 

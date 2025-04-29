@@ -222,15 +222,14 @@ const CenterMap: React.FC<CenterMapProps> = ({
       // If we have a single marker, set a specific zoom level
       if (validCenterCount === 1) {
         setTimeout(() => {
-          mapRef.setZoom(15); // Closer zoom for a single center
+          mapRef.setZoom(16); // Increased zoom level for single center
         }, 100);
       } else {
         // Add some padding for multiple markers
-        // This ensures markers aren't too close to the edge
         setTimeout(() => {
           const currentZoom = mapRef.getZoom() || defaultZoom;
-          // Limit the zoom level for better overview when many markers are present
-          const targetZoom = Math.min(currentZoom, validCenterCount <= 3 ? 13 : 12); 
+          // Increase zoom levels for better visibility
+          const targetZoom = Math.min(currentZoom, validCenterCount <= 3 ? 14 : 13); 
           mapRef.setZoom(targetZoom);
         }, 200);
       }
@@ -271,6 +270,33 @@ const CenterMap: React.FC<CenterMapProps> = ({
   // Handle marker click to select a center
   const handleMarkerClick = (center: Center) => {
     setSelectedCenter(center);
+    
+    // Find and highlight the corresponding card
+    const centerElement = document.getElementById(`center-card-${center.branch_code}`);
+    if (centerElement) {
+      // First remove highlight from any previously highlighted cards
+      document.querySelectorAll('.highlight-card').forEach(el => {
+        el.classList.remove('highlight-card');
+      });
+
+      // Add a small delay to ensure the scroll completes before highlighting
+      setTimeout(() => {
+        centerElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center'
+        });
+        
+        // Add highlight class and ensure it's visible
+        centerElement.classList.add('highlight-card');
+        centerElement.style.zIndex = '10';
+        
+        // Remove highlight and reset z-index after animation
+        setTimeout(() => {
+          centerElement.classList.remove('highlight-card');
+          centerElement.style.zIndex = '';
+        }, 1500);
+      }, 100);
+    }
     
     if (onCenterSelect) {
       onCenterSelect(center);
@@ -496,12 +522,14 @@ const CenterMap: React.FC<CenterMapProps> = ({
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={centerPosition}
-          zoom={initialLat && initialLng ? 13 : defaultZoom}
+          zoom={initialLat && initialLng ? 14 : defaultZoom}
           options={{
             fullscreenControl: true,
             mapTypeControl: true,
             streetViewControl: true,
             zoomControl: true,
+            maxZoom: 18,
+            minZoom: 5,
           }}
           onLoad={onMapLoad}
         >
