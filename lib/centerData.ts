@@ -129,28 +129,70 @@ async function initializeDataMappings(): Promise<void> {
   isDataMappingInitialized = true;
 }
 
+// Function to check if we're in a build/SSR environment
+const isServerEnvironment = () => {
+  return typeof window === 'undefined';
+};
+
+// Function to determine if we're in Next.js static generation
+const isStaticGeneration = () => {
+  return process.env.NEXT_PHASE === 'phase-production-build';
+};
+
+// Fallback empty data structure for build time
+const getEmptyData = (): CentersData => {
+  return {
+    data: [],
+    total: 0,
+    zone: '',
+    subzone: '',
+    country: '',
+    state: '',
+    city: ''
+  };
+};
+
 // Function to fetch data from API only
 async function fetchCentersData(): Promise<CentersData> {
   // Return cached data if available
   if (centersData !== null) return centersData;
+  
+  // If we're in a build environment or SSR, return empty data
+  // This prevents API calls during static generation
+  if (isServerEnvironment() && isStaticGeneration()) {
+    console.warn('Static generation detected - using empty centers data');
+    const emptyData = getEmptyData();
+    centersData = emptyData;
+    return emptyData;
+  }
   
   // Get the origin for absolute URLs
   const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   
   try {
     // Try to load from API endpoint with absolute URL
-    const response = await fetch(`${origin}/api/centers?lightweight=false`);
+    const response = await fetch(`${origin}/api/centers?lightweight=false`, {
+      // Add cache: 'no-store' to avoid caching issues during build
+      cache: 'no-store'
+    });
     
     if (response.ok) {
       const data = await response.json() as CentersData;
       centersData = data;
       return data;
     } else {
-      throw new Error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
+      console.error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
+      // Return empty data on error to avoid build failures
+      const emptyData = getEmptyData();
+      centersData = emptyData;
+      return emptyData;
     }
   } catch (error) {
     console.error('API data loading error:', error);
-    throw error;
+    // Return empty data on error
+    const emptyData = getEmptyData();
+    centersData = emptyData;
+    return emptyData;
   }
 }
 
@@ -161,12 +203,20 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
     return stateCentersCache[state];
   }
   
+  // If in build/SSR environment, return empty array
+  if (isServerEnvironment() && isStaticGeneration()) {
+    stateCentersCache[state] = [];
+    return [];
+  }
+  
   // Get the origin for absolute URLs
   const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   
   try {
     // Load directly from API with state filter
-    const response = await fetch(`${origin}/api/centers?state=${encodeURIComponent(state)}`);
+    const response = await fetch(`${origin}/api/centers?state=${encodeURIComponent(state)}`, {
+      cache: 'no-store'
+    });
     
     if (response.ok) {
       const data = await response.json() as CentersData;
@@ -197,13 +247,20 @@ async function fetchCentersByDistrict(state: string, district: string): Promise<
     districtCentersCache[state] = {};
   }
   
+  // If in build/SSR environment, return empty array
+  if (isServerEnvironment() && isStaticGeneration()) {
+    districtCentersCache[state][district] = [];
+    return [];
+  }
+  
   // Get the origin for absolute URLs
   const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   
   try {
     // Load directly from API with state and district filter
     const response = await fetch(
-      `${origin}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`
+      `${origin}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`,
+      { cache: 'no-store' }
     );
     
     if (response.ok) {

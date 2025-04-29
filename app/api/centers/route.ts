@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import { CentersData, Center } from '@/lib/types';
 
+// Add this export to tell Next.js that this route is dynamic and should be server-rendered
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
