@@ -392,7 +392,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {nearbyCenters.map((nearbyCenter) => (
-                    <div key={nearbyCenter.branch_code} className="block h-full">
+                    <div 
+                      key={nearbyCenter.branch_code} 
+                      id={`center-card-${nearbyCenter.branch_code}`}
+                      className="block h-full transition-all duration-200 rounded-lg border border-neutral-200 hover:shadow-md"
+                    >
                       <CenterCard 
                         center={nearbyCenter} 
                         distance={nearbyCenter.distance} 

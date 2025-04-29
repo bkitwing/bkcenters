@@ -281,6 +281,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
       // Add a small delay to ensure the scroll completes before highlighting
       setTimeout(() => {
+        // Scroll into view with smooth behavior
         centerElement.scrollIntoView({ 
           behavior: 'smooth', 
           block: 'center'
@@ -288,12 +289,10 @@ const CenterMap: React.FC<CenterMapProps> = ({
         
         // Add highlight class and ensure it's visible
         centerElement.classList.add('highlight-card');
-        centerElement.style.zIndex = '10';
         
-        // Remove highlight and reset z-index after animation
+        // Remove highlight after animation
         setTimeout(() => {
           centerElement.classList.remove('highlight-card');
-          centerElement.style.zIndex = '';
         }, 1500);
       }, 100);
     }
