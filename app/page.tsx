@@ -64,7 +64,7 @@ export default function HomePage() {
   const [regionViewMode, setRegionViewMode] = useState<ViewMode>('list');
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [maxDistance, setMaxDistance] = useState<number>(20);
+  const [maxDistance, setMaxDistance] = useState<number>(50);
   const [displayLimit, setDisplayLimit] = useState<number>(10);
   const [loadingMore, setLoadingMore] = useState(false);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
@@ -634,7 +634,6 @@ export default function HomePage() {
         /* Regions Section with State Cards - Only shown when not searching */
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-            <h2 className="text-xl sm:text-2xl font-bold spiritual-text-gradient">Explore by Region</h2>
             <div className="flex flex-wrap gap-2">
               <div className="flex space-x-1 bg-light rounded-md border border-neutral-200">
                 <button 
