@@ -51,6 +51,7 @@ export default function HomePage() {
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [address, setAddress] = useState<string>('');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; } | undefined>(undefined);
   const [nearestCenters, setNearestCenters] = useState<(Center & { distance?: number })[]>([]);
   const [allNearestCenters, setAllNearestCenters] = useState<(Center & { distance?: number })[]>([]);
   const [statesSummary, setStatesSummary] = useState<StateSummary[]>([]);
@@ -67,6 +68,7 @@ export default function HomePage() {
   const [displayLimit, setDisplayLimit] = useState<number>(10);
   const [loadingMore, setLoadingMore] = useState(false);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const mapRef = useRef<MapRef>(null);
   const regionMapRef = useRef<HTMLDivElement>(null);
@@ -280,14 +282,34 @@ export default function HomePage() {
     }
   };
   
+  // Function to scroll to search results
+  const scrollToSearchResults = useCallback(() => {
+    if (searchResultsRef.current) {
+      searchResultsRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, []);
+
   // Handle search result from SearchBar component
   const handleSearchResult = (latitude: number, longitude: number, searchedAddress: string) => {
     setLat(latitude);
     setLng(longitude);
     setAddress(searchedAddress);
     
+    // Set user location if the search is from current location
+    if (searchedAddress === "Your Current Location") {
+      setUserLocation({ lat: latitude, lng: longitude });
+    } else {
+      setUserLocation(undefined);
+    }
+    
     // Update URL with search parameters
     router.push(`/?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent(searchedAddress)}`);
+
+    // Add a small delay to ensure the search results are rendered before scrolling
+    setTimeout(scrollToSearchResults, 100);
   };
   
   // Handle location button click
@@ -313,6 +335,7 @@ export default function HomePage() {
     setLat(null);
     setLng(null);
     setAddress('');
+    setUserLocation(undefined);
     setNearestCenters([]);
     setAllNearestCenters([]);
     router.push('/');
@@ -427,29 +450,30 @@ export default function HomePage() {
       }
       
       fetchRetreatCentersCount();
-      // Set total centers from all centers
       setTotalCenters(allCenters.length);
     }, [allCenters.length]);
     
     return (
-      <div className="stats-bar bg-white p-4 rounded-lg shadow-md flex flex-wrap justify-around items-center gap-4 mb-6">
-        <div className="stat text-center">
-          <div className="stat-value text-primary text-xl">{totalCenters.toLocaleString()}</div>
-          <div className="stat-label text-neutral-600">Total Centers</div>
-        </div>
-        <div className="stat text-center">
-          <div className="stat-value text-secondary text-xl">{statesSummary.length}</div>
-          <div className="stat-label text-neutral-600">States</div>
-        </div>
-        <div className="stat text-center">
-          <div className="stat-value text-accent text-xl">{regionDetails.length}</div>
-          <div className="stat-label text-neutral-600">Regions</div>
-        </div>
-        <div className="stat text-center">
-          <div className="stat-value text-spirit-gold-500 text-xl">{retreatCenters}</div>
-          <div className="stat-label text-neutral-600">
-            <Link href="/retreat" className="hover:text-primary-focus hover:underline">
-              Retreat Centers
+      <div className="stats-bar bg-white p-4 rounded-lg shadow-md mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
+            <div className="stat-value text-primary text-lg sm:text-xl font-bold">{totalCenters.toLocaleString()}</div>
+            <div className="stat-label text-neutral-600 text-xs sm:text-sm">Total Centers</div>
+          </div>
+          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
+            <div className="stat-value text-secondary text-lg sm:text-xl font-bold">{statesSummary.length}</div>
+            <div className="stat-label text-neutral-600 text-xs sm:text-sm">States</div>
+          </div>
+          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
+            <div className="stat-value text-accent text-lg sm:text-xl font-bold">{regionDetails.length}</div>
+            <div className="stat-label text-neutral-600 text-xs sm:text-sm">Regions</div>
+          </div>
+          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
+            <Link href="/retreat" className="hover:opacity-90 transition-opacity">
+              <div className="stat-value text-spirit-gold-500 text-lg sm:text-xl font-bold">{retreatCenters}</div>
+              <div className="stat-label text-neutral-600 text-xs sm:text-sm hover:text-primary-focus">
+                Retreat Centers
+              </div>
             </Link>
           </div>
         </div>
@@ -507,19 +531,10 @@ export default function HomePage() {
       
       {/* Search Results (if user has searched) */}
       {lat && lng ? (
-        <div className="mb-8">
+        <div ref={searchResultsRef} className="mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
             <div className="flex items-center">
-              <h2 className="text-xl sm:text-2xl font-bold spiritual-text-gradient">Centers Near {address}</h2>
-              <button 
-                onClick={handleClearSearch}
-                className="ml-3 p-1 rounded-full hover:bg-neutral-100 transition-colors"
-                title="Clear search results"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <h2 className="text-sm font-medium mb-4 text-spirit-blue-700">Centers Near {address}</h2>
             </div>
             <div className="flex items-center space-x-2 w-full sm:w-auto">
               <div className="flex items-center flex-1 sm:flex-auto">
@@ -553,6 +568,7 @@ export default function HomePage() {
                     showInfoWindowOnLoad={false}
                     height="100%"
                     selectedCenter={selectedCenter}
+                    userLocation={userLocation}
                   />
                 </div>
               </div>
@@ -563,7 +579,7 @@ export default function HomePage() {
               <div ref={resultsContainerRef} className="h-[50vh] sm:h-[55vh] md:h-[calc(100vh-64px)] overflow-y-auto pr-2">
                 {nearestCenters.length > 0 ? (
                   <>
-                    <h3 className="text-lg font-medium mb-4 text-spirit-blue-700">Found {nearestCenters.length} centers near you</h3>
+                    <h3 className="text-xl font-medium mb-4 text-spirit-blue-700">Found {nearestCenters.length} centers near you</h3>
                     <div className="space-y-3">
                       {nearestCenters.map((center) => (
                         <div 
@@ -672,7 +688,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     {regionToStates[region.name] && Object.keys(regionToStates[region.name].states)
                       .sort((a, b) => {
                         if (sortBy === 'alpha') {
@@ -689,28 +705,23 @@ export default function HomePage() {
                           <Link
                             key={stateName}
                             href={formatCenterUrl(region.name, stateName)}
-                            className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-neutral-200 p-4 block"
+                            className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-neutral-200 p-3 sm:p-4 block"
                           >
-                            <h4 className="font-semibold text-lg mb-3 text-neutral-800">{stateName}</h4>
-                            <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 text-neutral-800 line-clamp-2">{stateName}</h4>
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                               <div className="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-spirit-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-spirit-blue-600 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                 </svg>
-                                <span className="text-sm text-neutral-700">{stateData?.districtCount || 0} Districts</span>
+                                <span className="text-neutral-700">{stateData?.districtCount || 0} Districts</span>
                               </div>
-                            </div>
-                            <div className="flex justify-between items-center">
                               <div className="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span className="text-sm text-neutral-700">{stateData?.centerCount || 0} Centers</span>
+                                <span className="text-neutral-700">{stateData?.centerCount || 0} Centers</span>
                               </div>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
                             </div>
                           </Link>
                         );
@@ -724,9 +735,13 @@ export default function HomePage() {
               <div ref={regionMapRef} className="h-[500px] sm:h-[600px]">
                 <CenterMap 
                   centers={stateMapMarkers} 
-                  autoZoom={true}
+                  autoZoom={false}
                   onCenterSelect={handleCenterSelect}
                   height="100%"
+                  defaultZoom={5}
+                  initialLat={20.5937}
+                  initialLng={78.9629}
+                  initialZoom={5}
                 />
               </div>
               <div className="p-4 bg-white border-t border-neutral-200">

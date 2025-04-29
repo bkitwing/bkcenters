@@ -19,6 +19,7 @@ interface CenterMapProps {
   defaultZoom?: number;
   showInfoWindowOnLoad?: boolean;
   selectedCenter?: Center | null;
+  userLocation?: { lat: number; lng: number; };
 }
 
 const CenterMap: React.FC<CenterMapProps> = ({
@@ -33,7 +34,8 @@ const CenterMap: React.FC<CenterMapProps> = ({
   highlightCenter = false,
   defaultZoom = 5,
   showInfoWindowOnLoad = false,
-  selectedCenter: externalSelectedCenter = null
+  selectedCenter: externalSelectedCenter = null,
+  userLocation
 }) => {
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
@@ -217,22 +219,36 @@ const CenterMap: React.FC<CenterMapProps> = ({
     });
 
     if (hasValidCoords) {
-      mapRef.fitBounds(bounds);
+      // Add padding to the bounds
+      const padding = { 
+        top: 50, 
+        right: 50, 
+        bottom: 50, 
+        left: 50 
+      };
       
-      // If we have a single marker, set a specific zoom level
-      if (validCenterCount === 1) {
-        setTimeout(() => {
-          mapRef.setZoom(16); // Increased zoom level for single center
-        }, 100);
-      } else {
-        // Add some padding for multiple markers
-        setTimeout(() => {
-          const currentZoom = mapRef.getZoom() || defaultZoom;
-          // Increase zoom levels for better visibility
-          const targetZoom = Math.min(currentZoom, validCenterCount <= 3 ? 14 : 13); 
+      mapRef.fitBounds(bounds, padding);
+      
+      // Add a slight delay before adjusting zoom
+      setTimeout(() => {
+        // Get the current zoom level
+        const currentZoom = mapRef.getZoom() || defaultZoom;
+        
+        // For single marker
+        if (validCenterCount === 1) {
+          mapRef.setZoom(16);
+        }
+        // For state view (when markers are state summaries)
+        else if (centers.some(c => c.is_state_summary)) {
+          const targetZoom = Math.min(currentZoom, 5);
           mapRef.setZoom(targetZoom);
-        }, 200);
-      }
+        }
+        // For district or nearby centers view
+        else {
+          const targetZoom = Math.min(currentZoom, validCenterCount <= 3 ? 14 : 13);
+          mapRef.setZoom(targetZoom);
+        }
+      }, 100);
     }
   }, [mapRef, centers, defaultZoom, getValidCoordinates]);
 
@@ -400,23 +416,12 @@ const CenterMap: React.FC<CenterMapProps> = ({
     if (center.is_state_summary) {
       const count = center.district_total || 0;
       
-      // Calculate color intensity based on center count
-      // Higher count = darker purple
-      // Lower count = lighter purple
-      let opacity = 0.4 + Math.min(count / 100, 0.6); // Scale opacity between 0.4 and 1.0
-      let scale = 12 + Math.min(count / 10, 8); // Scale size between 12 and 20
-      
-      // For very small numbers, ensure they're still visible
-      if (count <= 5) {
-        opacity = 0.4;
-        scale = 12;
-      }
-      
+      // Use fixed size for state markers
       return {
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: '#7E57C2', // Primary purple
-        fillOpacity: opacity,
-        scale: scale,
+        fillOpacity: 0.7, // Fixed opacity
+        scale: 15, // Fixed size for all state markers
         strokeColor: '#FFFFFF',
         strokeWeight: 2,
         labelOrigin: new google.maps.Point(0, 0)
@@ -560,6 +565,23 @@ const CenterMap: React.FC<CenterMapProps> = ({
               </Marker>
             );
           })}
+
+          {/* Add user location marker */}
+          {userLocation && markersReady && (
+            <Marker
+              position={userLocation}
+              icon={{
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: '#4285F4', // Google Maps blue color
+                fillOpacity: 1,
+                strokeColor: '#FFFFFF',
+                strokeWeight: 2,
+                scale: 8
+              }}
+              title="Your Location"
+              zIndex={2000} // Higher than other markers
+            />
+          )}
         </GoogleMap>
       ) : (
         <div className="h-full w-full flex items-center justify-center bg-gray-100">

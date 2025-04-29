@@ -61,7 +61,7 @@ export async function generateStaticParams() {
     const paths = [];
     
     // Limit the number of centers we pre-generate to avoid build timeouts
-    const MAX_CENTERS_PER_DISTRICT = 10;
+    const MAX_CENTERS_PER_DISTRICT = 30;
     
     for (const region of regions) {
       const states = await getStatesList(region);
@@ -288,7 +288,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         
         <div className="bg-light rounded-lg shadow-lg overflow-hidden mb-8 border border-neutral-200">
           <div className="p-6">
-            <h1 className="text-4xl font-bold spiritual-text-gradient">{center.name}</h1>
+            <h1 className="text-3xl font-bold spiritual-text-gradient">{center.name}</h1>
             <p className="text-sm text-neutral-600">
               Brahma Kumaris Meditation Center
             </p>
@@ -296,13 +296,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
             <div className="mt-6 grid md:grid-cols-2 gap-8">
               <div>
                 <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Address</h2>
+                  <h2 className="text-xl font-semibold mb-1 text-spirit-blue-700">Address</h2>
                   <p className="text-neutral-700">{formattedAddress}</p>
                 </div>
                 
                 {hasMobileOrContact && (
                   <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Contact</h2>
+                    <h2 className="text-xl font-semibold mb-2 text-spirit-blue-700">Contact</h2>
                     
                     {center.contact && (
                       <div className="flex items-center mb-2">
@@ -330,7 +330,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                 
                 {center.email && (
                   <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Email</h2>
+                    <h2 className="text-xl font-semibold mb-2 text-spirit-blue-700">Email</h2>
                     <div className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -388,7 +388,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
             {/* Nearby Centers Section */}
             {nearbyCenters.length > 0 && (
               <div className="mt-10">
-                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Nearby RajyogMeditation Centers</h2>
+                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Nearby Centers</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {nearbyCenters.map((nearbyCenter) => (
