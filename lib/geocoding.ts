@@ -80,13 +80,14 @@ export async function geocodeAddress(center: Center): Promise<[string, string] |
 // Function to check if a center has valid coordinates
 export function hasValidCoordinates(center: Center): boolean {
   const isValid = Boolean(
-    center.coords && 
+    center?.coords && 
+    Array.isArray(center.coords) &&
     center.coords.length === 2 &&
     !isNaN(parseFloat(center.coords[0])) &&
     !isNaN(parseFloat(center.coords[1]))
   );
   
-  if (!isValid && center.coords) {
+  if (!isValid && center?.coords) {
     console.warn(`Invalid coordinates detected for ${center.name}:`, center.coords);
   }
   

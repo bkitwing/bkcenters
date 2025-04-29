@@ -55,7 +55,7 @@ export default async function StatePage({ params }: StatePageProps) {
         <h1 className="text-2xl mb-4">Redirecting to correct region...</h1>
         <p>The state {actualState} belongs to region {stateRegion}, not {actualRegion}.</p>
         <p className="mt-4">
-          <Link href={formatCenterUrl(stateRegion, actualState)} className="text-primary">
+          <Link href="/" className="text-primary">
             Click here if you are not redirected automatically.
           </Link>
         </p>
@@ -85,4 +85,4 @@ export default async function StatePage({ params }: StatePageProps) {
       districtSummary={districtSummary}
     />
   );
-} 
+}

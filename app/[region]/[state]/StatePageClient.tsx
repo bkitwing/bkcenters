@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
@@ -76,8 +76,8 @@ export default function StatePageClient({
       <nav className="flex mb-6 text-sm">
         <ol className="flex items-center space-x-2">
           <li>
-            <Link href="/centers" className="text-neutral-500 hover:text-primary">
-              Centers
+            <Link href="/" className="text-neutral-500 hover:text-primary">
+              Home
             </Link>
           </li>
           <li className="flex items-center">

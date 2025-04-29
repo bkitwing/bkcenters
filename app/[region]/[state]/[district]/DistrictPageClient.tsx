@@ -84,8 +84,8 @@ export default function DistrictPageClient({
       <nav className="flex mb-6 text-sm">
         <ol className="flex items-center space-x-2">
           <li>
-            <Link href="/centers" className="text-neutral-500 hover:text-primary">
-              Centers
+            <Link href="/" className="text-neutral-500 hover:text-primary">
+              Home
             </Link>
           </li>
           <li className="flex items-center">
@@ -190,7 +190,7 @@ export default function DistrictPageClient({
             <Link href={formatCenterUrl(stateRegion, actualState)} className="btn-primary">
               View Other Districts in {actualState}
             </Link>
-            <Link href="/centers" className="btn-secondary">
+            <Link href="/" className="btn-secondary">
               Explore All Centers
             </Link>
           </div>

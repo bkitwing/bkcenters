@@ -1,6 +1,5 @@
 // Data service for center information - client-side only
 import { Center, CentersData, RegionStateMapping, StateDistrictMapping, DistrictCentersMapping } from './types';
-import { geocodeAddress } from './geocoding';
 import { deSlugify } from './urlUtils';
 
 // Cache for data
@@ -349,6 +348,11 @@ export async function getCentersByCityName(cityName: string): Promise<Center[]> 
   );
 }
 
+// Helper to detect server environment
+const isServer = () => {
+  return typeof window === 'undefined';
+};
+
 export async function getNearestCenters(latitude: number, longitude: number, limit: number = 5): Promise<Center[]> {
   const centers = await getAllCenters();
   
@@ -365,7 +369,7 @@ export async function getNearestCenters(latitude: number, longitude: number, lim
     return R * c; // Distance in km
   };
 
-  // Process centers and calculate distances - limit has been increased to support lazy loading
+  // Process centers and calculate distances
   const processedCenters = await Promise.all(centers.map(async (center) => {
     // Try to get coordinates from the center
     let lat: number | null = null;
@@ -381,9 +385,11 @@ export async function getNearestCenters(latitude: number, longitude: number, lim
       }
     }
 
-    // If no valid coordinates, try to geocode the address
-    if (lat === null || lng === null) {
+    // If no valid coordinates and we're in the browser, try to geocode the address
+    // Skip geocoding on the server to prevent errors
+    if ((lat === null || lng === null) && !isServer()) {
       try {
+        const { geocodeAddress } = await import('./geocoding');
         const geocodedCoords = await geocodeAddress(center);
         if (geocodedCoords) {
           lat = parseFloat(geocodedCoords[0]);
@@ -405,10 +411,9 @@ export async function getNearestCenters(latitude: number, longitude: number, lim
   }));
 
   // Sort centers by distance and return the requested number
-  // Now supports larger limits for lazy loading and pagination
   return processedCenters
     .sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity))
-    .slice(0, Math.min(limit, 1000)); // Increased upper bound to 1000 for better lazy loading
+    .slice(0, Math.min(limit, 1000)); // Cap at 1000 for better lazy loading
 }
 
 export async function getStateData(state: string): Promise<{ 
@@ -543,22 +548,26 @@ export async function getCentersByState(state: string): Promise<Center[]> {
 
 // Get region for a specific state
 export async function getRegionForState(state: string): Promise<string> {
-  // Check cache first
-  if (stateRegionCache[state]) {
-    return stateRegionCache[state];
+  // Ensure data mappings are initialized
+  if (!isDataMappingInitialized) {
+    await initializeDataMappings();
   }
   
-  // If not in cache, get all centers to populate cache
-  await getAllCenters();
-  
-  // Check cache again
-  if (stateRegionCache[state]) {
-    return stateRegionCache[state];
+  // Get the state data from our mapping
+  const stateData = stateToDistrictMapping?.[state];
+  if (stateData?.region) {
+    return stateData.region;
   }
   
-  // If still not found, return default
-  console.warn(`No region found for state: ${state}`);
-  return 'INDIA';
+  // If we still don't have the region, try to get it from all centers
+  // This is a fallback in case the mappings weren't properly initialized
+  const centers = await getAllCenters();
+  const center = centers.find(c => c.state === state);
+  if (center?.region) {
+    return center.region;
+  }
+  
+  throw new Error(`No region found for state: ${state}. This indicates a data integrity issue.`);
 }
 
 // Get full region to state mapping - much faster than individual lookups

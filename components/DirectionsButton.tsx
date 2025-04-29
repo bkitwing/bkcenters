@@ -89,7 +89,7 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
   }, [showSearchInput]);
 
   const getDestinationCoords = () => {
-    if (center.coords && center.coords.length === 2) {
+    if (center?.coords && Array.isArray(center.coords) && center.coords.length === 2) {
       return `${center.coords[0]},${center.coords[1]}`;
     } else {
       return encodeURIComponent(address);

@@ -27,7 +27,7 @@ const Header = () => {
           const { latitude, longitude } = position.coords;
           
           // Navigate to results page with query params
-          router.push(`/centers?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent("Current Location")}`);
+          router.push(`/?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent("Current Location")}`);
         } catch (error) {
           console.error("Error handling location:", error);
           alert("Could not determine your location");
@@ -77,7 +77,7 @@ const Header = () => {
         <nav className="hidden md:block">
           <ul className="flex space-x-8 items-center">
             <li>
-              <Link href="/centers" className="flex items-center text-neutral-700 hover:text-primary transition-colors" aria-label="Home">
+              <Link href="/" className="flex items-center text-neutral-700 hover:text-primary transition-colors" aria-label="Home">
                 <FaHome size={22} className="text-gray-600" />
               </Link>
             </li>
@@ -92,7 +92,7 @@ const Header = () => {
               </button>
             </li>
             <li>
-              <Link href="/centers/retreat" className="flex items-center text-neutral-700 hover:text-primary transition-colors">
+              <Link href="/retreat" className="flex items-center text-neutral-700 hover:text-primary transition-colors">
                 <span className="text-gray-600 font-medium">Retreat Centers</span>
               </Link>
             </li>
@@ -114,7 +114,7 @@ const Header = () => {
           <nav className="container mx-auto px-4 py-3">
             <ul className="space-y-4">
               <li>
-                <Link href="/centers" className="flex items-center text-neutral-700 hover:text-primary transition-colors" onClick={toggleMenu} aria-label="Home">
+                <Link href="/" className="flex items-center text-neutral-700 hover:text-primary transition-colors" onClick={toggleMenu} aria-label="Home">
                   <FaHome size={22} className="text-gray-600" />
                 </Link>
               </li>
@@ -132,7 +132,7 @@ const Header = () => {
                 </button>
               </li>
               <li>
-                <Link href="/centers/retreat" className="flex items-center text-neutral-700 hover:text-primary transition-colors" onClick={toggleMenu}>
+                <Link href="/retreat" className="flex items-center text-neutral-700 hover:text-primary transition-colors" onClick={toggleMenu}>
                   <span className="text-gray-600 font-medium">Retreat Centers</span>
                 </Link>
               </li>

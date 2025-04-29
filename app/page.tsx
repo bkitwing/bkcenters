@@ -379,209 +379,150 @@ export default function HomePage() {
     }
   };
   
+  // Get sorted regions based on sort option
+  const getSortedRegions = (): {name: string; stateCount: number; centerCount: number}[] => {
+    if (sortBy === 'alpha') {
+      return [...regionDetails].sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      return [...regionDetails].sort((a, b) => b.centerCount - a.centerCount);
+    }
+  };
+  
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold mb-6 text-center text-primary">Find Brahma Kumaris Meditation Centers</h1>
+    <main className="container mx-auto px-4 py-8">
       
-      <SearchBar onSearchResult={handleSearchResult} />
+      {/* Search Bar */}
+      <div className="bg-light rounded-lg shadow-md p-8 border border-neutral-200 mb-12">
+        <h2 className="text-2xl font-bold mb-6 text-center spiritual-text-gradient">Find a Center Near You</h2>
+        <SearchBar onSearchResult={handleSearchResult} />
+      </div>
       
-      {/* Stats summary bar */}
-      <StatsSummary />
-      
-      {lat && lng ? (
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-3">Meditation Centers Near {address}</h2>
-          
-          <div className="mb-4">
-            <label htmlFor="distance-slider" className="block mb-2 text-sm font-medium text-neutral-700">
-              Maximum Distance: {maxDistance} km
-            </label>
-            <input
-              id="distance-slider"
-              type="range"
-              min="5"
-              max="100"
-              step="5"
-              value={maxDistance}
-              onChange={handleDistanceChange}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            />
+      {lat && lng && (
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold spiritual-text-gradient">Centers Near {address}</h2>
+            <div className="flex items-center space-x-2">
+              <label htmlFor="distance-filter" className="text-sm text-neutral-600">Distance:</label>
+              <input 
+                id="distance-filter"
+                type="range" 
+                min="5" 
+                max="100" 
+                step="5" 
+                value={maxDistance} 
+                onChange={handleDistanceChange}
+                className="w-32"
+              />
+              <span className="text-sm text-neutral-600">{maxDistance} km</span>
+            </div>
           </div>
           
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="lg:w-1/2 rounded-lg overflow-hidden bg-white p-2 shadow-md h-[500px]" ref={mapRef}>
-              <CenterMap 
-                centers={nearestCenters}
-                onCenterSelect={handleCenterSelect}
-                initialLat={lat}
-                initialLng={lng}
-                initialZoom={10}
-                autoZoom={false}
-                highlightCenter={true}
-              />
-            </div>
-            
-            <div className="lg:w-1/2 flex flex-col">
-              <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-medium">
-                    {nearestCenters.length} centers found within {maxDistance}km
-                  </h3>
-                </div>
-              </div>
-              
-              <div 
-                className="flex-1 overflow-y-auto bg-white rounded-lg shadow-md p-2 h-[400px]"
-                ref={resultsContainerRef}
-              >
-                {loading ? (
-                  <div className="flex justify-center items-center h-full">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                  </div>
-                ) : nearestCenters.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="md:col-span-1 bg-light rounded-lg shadow-md border border-neutral-200 p-4">
+              <div ref={resultsContainerRef} className="h-[600px] overflow-y-auto pr-2">
+                {nearestCenters.length > 0 ? (
                   <>
-                    <div className="grid gap-4">
+                    <div className="space-y-4">
                       {nearestCenters.map((center) => (
-                        <div
-                          key={center.branch_code}
-                          id={`center-card-${center.branch_code}`}
-                          className={`transition-colors duration-300 ${selectedCenter?.branch_code === center.branch_code ? 'bg-primary-50' : ''}`}
-                          onClick={() => handleCardClick(center)}
-                        >
-                          <CenterCard 
-                            center={center}
-                            distance={center.distance}
-                            showDistance={true}
-                          />
-                        </div>
+                        <CenterCard 
+                          key={center.branch_code} 
+                          center={center} 
+                          distance={center.distance}
+                          showDistance={true}
+                        />
                       ))}
-                      {/* Sentinel element for lazy loading */}
-                      {nearestCenters.length < allNearestCenters.filter(c => 
-                        typeof c.distance === 'number' && c.distance <= maxDistance
-                      ).length && (
-                        <div id="lazy-load-sentinel" className="h-4">
-                          {loadingMore && (
-                            <div className="flex justify-center p-4">
-                              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
+                    {/* Sentinel element for intersection observer */}
+                    <div id="lazy-load-sentinel" className="h-4"></div>
+                    {/* Loading indicator */}
+                    {loadingMore && (
+                      <div className="text-center py-4">
+                        <div className="animate-pulse text-neutral-400">Loading more centers...</div>
+                      </div>
+                    )}
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-                    <p className="text-lg text-neutral-600 mb-2">No centers found within {maxDistance}km</p>
-                    <p className="text-sm text-neutral-500">Try increasing the distance or searching in a different location</p>
+                  <div className="text-center py-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-neutral-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 className="text-xl font-semibold mb-2 text-neutral-600">No Centers Found</h3>
+                    <p className="text-neutral-500">
+                      We couldn't find any meditation centers within {maxDistance} km of your location.
+                    </p>
+                    <button 
+                      onClick={() => setMaxDistance(prev => Math.min(prev + 20, 100))}
+                      className="mt-4 text-primary hover:underline"
+                    >
+                      Try increasing the distance filter
+                    </button>
                   </div>
                 )}
               </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="mb-8">
-          <div className="view-controls mb-4 flex justify-end">
-            <div className="bg-white rounded-lg shadow-sm p-1 inline-flex">
-              <button 
-                className={`px-3 py-1 rounded-md ${viewMode === 'list' ? 'bg-primary text-white' : 'text-primary'}`}
-                onClick={() => handleViewModeChange('list')}
-              >
-                List
-              </button>
-              <button 
-                className={`px-3 py-1 rounded-md ${viewMode === 'map' ? 'bg-primary text-white' : 'text-primary'}`}
-                onClick={() => handleViewModeChange('map')}
-              >
-                Map
-              </button>
+            <div ref={mapRef} className="md:col-span-2 bg-light rounded-lg shadow-md border border-neutral-200 overflow-hidden">
+              <div className="h-[600px]">
+                <CenterMap 
+                  centers={nearestCenters} 
+                  autoZoom={nearestCenters.length > 0}
+                  onCenterSelect={handleCenterSelect}
+                  highlightCenter={true}
+                  showInfoWindowOnLoad={selectedCenter !== null}
+                />
+              </div>
             </div>
           </div>
-          
-          {viewMode === 'map' ? (
-            <div className="rounded-lg overflow-hidden bg-white p-2 shadow-md h-[600px]" ref={mapRef}>
-              <CenterMap 
-                centers={stateMapMarkers}
-                initialZoom={5}
-                initialLat={20.5937}
-                initialLng={78.9629}
-                onCenterSelect={handleCenterSelect}
-                autoZoom={true}
-              />
-            </div>
-          ) : (
-            <>
-              <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-semibold">Browse by Region and State</h3>
-                  <div className="sort-controls inline-flex bg-gray-100 rounded-md p-1">
-                    <button 
-                      className={`px-3 py-1 text-sm rounded-md ${sortBy === 'centers' ? 'bg-white shadow-sm' : ''}`}
-                      onClick={() => handleSortChange('centers')}
-                    >
-                      Most Centers
-                    </button>
-                    <button 
-                      className={`px-3 py-1 text-sm rounded-md ${sortBy === 'alpha' ? 'bg-white shadow-sm' : ''}`}
-                      onClick={() => handleSortChange('alpha')}
-                    >
-                      Alphabetical
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              {regionDetails.length > 0 && (
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-3 text-neutral-700">Regions</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {regionDetails
-                      .sort((a, b) => b.centerCount - a.centerCount)
-                      .map(region => (
-                        <Link 
-                          href={`/${region.name.toLowerCase()}`} 
-                          key={region.name}
-                          className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all"
-                        >
-                          <h4 className="font-medium text-primary mb-1">{region.name}</h4>
-                          <p className="text-sm text-neutral-600">
-                            {region.centerCount.toLocaleString()} centers in {region.stateCount} states
-                          </p>
-                        </Link>
-                      ))
-                    }
-                  </div>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {getSortedStates().map(state => {
-                  const region = getRegionForStateLocal(state.state);
-                  return (
-                    <Link 
-                      href={formatCenterUrl(region, state.state)}
-                      key={state.state}
-                      className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-primary">{state.state}</h3>
-                          <p className="text-sm text-neutral-600">
-                            {state.centerCount} centers, {state.districtCount} districts
-                          </p>
-                        </div>
-                        <span className="bg-primary-50 text-primary text-xs px-2 py-1 rounded-full">
-                          {region}
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </>
-          )}
         </div>
       )}
-    </div>
+      
+      {/* Regions Section */}
+      <div className="mb-12">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold spiritual-text-gradient">Explore by Region</h2>
+          <div className="flex space-x-2 bg-light rounded-md border border-neutral-200">
+            <button 
+              onClick={() => handleSortChange('centers')}
+              className={`px-3 py-1 text-sm ${sortBy === 'centers' ? 'bg-primary text-white rounded-md' : 'text-neutral-600'}`}
+            >
+              By Centers
+            </button>
+            <button 
+              onClick={() => handleSortChange('alpha')}
+              className={`px-3 py-1 text-sm ${sortBy === 'alpha' ? 'bg-primary text-white rounded-md' : 'text-neutral-600'}`}
+            >
+              Alphabetical
+            </button>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {getSortedRegions().map(region => (
+            <Link
+              key={region.name}
+              href={formatCenterUrl(region.name)}
+              className="bg-light p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 block"
+            >
+              <h3 className="text-xl font-semibold mb-1 text-spirit-blue-700">{region.name}</h3>
+              <div className="space-y-1 mb-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-500">States/UT:</span>
+                  <span className="text-neutral-700 font-medium">{region.stateCount}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-500">Centers:</span>
+                  <span className="text-neutral-700 font-medium">{region.centerCount}</span>
+                </div>
+              </div>
+              <div className="text-right mt-2">
+                <span className="text-primary font-medium">Explore →</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+      
+      {/* Statistics Summary */}
+      <StatsSummary />
+    </main>
   );
 }

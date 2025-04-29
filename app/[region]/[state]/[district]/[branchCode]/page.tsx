@@ -95,26 +95,41 @@ export async function generateStaticParams() {
 }
 
 export default async function CenterPage({ params }: CenterPageProps) {
-  const urlRegion = decodeURIComponent(params.region);
+  const urlRegion = decodeURIComponent(params.region).toUpperCase();
   const state = decodeURIComponent(params.state);
   const district = decodeURIComponent(params.district);
   const branchCode = decodeURIComponent(params.branchCode);
-  
-  // Get the actual region for this state from our data
-  const actualRegion = await getRegionForState(state);
   
   // Get the host from headers for constructing absolute URLs
   const headersList = headers();
   const host = headersList.get('host') || 'brahmakumaris.org';
   const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
 
+  // Initialize actualRegion with urlRegion as default
+  let actualRegion = urlRegion;
+
   try {
     const center = await getCenterByCode(branchCode) as CenterWithServices;
     
-    // Check if the URL region matches the actual region
+    // Try to get the region from the center data
+    if (center?.region) {
+      actualRegion = center.region.toUpperCase();
+    } else {
+      try {
+        // If no region in center data, try getting it from state mapping
+        actualRegion = (await getRegionForState(state)).toUpperCase();
+      } catch (error) {
+        // If getRegionForState fails, keep using the URL region
+        console.warn(`Failed to get region for state ${state}, using URL region ${urlRegion}`);
+      }
+    }
+    
+    // Check if the URL region matches the actual region (case-insensitive)
     if (urlRegion !== actualRegion && actualRegion !== 'INDIA' && center) {
+      // For the redirect URL, use the original case from center.region or a lowercase version
+      const redirectRegion = center?.region || actualRegion.toLowerCase();
       // Redirect to the correct URL
-      const formattedUrl = formatCenterUrl(actualRegion, state, district, center.name);
+      const formattedUrl = formatCenterUrl(redirectRegion, state, district, center.name);
       return (
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl mb-4">Redirecting to correct region...</h1>
@@ -155,7 +170,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
     const formattedAddress = formatAddress();
     
     const getGoogleMapsUrl = () => {
-      if (center.coords && center.coords.length === 2) {
+      if (center?.coords && Array.isArray(center.coords) && center.coords.length === 2) {
         const [lat, lng] = center.coords;
         const address = encodeURIComponent(formattedAddress);
         
@@ -178,7 +193,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
 
     // Get nearby centers
     let nearbyCenters: Center[] = [];
-    if (center.coords && center.coords.length === 2) {
+    if (center?.coords && Array.isArray(center.coords) && center.coords.length === 2) {
       const [lat, lng] = center.coords.map(parseFloat);
       if (!isNaN(lat) && !isNaN(lng)) {
         // Get 7 nearest centers (including the current one)

@@ -72,7 +72,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
       if (initialLat && initialLng) {
         setCenterPosition({ lat: initialLat, lng: initialLng });
         console.log('Setting center from initialLat/initialLng:', initialLat, initialLng);
-      } else if (centers.length > 0 && centers[0].coords && centers[0].coords.length === 2) {
+      } else if (centers.length > 0 && centers[0]?.coords && Array.isArray(centers[0].coords) && centers[0].coords.length === 2) {
         const lat = parseFloat(centers[0].coords[0]);
         const lng = parseFloat(centers[0].coords[1]);
         if (!isNaN(lat) && !isNaN(lng)) {
@@ -170,13 +170,13 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
     centers.forEach(center => {
       // Use original coordinates if valid, otherwise use geocoded coordinates
-      let coords = center.coords;
+      let coords = center?.coords;
       const geocodedCoords = geocodedCenters.get(center.branch_code);
       if (!hasValidCoordinates(center) && geocodedCoords) {
         coords = geocodedCoords;
       }
       
-      if (coords && coords.length === 2) {
+      if (coords && Array.isArray(coords) && coords.length === 2) {
         try {
           const lat = parseFloat(coords[0]);
           const lng = parseFloat(coords[1]);

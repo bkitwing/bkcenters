@@ -203,33 +203,48 @@ export default async function RegionPage({ params }: RegionPageProps) {
             </div>
           ))
       ) : (
-        <div className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {states.map(state => (
-              <Link
-                key={state.name}
-                href={formatCenterUrl(region, state.name)}
-                className="bg-light p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 block"
-              >
-                <h3 className="text-xl font-semibold mb-2 text-spirit-purple-700">{state.name}</h3>
-                <div className="flex justify-between items-center">
-                  <span className="text-neutral-600">
-                    {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'}
-                  </span>
-                  <span className="text-primary font-medium">View →</span>
-                </div>
+        // For specific regions, show the states directly
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          {states.map(state => (
+            <Link
+              key={state.name}
+              href={formatCenterUrl(region, state.name)}
+              className="bg-light p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 block"
+            >
+              <h2 className="text-xl font-semibold mb-2 text-spirit-purple-700">{state.name}</h2>
+              <div className="flex justify-between items-center">
+                <span className="text-neutral-600">
+                  {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'}
+                </span>
+                <span className="text-primary font-medium">View →</span>
+              </div>
+            </Link>
+          ))}
+          
+          {states.length === 0 && (
+            <div className="col-span-full bg-light p-8 rounded-lg shadow-md text-center border border-neutral-200">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-neutral-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h2 className="text-2xl font-bold mb-4 text-neutral-700">No States Found</h2>
+              <p className="text-neutral-600 mb-6">
+                We couldn't find any states in {region}.
+              </p>
+              
+              <Link href="/" className="btn-primary">
+                Explore All Centers
               </Link>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       )}
       
-      <div className="mt-8">
-        <Link href="/" className="text-primary hover:underline font-medium inline-flex items-center">
+      <div className="mt-8 pt-6 border-t border-neutral-200">
+        <Link href="/" className="text-primary hover:underline inline-flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.25 9l3 3m0 0l-3 3m3-3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to Center Directory
+          Back to Home
         </Link>
       </div>
     </div>
