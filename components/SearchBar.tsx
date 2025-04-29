@@ -13,15 +13,21 @@ declare global {
 interface SearchBarProps {
   onSearchResult?: (lat: number, lng: number, address: string) => void;
   placeholder?: string;
+  value?: string;
+  onClear?: () => void;
+  showClearButton?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
   onSearchResult,
-  placeholder = 'Enter your location to find centers near you...'
+  placeholder = 'Enter your location to find centers near you...',
+  value,
+  onClear,
+  showClearButton = false
 }) => {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(value || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -45,6 +51,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
       }
     }
   }, []);
+  
+  // Update internal state when value prop changes
+  useEffect(() => {
+    if (value !== undefined) {
+      setInputValue(value);
+    }
+  }, [value]);
   
   const initAutocomplete = () => {
     if (!inputRef.current || !window.google?.maps?.places) return;
@@ -182,82 +195,53 @@ const SearchBar: React.FC<SearchBarProps> = ({
   
   return (
     <div className="w-full relative">
-      <div className="flex gap-2">
-        <div className="relative flex-grow">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            className="w-full p-4 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent"
-            placeholder={!hasValidKey ? "Location search unavailable (API key missing)" : placeholder}
-            disabled={isLoading || !hasValidKey || !!loadError}
-          />
-          <div className="absolute right-3 top-4">
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#FF7F50]"></div>
-            ) : (
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-6 w-6 text-gray-500" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-                />
-              </svg>
-            )}
-          </div>
-        </div>
+      <div className="relative flex-grow">
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          className="w-full p-4 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent"
+          placeholder={!hasValidKey ? "Location search unavailable (API key missing)" : placeholder}
+          disabled={isLoading || !hasValidKey || !!loadError}
+        />
         
-        <button
-          onClick={handleGetCurrentLocation}
-          disabled={isLocating || isLoading}
-          className="bg-[#FF7F50] text-white rounded-lg px-4 py-2 hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
-        >
-          {isLocating ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>Locating...</span>
-            </>
-          ) : (
-            <>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
+        <div className="absolute right-3 top-4">
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#FF7F50]"></div>
+          ) : showClearButton && inputValue ? (
+            <button 
+              onClick={onClear}
+              className="focus:outline-none"
+              aria-label="Clear search"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-              <span className="hidden sm:inline">Use My Location</span>
-              <span className="inline sm:hidden">Location</span>
-            </>
+            </button>
+          ) : (
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6 text-gray-500" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+              />
+            </svg>
           )}
-        </button>
+        </div>
       </div>
       
       {locationError && (
-        <p className="mt-2 text-sm text-red-500">
+        <div className="absolute -bottom-6 left-0 text-red-500 text-sm">
           {locationError}
-        </p>
+        </div>
       )}
       
       {!hasValidKey && (

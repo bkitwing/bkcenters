@@ -78,26 +78,26 @@ const CenterCard: React.FC<CenterCardProps> = ({
   const fullUrl = formatCenterUrl(center.region, center.state, center.district, center.name);
   
   return (
-    <div className="card hover:shadow-md transition-shadow border border-neutral-200 p-4 rounded-lg h-full flex flex-col">
+    <div className="flex flex-col h-full bg-white p-3">
       <div className="mb-2">
         <Link href={fullUrl}>
           <h3 className="text-2xl font-bold spiritual-text-gradient">{center.name}</h3>
         </Link>
         {showDistance && distance && (
-          <span className="text-sm font-bold mb-6 spiritual-text-gradient">
+          <span className="text-sm font-bold spiritual-text-gradient">
             {distance.toFixed(1)} km away
           </span>
         )}
       </div>
       
-      <p className="text-neutral-600 mt-2 mb-3 text-sm line-clamp-2">
+      <p className="text-neutral-600 mt-1 mb-2 text-sm line-clamp-2">
         {formattedAddress}
       </p>
       
       <div className="contact-info text-sm flex-grow">
         {center.contact && (
           <div className="flex items-center text-neutral-600 mb-1">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
             <div>
@@ -118,7 +118,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
         
         {center.mobile && (
           <div className="flex items-center text-neutral-600 mb-1">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
             <div>
@@ -138,8 +138,8 @@ const CenterCard: React.FC<CenterCardProps> = ({
         )}
         
         {center.email && (
-          <div className="flex items-center text-neutral-600 mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="flex items-center text-neutral-600 mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             <a href={`mailto:${center.email}`} className="hover:underline truncate">
@@ -149,7 +149,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
         )}
       </div>
       
-      <div className="mt-5 flex justify-between mt-auto pt-3 border-t border-neutral-100">
+      <div className="flex justify-between mt-auto pt-2 border-t border-neutral-100">
         <div className="flex gap-4">
           {/* View Details Icon */}
           <Link 

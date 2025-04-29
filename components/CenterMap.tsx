@@ -18,6 +18,7 @@ interface CenterMapProps {
   highlightCenter?: boolean;
   defaultZoom?: number;
   showInfoWindowOnLoad?: boolean;
+  selectedCenter?: Center | null;
 }
 
 const CenterMap: React.FC<CenterMapProps> = ({
@@ -31,7 +32,8 @@ const CenterMap: React.FC<CenterMapProps> = ({
   autoZoom = false,
   highlightCenter = false,
   defaultZoom = 5,
-  showInfoWindowOnLoad = false
+  showInfoWindowOnLoad = false,
+  selectedCenter: externalSelectedCenter = null
 }) => {
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
@@ -39,11 +41,21 @@ const CenterMap: React.FC<CenterMapProps> = ({
   const [markersReady, setMarkersReady] = useState(false);
   const [geocodedCenters, setGeocodedCenters] = useState<Map<string, [string, string]>>(new Map());
   
+  // Create a reference to store all markers for later access
+  const [markers, setMarkers] = useState<Map<string, google.maps.Marker>>(new Map());
+  
   // Use our custom Google Maps hook
   const { isLoaded, loadError, hasValidKey } = useGoogleMaps();
   const [GoogleMap, setGoogleMap] = useState<any>(null);
   const [Marker, setMarker] = useState<any>(null);
   const [InfoWindow, setInfoWindow] = useState<any>(null);
+
+  // Use external selectedCenter if provided
+  useEffect(() => {
+    if (externalSelectedCenter) {
+      setSelectedCenter(externalSelectedCenter);
+    }
+  }, [externalSelectedCenter]);
 
   // Lazy load the Google Maps components only when API is ready
   useEffect(() => {
@@ -161,28 +173,42 @@ const CenterMap: React.FC<CenterMapProps> = ({
     geocodeCenters();
   }, [isLoaded, centers, geocodedCenters]);
 
+  // Helper function to get valid coordinates for a center (either original or geocoded)
+  const getValidCoordinates = useCallback((center: Center): [string, string] | null => {
+    // Use original coordinates if valid
+    if (hasValidCoordinates(center)) {
+      return center.coords as [string, string];
+    }
+    
+    // Use geocoded coordinates as fallback
+    const geocodedCoords = geocodedCenters.get(center.branch_code);
+    if (geocodedCoords) {
+      return geocodedCoords;
+    }
+    
+    return null;
+  }, [geocodedCenters]);
+
   // Auto-zoom to fit all markers
   const fitBounds = useCallback(() => {
     if (!mapRef || !centers.length || !google?.maps) return;
 
     const bounds = new google.maps.LatLngBounds();
     let hasValidCoords = false;
+    let validCenterCount = 0;
 
     centers.forEach(center => {
-      // Use original coordinates if valid, otherwise use geocoded coordinates
-      let coords = center?.coords;
-      const geocodedCoords = geocodedCenters.get(center.branch_code);
-      if (!hasValidCoordinates(center) && geocodedCoords) {
-        coords = geocodedCoords;
-      }
+      // Get coordinates using our helper function
+      const coords = getValidCoordinates(center);
       
-      if (coords && Array.isArray(coords) && coords.length === 2) {
+      if (coords) {
         try {
           const lat = parseFloat(coords[0]);
           const lng = parseFloat(coords[1]);
           if (!isNaN(lat) && !isNaN(lng)) {
             bounds.extend({ lat, lng });
             hasValidCoords = true;
+            validCenterCount++;
           }
         } catch (e) {
           console.error('Error adding point to bounds:', e);
@@ -194,22 +220,22 @@ const CenterMap: React.FC<CenterMapProps> = ({
       mapRef.fitBounds(bounds);
       
       // If we have a single marker, set a specific zoom level
-      if (centers.length === 1 && highlightCenter) {
+      if (validCenterCount === 1) {
         setTimeout(() => {
-          mapRef.setZoom(defaultZoom);
+          mapRef.setZoom(15); // Closer zoom for a single center
         }, 100);
       } else {
         // Add some padding for multiple markers
-        const listener = google.maps.event.addListenerOnce(mapRef, 'bounds_changed', () => {
-          mapRef.setZoom(Math.min(mapRef.getZoom() || 10, 12));
-        });
-        
-        return () => {
-          google.maps.event.removeListener(listener);
-        };
+        // This ensures markers aren't too close to the edge
+        setTimeout(() => {
+          const currentZoom = mapRef.getZoom() || defaultZoom;
+          // Limit the zoom level for better overview when many markers are present
+          const targetZoom = Math.min(currentZoom, validCenterCount <= 3 ? 13 : 12); 
+          mapRef.setZoom(targetZoom);
+        }, 200);
       }
     }
-  }, [mapRef, centers, defaultZoom, highlightCenter, geocodedCenters]);
+  }, [mapRef, centers, defaultZoom, getValidCoordinates]);
 
   // Apply auto-zoom when map and centers are available
   useEffect(() => {
@@ -242,12 +268,57 @@ const CenterMap: React.FC<CenterMapProps> = ({
     }
   }, [mapRef, initialZoom, autoZoom]);
 
+  // Handle marker click to select a center
   const handleMarkerClick = (center: Center) => {
     setSelectedCenter(center);
+    
     if (onCenterSelect) {
       onCenterSelect(center);
     }
   };
+  
+  // Highlight a marker when its corresponding center is selected and center the map on it
+  useEffect(() => {
+    if (!mapRef || !selectedCenter) return;
+    
+    // Find the marker for the selected center
+    const marker = markers.get(selectedCenter.branch_code);
+    if (marker) {
+      // Apply bounce animation to the marker
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      
+      // Center the map on the selected marker with a slight zoom-in effect
+      if (selectedCenter.coords && selectedCenter.coords.length === 2) {
+        const [lat, lng] = selectedCenter.coords.map(parseFloat);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          // Smoothly pan to the marker
+          mapRef.panTo({ lat, lng });
+          
+          // Zoom in slightly if we're zoomed out too far
+          const currentZoom = mapRef.getZoom() || defaultZoom;
+          if (currentZoom < 13) {
+            mapRef.setZoom(13);
+          }
+        }
+      }
+      
+      // Stop animation after 1.5 seconds
+      setTimeout(() => {
+        if (marker) {
+          marker.setAnimation(null);
+        }
+      }, 1500);
+    }
+  }, [selectedCenter, markers, mapRef, defaultZoom]);
+
+  // Register each marker when created
+  const registerMarker = useCallback((branchCode: string, marker: google.maps.Marker) => {
+    setMarkers(prev => {
+      const newMarkers = new Map(prev);
+      newMarkers.set(branchCode, marker);
+      return newMarkers;
+    });
+  }, []);
 
   const onMapLoad = (map: google.maps.Map) => {
     setMapRef(map);
@@ -262,59 +333,20 @@ const CenterMap: React.FC<CenterMapProps> = ({
     }, 100);
   };
 
-  // Show static map if Google Maps API key is missing or invalid
-  if (!hasValidKey || loadError) {
-    return (
-      <div 
-        style={{ height, position: 'relative' }} 
-        className="bg-spirit-purple-50 rounded-lg flex flex-col items-center justify-center border border-spirit-purple-100"
-      >
-        <div className="text-center p-4">
-          <p className="text-neutral-500 mb-2">Map unavailable</p>
-          <p className="text-sm text-neutral-400 mb-4">Google Maps API key required</p>
-          
-          {centers.map(center => (
-            <div 
-              key={center.branch_code} 
-              className="bg-light p-3 mb-2 rounded-md shadow-sm cursor-pointer hover:shadow-md transition-shadow border border-neutral-200"
-              onClick={() => handleMarkerClick(center)}
-            >
-              <p className="font-medium text-primary">{center.name}</p>
-              <p className="text-sm text-neutral-500">
-                {center.coords ? `${center.coords[0]}, ${center.coords[1]}` : 'No coordinates'}
-              </p>
-            </div>
-          ))}
-          
-          <div className="mt-4 text-xs text-neutral-400">
-            <p>To enable maps, add a Google Maps API key to your .env.local file:</p>
-            <code className="bg-neutral-200 p-1 rounded">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here</code>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Loading placeholder
-  if (!isLoaded || !centerPosition || !GoogleMap || !Marker || !InfoWindow) {
-    console.log('Map loading state:', { 
-      isLoaded, 
-      hasPosition: !!centerPosition, 
-      hasGoogleMap: !!GoogleMap, 
-      hasMarker: !!Marker, 
-      hasInfoWindow: !!InfoWindow 
-    });
-    return <div className="animate-pulse bg-spirit-blue-100 rounded-lg" style={{ height }}></div>;
-  }
-
-  const containerStyle = {
-    width: '100%',
-    height: '100%',
-    borderRadius: '0.5rem'
-  };
-
   // Customize marker icons for district view or highlighted center
   const getMarkerIcon = (center: Center) => {
+    // For selected center (given higher priority)
+    if (selectedCenter?.branch_code === center.branch_code) {
+      return {
+        path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+        fillColor: '#7E57C2', // Primary purple
+        fillOpacity: 1,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2.5,
+        scale: 1.3
+      };
+    }
+    
     // For district markers, show markers with intensity based on count
     if (isDistrictView) {
       const count = center.district_total || 0;
@@ -332,7 +364,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: baseColor,
         fillOpacity: opacity,
-        scale: 18, // Fixed size for all markers
+        scale: 15, // Fixed size for all markers
         strokeColor: '#FFFFFF',
         strokeWeight: 2,
         labelOrigin: new google.maps.Point(0, 0)
@@ -441,9 +473,26 @@ const CenterMap: React.FC<CenterMapProps> = ({
     return addressParts.length > 0 ? addressParts.join(', ') : 'Address not available';
   };
 
+  // Helper function to calculate InfoWindow offset based on center type
+  const getInfoWindowOffset = useCallback((center: Center): google.maps.Size => {
+    if (center.is_state_summary || center.is_district_summary) {
+      // Larger offset for summary markers which are bigger
+      return new google.maps.Size(0, -35);
+    }
+    
+    // Standard offset for regular markers
+    return new google.maps.Size(0, -25);
+  }, []);
+
+  const containerStyle = {
+    width: '100%',
+    height: '100%',
+    borderRadius: '0.5rem'
+  };
+
   return (
     <div style={{ height }}>
-      {isLoaded && centerPosition && (
+      {isLoaded && centerPosition && GoogleMap && Marker && InfoWindow ? (
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={centerPosition}
@@ -457,111 +506,53 @@ const CenterMap: React.FC<CenterMapProps> = ({
           onLoad={onMapLoad}
         >
           {markersReady && centers.map((center) => {
-            // Use original coordinates if valid, otherwise use geocoded coordinates
-            let coords = center.coords;
-            const geocodedCoords = geocodedCenters.get(center.branch_code);
-            if (!hasValidCoordinates(center) && geocodedCoords) {
-              coords = geocodedCoords;
-            }
+            // Get coordinates (either original or geocoded)
+            const coords = getValidCoordinates(center);
             
-            if (!coords || coords.length !== 2) return null;
+            // Skip centers without valid coordinates
+            if (!coords) return null;
             
-            try {
-              const position = {
-                lat: parseFloat(coords[0]),
-                lng: parseFloat(coords[1])
-              };
-              
-              if (isNaN(position.lat) || isNaN(position.lng)) {
-                console.warn(`Invalid coordinates for center ${center.name}:`, coords);
-                return null;
-              }
-              
-              return (
-                <Marker
-                  key={center.branch_code}
-                  position={position}
-                  title={center.name}
-                  onClick={() => handleMarkerClick(center)}
-                  icon={getMarkerIcon(center)}
-                  label={getMarkerLabel(center)}
-                  animation={highlightCenter && center.is_highlighted ? 1 : undefined} // 1 = BOUNCE
-                />
-              );
-            } catch (e) {
-              console.error(`Error creating marker for center ${center.name}:`, e);
-              return null;
-            }
+            const [lat, lng] = coords.map(parseFloat);
+            if (isNaN(lat) || isNaN(lng)) return null;
+            
+            const isSelected = selectedCenter?.branch_code === center.branch_code;
+            
+            return (
+              <Marker
+                key={center.branch_code}
+                position={{ lat, lng }}
+                onClick={() => handleMarkerClick(center)}
+                icon={getMarkerIcon(center)}
+                label={getMarkerLabel(center)}
+                title={center.name}
+                animation={isSelected ? google.maps.Animation.BOUNCE : null}
+                onLoad={(marker: google.maps.Marker) => registerMarker(center.branch_code, marker)}
+                zIndex={isSelected ? 1000 : undefined}
+              >
+                {/* InfoWindow disabled as per requirements */}
+              </Marker>
+            );
           })}
-
-          {selectedCenter && (
-            (() => {
-              // Use original coordinates if valid, otherwise use geocoded coordinates
-              let coords = selectedCenter.coords;
-              const geocodedCoords = geocodedCenters.get(selectedCenter.branch_code);
-              if (!hasValidCoordinates(selectedCenter) && geocodedCoords) {
-                coords = geocodedCoords;
-              }
-              
-              if (!coords || coords.length !== 2) return null;
-              
-              try {
-                const position = {
-                  lat: parseFloat(coords[0]),
-                  lng: parseFloat(coords[1])
-                };
-                
-                if (isNaN(position.lat) || isNaN(position.lng)) return null;
-                
-                return (
-                  <InfoWindow
-                    position={position}
-                    onCloseClick={() => setSelectedCenter(null)}
-                  >
-                    <div className="max-w-xs">
-                      <h3 className="font-semibold text-base">{selectedCenter.name}</h3>
-                      {isDistrictView && selectedCenter.is_district_summary ? (
-                        <div>
-                          <p className="text-sm text-gray-700 mt-1">
-                            <span className="inline-flex items-center justify-center bg-[#FF7F50] text-white font-semibold text-sm rounded-full w-8 h-8 mr-1">
-                              {selectedCenter.district_total || 0}
-                            </span>
-                            meditation {selectedCenter.district_total === 1 ? 'center' : 'centers'} in this district
-                          </p>
-                          <div className="mt-2">
-                            <a
-                              href={formatCenterUrl(selectedCenter.region, selectedCenter.state, selectedCenter.district)}
-                              className="text-[#FF7F50] text-sm font-medium"
-                            >
-                              View Centers in {selectedCenter.district}
-                            </a>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="text-sm text-gray-700 mt-1">
-                            {selectedCenter.description || formatAddress(selectedCenter)}
-                          </p>
-                          <div className="mt-2">
-                            <a
-                              href={formatCenterUrl(selectedCenter.region, selectedCenter.state, selectedCenter.district, selectedCenter.name)}
-                              className="text-[#FF7F50] text-sm font-medium"
-                            >
-                              View Details
-                            </a>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </InfoWindow>
-                );
-              } catch (e) {
-                console.error(`Error creating info window for center ${selectedCenter.name}:`, e);
-                return null;
-              }
-            })()
-          )}
         </GoogleMap>
+      ) : (
+        <div className="h-full w-full flex items-center justify-center bg-gray-100">
+          {loadError ? (
+            <div className="text-center p-4">
+              <p className="text-red-500 font-medium">Error loading Google Maps</p>
+              <p className="text-sm text-gray-600 mt-2">Failed to load Google Maps</p>
+            </div>
+          ) : !hasValidKey ? (
+            <div className="text-center p-4">
+              <p className="text-yellow-600 font-medium">Google Maps API key not configured</p>
+              <p className="text-sm text-gray-600 mt-2">Please add your API key in .env.local file</p>
+            </div>
+          ) : (
+            <div className="animate-pulse flex flex-col items-center">
+              <div className="h-12 w-12 bg-blue-200 rounded-full mb-2"></div>
+              <p className="text-gray-500">Loading map...</p>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
