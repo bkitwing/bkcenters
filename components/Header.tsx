@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { FaHome, FaBars, FaTimes } from 'react-icons/fa';
-import { MdMyLocation } from 'react-icons/md';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { FaHome, FaBars, FaTimes } from "react-icons/fa";
+import { MdMyLocation } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,14 +20,18 @@ const Header = () => {
       alert("Geolocation is not supported by your browser");
       return;
     }
-    
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
           const { latitude, longitude } = position.coords;
-          
+
           // Navigate to results page with query params
-          router.push(`/bkcenters?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent("Current Location")}`);
+          router.push(
+            `/?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent(
+              "Current Location"
+            )}`
+          );
         } catch (error) {
           console.error("Error handling location:", error);
           alert("Could not determine your location");
@@ -36,10 +40,11 @@ const Header = () => {
       (error) => {
         console.error("Error getting location:", error);
         let errorMessage = "Failed to get your location";
-        
+
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied. Please allow location access in your browser.";
+            errorMessage =
+              "Location access denied. Please allow location access in your browser.";
             break;
           case error.POSITION_UNAVAILABLE:
             errorMessage = "Location information is unavailable";
@@ -48,13 +53,13 @@ const Header = () => {
             errorMessage = "Location request timed out";
             break;
         }
-        
+
         alert(errorMessage);
       },
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 0
+        maximumAge: 0,
       }
     );
   };
@@ -63,12 +68,17 @@ const Header = () => {
     <header className="bg-white border-b border-neutral-200 sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <Link href="https://www.brahmakumaris.com/" target="_blank" rel="noopener noreferrer" className="flex items-center">
-          <Image 
-            src="/Brahma Kumaris logo.webp" 
-            alt="Brahma Kumaris" 
-            width={80} 
-            height={80} 
+        <Link
+          href="https://www.brahmakumaris.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center"
+        >
+          <Image
+            src="/Brahma Kumaris logo.webp"
+            alt="Brahma Kumaris"
+            width={80}
+            height={80}
             className="h-10 w-auto"
             unoptimized
           />
@@ -78,12 +88,16 @@ const Header = () => {
         <nav className="hidden md:block">
           <ul className="flex space-x-8 items-center">
             <li>
-              <Link href="/bkcenters" className="flex items-center text-neutral-700 hover:text-primary transition-colors" aria-label="Home">
+              <Link
+                href="/"
+                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                aria-label="Home"
+              >
                 <FaHome size={22} className="text-gray-600" />
               </Link>
             </li>
             <li>
-              <button 
+              <button
                 onClick={handleUseMyLocation}
                 className="flex items-center transition-colors focus:outline-none nearby-button"
               >
@@ -93,15 +107,20 @@ const Header = () => {
               </button>
             </li>
             <li>
-              <Link href="/bkcenters/retreat" className="flex items-center text-neutral-700 hover:text-primary transition-colors">
-                <span className="text-gray-600 font-medium">Retreat Centers</span>
+              <Link
+                href="/retreat"
+                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+              >
+                <span className="text-gray-600 font-medium">
+                  Retreat Centers
+                </span>
               </Link>
             </li>
           </ul>
         </nav>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="md:hidden text-neutral-700 focus:outline-none"
           onClick={toggleMenu}
         >
@@ -115,12 +134,17 @@ const Header = () => {
           <nav className="container mx-auto px-4 py-3">
             <ul className="space-y-4">
               <li>
-                <Link href="/bkcenters" className="flex items-center text-neutral-700 hover:text-primary transition-colors" onClick={toggleMenu} aria-label="Home">
+                <Link
+                  href="/"
+                  className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                  onClick={toggleMenu}
+                  aria-label="Home"
+                >
                   <FaHome size={22} className="text-gray-600" />
                 </Link>
               </li>
               <li>
-                <button 
+                <button
                   onClick={() => {
                     toggleMenu();
                     handleUseMyLocation();
@@ -133,8 +157,14 @@ const Header = () => {
                 </button>
               </li>
               <li>
-                <Link href="/bkcenters/retreat" className="flex items-center text-neutral-700 hover:text-primary transition-colors" onClick={toggleMenu}>
-                  <span className="text-gray-600 font-medium">Retreat Centers</span>
+                <Link
+                  href="/retreat"
+                  className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                  onClick={toggleMenu}
+                >
+                  <span className="text-gray-600 font-medium">
+                    Retreat Centers
+                  </span>
                 </Link>
               </li>
             </ul>
@@ -146,7 +176,7 @@ const Header = () => {
         .nearby-button {
           animation: subtle-pulse 3s ease-in-out infinite;
         }
-        
+
         @keyframes subtle-pulse {
           0% {
             opacity: 1;
@@ -163,4 +193,4 @@ const Header = () => {
   );
 };
 
-export default Header; 
+export default Header;
