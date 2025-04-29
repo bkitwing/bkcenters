@@ -13,7 +13,7 @@
  */
 export function formatCenterUrl(region: string, state: string = '', district: string = '', centerName: string = ''): string {
   // Start with base path
-  let url = '';
+  let url = '/bkcenters';
   
   // Format and add region if provided
   if (region) {
