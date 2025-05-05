@@ -1,10 +1,11 @@
- 'use client';
+'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import CenterMap from '@/components/CenterMap';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
+import SearchBar from '@/components/SearchBar';
 
 interface StatePageClientProps {
   actualRegion: string;
@@ -69,6 +70,11 @@ export default function StatePageClient({
       marker.district?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [allDistrictMarkers, searchQuery]);
+
+  // Handle search query clear
+  const handleClearSearch = () => {
+    setSearchQuery("");
+  };
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -126,20 +132,18 @@ export default function StatePageClient({
           <div className="bg-light rounded-lg shadow-md p-4 border border-neutral-200 h-full">
             <h2 className="text-xl mb-3 font-bold spiritual-text-gradient">Districts in {actualState}</h2>
             
-            {/* Search input */}
-            <div className="relative mb-3">
-              <input
-                type="text"
+            {/* Search input with voice capability */}
+            <div className="mb-3">
+              <SearchBar
                 placeholder="Search districts..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full py-2 px-3 border border-neutral-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm"
+                onClear={handleClearSearch}
+                showClearButton={searchQuery.length > 0}
+                onSearchResult={(lat, lng, address) => {
+                  // We're not using coordinates here, just the text
+                  setSearchQuery(address);
+                }}
               />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
             </div>
             
             <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
@@ -176,7 +180,7 @@ export default function StatePageClient({
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to {stateRegion} States
+          Back to {stateRegion} Country
         </Link>
       </div>
     </div>

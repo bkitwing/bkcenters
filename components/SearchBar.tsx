@@ -7,6 +7,8 @@ import { useGoogleMaps } from '@/lib/useGoogleMaps';
 declare global {
   interface Window {
     google: any;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
   }
 }
 
@@ -32,6 +34,105 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const { isLoaded, loadError, hasValidKey } = useGoogleMaps();
+  
+  // Voice recognition states
+  const [isListening, setIsListening] = useState(false);
+  const [speechRecognition, setSpeechRecognition] = useState<any>(null);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [interimTranscript, setInterimTranscript] = useState<string>('');
+  
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (SpeechRecognition) {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-IN'; // Set to Indian English by default
+          
+          // Setup recognition event handlers
+          recognition.onresult = (event: any) => {
+            let interimTranscript = '';
+            let finalTranscript = '';
+            
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+              const transcript = event.results[i][0].transcript;
+              if (event.results[i].isFinal) {
+                finalTranscript += transcript;
+              } else {
+                interimTranscript += transcript;
+              }
+            }
+            
+            // Update the interim transcript for display
+            setInterimTranscript(interimTranscript);
+            
+            // If we have a final result, update the input value
+            if (finalTranscript) {
+              setInputValue(finalTranscript);
+              if (inputRef.current) {
+                inputRef.current.value = finalTranscript;
+              }
+            }
+          };
+          
+          recognition.onerror = (event: any) => {
+            console.error('Speech recognition error', event);
+            setVoiceError('Error recognizing speech. Please try again.');
+            stopListening();
+          };
+          
+          recognition.onend = () => {
+            setIsListening(false);
+            // If there was an interim transcript when ended, finalize it
+            if (interimTranscript) {
+              setInputValue(prev => prev || interimTranscript);
+              setInterimTranscript('');
+            }
+          };
+          
+          setSpeechRecognition(recognition);
+          setVoiceSupported(true);
+        } catch (error) {
+          console.error('Error initializing speech recognition:', error);
+          setVoiceSupported(false);
+        }
+      } else {
+        setVoiceSupported(false);
+      }
+    }
+  }, []);
+  
+  const startListening = () => {
+    setVoiceError(null);
+    setInterimTranscript('');
+    if (speechRecognition) {
+      try {
+        speechRecognition.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+        setVoiceError('Could not start voice input. Please try again.');
+      }
+    }
+  };
+  
+  const stopListening = () => {
+    if (speechRecognition) {
+      try {
+        speechRecognition.stop();
+      } catch (error) {
+        console.error('Error stopping speech recognition:', error);
+      }
+    }
+    setIsListening(false);
+    // Clear interim transcript when stopping
+    setInterimTranscript('');
+  };
   
   useEffect(() => {
     // Only initialize autocomplete after Google Maps is loaded
@@ -186,12 +287,34 @@ const SearchBar: React.FC<SearchBarProps> = ({
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+    // Clear any error messages when user starts typing
+    if (voiceError) setVoiceError(null);
+    if (locationError) setLocationError(null);
+  };
+  
+  // Handle input focus to clear error states
+  const handleInputFocus = () => {
+    // Clear error messages when user clicks in the search box
+    if (voiceError) setVoiceError(null);
+    if (locationError) setLocationError(null);
   };
   
   // Show loading state while Google Maps is loading
   useEffect(() => {
     setIsLoading(!isLoaded);
   }, [isLoaded]);
+
+  // Clean up speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (speechRecognition && isListening) {
+        speechRecognition.stop();
+      }
+    };
+  }, [speechRecognition, isListening]);
+  
+  // Combine inputValue and interimTranscript for display
+  const displayValue = isListening && interimTranscript ? interimTranscript : inputValue;
   
   return (
     <div className="w-full relative">
@@ -199,14 +322,57 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <input
           ref={inputRef}
           type="text"
-          value={inputValue}
+          value={displayValue}
           onChange={handleInputChange}
-          className="w-full p-4 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent"
-          placeholder={!hasValidKey ? "Location search unavailable (API key missing)" : placeholder}
+          onFocus={handleInputFocus}
+          className={`w-full p-4 ${voiceSupported ? 'pr-24' : 'pr-10'} rounded-lg border ${locationError || voiceError ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent ${isListening ? 'animate-pulse-light' : ''}`}
+          placeholder={
+            voiceError 
+              ? "Error recognizing speech" 
+              : locationError
+                ? "Location error"
+                : isListening 
+                  ? "Listening..." 
+                  : (!hasValidKey 
+                    ? "Location search unavailable (API key missing)" 
+                    : placeholder)
+          }
           disabled={isLoading || !hasValidKey || !!loadError}
+          readOnly={isListening}
         />
         
-        <div className="absolute right-3 top-4">
+        <div className="absolute right-3 top-4 flex items-center space-x-2">
+          {voiceSupported && (
+            <div className="flex items-center">
+              {isListening && (
+                <span className="text-spirit-purple-600 text-xs mr-2 flex items-center">
+                  <span className="flex space-x-1 mr-1">
+                    <span className="h-2 w-2 bg-spirit-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="h-2 w-2 bg-spirit-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="h-2 w-2 bg-spirit-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </span>
+                </span>
+              )}
+              <button
+                onClick={isListening ? stopListening : startListening}
+                disabled={isLoading || !hasValidKey || !!loadError}
+                className={`rounded-full p-1 focus:outline-none ${isListening ? 'bg-red-500 text-white' : voiceError ? 'text-red-500' : 'text-gray-500 hover:text-gray-700'}`}
+                title={voiceError ? 'Try again' : isListening ? 'Stop voice input' : 'Start voice input'}
+                aria-label={voiceError ? 'Try again' : isListening ? 'Stop voice input' : 'Start voice input'}
+              >
+                {isListening ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          )}
+          
           {isLoading ? (
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#FF7F50]"></div>
           ) : showClearButton && inputValue ? (
@@ -237,12 +403,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
           )}
         </div>
       </div>
-      
-      {locationError && (
-        <div className="absolute -bottom-6 left-0 text-red-500 text-sm">
-          {locationError}
-        </div>
-      )}
       
       {!hasValidKey && (
         <p className="mt-2 text-xs text-red-500">

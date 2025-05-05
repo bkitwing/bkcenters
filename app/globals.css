@@ -74,4 +74,18 @@ body {
     position: relative;
     z-index: 1;
   }
+}
+
+/* Custom animation for voice input */
+@keyframes pulse-light {
+  0%, 100% {
+    background-color: rgba(126, 87, 194, 0.05);
+  }
+  50% {
+    background-color: rgba(126, 87, 194, 0.1);
+  }
+}
+
+.animate-pulse-light {
+  animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 } 
