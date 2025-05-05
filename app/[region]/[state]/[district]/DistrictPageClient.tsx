@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import CenterMap from '@/components/CenterMap';
 import CenterCard from '@/components/CenterCard';
+import SearchBar from '@/components/SearchBar';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 
@@ -68,6 +69,11 @@ export default function DistrictPageClient({
         mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
+  };
+
+  // Handle search query clear
+  const handleClearSearch = () => {
+    setSearchQuery("");
   };
 
   // Create an enhanced version of centers with highlighting property
@@ -139,20 +145,18 @@ export default function DistrictPageClient({
             />
           </div>
           
-          {/* Search input */}
-          <div className="relative mb-6">
-            <input
-              type="text"
+          {/* Search input with voice capability */}
+          <div className="mb-6">
+            <SearchBar
               placeholder={`Search centers within ${actualDistrict}...`}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-2 px-3 border border-neutral-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+              onClear={handleClearSearch}
+              showClearButton={searchQuery.length > 0}
+              onSearchResult={(lat, lng, address) => {
+                // We're not using coordinates here, just the text
+                setSearchQuery(address);
+              }}
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
           </div>
           
           {filteredCenters.length > 0 ? (
@@ -202,7 +206,7 @@ export default function DistrictPageClient({
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          Back to {actualState} State
+          Back to {actualState} Centers
         </Link>
       </div>
     </div>
