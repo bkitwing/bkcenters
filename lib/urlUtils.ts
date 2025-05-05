@@ -18,7 +18,7 @@ export function formatCenterUrl(
   centerName: string = ""
 ): string {
   // Start with base path
-  let url = "/";
+  let url = "";
 
   // Format and add region if provided
   if (region) {
