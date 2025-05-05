@@ -645,9 +645,8 @@ export async function getRegionForState(state: string): Promise<string> {
     return center.region;
   }
 
-  // throw new Error(
-  //   `No region found for state: ${state}. This indicates a data integrity issue.`
-  // );
+  // Return a default value if no region is found
+  return "Unknown";
 }
 
 // Get full region to state mapping - much faster than individual lookups
