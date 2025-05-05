@@ -160,7 +160,7 @@ const isStaticGeneration = () => {
 
 // Fallback empty data structure for build time
 const getEmptyData = (): CentersData => {
-//@ts-expect-error
+  //@ts-expect-error
   return {
     data: [],
     total: 0,
@@ -179,12 +179,12 @@ async function fetchCentersData(): Promise<CentersData> {
 
   // If we're in a build environment or SSR, return empty data
   // This prevents API calls during static generation
-  // if (isServerEnvironment() && isStaticGeneration()) {
-  //   console.warn("Static generation detected - using empty centers data");
-  //   const emptyData = getEmptyData();
-  //   centersData = emptyData;
-  //   return emptyData;
-  // }
+  if (isServerEnvironment() && isStaticGeneration()) {
+    console.warn("Static generation detected - using empty centers data");
+    const emptyData = getEmptyData();
+    centersData = emptyData;
+    return emptyData;
+  }
 
   // Get the origin for absolute URLs
   const origin =
@@ -624,7 +624,6 @@ export async function getCentersByState(state: string): Promise<Center[]> {
 }
 
 // Get region for a specific state
-// @ts-expect-error
 export async function getRegionForState(state: string): Promise<string> {
   // Ensure data mappings are initialized
   if (!isDataMappingInitialized) {
