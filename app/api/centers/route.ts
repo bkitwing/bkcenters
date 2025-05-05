@@ -1,60 +1,52 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { CentersData, Center } from "@/lib/types";
+import { Low } from 'lowdb'
+import { JSONFile } from 'lowdb/node'
+import lodash from 'lodash'
 
 // Add this export to tell Next.js that this route is dynamic and should be server-rendered
 export const dynamic = "force-dynamic";
 
+class LowWithLodash<T> extends Low<T> {
+  chain: lodash.ExpChain<this['data']> = lodash.chain(this).get('data')
+}
+
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-    // Check if we need to just return keys for a single state or district
     const state = url.searchParams.get("state");
     const district = url.searchParams.get("district");
     const lightweight = url.searchParams.get("lightweight") === "true";
 
-    // Get raw data
-    const centersData = await loadCentersData();
+    // Load data
+    // const centersData = await loadCentersData();
+    // const adapter = new JSONFile<CentersData>('Center-Processed.json');
+    // const db = new LowSync<CentersData>(adapter, {});
+    const adapter = new JSONFile<CentersData>('Center-Processed.json')
+    
 
-    // Return filtered and optimized data based on query params
-    if (state) {
-      // Filter by state
-      const filtered = centersData.data.filter(
-        (center) => center.state === state
-      );
+    // @ts-expect-error
+    const db = new LowWithLodash(adapter,{})
+    await db.read();
 
-      if (district) {
-        // Further filter by district
-        const districtCenters = filtered.filter(
-          (center) => center.district === district
-        );
-
-        return createResponse({
-          ...centersData,
-          total: districtCenters.length,
-          state,
-          data: districtCenters.map((center) =>
-            optimizeCenter(center, lightweight)
-          ),
-        });
-      }
-
-      return createResponse({
-        ...centersData,
-        total: filtered.length,
-        state,
-        data: filtered.map((center) => optimizeCenter(center, lightweight)),
-      });
+    let query = db.chain.get('data');
+   
+    if(query){
+      query = query.filter(state ? (district ? { state,district  } : { state }) : {})
     }
+    const filteredData = await query.value();
 
-    // Return all centers but optimize data size
-    return createResponse({
-      ...centersData,
-      data: centersData.data.map((center) =>
-        optimizeCenter(center, lightweight)
-      ),
-    });
+    // Prepare response
+    const responseData = {
+      total: filteredData.length,
+      state: state || undefined,
+      district: district || undefined,
+      data: filteredData.map(center => optimizeCenter(center, lightweight)),
+    };
+
+    return createResponse(responseData);
+  
+    
   } catch (error) {
     console.error("Error in API route:", error);
     return new NextResponse(
@@ -123,20 +115,22 @@ function optimizeCenter(center: Center, lightweight: boolean): Center {
 }
 
 // Load centers data from file system
-async function loadCentersData(): Promise<CentersData> {
-  console.log(process.cwd());
-  // Load only from the main data file
-  const mainFilePath = path.join(process.cwd(), "Center-Processed.json");
-  if (fs.existsSync(mainFilePath)) {
-    try {
-      const fileContents = fs.readFileSync(mainFilePath, "utf8");
-      return JSON.parse(fileContents) as CentersData;
-    } catch (error) {
-      console.error("Error reading centers data:", error);
-      throw new Error("Failed to load centers data");
-    }
-  } else {
-    console.error("Centers data file not found at:", mainFilePath);
-    throw new Error("Centers data file not found");
-  }
-}
+// async function loadCentersData(): Promise<CentersData> {
+//   console.log(process.cwd());
+//   // Load only from the main data file
+//   const mainFilePath = path.join(process.cwd(), "Center-Processed.json");
+//   if (fs.existsSync(mainFilePath)) {
+//     try {
+//       const fileContents = fs.readFileSync(mainFilePath, "utf8");
+//       return JSON.parse(fileContents) as CentersData;
+//     } catch (error) {
+//       console.error("Error reading centers data:", error);
+//       throw new Error("Failed to load centers data");
+//     }
+//   } else {
+//     console.error("Centers data file not found at:", mainFilePath);
+//     throw new Error("Centers data file not found");
+//   }
+// }
+
+

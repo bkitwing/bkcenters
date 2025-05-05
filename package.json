@@ -18,6 +18,8 @@
     "eslint-config-next": "^13.4.18",
     "google-map-react": "^2.2.1",
     "leaflet": "^1.9.4",
+    "lodash": "^4.17.21",
+    "lowdb": "^7.0.1",
     "next": "^13.4.18",
     "nodemailer": "^6.10.1",
     "react": "^18.2.0",
@@ -27,6 +29,7 @@
     "typescript": "^5.1.6"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.16",
     "@types/nodemailer": "^6.4.14",
     "autoprefixer": "^10.4.15",
     "postcss": "^8.4.28",

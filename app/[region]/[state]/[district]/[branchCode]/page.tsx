@@ -26,8 +26,11 @@ interface CenterPageProps {
   };
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata({ params }: CenterPageProps): Promise<Metadata> {
   try {
+
     const center = await getCenterByCode(params.branchCode) as CenterWithServices;
     
     if (!center) {
@@ -103,7 +106,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
   // Get the host from headers for constructing absolute URLs
   const headersList = headers();
   const host = headersList.get('host') || 'brahmakumaris.org';
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  // const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  const protocol = 'http' 
 
   // Initialize actualRegion with urlRegion as default
   let actualRegion = urlRegion;

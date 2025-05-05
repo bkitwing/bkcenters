@@ -25,7 +25,6 @@ export default async function RetreatCentersPage() {
     const indexB = orderFromFunction.indexOf(b.branch_code);
     return indexA - indexB;
   });
-  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb Navigation */}

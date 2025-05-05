@@ -36,6 +36,9 @@ export interface Center {
 }
 
 export interface CentersData {
+  map(arg0: (center: any) => Center): unknown;
+  length: any;
+  filter(arg0: (center: any) => boolean): CentersData;
   total: number;
   zone: string;
   subzone: string;
