@@ -239,6 +239,7 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
       ? window.location.origin + process.env.NEXT_PUBLIC_BASE_PATH
       : "http://localhost:3000" + process.env.NEXT_PUBLIC_BASE_PATH;
 
+  console.log("Origin", origin);
   try {
     // Load directly from API with state filter
     const response = await fetch(
