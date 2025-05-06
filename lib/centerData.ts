@@ -21,6 +21,12 @@ let stateToDistrictMapping: StateDistrictMapping | null = null;
 let districtToCentersMapping: DistrictCentersMapping | null = null;
 let isDataMappingInitialized = false;
 
+const getOrigin = () => {
+  return process.env.NODE_ENV === "production"
+    ? "https://www.brahmakumaris.com"
+    : "http://localhost:3000";
+};
+
 // Function to build all data mappings - call this once at initialization
 async function initializeDataMappings(): Promise<void> {
   if (isDataMappingInitialized) return;
@@ -187,10 +193,7 @@ async function fetchCentersData(): Promise<CentersData> {
   }
 
   // Get the origin for absolute URLs
-  const origin =
-    typeof window !== "undefined"
-      ? window.location.origin + process.env.NEXT_PUBLIC_BASE_PATH
-      : "http://localhost:3000" + process.env.NEXT_PUBLIC_BASE_PATH;
+  const origin = getOrigin();
   try {
     // Try to load from API endpoint with absolute URL
     const response = await fetch(`${origin}/api/centers?lightweight=false`, {
@@ -234,10 +237,7 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
   }
 
   // Get the origin for absolute URLs
-  const origin =
-    typeof window !== "undefined"
-      ? window.location.origin + process.env.NEXT_PUBLIC_BASE_PATH
-      : "http://localhost:3000" + process.env.NEXT_PUBLIC_BASE_PATH;
+  const origin = getOrigin();
 
   console.log("Origin", origin);
   try {
@@ -288,10 +288,7 @@ async function fetchCentersByDistrict(
   }
 
   // Get the origin for absolute URLs
-  const origin =
-    typeof window !== "undefined"
-      ? window.location.origin + process.env.NEXT_PUBLIC_BASE_PATH
-      : "http://localhost:3000" + process.env.NEXT_PUBLIC_BASE_PATH;
+  const origin = getOrigin();
   try {
     // Load directly from API with state and district filter
     const response = await fetch(
