@@ -4867,16 +4867,16 @@
     {
       "address": {
         "city": "Amreli",
-        "line1": "H No: 340",
-        "line2": "Rampara Street No-1",
-        "line3": "Jesingpada",
+        "line1": "Manmanabhav",
+        "line2": "Nilkanth Chawk, Near Mandli Godown",
+        "line3": "Jesingpara",
         "pincode": "365601"
       },
       "branch_code": "05141",
       "contact": "",
       "coords": [
-        "21.5971280000",
-        "71.1996650000"
+        "21.5960430000",
+        "71.2010040000"
       ],
       "country": "India",
       "district": "Amreli",
@@ -8673,21 +8673,21 @@
     {
       "address": {
         "city": "Bakhri Bazar",
-        "line1": "H No: 373, Shri Ganesh Complex",
-        "line2": "Manjhaul Road",
-        "line3": "Near Ambedkar Chowk",
+        "line1": "House Of Raju Transport",
+        "line2": "Makha Chak, Near Girls High School",
+        "line3": "Ward No: 20",
         "pincode": "848202"
       },
       "branch_code": "05455",
       "contact": "",
       "coords": [
-        "25.5958080000",
-        "86.2555160000"
+        "25.5956800000",
+        "86.2549200000"
       ],
       "country": "India",
       "district": "Begusarai",
       "email": "",
-      "mobile": "8877334187, 7549445388",
+      "mobile": "8877334187",
       "name": "Bakhri Bazar",
       "region": "India",
       "state": "Bihar"

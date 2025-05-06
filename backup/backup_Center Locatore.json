@@ -135,7 +135,7 @@
       "email": "shantivan@bkivv.org",
       "mobile": "9414153000",
       "name": "ABU ROAD SHANTIVAN",
-      "region": "INDIA",
+      "region": "MADHUBAN SISTER CONCERNS",
       "section": "90007",
       "state": "RAJASTHAN",
       "state_id": "19",
@@ -554,7 +554,7 @@
       "district_id": "202",
       "email": "adur@bkivv.org",
       "mobile": "9495435578, 7907043151",
-      "name": "ADOOR",
+      "name": "ADOOR PANNIVIZHA",
       "region": "INDIA",
       "section": "02334",
       "state": "KERALA",
@@ -4120,62 +4120,6 @@
     },
     {
       "address": {
-        "city": "ALAMNAGAR ",
-        "line1": "BUILDING-9",
-        "line2": "NEAR KANYA MADHYA VIDHYALAYA",
-        "line3": "VIJAY SMARAK, KAMESHWAR NAGAR",
-        "pincode": "852219"
-      },
-      "branch_code": "05561",
-      "contact": "",
-      "coords": [
-        "25.5691210000",
-        "86.9020120000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Madhepura",
-      "district_id": "79",
-      "email": "",
-      "mobile": "9835991783, 8540961622",
-      "name": "ALAMNAGAR ",
-      "region": "INDIA",
-      "section": "02474",
-      "state": "BIHAR",
-      "state_id": "5",
-      "sub_zone": "EBI",
-      "zone": "EASTERN"
-    },
-    {
-      "address": {
-        "city": "ALAMNAGAR",
-        "line1": "PLOT NO: 1196/2359, OM SHANTI BHAWAN",
-        "line2": "NEAR V.S. PROJECT KANYA +2 SCHOOL",
-        "line3": "HP GAS AGENCY ROAD",
-        "pincode": "852219"
-      },
-      "branch_code": "05588",
-      "contact": "",
-      "coords": [
-        "25.5691190000",
-        "86.9020230000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Madhepura",
-      "district_id": "79",
-      "email": "",
-      "mobile": "6204515892, 7857067107",
-      "name": "ALAMNAGAR",
-      "region": "INDIA",
-      "section": "03366",
-      "state": "BIHAR",
-      "state_id": "5",
-      "sub_zone": "EBI",
-      "zone": "EASTERN"
-    },
-    {
-      "address": {
         "city": "ALAND",
         "line1": "SANGAM TEERTH, H NO: 11-355/6H",
         "line2": "PWD OFFICE ROAD",
@@ -6249,16 +6193,16 @@
     {
       "address": {
         "city": "AMRELI",
-        "line1": "H NO: 340",
-        "line2": "RAMPARA STREET NO-1",
-        "line3": "JESINGPADA",
+        "line1": "MANMANABHAV",
+        "line2": "NILKANTH CHAWK, NEAR MANDLI GODOWN",
+        "line3": "JESINGPARA",
         "pincode": "365601"
       },
       "branch_code": "05141",
       "contact": "",
       "coords": [
-        "21.5971280000",
-        "71.1996650000"
+        "21.5960430000",
+        "71.2010040000"
       ],
       "country": "INDIA",
       "country_id": "1",
@@ -6826,7 +6770,7 @@
       "district_id": "1368",
       "email": "",
       "mobile": "8057300519",
-      "name": "ANDA",
+      "name": "ANDA (ANAND NAGAR)",
       "region": "INDIA",
       "section": "00890",
       "state": "UTTAR PRADESH",
@@ -8841,8 +8785,8 @@
       "district": "Kendrapara",
       "district_id": "345",
       "email": "aul@bkivv.org",
-      "mobile": "8895658191",
-      "name": "AUL",
+      "mobile": "9337232525, 8895658191",
+      "name": "AUL (NIAL)",
       "region": "INDIA",
       "section": "00141",
       "state": "ODISHA",
@@ -9905,7 +9849,7 @@
       "district": "Thane",
       "district_id": "266",
       "email": "badlapur@bkivv.org",
-      "mobile": "9860593066",
+      "mobile": "9860593066, 9987414422",
       "name": "BADLAPUR",
       "region": "INDIA",
       "section": "01326",
@@ -11093,23 +11037,23 @@
     {
       "address": {
         "city": "BAKHRI BAZAR",
-        "line1": "H NO: 373, SHRI GANESH COMPLEX",
-        "line2": "MANJHAUL ROAD",
-        "line3": "NEAR AMBEDKAR CHOWK",
+        "line1": "HOUSE OF RAJU TRANSPORT",
+        "line2": "MAKHA CHAK, NEAR GIRLS HIGH SCHOOL",
+        "line3": "WARD NO: 20",
         "pincode": "848202"
       },
       "branch_code": "05455",
       "contact": "",
       "coords": [
-        "25.5958080000",
-        "86.2555160000"
+        "25.5956800000",
+        "86.2549200000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Begusarai",
       "district_id": "73",
       "email": "",
-      "mobile": "8877334187, 7549445388",
+      "mobile": "8877334187",
       "name": "BAKHRI BAZAR",
       "region": "INDIA",
       "section": "02474",
@@ -12342,7 +12286,7 @@
       "district_id": "335",
       "email": "",
       "mobile": "6371580609",
-      "name": "BAMRA",
+      "name": "BAMRA GOBINDPUR",
       "region": "INDIA",
       "section": "00187",
       "state": "ODISHA",
@@ -14804,8 +14748,8 @@
       "country_id": "1",
       "district": "Bilaspur",
       "district_id": "148",
-      "email": "",
-      "mobile": "9981524479, 9981199496",
+      "email": "bartori@bkivv.org",
+      "mobile": "7223885759, 7489871118",
       "name": "BARTORI",
       "region": "INDIA",
       "section": "02822",
@@ -21024,7 +20968,7 @@
       "mobile": "9026138660, 7307416673",
       "name": "BEWAR (HAMIRPUR)",
       "region": "INDIA",
-      "section": "01636",
+      "section": "00890",
       "state": "UTTAR PRADESH",
       "state_id": "23",
       "sub_zone": "UKD",
@@ -21537,23 +21481,23 @@
     {
       "address": {
         "city": "BHALKI",
-        "line1": "DIVYA JYOTI DHAM",
-        "line2": "H.NO: 4-7-172/1(II), NEAR BASWESHWAR CHOWK",
-        "line3": "UDGIR ROAD",
+        "line1": "H.NO: 5-10-39/1/81,  SADBHAVANA BHAWAN",
+        "line2": "ASTURE LAYOUT, GURU COLONY",
+        "line3": "NEAR KHADAKESWAR HIGH SCHOOL",
         "pincode": "585328"
       },
       "branch_code": "01330",
-      "contact": "08484-262770",
+      "contact": "",
       "coords": [
-        "18.0531662000",
-        "77.2143075000"
+        "18.0420870000",
+        "77.2218280000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Bidar",
       "district_id": "186",
       "email": "bhalki@bkivv.org",
-      "mobile": "9480271744",
+      "mobile": "9480271744, 8217648157",
       "name": "BHALKI",
       "region": "INDIA",
       "section": "00569",
@@ -27012,7 +26956,7 @@
       "country_id": "1",
       "district": "Bilaspur",
       "district_id": "148",
-      "email": "",
+      "email": "jarahabhata.bsp@bkivv.org",
       "mobile": "9981199496",
       "name": "BILASPUR JARAHABHATA",
       "region": "INDIA",
@@ -35341,9 +35285,9 @@
     {
       "address": {
         "city": "CHODAVARAM",
-        "line1": "H.NO: 10-41A, VISHWA BRAHMINA STREET",
-        "line2": "GAVARAVARAM ROAD",
-        "line3": "",
+        "line1": "H.NO: 10-41A, DIVYA DARSHAN BHAWAN",
+        "line2": "VISHWA BRAHMINA STREET",
+        "line3": "GAVARAVARAM ROAD",
         "pincode": "531036"
       },
       "branch_code": "03363",
@@ -35459,7 +35403,7 @@
         "pincode": "362250"
       },
       "branch_code": "02366",
-      "contact": "2870288900",
+      "contact": "",
       "coords": [
         "21.0324396000",
         "70.2345465000"
@@ -35468,8 +35412,8 @@
       "country_id": "1",
       "district": "Junagadh",
       "district_id": "104",
-      "email": "",
-      "mobile": "",
+      "email": "bhalka.vrl@bkivv.org",
+      "mobile": "7265077138",
       "name": "CHORWAD",
       "region": "INDIA",
       "section": "00307",
@@ -36404,90 +36348,6 @@
     },
     {
       "address": {
-        "city": "CUTTACK",
-        "line1": "PLOT NO: 58/1294, GYAN UDAYA BHAWAN",
-        "line2": "KATA NO:39-D1, WARD NO-8, GAYATRI NAGAR, LANE-3",
-        "line3": "NEAR MORDEN PUBLIC SCHOOL, BIDANASI",
-        "pincode": "753014"
-      },
-      "branch_code": "01009",
-      "contact": "0671- 2306451",
-      "coords": [
-        "20.4900522000",
-        "85.8371845000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Cuttack",
-      "district_id": "991",
-      "email": "tulsipur.ctc@bkivv.org",
-      "mobile": "9438175321, 6712306451",
-      "name": "CUTTACK BIDANASI",
-      "region": "INDIA",
-      "section": "00141",
-      "state": "ODISHA",
-      "state_id": "17",
-      "sub_zone": "EOR",
-      "zone": "EASTERN"
-    },
-    {
-      "address": {
-        "city": "CUTTACK",
-        "line1": "PLOT NO: C/1348",
-        "line2": "C.D.A., SECTOR-VI",
-        "line3": "MARKAT NAGAR",
-        "pincode": "753014"
-      },
-      "branch_code": "01773",
-      "contact": "0671- 2366466",
-      "coords": [
-        "20.4746155000",
-        "85.8402090000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Cuttack",
-      "district_id": "991",
-      "email": "",
-      "mobile": "9438582480",
-      "name": "CUTTACK MARKAT NAGAR",
-      "region": "INDIA",
-      "section": "00141",
-      "state": "ODISHA",
-      "state_id": "17",
-      "sub_zone": "EOR",
-      "zone": "EASTERN"
-    },
-    {
-      "address": {
-        "city": "DABHARA",
-        "line1": "H NO: 72",
-        "line2": "NEAR PURANA BUS STAND",
-        "line3": "WARD NO-12, CHARAPUR ROAD",
-        "pincode": "495688"
-      },
-      "branch_code": "03881",
-      "contact": "",
-      "coords": [
-        "21.7814545000",
-        "83.0834970000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Janjgir-Champa",
-      "district_id": "1383",
-      "email": "",
-      "mobile": "9424230396, 9424230396",
-      "name": "DABHARA",
-      "region": "INDIA",
-      "section": "00342",
-      "state": "CHHATTISGARH",
-      "state_id": "35",
-      "sub_zone": "IOP",
-      "zone": "INDORE"
-    },
-    {
-      "address": {
         "city": "DABHOI",
         "line1": "H NO: 27, 'SHANTI SAGAR'",
         "line2": "NEAR CHUNILAL PARK SOCIETY",
@@ -37206,7 +37066,7 @@
       "district_id": "106",
       "email": "",
       "mobile": "9427376231",
-      "name": "DANTA",
+      "name": "DANTA (BANASKANTHA)",
       "region": "INDIA",
       "section": "00292",
       "state": "GUJARAT",
@@ -41181,7 +41041,7 @@
       "district": "Saharanpur",
       "district_id": "2394",
       "email": "shivchowk.dbd@bkivv.org",
-      "mobile": "9258076922, 9258076924",
+      "mobile": "9258076922",
       "name": "DEOBAND SHIV CHOWK",
       "region": "INDIA",
       "section": "00782",
@@ -44457,7 +44317,7 @@
       "district": "Dhule",
       "district_id": "270",
       "email": "dondaicha@bkivv.org",
-      "mobile": "9422788290, 9422268095",
+      "mobile": "9422268095, 9960965996",
       "name": "DONDAICHA",
       "region": "INDIA",
       "section": "00585",
@@ -48613,22 +48473,22 @@
     {
       "address": {
         "city": "GANDHINAGAR",
-        "line1": "PLOT NO: 448/2",
-        "line2": "BEHIND SHIV SHAKHTI MANDIR, SECTOR RING ROAD",
-        "line3": "NEAR PRERNA VIDYALAYA, SECTOR- 5A",
+        "line1": "PLOT NO: 431/1",
+        "line2": "BEHIND SHIV SHAKHI MAHADEV TEMPLE",
+        "line3": "SECTOR- 5A",
         "pincode": "382006"
       },
       "branch_code": "04845",
       "contact": "",
       "coords": [
-        "23.2140850000",
-        "72.6280100000"
+        "23.2141540000",
+        "72.6280220000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Gandhinagar",
       "district_id": "107",
-      "email": "",
+      "email": "sector5.gnr@bkivv.org",
       "mobile": "6354805245, 9879612144",
       "name": "GANDHINAGAR SECTOR 5",
       "region": "INDIA",
@@ -63117,23 +62977,23 @@
     {
       "address": {
         "city": "ITANAGAR",
-        "line1": "FLAT NO: 85, RIBA MANSION",
-        "line2": "OPP: ANNE HOTEL (BUS STOP)",
-        "line3": "BANK TINALI, NH- 52A",
+        "line1": "GADI SHOP BUILDING, FIRST FLOOR",
+        "line2": "C-SECTOR, GANDHI MARKET, NEAR AUTO STAND",
+        "line3": "ITANAGAR",
         "pincode": "791111"
       },
       "branch_code": "01020",
-      "contact": "0360- 2214141",
+      "contact": "",
       "coords": [
-        "27.0997702000",
-        "93.6284894000"
+        "27.0995310000",
+        "93.6296790000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Papum Pare",
       "district_id": "2948",
       "email": "itanagar@bkivv.org",
-      "mobile": "9436253300",
+      "mobile": "9436253300, 7005545656",
       "name": "ITANAGAR",
       "region": "INDIA",
       "section": "01020",
@@ -74837,7 +74697,7 @@
       "district": "Raigad",
       "district_id": "273",
       "email": "",
-      "mobile": "9987693015",
+      "mobile": "9987693015, 9987693011",
       "name": "KARJAT (RAIGARH)",
       "region": "INDIA",
       "section": "00633",
@@ -76965,7 +76825,7 @@
       "district": "East Champaran",
       "district_id": "74",
       "email": "",
-      "mobile": "9631078742",
+      "mobile": "9973127088, 9631078742",
       "name": "KESARIYA",
       "region": "INDIA",
       "section": "04062",
@@ -79951,7 +79811,7 @@
         "pincode": "362720"
       },
       "branch_code": "01095",
-      "contact": "02795-221808",
+      "contact": "",
       "coords": [
         "20.7963278000",
         "70.7076680000"
@@ -79960,8 +79820,8 @@
       "country_id": "1",
       "district": "GIR SOMNATH",
       "district_id": "5298",
-      "email": "",
-      "mobile": "9825922491",
+      "email": "bhalka.vrl@bkivv.org",
+      "mobile": "9327785515",
       "name": "KODINAR",
       "region": "INDIA",
       "section": "01095",
@@ -82745,7 +82605,7 @@
     {
       "address": {
         "city": "KOUNDKERA",
-        "line1": "H NO: 331, BAZAR CHOWK",
+        "line1": "H NO: 331, VARDANI BHAWAN, BAZAR CHOWK",
         "line2": "POKHRA-BORSI ROAD",
         "line3": "TAL-RAJIM",
         "pincode": "493992"
@@ -94982,7 +94842,7 @@
       "address": {
         "city": "MOTIZER",
         "line1": "PITRU CHHAYA-MATRU CHHAYA",
-        "line2": "PATEL WADA",
+        "line2": "PATEL WADA, MAIN ROAD",
         "line3": "TAL: KAPADVANJ",
         "pincode": "387650"
       },
@@ -95083,7 +94943,7 @@
       "email": "gyansarovar@bkivv.org",
       "mobile": "9414124382",
       "name": "MOUNT ABU GYAN SAROVAR",
-      "region": "INDIA",
+      "region": "MADHUBAN SISTER CONCERNS",
       "section": "90006",
       "state": "RAJASTHAN",
       "state_id": "19",
@@ -95111,7 +94971,7 @@
       "email": "abu@bkivv.org; madhuban@bkivv.org",
       "mobile": "9414092201",
       "name": "MOUNT ABU PANDAV BHAWAN",
-      "region": "INDIA",
+      "region": "MADHUBAN SISTER CONCERNS",
       "section": "90001",
       "state": "RAJASTHAN",
       "state_id": "19",
@@ -96409,34 +96269,6 @@
     {
       "address": {
         "city": "MUMBAI",
-        "line1": "21, DEV CHHAYA, HEERA-PANNA MALL",
-        "line2": "TARDEO ROAD",
-        "line3": "HAJI ALI",
-        "pincode": "400034"
-      },
-      "branch_code": "02907",
-      "contact": "022- 23515806",
-      "coords": [
-        "18.9766532000",
-        "72.8117757000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "MUMBAI CITY",
-      "district_id": "5302",
-      "email": "hajiali.mum@bkivv.org",
-      "mobile": "9969495366, 9766984993",
-      "name": "MUMBAI HAJI ALI",
-      "region": "INDIA",
-      "section": "01723",
-      "state": "MAHARASHTRA",
-      "state_id": "12",
-      "sub_zone": "MMU",
-      "zone": "MAHARASTRA"
-    },
-    {
-      "address": {
-        "city": "MUMBAI",
         "line1": "23, DAR-UL-MULUK, 2ND FLOOR",
         "line2": "PANDITA RAMABAI ROAD",
         "line3": "GAMDEVI",
@@ -96817,7 +96649,7 @@
       "district": "MUMBAI SUBURBAN",
       "district_id": "1962",
       "email": "vikhroli.mum@bkivv.org",
-      "mobile": "9869131644",
+      "mobile": "9869131644, 9920553163",
       "name": "MUMBAI VIKROLI",
       "region": "INDIA",
       "section": "00646",
@@ -96997,6 +96829,34 @@
     {
       "address": {
         "city": "MUMBAI",
+        "line1": "FLAT NO : 1, GROUND FLOOR, DEV CHHAYA",
+        "line2": "HEERA-PANNA MALL, TARDEO ROAD",
+        "line3": "HAJI ALI",
+        "pincode": "400034"
+      },
+      "branch_code": "02907",
+      "contact": "022- 23515806",
+      "coords": [
+        "18.9766532000",
+        "72.8117757000"
+      ],
+      "country": "INDIA",
+      "country_id": "1",
+      "district": "MUMBAI CITY",
+      "district_id": "5302",
+      "email": "hajiali.mum@bkivv.org",
+      "mobile": "9969495366, 9766984993",
+      "name": "MUMBAI HAJI ALI",
+      "region": "INDIA",
+      "section": "01723",
+      "state": "MAHARASHTRA",
+      "state_id": "12",
+      "sub_zone": "MMU",
+      "zone": "MAHARASTRA"
+    },
+    {
+      "address": {
+        "city": "MUMBAI",
         "line1": "FLAT NO: 101/103, BLDG NO : 37, SHANTI PLAZA,",
         "line2": "TANAJI MALUSARE ROAD, OPP: BANK OF INDIA",
         "line3": "SHANTI PARK, MIRA ROAD EAST",
@@ -97153,7 +97013,7 @@
       "district": "MUMBAI SUBURBAN",
       "district_id": "1962",
       "email": "",
-      "mobile": "9987693014",
+      "mobile": "9987693014, 9987410006",
       "name": "MUMBAI KANJUR MARG",
       "region": "INDIA",
       "section": "00633",
@@ -97937,7 +97797,7 @@
       "district": "MUMBAI SUBURBAN",
       "district_id": "1962",
       "email": "chembur.mum@bkivv.org",
-      "mobile": "9324578428",
+      "mobile": "9324578428, 9887585476",
       "name": "MUMBAI CHEMBUR",
       "region": "INDIA",
       "section": "01402",
@@ -99741,24 +99601,24 @@
     {
       "address": {
         "city": "NAGAD",
-        "line1": "H NO: 277, DHOBI GALLI",
-        "line2": "MANIK NAGAR",
+        "line1": "GAT NO: 117/1, PLOT NO 3 AND 4, SUKH SHANTI BHAWAN",
+        "line2": "MANIK NAGAR, KAJGAON ROAD",
         "line3": "TAL: KANNAD",
         "pincode": "431103"
       },
       "branch_code": "04252",
       "contact": "",
       "coords": [
-        "20.4636440000",
-        "75.1752011000"
+        "20.4640040000",
+        "75.1729170000"
       ],
       "country": "INDIA",
       "country_id": "1",
-      "district": "Aurangabad",
+      "district": "CHHATRAPATI SAMBHAJI NAGAR",
       "district_id": "71",
       "email": "",
       "mobile": "9021941961, 7020888832",
-      "name": "NAGAD",
+      "name": "NAGAD MANIK NAGAR",
       "region": "INDIA",
       "section": "00601",
       "state": "MAHARASHTRA",
@@ -103801,23 +103661,23 @@
     {
       "address": {
         "city": "NAYA NANGAL",
-        "line1": "H NO: 251, MOHINDERS PHULLWARI",
-        "line2": "PHASE-IA, SHIVALIK AVENUE",
-        "line3": "AJOULI MODH ROAD, NAYA NANGAL",
+        "line1": "H NO: 697, SHIVANCHAL BHAWAN",
+        "line2": "PHASE-1A, SHIVALIK AVENUE",
+        "line3": "NAYA NANGAL, TAL: NANGAL DAM",
         "pincode": "140126"
       },
       "branch_code": "04632",
       "contact": "",
       "coords": [
-        "31.3804911000",
-        "76.3405821000"
+        "31.3809670000",
+        "76.3366510000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Rupnagar",
       "district_id": "2381",
       "email": "nayanangal@bkivv.org",
-      "mobile": "7009498736",
+      "mobile": "9780703108, 7009498736",
       "name": "NAYA NANGAL",
       "region": "INDIA",
       "section": "01940",
@@ -106644,7 +106504,7 @@
       "country_id": "1",
       "district": "SOUTH DELHI",
       "district_id": "5289",
-      "email": "dayanandcolony.del@bkivv.org",
+      "email": "lajpatnagar4.del@bkivv.org",
       "mobile": "9548599955, 9650692261",
       "name": "NEW DELHI LAJPAT NAGAR 4",
       "region": "INDIA",
@@ -106924,7 +106784,7 @@
       "country_id": "1",
       "district": "SOUTH DELHI",
       "district_id": "5289",
-      "email": "lajpatnagar.del@bkivv.org",
+      "email": "lajpatnagar1.del@bkivv.org",
       "mobile": "9650692261, 9548599955",
       "name": "NEW DELHI LAJPAT NAGAR 1",
       "region": "INDIA",
@@ -114133,16 +113993,16 @@
     {
       "address": {
         "city": "PATHARIA (DAMOH)",
-        "line1": "H NO: 150",
-        "line2": "SWAMI VIVEKAND WARD NO-7",
-        "line3": "KURMYAT MOHALLA",
+        "line1": "SHIV SHAKTI BHAWAN",
+        "line2": "DAMOH ROAD, WARD NO-5",
+        "line3": "NEAR MAHADEV MANDIR",
         "pincode": "470666"
       },
       "branch_code": "05024",
       "contact": "",
       "coords": [
-        "23.8957280000",
-        "79.1939130000"
+        "23.9001210000",
+        "79.1983100000"
       ],
       "country": "INDIA",
       "country_id": "1",
@@ -115884,9 +115744,9 @@
       "country_id": "1",
       "district": "Jaipur",
       "district_id": "371",
-      "email": "",
+      "email": "phagi@bkivv.org",
       "mobile": "8239704423",
-      "name": "PHAGI",
+      "name": "PHAGI CHINDOLA KA MOHALLA",
       "region": "INDIA",
       "section": "02678",
       "state": "RAJASTHAN",
@@ -126453,16 +126313,16 @@
     {
       "address": {
         "city": "RAU",
-        "line1": "H NO: 104, UPADHYAY PALACE",
-        "line2": "NEAR MINESH HOSPITAL",
-        "line3": "KIBE COLONY, RAILWAY STATION ROAD",
+        "line1": "H NO: 65",
+        "line2": "NEAR SACCHE DARBAR GURUDWARA",
+        "line3": "MANDLE COLONY",
         "pincode": "453331"
       },
       "branch_code": "02554",
       "contact": "",
       "coords": [
-        "22.6362760000",
-        "75.8067750000"
+        "22.6383880000",
+        "75.8084240000"
       ],
       "country": "INDIA",
       "country_id": "1",
@@ -126470,7 +126330,7 @@
       "district_id": "214",
       "email": "",
       "mobile": "9111678546, 8827673752",
-      "name": "RAU KIBE COLONY",
+      "name": "RAU MANDLE COLONY",
       "region": "INDIA",
       "section": "02554",
       "state": "MADHYA PRADESH",
@@ -130121,16 +129981,16 @@
     {
       "address": {
         "city": "SANDILA",
-        "line1": "HOUSE NO: 64B1",
-        "line2": "OPP: POLICE THANE",
-        "line3": "RAJA DURGA PRASAD SARAI MAIN ROAD",
+        "line1": "ANAND BHAWAN",
+        "line2": "BEGUM GANJ",
+        "line3": "SANDILA",
         "pincode": "241204"
       },
       "branch_code": "02821",
       "contact": "",
       "coords": [
-        "27.0633022000",
-        "80.5124892000"
+        "27.0546400000",
+        "80.5181990000"
       ],
       "country": "INDIA",
       "country_id": "1",
@@ -133817,22 +133677,22 @@
     {
       "address": {
         "city": "SHEDGEWADI",
-        "line1": "HOUSE NO: 265, SUBHASH YASWANT SURYAVANSHI",
-        "line2": "KOKRUD ROAD, OPP: SANJIVINI HOSPITAL",
-        "line3": "TAL: BATIS SHIRALA",
+        "line1": "SONIYAJI COMPLEX",
+        "line2": "SHEDGEWADI FATA, NEAR MADHUBAN NIWAS BUNGLOW",
+        "line3": "TAL: 32 SHIRALA",
         "pincode": "415405"
       },
       "branch_code": "02871",
       "contact": "",
       "coords": [
-        "17.0458930000",
-        "73.9891430000"
+        "17.0464670000",
+        "73.9882380000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Sangli",
       "district_id": "284",
-      "email": "",
+      "email": "shedgewadi@bkivv.org",
       "mobile": "7391874715, 9604138206",
       "name": "SHEDGEWADI",
       "region": "INDIA",
@@ -134813,7 +134673,7 @@
       "district": "Solapur",
       "district_id": "2566",
       "email": "bale@bkivv.org",
-      "mobile": "9307205974, 9588438540",
+      "mobile": "9657020074",
       "name": "SHIVAJI NAGAR (BALE)",
       "region": "INDIA",
       "section": "00689",
@@ -138521,23 +138381,23 @@
     {
       "address": {
         "city": "SONEPUR",
-        "line1": "NEAR BUS STAND",
-        "line2": "BADBAGICHA ROAD",
-        "line3": "",
+        "line1": "SWARNIM BHAWAN, BRAHMA KUMARIS MARG",
+        "line2": "SUBARNAMERU TEMPLE ROAD",
+        "line3": "NEAR SURESWARI MANDIR, WARD NO:12",
         "pincode": "767017"
       },
       "branch_code": "01782",
       "contact": "",
       "coords": [
-        "20.8433028000",
-        "83.9108734000"
+        "20.8389300000",
+        "83.9142800000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "SUBARNAPUR",
       "district_id": "349",
       "email": "",
-      "mobile": "9777407846",
+      "mobile": "8763340317",
       "name": "SONEPUR",
       "region": "INDIA",
       "section": "00187",
@@ -139558,12 +139418,12 @@
       "address": {
         "city": "SULLURUPETA",
         "line1": "D.NO: 5-2-209, LIGHT HOUSE",
-        "line2": "POST OFFICE LINE, NEAR CURRENT OFFICE",
-        "line3": "SULLUR, KAPU STREET",
+        "line2": "POST OFFICE LINE, SULLURPETA",
+        "line3": "KAPU STREET",
         "pincode": "524121"
       },
       "branch_code": "00547",
-      "contact": "08623- 242985",
+      "contact": "",
       "coords": [
         "13.6944358100",
         "80.0167413800"
@@ -139573,7 +139433,7 @@
       "district": "Nellore",
       "district_id": "1",
       "email": "sullurpet@bkivv.org",
-      "mobile": "9206101820",
+      "mobile": "9206101820, 9441371375",
       "name": "SULLURUPETA",
       "region": "INDIA",
       "section": "00547",
@@ -140929,23 +140789,23 @@
     {
       "address": {
         "city": "SURAT",
-        "line1": "PLOT NO: 23, SHREE DARSHAN SOCIETY",
-        "line2": "BEHIND SHIRDIDHAM SOCIETY",
-        "line3": "DEVADH GODADARA ROAD, TAL: CHORASI",
+        "line1": "PLOT NO: C-225, MANSAROVAR SOCIETY",
+        "line2": "NEAR SHREE HARI CLINIC",
+        "line3": "LIMBAYAT ZONE, DEVADH GAM",
         "pincode": "394210"
       },
       "branch_code": "04030",
       "contact": "",
       "coords": [
-        "21.1694670000",
-        "72.8927130000"
+        "21.1651600000",
+        "72.8829500000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Surat",
       "district_id": "112",
-      "email": "",
-      "mobile": "7284824852, 9624566835",
+      "email": "devadh.srt@bkivv.org",
+      "mobile": "7284824852, 7567958001",
       "name": "SURAT DEVADH GAM",
       "region": "INDIA",
       "section": "01108",
@@ -141271,7 +141131,7 @@
         "pincode": "362275"
       },
       "branch_code": "02367",
-      "contact": "2876264161",
+      "contact": "",
       "coords": [
         "20.8399557000",
         "70.4808705000"
@@ -141280,8 +141140,8 @@
       "country_id": "1",
       "district": "GIR SOMNATH",
       "district_id": "5298",
-      "email": "",
-      "mobile": "",
+      "email": "bhalka.vrl@bkivv.org",
+      "mobile": "8200144922",
       "name": "SUTRAPADA",
       "region": "INDIA",
       "section": "01095",
@@ -141719,7 +141579,7 @@
         "pincode": "362150"
       },
       "branch_code": "01110",
-      "contact": "02877-221108",
+      "contact": "",
       "coords": [
         "21.0512646000",
         "70.5290138000"
@@ -141728,8 +141588,8 @@
       "country_id": "1",
       "district": "Junagadh",
       "district_id": "104",
-      "email": "bkjaimala@gmail.com",
-      "mobile": "9879559004",
+      "email": "bhalka.vrl@bkivv.org",
+      "mobile": "8140266812",
       "name": "TALALA (GIR)",
       "region": "INDIA",
       "section": "01110",
@@ -141943,7 +141803,7 @@
         "pincode": "383215"
       },
       "branch_code": "01111",
-      "contact": "02770-221244",
+      "contact": "",
       "coords": [
         "23.3494156000",
         "72.9507733000"
@@ -141953,8 +141813,8 @@
       "district": "Sabarkantha",
       "district_id": "113",
       "email": "talod@bkivv.org",
-      "mobile": "9898595125",
-      "name": "TALOD",
+      "mobile": "7984106755, 9898595125",
+      "name": "TALOD (SABARKANTHA)",
       "region": "INDIA",
       "section": "01111",
       "state": "GUJARAT",
@@ -145129,23 +144989,23 @@
     {
       "address": {
         "city": "TIRUVARUR",
-        "line1": "H NO: 10",
-        "line2": "MELA KOTHA STREET",
-        "line3": "NEAR BUS STAND",
+        "line1": "H NO: 25B",
+        "line2": "JAVULIKKARA STREET",
+        "line3": "NEAR TIRUVARUR MEDICAL CENTRE",
         "pincode": "610002"
       },
       "branch_code": "01621",
-      "contact": "04366-244544",
+      "contact": "",
       "coords": [
-        "10.7828250000",
-        "79.6353850000"
+        "10.7751340000",
+        "79.6280890000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "TIRUVARUR",
       "district_id": "5148",
       "email": "thiruvarur@bkivv.org",
-      "mobile": "9487060129",
+      "mobile": "9025114713, 9487060129",
       "name": "TIRUVARUR",
       "region": "INDIA",
       "section": "00848",
@@ -148758,7 +148618,7 @@
       "district_id": "108",
       "email": "valia@bkivv.org",
       "mobile": "9429284732, 9425200266",
-      "name": "VALIA",
+      "name": "VALIA (BHARUCH)",
       "region": "INDIA",
       "section": "00235",
       "state": "GUJARAT",
@@ -149442,8 +149302,8 @@
       "address": {
         "city": "VASAD",
         "line1": "H NO: 27, SHIVALAY",
-        "line2": "OPP: YASH WEIGH BRIDGE",
-        "line3": "NEAR VASAD CHAWKDI, MAGANVADI-2",
+        "line2": "MAGANVADI-2 SOCIETY, BEHIND LAXMI MART",
+        "line3": "NEAR VASAD CHAUKADI",
         "pincode": "388306"
       },
       "branch_code": "02316",
@@ -149457,8 +149317,8 @@
       "district": "Anand",
       "district_id": "118",
       "email": "vasad@bkivv.org",
-      "mobile": "7043802420, 9565454287",
-      "name": "VASAD",
+      "mobile": "7043802420, 9265454287",
+      "name": "VASAD MAGANVADI-2",
       "region": "INDIA",
       "section": "00208",
       "state": "GUJARAT",
@@ -150281,23 +150141,23 @@
     {
       "address": {
         "city": "VIJAPUR",
-        "line1": "73, ANAND ASHRAM SOCIETY",
-        "line2": "OPP. GARDEN, NEAR NEW POLICE STATION",
-        "line3": "LADOL ROAD",
+        "line1": "SHIV DARSHAN BHAWAN",
+        "line2": "PRAGATI SOCIETY, MANIPURA ROAD",
+        "line3": "VIJAPUR",
         "pincode": "382870"
       },
       "branch_code": "01114",
-      "contact": "02763-222584",
+      "contact": "",
       "coords": [
-        "23.5664972000",
-        "72.7489042000"
+        "23.5659600000",
+        "72.7414500000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Mehsana",
       "district_id": "105",
       "email": "vijapur@bkivv.org",
-      "mobile": "7567830308, 8866379710",
+      "mobile": "7567830308, 9427322269",
       "name": "VIJAPUR",
       "region": "INDIA",
       "section": "00208",
@@ -153042,7 +152902,7 @@
       "district_id": "13",
       "email": "",
       "mobile": "9030828763, 9032716061",
-      "name": "WYRA",
+      "name": "WYRA (KHAMMAM)",
       "region": "INDIA",
       "section": "00615",
       "state": "TELANGANA",
@@ -153640,370 +153500,6 @@
     },
     {
       "address": {
-        "city": "YELLAPUR",
-        "line1": "S.NO: 103, VALUES, SPIRITUALITY AND YOGA CENTRE",
-        "line2": "TAPOVAN RETREAT CENTRE, MUNDAGOD ROAD",
-        "line3": "VILL: SAHASRAHALLI",
-        "pincode": "581359"
-      },
-      "branch_code": "00446",
-      "contact": "08419-262332",
-      "coords": [
-        "14.9675097000",
-        "74.7302734000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "UTTARA KANNADA",
-      "district_id": "5278",
-      "email": "yellapur@bkivv.org",
-      "mobile": "8197804472, 9480484013",
-      "name": "YELLAPUR TAPOVAN RETREAT CENTRE",
-      "region": "INDIA",
-      "section": "00446",
-      "state": "KARNATAKA",
-      "state_id": "9",
-      "sub_zone": "KTH",
-      "zone": "KARNATAKA HUBBALLI"
-    },
-    {
-      "address": {
-        "city": "YEMMIGANUR",
-        "line1": "D NO: 1/1282-2, 'RAJYOGA BHAWAN'",
-        "line2": "NEAR LIC OFFICE, H.B.S. COLONY",
-        "line3": "YEMMIGANUR",
-        "pincode": "518360"
-      },
-      "branch_code": "01257",
-      "contact": "08512-228558",
-      "coords": [
-        "15.7672126000",
-        "77.4743668000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Kurnool",
-      "district_id": "4",
-      "email": "",
-      "mobile": "8500467558",
-      "name": "YEMMIGANUR",
-      "region": "INDIA",
-      "section": "01257",
-      "state": "ANDHRA PRADESH",
-      "state_id": "1",
-      "sub_zone": "KTH",
-      "zone": "KARNATAKA HUBBALLI"
-    },
-    {
-      "address": {
-        "city": "YEOLA",
-        "line1": "FLAT NO: 7 & 8, SIDDHI SAMRATH APARTMENT",
-        "line2": "OPP: ABHINAV BALVIKAS MANDIR",
-        "line3": "PATEL COLONY, VINCHUR ROAD",
-        "pincode": "423401"
-      },
-      "branch_code": "02560",
-      "contact": "",
-      "coords": [
-        "20.0389650000",
-        "74.4766683000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Nashik",
-      "district_id": "275",
-      "email": "yeola@bkivv.org",
-      "mobile": "8999169684, 7588557312",
-      "name": "YEOLA",
-      "region": "INDIA",
-      "section": "01380",
-      "state": "MAHARASHTRA",
-      "state_id": "12",
-      "sub_zone": "MSI",
-      "zone": "MAHARASTRA"
-    },
-    {
-      "address": {
-        "city": "YERRAGUNTLA",
-        "line1": "H NO: 2/1/164, SHIVA SHAKTI BHAWAN",
-        "line2": "SATHRAM STREET",
-        "line3": "PRODDATUR ROAD",
-        "pincode": "516309"
-      },
-      "branch_code": "01202",
-      "contact": "08563-275596",
-      "coords": [
-        "14.6381158000",
-        "78.5421523000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "KADAPA",
-      "district_id": "2",
-      "email": "",
-      "mobile": "8985599411, 9441408450",
-      "name": "YERRAGUNTLA",
-      "region": "INDIA",
-      "section": "00403",
-      "state": "ANDHRA PRADESH",
-      "state_id": "1",
-      "sub_zone": "KTC",
-      "zone": "KARNATAKA BENGALURU CITY"
-    },
-    {
-      "address": {
-        "city": "ZAHEERABAD",
-        "line1": "PLOT.NO: 28, PANCHMUKHI HANUMAN TEMPLE",
-        "line2": "ADARSH NAGAR, MAIN ROAD",
-        "line3": "ASVEEN COLONY",
-        "pincode": "502318"
-      },
-      "branch_code": "01361",
-      "contact": "08451- 283877",
-      "coords": [
-        "17.6847435000",
-        "77.6216299000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Sangareddy",
-      "district_id": "2433",
-      "email": "zaheerabad@bkivv.org",
-      "mobile": "9705154916, 9000169666",
-      "name": "ZAHEERABAD",
-      "region": "INDIA",
-      "section": "00569",
-      "state": "TELANGANA",
-      "state_id": "131",
-      "sub_zone": "MSI",
-      "zone": "MAHARASTRA"
-    },
-    {
-      "address": {
-        "city": "ZAMANIA",
-        "line1": "H NO: 191, WARD NO: 9",
-        "line2": "DIGREE TOLA, NEAR GOVERNMENT HOSPITAL",
-        "line3": "ZAMANIA RAILWAY STATION",
-        "pincode": "232331"
-      },
-      "branch_code": "03118",
-      "contact": "",
-      "coords": [
-        "25.3618570000",
-        "83.5450319000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Ghazipur",
-      "district_id": "1189",
-      "email": "zamania@bkivv.org",
-      "mobile": "8271848925",
-      "name": "ZAMANIA RAILWAY STATION",
-      "region": "INDIA",
-      "section": "00180",
-      "state": "UTTAR PRADESH",
-      "state_id": "23",
-      "sub_zone": "EBI",
-      "zone": "EASTERN"
-    },
-    {
-      "address": {
-        "city": "ZANKHVAV",
-        "line1": "PLOT NO: 6,7,8, RAMDEV SOCIETY",
-        "line2": "BEHIND SURAT DISTRICH BANK",
-        "line3": "MANDVI ROAD, TAL: MANGROL",
-        "pincode": "394440"
-      },
-      "branch_code": "04078",
-      "contact": "",
-      "coords": [
-        "21.4510070000",
-        "73.3189250000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Surat",
-      "district_id": "112",
-      "email": "",
-      "mobile": "9913428631, 9409116195",
-      "name": "ZANKHVAV",
-      "region": "INDIA",
-      "section": "02638",
-      "state": "GUJARAT",
-      "state_id": "4",
-      "sub_zone": "NADIAD",
-      "zone": "GUJARAT"
-    },
-    {
-      "address": {
-        "city": "ZARI",
-        "line1": "H NO: 687",
-        "line2": "SAWANT GALLI",
-        "line3": "NEAR MAHADEV MANDIR",
-        "pincode": "431540"
-      },
-      "branch_code": "05115",
-      "contact": "",
-      "coords": [
-        "19.4086290000",
-        "76.7704490000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Parbhani",
-      "district_id": "264",
-      "email": "",
-      "mobile": "7387575350",
-      "name": "ZARI",
-      "region": "INDIA",
-      "section": "00661",
-      "state": "MAHARASHTRA",
-      "state_id": "12",
-      "sub_zone": "MPO",
-      "zone": "MAHARASTRA"
-    },
-    {
-      "address": {
-        "city": "ZIRA",
-        "line1": "H NO: 2083, WARD NO: 5",
-        "line2": "OLD POST OFFICE STREET",
-        "line3": "",
-        "pincode": "142047"
-      },
-      "branch_code": "02196",
-      "contact": "01682-254047",
-      "coords": [
-        "30.9666210000",
-        "74.9923250000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "FEROZEPUR",
-      "district_id": "2916",
-      "email": "",
-      "mobile": "9530506982",
-      "name": "ZIRA",
-      "region": "INDIA",
-      "section": "00732",
-      "state": "PUNJAB",
-      "state_id": "18",
-      "sub_zone": "FARIDKOT",
-      "zone": "PUNJAB"
-    },
-    {
-      "address": {
-        "city": "ZIRAKPUR",
-        "line1": "H NO: 114, DIVINE LIGHT HOUSE",
-        "line2": "BADAL COLONY, NEAR BALAJI TIMBER",
-        "line3": "NR. AMBALA CHANDIGARH ROAD, TAL: DERA BASSI",
-        "pincode": "140603"
-      },
-      "branch_code": "03153",
-      "contact": "",
-      "coords": [
-        "30.6503490000",
-        "76.8204320000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "SAHIBZADA AJIT SINGH NAGAR",
-      "district_id": "2936",
-      "email": "badalcolony.zrk@bkivv.org",
-      "mobile": "9888327361, 9877546825",
-      "name": "ZIRAKPUR BADAL COLONY",
-      "region": "INDIA",
-      "section": "03153",
-      "state": "PUNJAB",
-      "state_id": "18",
-      "sub_zone": "CHANDIGARH",
-      "zone": "PUNJAB"
-    },
-    {
-      "address": {
-        "city": "ZIRAKPUR",
-        "line1": "H NO: 5A, SWADARSHAN DHAM, GROUND FLOOR",
-        "line2": "PARK VIEW, V.I.P. ROAD",
-        "line3": "SAVITRY ENCLAVE- GATE NO-2",
-        "pincode": "140603"
-      },
-      "branch_code": "05051",
-      "contact": "",
-      "coords": [
-        "30.6391470000",
-        "76.8138150000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "SAHIBZADA AJIT SINGH NAGAR",
-      "district_id": "2936",
-      "email": "",
-      "mobile": "9876309847",
-      "name": "ZIRAKPUR SAVITRY ENCLAVE",
-      "region": "INDIA",
-      "section": "00724",
-      "state": "PUNJAB",
-      "state_id": "18",
-      "sub_zone": "CHANDIGARH",
-      "zone": "PUNJAB"
-    },
-    {
-      "address": {
-        "city": "ZIRAKPUR",
-        "line1": "HOUSE NO: 77, VISHWA SHANTI BHAWAN",
-        "line2": "VISHRANTI CITY, SINGHPURA VILLAGE",
-        "line3": "NAGLA, ZIRAKPUR",
-        "pincode": "140603"
-      },
-      "branch_code": "05068",
-      "contact": "",
-      "coords": [
-        "30.6345290000",
-        "76.8302220000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "SAHIBZADA AJIT SINGH NAGAR",
-      "district_id": "2936",
-      "email": "nagla.zrk@bkivv.org",
-      "mobile": "9877895171",
-      "name": "ZIRAKPUR NAGLA",
-      "region": "INDIA",
-      "section": "03153",
-      "state": "PUNJAB",
-      "state_id": "18",
-      "sub_zone": "CHANDIGARH",
-      "zone": "PUNJAB"
-    },
-    {
-      "address": {
-        "city": "ZIRAPUR",
-        "line1": "PANJIKARAN SANKYA: 160",
-        "line2": "NEAR BUS STAND",
-        "line3": "CHAMUNDA MATA MANDIR ROAD",
-        "pincode": "465691"
-      },
-      "branch_code": "02073",
-      "contact": "",
-      "coords": [
-        "24.0193719000",
-        "76.3785789000"
-      ],
-      "country": "INDIA",
-      "country_id": "1",
-      "district": "Rajgarh",
-      "district_id": "237",
-      "email": "",
-      "mobile": "9575347591",
-      "name": "ZIRAPUR",
-      "region": "INDIA",
-      "section": "00347",
-      "state": "MADHYA PRADESH",
-      "state_id": "11",
-      "sub_zone": "IOP",
-      "zone": "INDORE"
-    },
-    {
-      "address": {
         "city": "ZODGA",
         "line1": "PLOT NO: 15, SHIVALYA",
         "line2": "NEAR ABBAS ALI MASJID",
@@ -154033,6 +153529,6 @@
   ],
   "state": "*",
   "subzone": "*",
-  "total": 5501,
+  "total": 5499,
   "zone": "*"
 }

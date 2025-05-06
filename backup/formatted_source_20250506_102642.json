@@ -6193,16 +6193,16 @@
     {
       "address": {
         "city": "AMRELI",
-        "line1": "H NO: 340",
-        "line2": "RAMPARA STREET NO-1",
-        "line3": "JESINGPADA",
+        "line1": "MANMANABHAV",
+        "line2": "NILKANTH CHAWK, NEAR MANDLI GODOWN",
+        "line3": "JESINGPARA",
         "pincode": "365601"
       },
       "branch_code": "05141",
       "contact": "",
       "coords": [
-        "21.5971280000",
-        "71.1996650000"
+        "21.5960430000",
+        "71.2010040000"
       ],
       "country": "INDIA",
       "country_id": "1",
@@ -11037,23 +11037,23 @@
     {
       "address": {
         "city": "BAKHRI BAZAR",
-        "line1": "H NO: 373, SHRI GANESH COMPLEX",
-        "line2": "MANJHAUL ROAD",
-        "line3": "NEAR AMBEDKAR CHOWK",
+        "line1": "HOUSE OF RAJU TRANSPORT",
+        "line2": "MAKHA CHAK, NEAR GIRLS HIGH SCHOOL",
+        "line3": "WARD NO: 20",
         "pincode": "848202"
       },
       "branch_code": "05455",
       "contact": "",
       "coords": [
-        "25.5958080000",
-        "86.2555160000"
+        "25.5956800000",
+        "86.2549200000"
       ],
       "country": "INDIA",
       "country_id": "1",
       "district": "Begusarai",
       "district_id": "73",
       "email": "",
-      "mobile": "8877334187, 7549445388",
+      "mobile": "8877334187",
       "name": "BAKHRI BAZAR",
       "region": "INDIA",
       "section": "02474",
