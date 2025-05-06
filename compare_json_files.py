@@ -3,10 +3,16 @@ import json
 import os
 import csv
 import datetime
-import difflib
 import sys
-import copy
 import shutil
+import argparse
+
+def ensure_backup_dir():
+    """Ensure backup directory exists"""
+    backup_dir = "backup"
+    if not os.path.exists(backup_dir):
+        os.makedirs(backup_dir)
+    return backup_dir
 
 def format_json(data):
     """Format JSON data with consistent indentation and sorting"""
@@ -17,146 +23,156 @@ def format_json(data):
         return {k: format_json(v) if isinstance(v, (dict, list)) else v for k, v in sorted(data.items())}
     return data
 
-def detect_changes(source_data, target_data, path="root"):
-    """
-    Detect detailed changes between two JSON objects
-    Returns a list of change records with path and type of change
-    """
-    changes = []
-    
-    # Different types
-    if type(source_data) != type(target_data):
-        changes.append({
-            "path": path,
-            "change_type": "type_change",
-            "source_type": type(source_data).__name__,
-            "target_type": type(target_data).__name__,
-            "source_value": str(source_data)[:100] if not isinstance(source_data, (dict, list)) else "...",
-            "target_value": str(target_data)[:100] if not isinstance(target_data, (dict, list)) else "..."
-        })
-        return changes
-    
-    if isinstance(source_data, dict):
-        # Find keys that exist in source but not in target (added)
-        source_keys = set(source_data.keys())
-        target_keys = set(target_data.keys())
+def extract_centers_by_branch_code(json_data):
+    """Extract centers from JSON data and index them by branch_code"""
+    # Check if the JSON has a 'data' field (containing centers)
+    if isinstance(json_data, dict) and 'data' in json_data:
+        centers = json_data['data']
+    elif isinstance(json_data, list):
+        centers = json_data
+    else:
+        centers = []
         
-        for key in source_keys - target_keys:
-            changes.append({
-                "path": f"{path}.{key}" if path != "root" else key,
-                "change_type": "key_added",
-                "key": key,
-                "value": str(source_data[key])[:100] if not isinstance(source_data[key], (dict, list)) else "..."
-            })
-        
-        # Find keys that exist in target but not in source (removed)
-        for key in target_keys - source_keys:
-            changes.append({
-                "path": f"{path}.{key}" if path != "root" else key,
-                "change_type": "key_removed",
-                "key": key,
-                "value": str(target_data[key])[:100] if not isinstance(target_data[key], (dict, list)) else "..."
-            })
-        
-        # Check values for keys that exist in both
-        for key in source_keys & target_keys:
-            new_path = f"{path}.{key}" if path != "root" else key
-            changes.extend(detect_changes(source_data[key], target_data[key], new_path))
+    # Create a dictionary with branch_code as key
+    centers_dict = {}
+    for center in centers:
+        if isinstance(center, dict) and 'branch_code' in center:
+            centers_dict[center['branch_code']] = center
             
-    elif isinstance(source_data, list):
-        if len(source_data) != len(target_data):
-            changes.append({
-                "path": path,
-                "change_type": "list_length_change",
-                "source_length": len(source_data),
-                "target_length": len(target_data)
-            })
-        
-        # Compare list items
-        min_length = min(len(source_data), len(target_data))
-        for i in range(min_length):
-            new_path = f"{path}[{i}]"
-            changes.extend(detect_changes(source_data[i], target_data[i], new_path))
+    return centers_dict
+
+def compare_centers(old_centers, new_centers):
+    """
+    Compare centers between old and new JSON data based on branch_code field
+    Returns lists of added, deleted, and modified entries with detailed field changes
+    """
+    # Find added, deleted and common branch_codes
+    old_branch_codes = set(old_centers.keys())
+    new_branch_codes = set(new_centers.keys())
     
-    elif source_data != target_data:
-        # For primitive values, record the difference
-        changes.append({
-            "path": path,
-            "change_type": "value_change",
-            "source_value": str(source_data)[:100],
-            "target_value": str(target_data)[:100]
+    added_branch_codes = new_branch_codes - old_branch_codes
+    deleted_branch_codes = old_branch_codes - new_branch_codes
+    common_branch_codes = old_branch_codes.intersection(new_branch_codes)
+    
+    # Prepare results
+    comparison_results = []
+    
+    # Process added entries
+    for branch_code in added_branch_codes:
+        comparison_results.append({
+            'ChangeType': 'Added',
+            'branch_code': branch_code,
+            'FieldName': '',
+            'OldValue': '',
+            'NewValue': json.dumps(new_centers[branch_code], ensure_ascii=False)[:200]
         })
     
-    return changes
-
-def count_differences(source_data, target_data):
-    """Count differences between two JSON objects"""
-    if type(source_data) != type(target_data):
-        return 1
+    # Process deleted entries
+    for branch_code in deleted_branch_codes:
+        comparison_results.append({
+            'ChangeType': 'Deleted',
+            'branch_code': branch_code,
+            'FieldName': '',
+            'OldValue': json.dumps(old_centers[branch_code], ensure_ascii=False)[:200],
+            'NewValue': ''
+        })
     
-    total_diff = 0
-    
-    if isinstance(source_data, dict):
-        # Count keys that are in source but not in target
-        source_keys = set(source_data.keys())
-        target_keys = set(target_data.keys())
-        added_keys = source_keys - target_keys
-        removed_keys = target_keys - source_keys
-        total_diff += len(added_keys) + len(removed_keys)
+    # Process modified entries
+    for branch_code in common_branch_codes:
+        old_center = old_centers[branch_code]
+        new_center = new_centers[branch_code]
         
-        # Count differences in values for keys that exist in both
-        for key in source_keys & target_keys:
-            total_diff += count_differences(source_data[key], target_data[key])
+        # Compare centers field by field
+        if old_center != new_center:
+            # Get all unique fields from both centers
+            all_fields = set(old_center.keys()).union(set(new_center.keys()))
+            modified = False
             
-    elif isinstance(source_data, list):
-        # This is a simplified approach - in reality, comparing lists is more complex
-        # We're assuming the lists contain objects that can be compared directly
-        if len(source_data) != len(target_data):
-            total_diff += abs(len(source_data) - len(target_data))
-        
-        # Compare list contents up to the length of the shorter list
-        min_length = min(len(source_data), len(target_data))
-        for i in range(min_length):
-            total_diff += count_differences(source_data[i], target_data[i])
+            for field in all_fields:
+                # Handle nested fields like 'address'
+                if field in old_center and field in new_center:
+                    if isinstance(old_center[field], dict) and isinstance(new_center[field], dict):
+                        # Compare nested dictionary
+                        nested_fields = set(old_center[field].keys()).union(set(new_center[field].keys()))
+                        
+                        for nested_field in nested_fields:
+                            old_value = old_center[field].get(nested_field, '')
+                            new_value = new_center[field].get(nested_field, '')
+                            
+                            if old_value != new_value:
+                                modified = True
+                                comparison_results.append({
+                                    'ChangeType': 'Modified',
+                                    'branch_code': branch_code,
+                                    'FieldName': f"{field}.{nested_field}",
+                                    'OldValue': str(old_value),
+                                    'NewValue': str(new_value)
+                                })
+                    # Handle array fields like 'coords'
+                    elif isinstance(old_center[field], list) and isinstance(new_center[field], list):
+                        if old_center[field] != new_center[field]:
+                            modified = True
+                            comparison_results.append({
+                                'ChangeType': 'Modified',
+                                'branch_code': branch_code,
+                                'FieldName': field,
+                                'OldValue': str(old_center[field]),
+                                'NewValue': str(new_center[field])
+                            })
+                    # Handle scalar fields
+                    elif old_center[field] != new_center[field]:
+                        modified = True
+                        comparison_results.append({
+                            'ChangeType': 'Modified',
+                            'branch_code': branch_code,
+                            'FieldName': field,
+                            'OldValue': str(old_center[field]),
+                            'NewValue': str(new_center[field])
+                        })
+                
+                # Field exists in old but not in new
+                elif field in old_center:
+                    modified = True
+                    comparison_results.append({
+                        'ChangeType': 'Modified',
+                        'branch_code': branch_code,
+                        'FieldName': field,
+                        'OldValue': str(old_center[field]),
+                        'NewValue': '<FIELD_REMOVED>'
+                    })
+                
+                # Field exists in new but not in old
+                elif field in new_center:
+                    modified = True
+                    comparison_results.append({
+                        'ChangeType': 'Modified',
+                        'branch_code': branch_code,
+                        'FieldName': field,
+                        'OldValue': '<FIELD_ADDED>',
+                        'NewValue': str(new_center[field])
+                    })
     
-    elif source_data != target_data:
-        # For primitive values, just count if they're different
-        total_diff += 1
-        
-    return total_diff
-
-def summarize_changes(changes):
-    """Create a summary of the changes"""
-    summary = {
-        "total_changes": len(changes),
-        "key_added": 0,
-        "key_removed": 0,
-        "value_change": 0,
-        "type_change": 0,
-        "list_length_change": 0,
-    }
-    
-    for change in changes:
-        change_type = change.get("change_type")
-        if change_type in summary:
-            summary[change_type] += 1
-        
-    return summary
-
-def ensure_backup_dir():
-    """Ensure backup directory exists"""
-    backup_dir = "backup"
-    if not os.path.exists(backup_dir):
-        os.makedirs(backup_dir)
-    return backup_dir
+    return comparison_results
 
 def main():
     try:
+        # Parse command-line arguments
+        parser = argparse.ArgumentParser(description='Compare two JSON files based on branch_code field and update the target file.')
+        parser.add_argument('--old', dest='old_file', default="Center Locatore.json",
+                            help='Path to the old JSON file (default: Center Locatore.json)')
+        parser.add_argument('--new', dest='new_file', default="Centers_Raw.json",
+                            help='Path to the new JSON file (default: Centers_Raw.json)')
+        parser.add_argument('--output', dest='output_file', default=None,
+                            help='Path to the output CSV file (default: auto-generated in backup directory)')
+        parser.add_argument('--no-update', dest='no_update', action='store_true',
+                            help='Do not update the target file with new data')
+        args = parser.parse_args()
+        
         print("Starting JSON processing script...")
         
         # Define file paths
-        source_file = "Centers_Raw.json"
-        target_file = "Center Locatore.json"
+        old_file = args.old_file
+        new_file = args.new_file
         
         # Ensure backup directory exists
         backup_dir = ensure_backup_dir()
@@ -165,137 +181,114 @@ def main():
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
         # Define file paths with backup directory
-        stats_filename = f"script_{timestamp}.csv"
-        changes_filename = f"changes_{timestamp}.csv"
+        comparison_filename = f"branches_comparison_{timestamp}.csv"
+        comparison_file = args.output_file if args.output_file else os.path.join(backup_dir, comparison_filename)
         
-        stats_file = os.path.join(backup_dir, stats_filename)
-        changes_file = os.path.join(backup_dir, changes_filename)
-        
-        # Check if files exist
-        if not os.path.exists(source_file):
-            raise FileNotFoundError(f"Source file '{source_file}' not found")
-        if not os.path.exists(target_file):
-            print(f"Warning: Target file '{target_file}' not found. A new file will be created.")
-        
-        # Create a backup of the target file if it exists
-        target_backup = None
-        if os.path.exists(target_file):
-            target_backup_filename = f"backup_{os.path.basename(target_file)}"
-            target_backup = os.path.join(backup_dir, target_backup_filename)
-            print(f"Creating backup of target file: {target_backup}")
-            shutil.copy2(target_file, target_backup)
-        
-        print(f"Reading source file: {source_file}")
-        with open(source_file, 'r', encoding='utf-8') as f:
-            source_data = json.load(f)
-        
-        print("Formatting source data...")
-        formatted_source_data = format_json(source_data)
-        
-        # Write formatted source data to a temporary file for comparison
         formatted_source_filename = f"formatted_source_{timestamp}.json"
         formatted_source_file = os.path.join(backup_dir, formatted_source_filename)
         
+        # Check if files exist
+        if not os.path.exists(new_file):
+            raise FileNotFoundError(f"Source file '{new_file}' not found")
+            
+        if not os.path.exists(old_file):
+            print(f"Warning: Target file '{old_file}' not found. Will create a new file.")
+            old_data = {}
+        else:
+            # Read old data
+            print(f"Reading old file: {old_file}")
+            try:
+                with open(old_file, 'r', encoding='utf-8') as f:
+                    old_data = json.load(f)
+                
+                # Create a backup of the old file
+                old_backup_filename = f"backup_{os.path.basename(old_file)}"
+                old_backup = os.path.join(backup_dir, old_backup_filename)
+                print(f"Creating backup of old file: {old_backup}")
+                shutil.copy2(old_file, old_backup)
+            except json.JSONDecodeError:
+                print(f"Warning: Target file '{old_file}' contains invalid JSON. Will create a new file.")
+                old_data = {}
+        
+        # Read new data
+        print(f"Reading new file: {new_file}")
+        with open(new_file, 'r', encoding='utf-8') as f:
+            new_data = json.load(f)
+        
+        # Format the new data
+        print("Formatting source data...")
+        formatted_source_data = format_json(new_data)
+        
+        # Write formatted source data to a temporary file for reference
         print(f"Writing formatted source data to temporary file: {formatted_source_file}")
         with open(formatted_source_file, 'w', encoding='utf-8') as f:
             json.dump(formatted_source_data, f, indent=2, ensure_ascii=False)
         
-        # Statistics to collect
-        stats = {
-            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "source_file": source_file,
-            "target_file": target_file,
-            "source_file_size": os.path.getsize(source_file),
-            "differences": 0,
-            "status": "Success"
-        }
+        # Extract centers indexed by branch_code
+        print("Extracting centers by branch_code...")
+        old_centers = extract_centers_by_branch_code(old_data)
+        new_centers = extract_centers_by_branch_code(new_data)
         
-        # Detailed changes list
-        all_changes = []
+        print(f"Found {len(old_centers)} centers in old file")
+        print(f"Found {len(new_centers)} centers in new file")
         
-        # If target file exists, compare the files
-        if os.path.exists(target_file):
-            print(f"Reading target file: {target_file}")
-            try:
-                with open(target_file, 'r', encoding='utf-8') as f:
-                    target_data = json.load(f)
-                
-                print("Calculating differences...")
-                stats["target_file_size"] = os.path.getsize(target_file)
-                stats["differences"] = count_differences(formatted_source_data, target_data)
-                
-                print("Detecting detailed changes...")
-                all_changes = detect_changes(formatted_source_data, target_data)
-                
-                # Add change summary to stats
-                change_summary = summarize_changes(all_changes)
-                stats.update(change_summary)
-                
-            except json.JSONDecodeError:
-                print(f"Warning: Target file '{target_file}' contains invalid JSON. Proceeding with copy operation.")
-                stats["status"] = "Target contained invalid JSON"
-        else:
-            stats["target_file_size"] = 0
-            stats["differences"] = "N/A (target file did not exist)"
+        # Compare the centers
+        print("Comparing centers by branch_code...")
+        comparison_results = compare_centers(old_centers, new_centers)
         
-        # Copy the formatted source data to the target file
-        print(f"Copying formatted data to target file: {target_file}")
-        with open(target_file, 'w', encoding='utf-8') as f:
-            json.dump(formatted_source_data, f, indent=2, ensure_ascii=False)
+        # Categorize results for summary
+        added = [result for result in comparison_results if result['ChangeType'] == 'Added']
+        deleted = [result for result in comparison_results if result['ChangeType'] == 'Deleted']
+        modified = [result for result in comparison_results if result['ChangeType'] == 'Modified']
         
-        # Write statistics to CSV
-        print(f"Writing statistics to: {stats_file}")
-        with open(stats_file, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow(["Metric", "Value"])
-            for key, value in stats.items():
-                writer.writerow([key, value])
+        # Write comparison results to CSV
+        print(f"Writing comparison results to: {comparison_file}")
+        with open(comparison_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=[
+                'ChangeType', 'branch_code', 'FieldName', 'OldValue', 'NewValue'
+            ])
+            writer.writeheader()
+            
+            # Write all results
+            for result in comparison_results:
+                writer.writerow(result)
         
-        # Write detailed changes to CSV
-        if all_changes:
-            print(f"Writing detailed changes to: {changes_file}")
-            with open(changes_file, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=[
-                    "path", "change_type", "key", "value", 
-                    "source_value", "target_value", 
-                    "source_type", "target_type",
-                    "source_length", "target_length"
-                ])
-                writer.writeheader()
-                
-                # Limit to 1000 records to avoid extremely large files
-                max_records = min(len(all_changes), 1000)
-                for i in range(max_records):
-                    writer.writerow(all_changes[i])
-                
-                if len(all_changes) > 1000:
-                    print(f"Note: Limited detailed changes to 1000 records (out of {len(all_changes)} total)")
+        # Copy the formatted source data to the target file (unless --no-update is specified)
+        if not args.no_update:
+            print(f"Copying formatted data to target file: {old_file}")
+            with open(old_file, 'w', encoding='utf-8') as f:
+                json.dump(formatted_source_data, f, indent=2, ensure_ascii=False)
         
-        print("Cleaning up temporary files...")
-        # We keep the formatted source file in the backup directory
+        # Print summary
+        added_branches = len(set([result['branch_code'] for result in added]))
+        deleted_branches = len(set([result['branch_code'] for result in deleted]))
+        modified_branches = len(set([result['branch_code'] for result in modified]))
         
-        print(f"Script completed successfully. Statistics saved to {stats_file}")
-        if all_changes:
-            print(f"Detailed changes saved to {changes_file}")
-        print(f"Source file has been formatted and copied to {target_file}")
+        print(f"Comparison completed successfully.")
+        print(f"Added branches: {added_branches}")
+        print(f"Deleted branches: {deleted_branches}")
+        print(f"Modified branches: {modified_branches}")
+        print(f"Total field modifications: {len(modified)}")
+        print(f"Results saved to {comparison_file}")
+        
+        if not args.no_update:
+            print(f"Source file has been formatted and copied to {old_file}")
         
     except Exception as e:
         error_message = f"Error: {str(e)}"
         print(error_message, file=sys.stderr)
         
-        # Try to write error to stats file
+        # Try to write error to a log file
         try:
             backup_dir = ensure_backup_dir()
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            stats_file = os.path.join(backup_dir, f"script_error_{timestamp}.csv")
-            with open(stats_file, 'w', newline='', encoding='utf-8') as f:
-                writer = csv.writer(f)
-                writer.writerow(["Metric", "Value"])
-                writer.writerow(["timestamp", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")])
-                writer.writerow(["status", "Error"])
-                writer.writerow(["error_message", str(e)])
+            error_file = os.path.join(backup_dir, f"error_{timestamp}.log")
+            with open(error_file, 'w', encoding='utf-8') as f:
+                f.write(f"Timestamp: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"Error: {str(e)}\n")
+            print(f"Error details written to: {error_file}", file=sys.stderr)
         except Exception as e2:
-            print(f"Failed to write error statistics: {str(e2)}", file=sys.stderr)
+            print(f"Failed to write error log: {str(e2)}", file=sys.stderr)
         
         sys.exit(1)
 
