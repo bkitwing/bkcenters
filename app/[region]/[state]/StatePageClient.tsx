@@ -74,6 +74,7 @@ export default function StatePageClient({
   // Handle search query clear
   const handleClearSearch = () => {
     setSearchQuery("");
+    // Reset any filtering or state related to search
   };
   
   return (
@@ -132,17 +133,16 @@ export default function StatePageClient({
           <div className="bg-light rounded-lg shadow-md p-4 border border-neutral-200 h-full">
             <h2 className="text-xl mb-3 font-bold spiritual-text-gradient">Districts in {actualState}</h2>
             
-            {/* Search input with voice capability */}
+            {/* Local search for filtering districts */}
             <div className="mb-3">
               <SearchBar
                 placeholder="Search districts..."
                 value={searchQuery}
                 onClear={handleClearSearch}
                 showClearButton={searchQuery.length > 0}
-                onSearchResult={(lat, lng, address) => {
-                  // We're not using coordinates here, just the text
-                  setSearchQuery(address);
-                }}
+                disableVoiceInput={true}
+                isLocalSearch={true}
+                onTextChange={setSearchQuery}
               />
             </div>
             

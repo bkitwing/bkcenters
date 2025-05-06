@@ -18,6 +18,9 @@ interface SearchBarProps {
   value?: string;
   onClear?: () => void;
   showClearButton?: boolean;
+  disableVoiceInput?: boolean;
+  isLocalSearch?: boolean;
+  onTextChange?: (text: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
@@ -25,7 +28,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = 'Enter your location to find centers near you...',
   value,
   onClear,
-  showClearButton = false
+  showClearButton = false,
+  disableVoiceInput = false,
+  isLocalSearch = false,
+  onTextChange
 }) => {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -42,9 +48,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [interimTranscript, setInterimTranscript] = useState<string>('');
   
-  // Initialize speech recognition
+  // Initialize speech recognition only if not disabled
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !disableVoiceInput) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       
       if (SpeechRecognition) {
@@ -77,6 +83,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
               if (inputRef.current) {
                 inputRef.current.value = finalTranscript;
               }
+              
+              // If local search, just update the parent component
+              if (isLocalSearch && onTextChange) {
+                onTextChange(finalTranscript);
+              }
             }
           };
           
@@ -92,6 +103,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
             if (interimTranscript) {
               setInputValue(prev => prev || interimTranscript);
               setInterimTranscript('');
+              
+              // If local search, just update the parent component
+              if (isLocalSearch && onTextChange) {
+                onTextChange(interimTranscript);
+              }
             }
           };
           
@@ -105,7 +121,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         setVoiceSupported(false);
       }
     }
-  }, []);
+  }, [disableVoiceInput, isLocalSearch, onTextChange]);
   
   const startListening = () => {
     setVoiceError(null);
@@ -135,15 +151,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
   
   useEffect(() => {
-    // Only initialize autocomplete after Google Maps is loaded
-    if (isLoaded && inputRef.current) {
+    // Only initialize autocomplete after Google Maps is loaded and if not in local search mode
+    if (isLoaded && inputRef.current && !isLocalSearch) {
       initAutocomplete();
     }
-  }, [isLoaded]);
+  }, [isLoaded, isLocalSearch]);
   
   useEffect(() => {
-    // Initialize from URL parameters
-    if (typeof window !== "undefined") {
+    // Initialize from URL parameters only if not in local search mode
+    if (typeof window !== "undefined" && !isLocalSearch) {
       const params = new URLSearchParams(window.location.search);
       const addressParam = params.get('address');
       
@@ -151,7 +167,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         setInputValue(decodeURIComponent(addressParam));
       }
     }
-  }, []);
+  }, [isLocalSearch]);
   
   // Update internal state when value prop changes
   useEffect(() => {
@@ -201,6 +217,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
   
   const handleGetCurrentLocation = () => {
+    if (isLocalSearch) return; // Skip for local search mode
+    
     setIsLocating(true);
     setLocationError(null);
     
@@ -286,7 +304,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
   
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    
+    // For local search, pass the value to parent immediately
+    if (isLocalSearch && onTextChange) {
+      onTextChange(newValue);
+    }
+    
     // Clear any error messages when user starts typing
     if (voiceError) setVoiceError(null);
     if (locationError) setLocationError(null);
@@ -301,8 +326,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   
   // Show loading state while Google Maps is loading
   useEffect(() => {
-    setIsLoading(!isLoaded);
-  }, [isLoaded]);
+    // Only show loading if we're not in local search mode
+    setIsLoading(!isLoaded && !isLocalSearch);
+  }, [isLoaded, isLocalSearch]);
 
   // Clean up speech recognition on unmount
   useEffect(() => {
@@ -325,7 +351,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={displayValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          className={`w-full p-4 ${voiceSupported ? 'pr-24' : 'pr-10'} rounded-lg border ${locationError || voiceError ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent ${isListening ? 'animate-pulse-light' : ''}`}
+          className={`w-full p-4 ${(!disableVoiceInput && voiceSupported) ? 'pr-24' : 'pr-10'} rounded-lg border ${locationError || voiceError ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent ${isListening ? 'animate-pulse-light' : ''}`}
           placeholder={
             voiceError 
               ? "Error recognizing speech" 
@@ -333,16 +359,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 ? "Location error"
                 : isListening 
                   ? "Listening..." 
-                  : (!hasValidKey 
+                  : (!hasValidKey && !isLocalSearch 
                     ? "Location search unavailable (API key missing)" 
                     : placeholder)
           }
-          disabled={isLoading || !hasValidKey || !!loadError}
+          disabled={(isLoading || !hasValidKey || !!loadError) && !isLocalSearch}
           readOnly={isListening}
         />
         
         <div className="absolute right-3 top-4 flex items-center space-x-2">
-          {voiceSupported && (
+          {!disableVoiceInput && voiceSupported && (
             <div className="flex items-center">
               {isListening && (
                 <span className="text-spirit-purple-600 text-xs mr-2 flex items-center">
@@ -355,7 +381,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               )}
               <button
                 onClick={isListening ? stopListening : startListening}
-                disabled={isLoading || !hasValidKey || !!loadError}
+                disabled={(isLoading || !hasValidKey || !!loadError) && !isLocalSearch}
                 className={`rounded-full p-1 focus:outline-none ${isListening ? 'bg-red-500 text-white' : voiceError ? 'text-red-500' : 'text-gray-500 hover:text-gray-700'}`}
                 title={voiceError ? 'Try again' : isListening ? 'Stop voice input' : 'Start voice input'}
                 aria-label={voiceError ? 'Try again' : isListening ? 'Stop voice input' : 'Start voice input'}
@@ -404,13 +430,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       </div>
       
-      {!hasValidKey && (
+      {!hasValidKey && !isLocalSearch && (
         <p className="mt-2 text-xs text-red-500">
           Google Maps API key is missing or invalid. Please add a valid key to enable location search.
         </p>
       )}
       
-      {loadError && (
+      {loadError && !isLocalSearch && (
         <p className="mt-2 text-xs text-red-500">
           Failed to load Google Maps. Please try again later.
         </p>

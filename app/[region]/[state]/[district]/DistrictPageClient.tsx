@@ -32,13 +32,27 @@ export default function DistrictPageClient({
     if (searchQuery.trim() === "") {
       return centers;
     }
+    const searchLower = searchQuery.toLowerCase();
     return centers.filter(center => 
-      center.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (center.address?.line1 && center.address.line1.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (center.address?.line2 && center.address.line2.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (center.address?.line3 && center.address.line3.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (center.address?.city && center.address.city.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (center.address?.pincode && center.address.pincode.toLowerCase().includes(searchQuery.toLowerCase()))
+      // Center name
+      center.name.toLowerCase().includes(searchLower) ||
+      // Address fields
+      (center.address?.line1 && center.address.line1.toLowerCase().includes(searchLower)) ||
+      (center.address?.line2 && center.address.line2.toLowerCase().includes(searchLower)) ||
+      (center.address?.line3 && center.address.line3.toLowerCase().includes(searchLower)) ||
+      (center.address?.city && center.address.city.toLowerCase().includes(searchLower)) ||
+      (center.address?.pincode && center.address.pincode.toLowerCase().includes(searchLower)) ||
+      // Contact information
+      (center.contact && center.contact.toLowerCase().includes(searchLower)) ||
+      (center.email && center.email.toLowerCase().includes(searchLower)) ||
+      (center.mobile && center.mobile.toLowerCase().includes(searchLower)) ||
+      // Branch code
+      (center.branch_code && center.branch_code.toLowerCase().includes(searchLower)) ||
+      // District, state, etc
+      (center.district && center.district.toLowerCase().includes(searchLower)) ||
+      (center.state && center.state.toLowerCase().includes(searchLower)) ||
+      (center.zone && center.zone.toLowerCase().includes(searchLower)) ||
+      (center.sub_zone && center.sub_zone.toLowerCase().includes(searchLower))
     );
   }, [centers, searchQuery]);
 
@@ -74,6 +88,8 @@ export default function DistrictPageClient({
   // Handle search query clear
   const handleClearSearch = () => {
     setSearchQuery("");
+    // Reset any selected center as well since we're clearing the filter
+    setSelectedCenter(null);
   };
 
   // Create an enhanced version of centers with highlighting property
@@ -145,17 +161,16 @@ export default function DistrictPageClient({
             />
           </div>
           
-          {/* Search input with voice capability */}
+          {/* Local search for filtering centers */}
           <div className="mb-6">
             <SearchBar
-              placeholder={`Search centers within ${actualDistrict}...`}
+              placeholder={`Search centers by name, address, contact details, etc...`}
               value={searchQuery}
               onClear={handleClearSearch}
               showClearButton={searchQuery.length > 0}
-              onSearchResult={(lat, lng, address) => {
-                // We're not using coordinates here, just the text
-                setSearchQuery(address);
-              }}
+              disableVoiceInput={true}
+              isLocalSearch={true}
+              onTextChange={setSearchQuery}
             />
           </div>
           
