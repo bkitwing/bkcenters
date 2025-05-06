@@ -22,9 +22,11 @@ let districtToCentersMapping: DistrictCentersMapping | null = null;
 let isDataMappingInitialized = false;
 
 const getOrigin = () => {
-  return process.env.NODE_ENV === "production"
-    ? "https://www.brahmakumaris.com"
-    : "http://localhost:3000";
+  const origin =
+    process.env.NODE_ENV === "production"
+      ? "https://www.brahmakumaris.com"
+      : "http://localhost:3000";
+  return origin + process.env.NEXT_PUBLIC_BASE_PATH;
 };
 
 // Function to build all data mappings - call this once at initialization
