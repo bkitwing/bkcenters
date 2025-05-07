@@ -13,6 +13,7 @@ import { Metadata } from 'next';
 import CenterMap from '@/components/CenterMap';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
+import { generateOgImageUrl } from '@/lib/ogUtils';
 
 // Define a unified type for state data
 interface StateData {
@@ -31,10 +32,49 @@ export async function generateMetadata({ params }: RegionPageProps): Promise<Met
   const regionSlug = decodeURIComponent(params.region);
   const actualRegion = await getRegionBySlug(regionSlug) || regionSlug;
   
+  // Get centers and states for this region
+  const centers = await getCentersByRegion(actualRegion);
+  const states = await getStatesByRegionFast(actualRegion);
+  
+  const title = `${actualRegion} - Brahma Kumaris Rajyog Meditation Centers`;
+  const description = `Explore Brahma Kumaris Rajyog meditation centers in ${actualRegion}. ${centers.length} centers across ${states.length} states.`;
+
+  // Calculate total districts
+  const districts = states.reduce((sum, state) => sum + state.districtCount, 0);
+
+  const pageTitle = `${actualRegion} Rajyoga Meditation Center`;
+  const imageTitle = actualRegion;
+
+  const ogImage = generateOgImageUrl({
+    title: actualRegion,
+    description: `${centers.length} Centers in ( ${states.length} States-Uts & ${districts} Districts)`,
+    type: 'region',
+    region: actualRegion,
+  });
+
   return {
-    title: `${actualRegion} Rajyog Meditation Centers - Brahma Kumaris`,
-    description: `Find Brahma Kumaris Rajyog meditation centers in ${actualRegion}. View locations by state, district, and more.`,
-    keywords: `Brahma Kumaris, Rajyog Meditation Centers, ${actualRegion}, spiritual centers, Nearby Meditation Centers, Om Shanti, Seva Kendra, 7 day courses, meditation retreats`,
+    title,
+    description,
+    keywords: `Brahma Kumaris, Rajyog Meditation Centers, ${actualRegion}, spiritual centers, meditation centers`,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `Brahma Kumaris Centers in ${actualRegion}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 

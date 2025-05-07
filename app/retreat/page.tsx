@@ -5,12 +5,47 @@ import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { Center } from '@/lib/types';
 import MapSection from '@/components/MapSection';
+import { generateOgImageUrl } from '@/lib/ogUtils';
 
-export const metadata: Metadata = {
-  title: 'Retreat Centers - Brahma Kumaris',
-  description: 'Find and explore Brahma Kumaris retreat centers across India. View locations, contact information, and more.',
-  keywords: 'Brahma Kumaris, retreat centers, spiritual retreats, meditation retreats, India',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  // Get retreat centers to count them
+  const retreatCenters = await getRetreatCenters();
+  
+  // Count unique states
+  const uniqueStates = new Set(retreatCenters.map(center => center.state));
+  const stateCount = uniqueStates.size;
+  
+  const title = 'Retreat Centers - Brahma Kumaris Rajyog Meditation Centers';
+  const description = `Find and explore ${retreatCenters.length} Brahma Kumaris retreat centers across ${stateCount} states in India. View locations, contact information, and more.`;
+
+  return {
+    title,
+    description,
+    keywords: 'Brahma Kumaris, retreat centers, spiritual retreats, meditation retreats, India',
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: [
+        {
+          url: generateOgImageUrl({
+            title: 'Retreat Centers',
+            description: `${retreatCenters.length} Retreat Centers in ${stateCount} States`,
+            type: 'retreat'
+          }),
+          width: 1200,
+          height: 630,
+          alt: 'Brahma Kumaris Retreat Centers',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function RetreatCentersPage() {
   // Get all retreat centers

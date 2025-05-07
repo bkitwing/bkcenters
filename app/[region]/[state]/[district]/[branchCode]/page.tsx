@@ -10,6 +10,7 @@ import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { headers } from 'next/headers';
+import { generateOgImageUrl } from '@/lib/ogUtils';
 
 // Extended interface for centers with optional service and timing data
 interface CenterWithServices extends Center {
@@ -30,7 +31,6 @@ export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: CenterPageProps): Promise<Metadata> {
   try {
-
     const center = await getCenterByCode(params.branchCode) as CenterWithServices;
     
     if (!center) {
@@ -43,11 +43,66 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
     const address = center.address ? 
       `${center.address.line1 || ''}, ${center.address.city || ''}, ${center.address.pincode || ''}` : 
       'Address not available';
+
+    const title = `${center.name} - Brahma Kumaris Rajyog Meditation Center - ${center.state}`;
+    const description = `Visit the Brahma Kumaris Rajyog meditation center at ${address} - ${center.state}, Contact information, Nearby Meditation Centers, directions, and more.`;
     
+    // Format complete address
+    const getCompleteAddress = () => {
+      const { line1, line2, line3, city, pincode } = center.address || {};
+      let parts = [];
+      
+      if (line1) parts.push(line1);
+      if (line2) parts.push(line2);
+      if (line3) parts.push(line3);
+      if (city) parts.push(city);
+      if (pincode) parts.push(pincode);
+      
+      return parts.join(', ');
+    };
+
+    const completeAddress = getCompleteAddress();
+    
+    // Format contact info for OG image with modern minimal icons
+    const contactLines = [
+      `📍 ${completeAddress}`,  // Location pin
+      [
+        center.contact ? `📞 ${center.contact}` : null,  // Phone
+        center.mobile ? `📱 ${center.mobile}` : null,    // Mobile
+        center.email ? `✉️ ${center.email}` : null       // Email
+      ].filter(Boolean).join('\n')
+    ].filter(Boolean).join('\n');
+
+    const ogImage = generateOgImageUrl({
+      title: center.name, // Shorter title for OG image
+      description: contactLines,
+      type: 'center',
+      location: `${center.address?.city || ''}, ${center.state}`,
+    });
+
     return {
-      title: `${center.name} - Brahma Kumaris Rajyog Meditation Center - ${center.state}`,
-      description: `Visit the Brahma Kumaris Rajyog Meditation center at ${address} - ${center.state}, Contact information, Nearby Meditation Centers, directions, and more.`,
+      title,
+      description,
       keywords: `Brahma Kumaris, meditation, ${center.name}, ${center.address?.city || ''}, ${center.state}, spiritual center`,
+      openGraph: {
+        title, // Keep original full title for meta tags
+        description,
+        type: 'website',
+        images: [
+          {
+            url: ogImage,
+            width: 1200,
+            height: 630,
+            alt: `${center.name} - Brahma Kumaris Meditation Center`,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title, // Keep original full title for Twitter
+        description,
+        images: [ogImage],
+      },
     };
   } catch (error) {
     console.error('Error generating metadata:', error);
@@ -240,68 +295,41 @@ export default async function CenterPage({ params }: CenterPageProps) {
     return (
       <div className="container mx-auto px-4 py-8">
         {/* Improved Responsive Breadcrumb Navigation */}
-        <nav className="mb-6" aria-label="Breadcrumb">
-          <ol className="flex flex-wrap items-center text-sm">
-            {/* Home */}
-            <li className="flex items-center">
-              <Link href="/" className="text-neutral-500 hover:text-primary whitespace-nowrap">
-                Home
-              </Link>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mx-2 text-neutral-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </li>
-            
+        <nav className="mb-4">
+          <ol className="flex items-center text-sm flex-wrap">
             {/* Region */}
             <li className="flex items-center">
               <Link 
                 href={formatCenterUrl(center.region || actualRegion, "", "", "")} 
-                className="text-neutral-500 hover:text-primary max-w-[100px] sm:max-w-none truncate"
+                className="text-neutral-500 hover:text-primary text-xs"
                 title={center.region || actualRegion}
               >
                 {center.region || actualRegion}
               </Link>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mx-2 text-neutral-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <span className="mx-2 text-neutral-400">&gt;</span>
             </li>
             
             {/* State */}
             <li className="flex items-center">
               <Link 
                 href={formatCenterUrl(center.region || actualRegion, center.state, "", "")} 
-                className="text-neutral-500 hover:text-primary max-w-[100px] sm:max-w-none truncate"
+                className="text-neutral-500 hover:text-primary text-xs"
                 title={center.state}
               >
                 {center.state}
               </Link>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mx-2 text-neutral-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <span className="mx-2 text-neutral-400">&gt;</span>
             </li>
             
             {/* District */}
             <li className="flex items-center">
               <Link 
                 href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} 
-                className="text-neutral-500 hover:text-primary max-w-[100px] sm:max-w-none truncate"
+                className="text-neutral-500 hover:text-primary text-xs"
                 title={center.district}
               >
                 {center.district}
               </Link>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mx-2 text-neutral-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </li>
-            
-            {/* Center Name - Current Page */}
-            <li className="flex-1 min-w-0">
-              <span 
-                className="font-medium text-primary truncate block"
-                title={center.name}
-              >
-                {center.name}
-              </span>
             </li>
           </ol>
         </nav>

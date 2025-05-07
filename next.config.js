@@ -17,6 +17,14 @@ const nextConfig = {
     // Disable strict mode during build to avoid duplicate effects
     strictNextHead: true,
   },
+  // Enable edge runtime for OpenGraph image generation
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.woff2$/,
+      type: 'asset/resource',
+    });
+    return config;
+  },
 };
 
 module.exports = nextConfig;

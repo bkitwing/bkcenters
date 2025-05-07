@@ -21,6 +21,8 @@ import CenterMap from "@/components/CenterMap";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
 import { Loader } from "@googlemaps/js-api-loader";
+import { Metadata } from 'next';
+import { generateOgImageUrl } from '@/lib/ogUtils';
 
 // Declare the google namespace globally
 declare global {
@@ -357,9 +359,26 @@ export default function HomePage() {
   const handleCurrentLocationClick = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          handleSearchResult(latitude, longitude, "Your Current Location");
+          
+          // Get location name using reverse geocoding
+          try {
+            const response = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+            );
+            const data = await response.json();
+            
+            if (data.results && data.results[0]) {
+              const locationName = data.results[0].formatted_address;
+              handleSearchResult(latitude, longitude, locationName);
+            } else {
+              handleSearchResult(latitude, longitude, "Your Current Location");
+            }
+          } catch (error) {
+            console.error('Error getting location name:', error);
+            handleSearchResult(latitude, longitude, "Your Current Location");
+          }
         },
         (error) => {
           console.error("Error getting location:", error);

@@ -10,6 +10,7 @@ import {
 import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import StatePageClient from './StatePageClient';
+import { generateOgImageUrl } from '@/lib/ogUtils';
 
 interface StatePageProps {
   params: {
@@ -24,12 +25,42 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
   
   // Get all centers in this state to determine the correct region
   const centers = await getCentersByState(actualState);
+  const districts = await getDistrictsByState(actualState);
   const actualRegion = centers.length > 0 ? centers[0].region : decodeURIComponent(params.region);
   
+  const title = `${actualState} - Brahma Kumaris Rajyog Meditation Centers - ${actualRegion}`;
+  const description = `Find Brahma Kumaris Rajyog meditation centers in ${actualState}. ${centers.length} centers across ${districts.length} districts.`;
+
+  const ogImage = generateOgImageUrl({
+    title: actualState,
+    description: `${centers.length} Centers in ${districts.length} Districts`,
+    type: 'state',
+    region: actualRegion,
+  });
+
   return {
-    title: `${actualState} - Rajyog Meditation Centers - ${actualRegion}`,
-    description: `Find Brahma Kumaris Rajyog meditation centers in ${actualState}, ${actualRegion}. View locations, contact information, and more.`,
+    title,
+    description,
     keywords: `Brahma Kumaris, Rajyog Meditation Centers, ${actualState}, ${actualRegion}, spiritual centers, 7 day courses, meditation retreats`,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `Brahma Kumaris Centers in ${actualState}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
