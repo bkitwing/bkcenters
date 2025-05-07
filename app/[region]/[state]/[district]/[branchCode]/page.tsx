@@ -243,8 +243,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <nav className="flex mb-6 text-sm">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/centers" className="text-neutral-500 hover:text-primary">
-                Centers
+              <Link href="/" className="text-neutral-500 hover:text-primary">
+                Home
               </Link>
             </li>
             <li className="flex items-center">
