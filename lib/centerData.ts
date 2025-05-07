@@ -7,6 +7,7 @@ import {
   DistrictCentersMapping,
 } from "./types";
 import { deSlugify } from "./urlUtils";
+import { RETREAT_CENTER_BRANCH_CODES } from './retreatCenters';
 
 // Cache for data
 let centersData: CentersData | null = null;
@@ -805,39 +806,28 @@ export async function getDistrictBySlug(
 }
 
 export async function getRetreatCenters(): Promise<Center[]> {
-  const allCenters = await getAllCenters();
+  try {
+    // Get all centers
+    const allCenters = await getAllCenters();
+    
+    if (!allCenters || allCenters.length === 0) {
+      console.warn('No centers found in the database');
+      return [];
+    }
 
-  // For now, we'll manually select retreat centers
-  // In a production environment, you would typically use a flag in the database
+    // Filter centers that are retreat centers using the branch codes
+    const retreatCenters = allCenters.filter(center => 
+      center.branch_code && RETREAT_CENTER_BRANCH_CODES.includes(center.branch_code)
+    );
 
-  // List of branch codes or names for retreat centers
-  const retreatCenterBranchCodes: string[] = [
-    "90001",
-    "90007",
-    "90006",
-    "04543",
-    "01758",
-    "04195",
-    "03793",
-    "03724",
-    "03180",
-    "02755",
-    "02417",
-    "02284",
-    "01758",
-    "00858",
-    "00510",
-    "00386",
-    "00346",
-    "00182",
-    // For example: 'RET001', 'RET002', etc.
-    // You should replace these with your actual retreat center codes
-  ];
-
-  // Filter centers that are retreat centers
-  const retreatCenters = allCenters.filter((center) =>
-    retreatCenterBranchCodes.includes(center.branch_code)
-  );
-
-  return retreatCenters;
+    // Sort centers according to the order in RETREAT_CENTER_BRANCH_CODES
+    return retreatCenters.sort((a, b) => {
+      const indexA = RETREAT_CENTER_BRANCH_CODES.indexOf(a.branch_code);
+      const indexB = RETREAT_CENTER_BRANCH_CODES.indexOf(b.branch_code);
+      return indexA - indexB;
+    });
+  } catch (error) {
+    console.error('Error fetching retreat centers:', error);
+    return [];
+  }
 }
