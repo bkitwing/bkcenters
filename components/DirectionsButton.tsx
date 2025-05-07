@@ -18,18 +18,33 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [startLocation, setStartLocation] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSelectingPlace, setIsSelectingPlace] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { isLoaded, loadError } = useGoogleMaps();
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const goButtonRef = useRef<HTMLButtonElement>(null);
 
   // Only close search input when clicking outside if not in the autocomplete dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Don't handle clicks when selecting from autocomplete
+      if (isSelectingPlace) {
+        return;
+      }
+      
       // Don't close if it's a Google autocomplete element
       if (event.target instanceof Element) {
         const pacContainer = document.querySelector('.pac-container');
-        if (pacContainer && pacContainer.contains(event.target)) {
+        const pacItem = document.querySelector('.pac-item');
+        
+        // Prevent closing when clicking on autocomplete dropdown or its items
+        if ((pacContainer && pacContainer.contains(event.target)) || 
+            (pacItem && pacItem.contains(event.target)) ||
+            (event.target as Element).classList.contains('pac-item') ||
+            (event.target as Element).classList.contains('pac-item-query')) {
+          setIsSelectingPlace(true);
+          setTimeout(() => setIsSelectingPlace(false), 300);
           return;
         }
       }
@@ -49,7 +64,7 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showSearchInput]);
+  }, [showSearchInput, isSelectingPlace]);
 
   // Init Google Places autocomplete when input is shown
   useEffect(() => {
@@ -63,12 +78,18 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
         autocompleteRef.current = autocomplete;
         
         const placeChangedListener = autocomplete.addListener('place_changed', () => {
+          setIsSelectingPlace(true);
           const place = autocomplete.getPlace();
           if (place && place.formatted_address) {
             setStartLocation(place.formatted_address);
-            // Don't immediately call getDirectionsFromInput here
-            // Instead, let the user confirm by clicking "Go"
+            // Focus the Go button to make it easier for the user to submit
+            setTimeout(() => {
+              if (goButtonRef.current) {
+                goButtonRef.current.focus();
+              }
+            }, 100);
           }
+          setTimeout(() => setIsSelectingPlace(false), 300);
         });
         
         return () => {
@@ -197,6 +218,7 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
             className="flex-grow p-2 border border-neutral-300 rounded text-sm"
           />
           <button
+            ref={goButtonRef}
             onClick={() => getDirectionsFromInput(startLocation)}
             disabled={!startLocation.trim() || isSubmitting}
             className="bg-spirit-purple-600 text-white px-2 py-1 rounded text-sm disabled:opacity-50 whitespace-nowrap"
