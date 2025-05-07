@@ -75,7 +75,7 @@ const Header = () => {
           className="flex items-center"
         >
           <Image
-            src="/Brahma Kumaris logo.webp"
+            src="/bkcenters/brahma-kumaris-logo.webp"
             alt="Brahma Kumaris"
             width={80}
             height={80}
