@@ -39,28 +39,25 @@ body {
   
   /* Improved highlight animation for center cards when clicked - more subtle */
   .highlight-card {
-    animation: pulse-highlight 1.5s ease-in-out;
+    animation: highlight-pulse 1.5s ease-in-out;
     position: relative;
     z-index: 10;
     background-color: rgba(126, 87, 194, 0.1); /* Light purple background */
     box-shadow: 0 0 0 2px rgba(126, 87, 194, 0.5); /* Purple border highlight */
   }
   
-  @keyframes pulse-highlight {
+  @keyframes highlight-pulse {
     0% {
       transform: scale(1);
-      background-color: rgba(126, 87, 194, 0.1);
-      box-shadow: 0 0 0 2px rgba(126, 87, 194, 0.5);
+      box-shadow: 0 0 0 0 rgba(126, 87, 194, 0.4);
     }
     50% {
       transform: scale(1.02);
-      background-color: rgba(126, 87, 194, 0.15);
-      box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.6);
+      box-shadow: 0 0 0 10px rgba(126, 87, 194, 0);
     }
     100% {
       transform: scale(1);
-      background-color: rgba(126, 87, 194, 0.1);
-      box-shadow: 0 0 0 2px rgba(126, 87, 194, 0.5);
+      box-shadow: 0 0 0 0 rgba(126, 87, 194, 0);
     }
   }
   

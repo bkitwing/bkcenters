@@ -60,15 +60,24 @@ export default function DistrictPageClient({
   const handleCenterSelect = (center: Center) => {
     setSelectedCenter(center);
     
-    // Find the card element and scroll to it
+    // Find and highlight the corresponding card
     const centerElement = document.getElementById(`center-${center.branch_code}`);
     if (centerElement) {
+      // First remove highlight from any previously highlighted cards
+      document.querySelectorAll('.highlight-card').forEach(el => {
+        el.classList.remove('highlight-card');
+      });
+      
+      // Scroll into view with smooth behavior
       centerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Add a highlight effect
-      centerElement.classList.add('shadow-md', 'bg-spirit-purple-50');
+      
+      // Add highlight class
+      centerElement.classList.add('highlight-card');
+      
+      // Remove highlight after animation
       setTimeout(() => {
-        centerElement.classList.remove('shadow-md', 'bg-spirit-purple-50');
-      }, 2000);
+        centerElement.classList.remove('highlight-card');
+      }, 1500);
     }
   };
 
@@ -180,7 +189,7 @@ export default function DistrictPageClient({
                 <div 
                   key={center.branch_code} 
                   id={`center-${center.branch_code}`}
-                  className={`h-full transition-all duration-300 ${selectedCenter?.branch_code === center.branch_code ? 'shadow-lg bg-spirit-purple-50' : 'shadow-sm'}`}
+                  className="card hover:shadow-md transition-shadow border border-neutral-200 p-4 rounded-lg h-full flex flex-col"
                   onClick={() => handleCardClick(center)}
                 >
                   <CenterCard center={center} hideViewIcon={true} />

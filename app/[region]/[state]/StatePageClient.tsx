@@ -29,6 +29,7 @@ export default function StatePageClient({
   districtSummary
 }: StatePageClientProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   
   // Prepare all district map markers - computed once
   const allDistrictMarkers = useMemo(() => {
@@ -46,10 +47,44 @@ export default function StatePageClient({
         district_total: item.centerCount,
         is_district_summary: true,
         // Add the district name for filtering
-        district: item.district
+        district: item.district,
+        // Add highlighting property
+        is_highlighted: selectedDistrict === item.district
       };
     }).filter(Boolean) as Center[];
-  }, [centers, districtSummary]);
+  }, [centers, districtSummary, selectedDistrict]);
+
+  // Handle district selection from map
+  const handleDistrictSelect = (center: Center) => {
+    const district = center.district;
+    setSelectedDistrict(district);
+    
+    // Find and highlight the corresponding card
+    const districtElement = document.getElementById(`district-${district}`);
+    if (districtElement) {
+      // First remove highlight from any previously highlighted cards
+      document.querySelectorAll('.highlight-card').forEach(el => {
+        el.classList.remove('highlight-card');
+      });
+      
+      // Scroll into view with smooth behavior
+      districtElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Add highlight class
+      districtElement.classList.add('highlight-card');
+      
+      // Remove highlight after animation
+      setTimeout(() => {
+        districtElement.classList.remove('highlight-card');
+      }, 1500);
+    }
+  };
+
+  // Handle search query clear
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setSelectedDistrict(null);
+  };
   
   // Filter districts based on search query
   const filteredDistricts = useMemo(() => {
@@ -71,12 +106,6 @@ export default function StatePageClient({
     );
   }, [allDistrictMarkers, searchQuery]);
 
-  // Handle search query clear
-  const handleClearSearch = () => {
-    setSearchQuery("");
-    // Reset any filtering or state related to search
-  };
-  
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb Navigation */}
@@ -124,6 +153,8 @@ export default function StatePageClient({
                 isDistrictView={true}
                 autoZoom={filteredMapMarkers.length > 0}
                 initialZoom={filteredMapMarkers.length === 0 ? 6 : undefined}
+                onCenterSelect={handleDistrictSelect}
+                highlightCenter={true}
               />
             </div>
           </div>
@@ -151,9 +182,14 @@ export default function StatePageClient({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {filteredDistricts.map(item => (
                     <Link 
-                      key={item.district} 
+                      key={item.district}
+                      id={`district-${item.district}`}
                       href={formatCenterUrl(stateRegion, actualState, item.district)}
-                      className="block p-2 rounded-lg border border-neutral-200 hover:border-primary hover:shadow-sm transition-all"
+                      className={`block p-2 rounded-lg border transition-all ${
+                        selectedDistrict === item.district 
+                          ? 'border-primary shadow-sm' 
+                          : 'border-neutral-200 hover:border-primary hover:shadow-sm'
+                      }`}
                     >
                       <h3 className="text-md font-medium text-spirit-purple-700 truncate">{item.district}</h3>
                       <div className="flex justify-between items-center mt-1">

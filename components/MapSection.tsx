@@ -10,13 +10,17 @@ interface MapSectionProps {
   initialLat?: number;
   initialLng?: number;
   defaultZoom?: number;
+  selectedCenter?: Center | null;
+  onCenterSelect?: (center: Center) => void;
 }
 
 export default function MapSection({ 
   centers, 
   initialLat, 
   initialLng, 
-  defaultZoom = 5 
+  defaultZoom = 5,
+  selectedCenter,
+  onCenterSelect
 }: MapSectionProps) {
   const [processedCenters, setProcessedCenters] = useState<Center[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +33,7 @@ export default function MapSection({
       // Add highlighting to all centers
       const highlightedCenters = centers.map(center => ({
         ...center,
-        is_highlighted: true
+        is_highlighted: selectedCenter ? center.branch_code === selectedCenter.branch_code : true
       }));
 
       setProcessedCenters(highlightedCenters);
@@ -37,7 +41,7 @@ export default function MapSection({
     }
 
     processCenters();
-  }, [centers]);
+  }, [centers, selectedCenter]);
 
   if (isLoading) {
     return <div className="animate-pulse bg-spirit-blue-100 rounded-lg h-full"></div>;
@@ -51,6 +55,8 @@ export default function MapSection({
       defaultZoom={defaultZoom}
       autoZoom={true}
       highlightCenter={true}
+      onCenterSelect={onCenterSelect}
+      selectedCenter={selectedCenter}
     />
   );
 } 
