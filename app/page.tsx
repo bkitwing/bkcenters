@@ -89,14 +89,17 @@ export default function HomePage() {
       .map((state) => {
         // Find a center in this state to use as reference point
         const stateCenter = allCenters.find(
-          (center) => center.state === state.state
+          (center) => center.state === state.state && 
+          center.coords && 
+          Array.isArray(center.coords) && 
+          center.coords.length === 2 &&
+          center.coords[0] !== null &&
+          center.coords[1] !== null &&
+          !isNaN(parseFloat(center.coords[0])) &&
+          !isNaN(parseFloat(center.coords[1]))
         );
 
-        if (
-          stateCenter &&
-          stateCenter.coords &&
-          stateCenter.coords.length === 2
-        ) {
+        if (stateCenter) {
           // Create a summary center object for the state
           return {
             ...stateCenter,
@@ -114,6 +117,9 @@ export default function HomePage() {
             region: stateCenter.region,
           };
         }
+
+        // If no valid center found, log a warning and return null
+        console.warn(`No center with valid coordinates found for state: ${state.state}`);
         return null;
       })
       .filter(Boolean) as Center[];

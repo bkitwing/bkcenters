@@ -8,12 +8,33 @@ export function hasValidCoordinates(center: Center): boolean {
     center?.coords && 
     Array.isArray(center.coords) &&
     center.coords.length === 2 &&
+    center.coords[0] !== null &&
+    center.coords[1] !== null &&
     !isNaN(parseFloat(center.coords[0])) &&
-    !isNaN(parseFloat(center.coords[1]))
+    !isNaN(parseFloat(center.coords[1])) &&
+    parseFloat(center.coords[0]) >= -90 && 
+    parseFloat(center.coords[0]) <= 90 &&
+    parseFloat(center.coords[1]) >= -180 && 
+    parseFloat(center.coords[1]) <= 180
   );
   
   if (!isValid && center?.coords) {
-    console.warn(`Invalid coordinates detected for ${center.name}:`, center.coords);
+    console.warn(`Invalid coordinates detected for ${center.name || 'Unknown Center'}:`, center.coords);
+    if (center.coords[0] === null || center.coords[1] === null) {
+      console.warn('Coordinates contain null values');
+    } else if (!Array.isArray(center.coords)) {
+      console.warn('Coordinates are not in array format');
+    } else if (center.coords.length !== 2) {
+      console.warn('Coordinates array does not have exactly 2 values');
+    } else if (isNaN(parseFloat(center.coords[0])) || isNaN(parseFloat(center.coords[1]))) {
+      console.warn('Coordinates contain non-numeric values');
+    } else {
+      const lat = parseFloat(center.coords[0]);
+      const lng = parseFloat(center.coords[1]);
+      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        console.warn('Coordinates are outside valid range');
+      }
+    }
   }
   
   return isValid;
