@@ -942,13 +942,10 @@ export default function HomePage() {
               <div ref={regionMapRef} className="h-[500px] sm:h-[600px]">
                 <CenterMap
                   centers={stateMapMarkers}
-                  autoZoom={false}
+                  autoZoom={true}
                   onCenterSelect={handleCenterSelect}
                   height="100%"
                   defaultZoom={5}
-                  initialLat={20.5937}
-                  initialLng={78.9629}
-                  initialZoom={5}
                 />
               </div>
               <div className="p-4 bg-white border-t border-neutral-200">

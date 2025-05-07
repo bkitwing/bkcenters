@@ -60,9 +60,6 @@ export default async function RetreatCentersPage() {
             <div className="h-[500px] border border-neutral-200 rounded-lg overflow-hidden shadow-md mb-8">
               <MapSection 
                 centers={sortedCenters} 
-                initialLat={20.5937} 
-                initialLng={78.9629}
-                defaultZoom={5}
               />
             </div>
             

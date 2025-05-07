@@ -17,6 +17,9 @@ def ensure_backup_dir():
 def format_json(data):
     """Format JSON data with consistent indentation and sorting"""
     if isinstance(data, list):
+        # Special case for coordinates - don't sort them
+        if len(data) == 2 and all(isinstance(x, str) and any(c.isdigit() for c in x) for x in data):
+            return data
         return sorted([format_json(item) if isinstance(item, (dict, list)) else item for item in data], 
                      key=lambda x: json.dumps(x) if isinstance(x, dict) else str(x))
     elif isinstance(data, dict):

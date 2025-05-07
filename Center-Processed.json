@@ -431,8 +431,8 @@
       "branch_code": "02334",
       "contact": "04734- 224676",
       "coords": [
-        "76.7397320000",
-        "9.1693850000"
+        "9.1693850000",
+        "76.7397320000"
       ],
       "country": "India",
       "district": "Pathanamthitta",
@@ -3291,8 +3291,8 @@
       "branch_code": "00834",
       "contact": "",
       "coords": [
-        "76.3447386000",
-        "9.4789514000"
+        "9.4789514000",
+        "76.3447386000"
       ],
       "country": "India",
       "district": "Alappuzha",
@@ -5381,8 +5381,8 @@
       "branch_code": "04492",
       "contact": "04546- 242315",
       "coords": [
-        "77.6224382000",
-        "9.9984308000"
+        "9.9984308000",
+        "77.6224382000"
       ],
       "country": "India",
       "district": "Theni",
@@ -6151,8 +6151,8 @@
       "branch_code": "01592",
       "contact": "04566-222433",
       "coords": [
-        "78.0994504000",
-        "9.5053518000"
+        "9.5053518000",
+        "78.0994504000"
       ],
       "country": "India",
       "district": "Virudhunagar",
@@ -6855,8 +6855,8 @@
       "branch_code": "01593",
       "contact": "",
       "coords": [
-        "76.8113240000",
-        "8.6968870000"
+        "8.6968870000",
+        "76.8113240000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -10263,7 +10263,7 @@
         "pincode": "752031"
       },
       "branch_code": "00992",
-      "contact": "06756- 253201",
+      "contact": "",
       "coords": [
         "19.7816684000",
         "85.1700028000"
@@ -17648,28 +17648,6 @@
     },
     {
       "address": {
-        "city": "Bhilad",
-        "line1": "Vrundavan Nagar, Vishva Nirman Upvan House",
-        "line2": "Bhilad-sarigam Road, Near Reshma Gir Gaushala",
-        "line3": "Tal: Umargam",
-        "pincode": "396155"
-      },
-      "branch_code": "02530",
-      "contact": "",
-      "coords": [
-        "20.2794160000",
-        "72.8776790000"
-      ],
-      "country": "India",
-      "district": "Valsad",
-      "email": "bhilad@bkivv.org",
-      "mobile": "9727537744, 9909571279",
-      "name": "Bhilad",
-      "region": "India",
-      "state": "Gujarat"
-    },
-    {
-      "address": {
         "city": "Bhilai Nagar",
         "line1": "1083, Gyan Surya Bhawan, Near Cricket Ground",
         "line2": "H.i.g. Housing Board Colony",
@@ -25005,8 +24983,8 @@
       "branch_code": "01595",
       "contact": "0481- 2401105",
       "coords": [
-        "76.5404410000",
-        "9.4310590000"
+        "9.4310590000",
+        "76.5404410000"
       ],
       "country": "India",
       "district": "Kottayam",
@@ -26281,8 +26259,8 @@
       "branch_code": "03599",
       "contact": "",
       "coords": [
-        "76.3460793000",
-        "9.6796793000"
+        "9.6796793000",
+        "76.3460793000"
       ],
       "country": "India",
       "district": "Alappuzha",
@@ -28305,8 +28283,8 @@
       "branch_code": "01994",
       "contact": "04554-275265",
       "coords": [
-        "77.2824040000",
-        "9.7346630000"
+        "9.7346630000",
+        "77.2824040000"
       ],
       "country": "India",
       "district": "Theni",
@@ -35609,8 +35587,8 @@
       "branch_code": "00464",
       "contact": "0484- 2367059",
       "coords": [
-        "76.2839490000",
-        "9.9631360000"
+        "9.9631360000",
+        "76.2839490000"
       ],
       "country": "India",
       "district": "Ernakulam",
@@ -35763,8 +35741,8 @@
       "branch_code": "04436",
       "contact": "",
       "coords": [
-        "76.5678060000",
-        "9.6967830000"
+        "9.6967830000",
+        "76.5678060000"
       ],
       "country": "India",
       "district": "Kottayam",
@@ -36503,13 +36481,13 @@
     {
       "address": {
         "city": "Faridabad",
-        "line1": "Shiv Darshan Bhavan, H No: 1065",
+        "line1": "Shiv Darshan Bhawan, H No: 1065",
         "line2": "Housing Board, Farent Huda Park",
         "line3": "Sector- 21c",
         "pincode": "121002"
       },
       "branch_code": "03434",
-      "contact": "0129- 2280051",
+      "contact": "",
       "coords": [
         "28.4338422000",
         "77.2945642000"
@@ -44211,8 +44189,8 @@
       "branch_code": "03273",
       "contact": "0479- 2140048",
       "coords": [
-        "76.4562978131",
-        "9.2843919062"
+        "9.2843919062",
+        "76.4562978131"
       ],
       "country": "India",
       "district": "Alappuzha",
@@ -52798,7 +52776,7 @@
       "district": "Ratlam",
       "email": "jaora@bkivv.org",
       "mobile": "9907648200, 8319415978",
-      "name": "Jaora",
+      "name": "Jaora (ratlam)",
       "region": "India",
       "state": "Madhya Pradesh"
     },
@@ -59039,8 +59017,8 @@
       "branch_code": "02612",
       "contact": "",
       "coords": [
-        "76.5378760000",
-        "9.0444780000"
+        "9.0444780000",
+        "76.5378760000"
       ],
       "country": "India",
       "district": "Kollam",
@@ -60139,8 +60117,8 @@
       "branch_code": "03275",
       "contact": "",
       "coords": [
-        "76.5007274000",
-        "9.1657662000"
+        "9.1657662000",
+        "76.5007274000"
       ],
       "country": "India",
       "district": "Alappuzha",
@@ -62515,8 +62493,8 @@
       "branch_code": "01263",
       "contact": "0484- 2233166",
       "coords": [
-        "76.2812975000",
-        "9.9125625000"
+        "9.9125625000",
+        "76.2812975000"
       ],
       "country": "India",
       "district": "Ernakulam",
@@ -62581,8 +62559,8 @@
       "branch_code": "00476",
       "contact": "0484- 2210606",
       "coords": [
-        "76.2525429000",
-        "9.9562648000"
+        "9.9562648000",
+        "76.2525429000"
       ],
       "country": "India",
       "district": "Ernakulam",
@@ -63681,8 +63659,8 @@
       "branch_code": "00845",
       "contact": "0474- 2761815",
       "coords": [
-        "76.5994330000",
-        "8.8987730000"
+        "8.8987730000",
+        "76.5994330000"
       ],
       "country": "India",
       "district": "Kollam",
@@ -64913,8 +64891,8 @@
       "branch_code": "00846",
       "contact": "",
       "coords": [
-        "76.5174215000",
-        "9.5906607000"
+        "9.5906607000",
+        "76.5174215000"
       ],
       "country": "India",
       "district": "Kottayam",
@@ -65001,8 +64979,8 @@
       "branch_code": "01608",
       "contact": "",
       "coords": [
-        "77.8493023000",
-        "9.1674118000"
+        "9.1674118000",
+        "77.8493023000"
       ],
       "country": "India",
       "district": "Thoothukudi",
@@ -68646,7 +68624,7 @@
       "address": {
         "city": "Lunkaransar",
         "line1": "Om Shanti Bhawan",
-        "line2": "Choudhari Colony, Off: Kalu Road",
+        "line2": "Choudhari Colony, Ward No-12, Off: Kalu Road",
         "line3": "Near Gramothan School",
         "pincode": "334603"
       },
@@ -68659,7 +68637,7 @@
       "country": "India",
       "district": "Bikaner",
       "email": "lunkaransar@bkivv.org",
-      "mobile": "9414006957",
+      "mobile": "9414006957, 7976140778",
       "name": "Lunkaransar",
       "region": "India",
       "state": "Rajasthan"
@@ -69115,8 +69093,8 @@
       "branch_code": "02819",
       "contact": "0452-2459269",
       "coords": [
-        "78.0520557706",
-        "9.9302099180"
+        "9.9302099180",
+        "78.0520557706"
       ],
       "country": "India",
       "district": "Madurai",
@@ -69137,8 +69115,8 @@
       "branch_code": "02818",
       "contact": "0452-2661632",
       "coords": [
-        "78.0990984000",
-        "9.9564113000"
+        "9.9564113000",
+        "78.0990984000"
       ],
       "country": "India",
       "district": "Madurai",
@@ -69159,8 +69137,8 @@
       "branch_code": "02817",
       "contact": "",
       "coords": [
-        "78.0545970000",
-        "9.8833470000"
+        "9.8833470000",
+        "78.0545970000"
       ],
       "country": "India",
       "district": "Madurai",
@@ -69181,8 +69159,8 @@
       "branch_code": "01993",
       "contact": "0452-2324778",
       "coords": [
-        "78.1337131000",
-        "9.9132124000"
+        "9.9132124000",
+        "78.1337131000"
       ],
       "country": "India",
       "district": "Madurai",
@@ -69203,8 +69181,8 @@
       "branch_code": "00850",
       "contact": "0452-2349477",
       "coords": [
-        "78.1196660000",
-        "9.9267400000"
+        "9.9267400000",
+        "78.1196660000"
       ],
       "country": "India",
       "district": "Madurai",
@@ -69225,8 +69203,8 @@
       "branch_code": "01995",
       "contact": "0452-2524597",
       "coords": [
-        "78.1463570000",
-        "9.9228360000"
+        "9.9228360000",
+        "78.1463570000"
       ],
       "country": "India",
       "district": "Madurai",
@@ -69269,8 +69247,8 @@
       "branch_code": "00849",
       "contact": "0452-2640315, 2640615",
       "coords": [
-        "78.1307051000",
-        "9.9634560000"
+        "9.9634560000",
+        "78.1307051000"
       ],
       "country": "India",
       "district": "Madurai",
@@ -72569,8 +72547,8 @@
       "branch_code": "01911",
       "contact": "",
       "coords": [
-        "76.5387940000",
-        "9.2337960000"
+        "9.2337960000",
+        "76.5387940000"
       ],
       "country": "India",
       "district": "Alappuzha",
@@ -77453,8 +77431,8 @@
       "branch_code": "03921",
       "contact": "0485-6066664",
       "coords": [
-        "76.5791870000",
-        "9.9875950000"
+        "9.9875950000",
+        "76.5791870000"
       ],
       "country": "India",
       "district": "Ernakulam",
@@ -78685,8 +78663,8 @@
       "branch_code": "02584",
       "contact": "04652- 292963",
       "coords": [
-        "77.4340250000",
-        "8.1978520000"
+        "8.1978520000",
+        "77.4340250000"
       ],
       "country": "India",
       "district": "Kanyakumari",
@@ -78707,8 +78685,8 @@
       "branch_code": "00853",
       "contact": "04652- 259719",
       "coords": [
-        "77.4027542000",
-        "8.1914141000"
+        "8.1914141000",
+        "77.4027542000"
       ],
       "country": "India",
       "district": "Kanyakumari",
@@ -86341,8 +86319,8 @@
       "branch_code": "02426",
       "contact": "",
       "coords": [
-        "76.8514990000",
-        "8.6777870000"
+        "8.6777870000",
+        "76.8514990000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -88827,8 +88805,8 @@
       "branch_code": "02206",
       "contact": "04564-229807",
       "coords": [
-        "78.5828840000",
-        "9.5502470000"
+        "9.5502470000",
+        "78.5828840000"
       ],
       "country": "India",
       "district": "Ramanathapuram",
@@ -90689,16 +90667,16 @@
     {
       "address": {
         "city": "Peddapalli",
-        "line1": "H No: 4-5-57/a",
-        "line2": "Off: Rajiv Rahadari,  Subhash Nagar",
-        "line3": "Near Venkateshwarlu Clothing Store",
+        "line1": "H No: 2-22/4",
+        "line2": "Near Reliance Tower",
+        "line3": "Rangampalli, Peddapalle",
         "pincode": "505172"
       },
       "branch_code": "05064",
       "contact": "",
       "coords": [
-        "18.6039230000",
-        "79.3752600000"
+        "18.5996500000",
+        "79.3774000000"
       ],
       "country": "India",
       "district": "Peddapalli",
@@ -90733,20 +90711,20 @@
     {
       "address": {
         "city": "Pendra Road",
-        "line1": "H.no: 136, Saraswati Nagar Road",
-        "line2": "Near Aashiyana, W.no: 4",
+        "line1": "Tahsil Chowk",
+        "line2": "Pendra Road, W.no: 19",
         "line3": "Gaurela",
         "pincode": "495117"
       },
       "branch_code": "03932",
       "contact": "",
       "coords": [
-        "22.7610656000",
-        "81.9016238000"
+        "22.7501100000",
+        "81.9104100000"
       ],
       "country": "India",
-      "district": "Bilaspur",
-      "email": "",
+      "district": "Gaurela Pendra Marwahi",
+      "email": "sirgitti@bkivv.org",
       "mobile": "9074708889",
       "name": "Pendra Road",
       "region": "India",
@@ -90835,7 +90813,7 @@
       "country": "India",
       "district": "Perambalur",
       "email": "",
-      "mobile": "9385944192",
+      "mobile": "9385944192, 7598336002",
       "name": "Perambalur",
       "region": "India",
       "state": "Tamil Nadu"
@@ -92193,8 +92171,8 @@
       "branch_code": "05204",
       "contact": "",
       "coords": [
-        "76.6689410000",
-        "9.3448790000"
+        "9.3448790000",
+        "76.6689410000"
       ],
       "country": "India",
       "district": "Pathanamthitta",
@@ -96879,8 +96857,8 @@
       "branch_code": "02205",
       "contact": "04563-222762",
       "coords": [
-        "77.5551750000",
-        "9.4420156000"
+        "9.4420156000",
+        "77.5551750000"
       ],
       "country": "India",
       "district": "Virudhunagar",
@@ -96929,7 +96907,7 @@
       "country": "India",
       "district": "Ratnagiri",
       "email": "",
-      "mobile": "",
+      "mobile": "9049448782, 7767025269",
       "name": "Rajapur",
       "region": "India",
       "state": "Maharashtra"
@@ -98067,8 +98045,8 @@
       "branch_code": "03422",
       "contact": "",
       "coords": [
-        "78.8798660000",
-        "9.3592090000"
+        "9.3592090000",
+        "78.8798660000"
       ],
       "country": "India",
       "district": "Ramanathapuram",
@@ -98177,8 +98155,8 @@
       "branch_code": "01613",
       "contact": "04573-221450",
       "coords": [
-        "79.3196140000",
-        "9.2892810000"
+        "9.2892810000",
+        "79.3196140000"
       ],
       "country": "India",
       "district": "Ramanathapuram",
@@ -99569,8 +99547,8 @@
       "country": "India",
       "district": "Amritsar",
       "email": "rayya@bkivv.org",
-      "mobile": "9779981368",
-      "name": "Rayya",
+      "mobile": "9815149269",
+      "name": "Rayya Model Town",
       "region": "India",
       "state": "Punjab"
     },
@@ -101857,7 +101835,7 @@
       "country": "India",
       "district": "Tiruchirappalli",
       "email": "",
-      "mobile": "8778002135",
+      "mobile": "8778002135, 8248817396",
       "name": "Samayapuram",
       "region": "India",
       "state": "Tamil Nadu"
@@ -103027,6 +103005,28 @@
       "name": "Saria",
       "region": "India",
       "state": "Chhattisgarh"
+    },
+    {
+      "address": {
+        "city": "Sarigam",
+        "line1": "Plot No:10, Vrundavan Nagar, Vishva Nirman Upvan House",
+        "line2": "Bhilad-sarigam Road, Near Reshma Gir Gaushala",
+        "line3": "Sarigam, Tal: Umargam",
+        "pincode": "396155"
+      },
+      "branch_code": "02530",
+      "contact": "",
+      "coords": [
+        "20.2808200000",
+        "72.8772190000"
+      ],
+      "country": "India",
+      "district": "Valsad",
+      "email": "bhilad@bkivv.org",
+      "mobile": "9727537744, 9909571279",
+      "name": "Sarigam",
+      "region": "India",
+      "state": "Gujarat"
     },
     {
       "address": {
@@ -108011,8 +108011,8 @@
       "branch_code": "02816",
       "contact": "04575-241507",
       "coords": [
-        "78.4999410000",
-        "9.8497880000"
+        "9.8497880000",
+        "78.4999410000"
       ],
       "country": "India",
       "district": "Sivaganga",
@@ -108033,8 +108033,8 @@
       "branch_code": "01614",
       "contact": "04562-250123",
       "coords": [
-        "77.7886174000",
-        "9.4321449000"
+        "9.4321449000",
+        "77.7886174000"
       ],
       "country": "India",
       "district": "Virudhunagar",
@@ -112939,8 +112939,8 @@
       "branch_code": "01618",
       "contact": "0471- 2743299, 2741862",
       "coords": [
-        "76.9293455000",
-        "8.4983147000"
+        "8.4983147000",
+        "76.9293455000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -112961,8 +112961,8 @@
       "branch_code": "03201",
       "contact": "471-2359351",
       "coords": [
-        "76.9761876000",
-        "8.4942647000"
+        "8.4942647000",
+        "76.9761876000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -112983,8 +112983,8 @@
       "branch_code": "04090",
       "contact": "0471-2575776",
       "coords": [
-        "76.9578406000",
-        "8.4845120000"
+        "8.4845120000",
+        "76.9578406000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -113005,8 +113005,8 @@
       "branch_code": "03180",
       "contact": "0471- 2394744",
       "coords": [
-        "77.0130930000",
-        "8.4430442000"
+        "8.4430442000",
+        "77.0130930000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -113071,8 +113071,8 @@
       "branch_code": "00863",
       "contact": "0461-2391692",
       "coords": [
-        "78.1130861000",
-        "8.7968024000"
+        "8.7968024000",
+        "78.1130861000"
       ],
       "country": "India",
       "district": "Thoothukudi",
@@ -113181,8 +113181,8 @@
       "branch_code": "03274",
       "contact": "",
       "coords": [
-        "76.3182360000",
-        "9.7756760000"
+        "9.7756760000",
+        "76.3182360000"
       ],
       "country": "India",
       "district": "Alappuzha",
@@ -113715,7 +113715,7 @@
       "country": "India",
       "district": "Tiruchirappalli",
       "email": "",
-      "mobile": "8248402711, 9443765883",
+      "mobile": "8903589654, 9443765883",
       "name": "Tiruchirappalli No 1 Tollgate",
       "region": "India",
       "state": "Tamil Nadu"
@@ -113753,8 +113753,8 @@
       "branch_code": "02815",
       "contact": "04549-281177",
       "coords": [
-        "77.9897795116",
-        "9.8301025436"
+        "9.8301025436",
+        "77.9897795116"
       ],
       "country": "India",
       "district": "Madurai",
@@ -113775,8 +113775,8 @@
       "branch_code": "00861",
       "contact": "",
       "coords": [
-        "77.6939580000",
-        "8.7261280000"
+        "8.7261280000",
+        "77.6939580000"
       ],
       "country": "India",
       "district": "Tirunelveli",
@@ -113885,8 +113885,8 @@
       "branch_code": "02059",
       "contact": "0469- 2600612",
       "coords": [
-        "76.5666514000",
-        "9.3743899000"
+        "9.3743899000",
+        "76.5666514000"
       ],
       "country": "India",
       "district": "Pathanamthitta",
@@ -114347,8 +114347,8 @@
       "branch_code": "00504",
       "contact": "0484- 2783045",
       "coords": [
-        "76.3410328000",
-        "9.9567076000"
+        "9.9567076000",
+        "76.3410328000"
       ],
       "country": "India",
       "district": "Ernakulam",
@@ -116745,8 +116745,8 @@
       "branch_code": "01624",
       "contact": "",
       "coords": [
-        "76.4081680000",
-        "9.7528310000"
+        "9.7528310000",
+        "76.4081680000"
       ],
       "country": "India",
       "district": "Kottayam",
@@ -116899,8 +116899,8 @@
       "branch_code": "03592",
       "contact": "04822- 210747",
       "coords": [
-        "76.6506772000",
-        "9.7221842000"
+        "9.7221842000",
+        "76.6506772000"
       ],
       "country": "India",
       "district": "Kottayam",
@@ -117339,8 +117339,8 @@
       "branch_code": "03200",
       "contact": "",
       "coords": [
-        "76.7544860000",
-        "8.7192630000"
+        "8.7192630000",
+        "76.7544860000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -117801,8 +117801,8 @@
       "branch_code": "03130",
       "contact": "",
       "coords": [
-        "76.9055870000",
-        "8.6745890000"
+        "8.6745890000",
+        "76.9055870000"
       ],
       "country": "India",
       "district": "Thiruvananthapuram",
@@ -118725,8 +118725,8 @@
       "branch_code": "01627",
       "contact": "04562-281005",
       "coords": [
-        "77.9680790300",
-        "9.5706564200"
+        "9.5706564200",
+        "77.9680790300"
       ],
       "country": "India",
       "district": "Virudhunagar",
