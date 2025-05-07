@@ -430,50 +430,32 @@ export async function getNearestCenters(
   };
 
   // Process centers and calculate distances
-  const processedCenters = await Promise.all(
-    centers.map(async (center) => {
-      // Try to get coordinates from the center
-      let lat: number | null = null;
-      let lng: number | null = null;
+  const processedCenters = centers.map((center) => {
+    // Try to get coordinates from the center
+    let lat: number | null = null;
+    let lng: number | null = null;
 
-      // First check if center has valid coordinates
-      if (center.coords && center.coords.length === 2) {
-        const parsedLat = parseFloat(center.coords[0]);
-        const parsedLng = parseFloat(center.coords[1]);
-        if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-          lat = parsedLat;
-          lng = parsedLng;
-        }
+    // Check if center has valid coordinates
+    if (center.coords && center.coords.length === 2) {
+      const parsedLat = parseFloat(center.coords[0]);
+      const parsedLng = parseFloat(center.coords[1]);
+      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
+        lat = parsedLat;
+        lng = parsedLng;
       }
+    }
 
-      // If no valid coordinates and we're in the browser, try to geocode the address
-      // Skip geocoding on the server to prevent errors
-      if ((lat === null || lng === null) && !isServer()) {
-        try {
-          const { geocodeAddress } = await import("./geocoding");
-          const geocodedCoords = await geocodeAddress(center);
-          if (geocodedCoords) {
-            lat = parseFloat(geocodedCoords[0]);
-            lng = parseFloat(geocodedCoords[1]);
-          }
-        } catch (error) {
-          console.warn(
-            `Failed to geocode address for center ${center.name}:`,
-            error
-          );
-        }
-      }
+    // No more client-side geocoding needed - coords should be available from server processing
 
-      // Calculate distance if we have valid coordinates
-      if (lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng)) {
-        const distance = getDistance(latitude, longitude, lat, lng);
-        return { ...center, distance };
-      }
+    // Calculate distance if we have valid coordinates
+    if (lat !== null && lng !== null && !isNaN(lat) && !isNaN(lng)) {
+      const distance = getDistance(latitude, longitude, lat, lng);
+      return { ...center, distance };
+    }
 
-      // If still no valid coordinates, return center with Infinity distance
-      return { ...center, distance: Infinity };
-    })
-  );
+    // If no valid coordinates, return center with Infinity distance
+    return { ...center, distance: Infinity };
+  });
 
   // Sort centers by distance and return the requested number
   return processedCenters

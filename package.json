@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "process-centers": "node process-centers.js"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.18.1",
@@ -14,6 +15,8 @@
     "@types/node": "^20.5.0",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
     "eslint": "^8.47.0",
     "eslint-config-next": "^13.4.18",
     "google-map-react": "^2.2.1",

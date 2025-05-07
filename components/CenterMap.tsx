@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Center } from '@/lib/types';
 import { useGoogleMaps } from '@/lib/useGoogleMaps';
-import { geocodeAddress, hasValidCoordinates, geocodeState } from '@/lib/geocoding';
+import { hasValidCoordinates } from '@/lib/geocoding';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { calculateCenterDistance, formatDistance } from '@/lib/distanceUtils';
 
@@ -42,7 +42,6 @@ const CenterMap: React.FC<CenterMapProps> = ({
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [markersReady, setMarkersReady] = useState(false);
-  const [geocodedCenters, setGeocodedCenters] = useState<Map<string, [string, string]>>(new Map());
   
   // Create a reference to store all markers for later access
   const [markers, setMarkers] = useState<Map<string, google.maps.Marker>>(new Map());
@@ -115,89 +114,15 @@ const CenterMap: React.FC<CenterMapProps> = ({
     }
   }, [centers, initialLat, initialLng]);
 
-  // Geocode addresses for centers without coordinates when Google Maps is loaded
-  useEffect(() => {
-    async function geocodeCenters() {
-      if (!isLoaded || !window.google?.maps?.Geocoder) {
-        console.log('Cannot geocode yet - Google Maps not loaded');
-        return;
-      }
-      
-      console.log('Starting geocoding for centers without coordinates');
-      const updatedGeocodedCenters = new Map(geocodedCenters);
-      let hasNewGeocodedCenters = false;
-      let processedCount = 0;
-
-      // Process centers that don't have valid coordinates
-      for (const center of centers) {
-        // Skip if already geocoded 
-        if (geocodedCenters.has(center.branch_code)) {
-          continue;
-        }
-        
-        // Skip if it has valid coordinates
-        if (hasValidCoordinates(center)) {
-          console.log(`Center ${center.name} already has valid coordinates: ${center.coords}`);
-          continue;
-        }
-
-        processedCount++;
-        console.log(`Geocoding center ${processedCount}/${centers.length}: ${center.name}`);
-        
-        try {
-          let coords;
-          
-          // Use state-specific geocoding for state summary markers
-          if (center.is_state_summary && center.state) {
-            coords = await geocodeState(center.state);
-            console.log(`Used state-specific geocoding for ${center.state}`);
-          } else {
-            coords = await geocodeAddress(center);
-          }
-          
-          if (coords) {
-            updatedGeocodedCenters.set(center.branch_code, coords);
-            hasNewGeocodedCenters = true;
-            console.log(`Successfully geocoded center ${center.name}: ${coords[0]}, ${coords[1]}`);
-          } else {
-            console.warn(`Failed to get coordinates for center ${center.name}`);
-          }
-        } catch (error) {
-          console.error(`Failed to geocode center ${center.name}:`, error);
-        }
-        
-        // Add a small delay between geocoding requests to avoid rate limits
-        if (processedCount < centers.length) {
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
-      }
-
-      if (hasNewGeocodedCenters) {
-        console.log(`Updated geocoded centers with ${updatedGeocodedCenters.size} entries`);
-        setGeocodedCenters(updatedGeocodedCenters);
-      } else {
-        console.log('No new centers were geocoded');
-      }
-    }
-
-    geocodeCenters();
-  }, [isLoaded, centers, geocodedCenters]);
-
-  // Helper function to get valid coordinates for a center (either original or geocoded)
+  // Helper function to get valid coordinates for a center
   const getValidCoordinates = useCallback((center: Center): [string, string] | null => {
-    // Use original coordinates if valid
+    // Use original coordinates if valid - no need for fallback geocoding anymore
     if (hasValidCoordinates(center)) {
       return center.coords as [string, string];
     }
     
-    // Use geocoded coordinates as fallback
-    const geocodedCoords = geocodedCenters.get(center.branch_code);
-    if (geocodedCoords) {
-      return geocodedCoords;
-    }
-    
     return null;
-  }, [geocodedCenters]);
+  }, []);
 
   // Auto-zoom to fit all markers
   const fitBounds = useCallback(() => {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Center } from '@/lib/types';
-import { geocodeAddress, hasValidCoordinates } from '@/lib/geocoding';
+import { hasValidCoordinates } from '@/lib/geocoding';
 import CenterMap from './CenterMap';
 
 interface MapSectionProps {
@@ -22,32 +22,12 @@ export default function MapSection({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function processCentersWithGeocode() {
+    // Process centers - no need for geocoding as it's now handled server-side
+    function processCenters() {
       setIsLoading(true);
       
-      // Create a copy of centers to modify
-      const centersToProcess = [...centers];
-
-      // Process each center to add missing coordinates if needed
-      for (let i = 0; i < centersToProcess.length; i++) {
-        const center = centersToProcess[i];
-        if (!hasValidCoordinates(center)) {
-          try {
-            const coordinates = await geocodeAddress(center);
-            if (coordinates) {
-              centersToProcess[i] = {
-                ...center,
-                coords: coordinates
-              };
-            }
-          } catch (error) {
-            console.error(`Failed to geocode address for center ${center.name}:`, error);
-          }
-        }
-      }
-
       // Add highlighting to all centers
-      const highlightedCenters = centersToProcess.map(center => ({
+      const highlightedCenters = centers.map(center => ({
         ...center,
         is_highlighted: true
       }));
@@ -56,7 +36,7 @@ export default function MapSection({
       setIsLoading(false);
     }
 
-    processCentersWithGeocode();
+    processCenters();
   }, [centers]);
 
   if (isLoading) {
