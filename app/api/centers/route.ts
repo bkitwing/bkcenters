@@ -3,6 +3,8 @@ import { CentersData, Center } from "@/lib/types";
 import { Low } from 'lowdb'
 import { JSONFile } from 'lowdb/node'
 import lodash from 'lodash'
+import path from 'path';
+import fs from 'fs';
 
 // Add this export to tell Next.js that this route is dynamic and should be server-rendered
 export const dynamic = "force-dynamic";
@@ -18,11 +20,21 @@ export async function GET(request: Request) {
     const district = url.searchParams.get("district");
     const lightweight = url.searchParams.get("lightweight") === "true";
 
-    // Load data
-    // const centersData = await loadCentersData();
-    // const adapter = new JSONFile<CentersData>('Center-Processed.json');
-    // const db = new LowSync<CentersData>(adapter, {});
-    const adapter = new JSONFile<CentersData>('Center-Processed.json')
+    // Try multiple locations for the data file
+    const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
+    const rootFilePath = path.join(process.cwd(), 'Center-Processed.json');
+    
+    // Check which file exists and use that one
+    let filePath;
+    if (fs.existsSync(publicFilePath)) {
+      filePath = publicFilePath;
+    } else if (fs.existsSync(rootFilePath)) {
+      filePath = rootFilePath;
+    } else {
+      throw new Error('Centers data file not found in any location');
+    }
+    
+    const adapter = new JSONFile<CentersData>(filePath);
     
 
     // @ts-expect-error

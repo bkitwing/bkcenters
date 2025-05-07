@@ -101,9 +101,25 @@ vercel
 /public                # Static assets
 ``` 
 
+## Data Files
 
+The application requires a `Center-Processed.json` file which contains all the center data. This file can be placed in either:
 
-Copy Content from api to Centers_Raw.json
-Run python3 compare_json_files.py
-change madhuban concern to INDIA
-node process-centers.js
+1. The project root directory (for development and processing)
+2. The `public` directory (for production deployment)
+
+The application will first check the `public` directory and then fall back to the root directory, using whichever file it finds first.
+
+### Generating the Data File
+
+To generate or update the centers data file:
+
+1. Copy content from the API to `Centers_Raw.json`
+2. Run `python3 compare_json_files.py`
+3. Change madhuban concern to INDIA if needed
+4. Run `node process-centers.js` to generate the processed file in the root directory
+
+For production deployment, you may need to copy this file to the public directory:
+```bash
+cp Center-Processed.json public/
+```
