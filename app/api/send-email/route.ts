@@ -87,14 +87,14 @@ export async function POST(request: Request) {
         }
       });
       
-      // Format the email
-      const emailSubject = `[${contactType}] ${name} - ${centerName}`;
+      // Format the email subject to include user's email
+      const emailSubject = `[${contactType}] ${name} <${email}> - ${centerName}`;
       
-      // Include system information in message
+      // Include system information in message with prominent user email display
       const emailHtml = `
-        <h2>${contactType} from ${name}</h2>
+        <h2>${contactType} from ${name} &lt;${email}&gt;</h2>
         <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
         ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
         <h3>Message:</h3>
         <p>${message.replace(/\n/g, '<br>')}</p>
@@ -102,15 +102,15 @@ export async function POST(request: Request) {
         <h4>System Information:</h4>
         <p><strong>Page URL:</strong> ${pageUrl}</p>
         <p><strong>User Agent:</strong> ${userAgent}</p>
-        <p><em>This email was sent from Brahma Kumaris website contact form.</em></p>
+        <p><em>This email was sent from Brahma Kumaris website contact form on behalf of ${name} (${email}).</em></p>
       `;
       
-      // Send email
+      // Send email - using user's name but admin email (limitation of Gmail OAuth)
       await transporter.sendMail({
-        from: `"Brahma Kumaris Contact Form" <${emailFrom}>`,
+        from: `"${name} via Contact Form" <${emailFrom}>`,
         to: centerEmail,
         cc: 'contact@brahmakumaris.com',
-        replyTo: email,
+        replyTo: email, // This ensures replies go directly to the user
         subject: emailSubject,
         html: emailHtml,
       });
