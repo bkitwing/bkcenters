@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaHome, FaBars, FaTimes } from "react-icons/fa";
+import { FaHome, FaBars, FaTimes, FaSearch } from "react-icons/fa";
 import { MdMyLocation } from "react-icons/md";
 import { useRouter } from "next/navigation";
 
@@ -75,7 +75,7 @@ const Header = () => {
           className="flex items-center"
         >
           <Image
-            src="/bkcenters/brahma-kumaris-logo.webp"
+            src="/centers/brahma-kumaris-logo.webp"
             alt="Brahma Kumaris"
             width={80}
             height={80}
@@ -89,9 +89,11 @@ const Header = () => {
           <ul className="flex space-x-8 items-center">
             <li>
               <Link
-                href="/"
+                href="https://www.brahmakumaris.com"
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
-                aria-label="Home"
+                aria-label="Brahma Kumaris Home"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <FaHome size={22} className="text-gray-600" />
               </Link>
@@ -116,16 +118,38 @@ const Header = () => {
                 </span>
               </Link>
             </li>
+            <li>
+              <Link
+                href="https://www.brahmakumaris.com/centers"
+                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                aria-label="Search Centers" 
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaSearch size={20} className="text-gray-600" />
+              </Link>
+            </li>
           </ul>
         </nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-neutral-700 focus:outline-none"
-          onClick={toggleMenu}
-        >
-          {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-        </button>
+        {/* Mobile Menu and Search Button */}
+        <div className="md:hidden flex items-center space-x-4">
+          <Link
+            href="https://www.brahmakumaris.com/centers"
+            className="text-neutral-700 hover:text-primary transition-colors"
+            aria-label="Search Centers"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaSearch size={20} className="text-gray-600" />
+          </Link>
+          <button
+            className="text-neutral-700 focus:outline-none"
+            onClick={toggleMenu}
+          >
+            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
@@ -135,12 +159,15 @@ const Header = () => {
             <ul className="space-y-4">
               <li>
                 <Link
-                  href="/"
+                  href="https://www.brahmakumaris.com"
                   className="flex items-center text-neutral-700 hover:text-primary transition-colors"
                   onClick={toggleMenu}
-                  aria-label="Home"
+                  aria-label="Brahma Kumaris Home"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <FaHome size={22} className="text-gray-600" />
+                  <FaHome size={22} className="text-gray-600 mr-2" />
+                  <span className="text-gray-600 font-medium">Home</span>
                 </Link>
               </li>
               <li>

@@ -25,9 +25,9 @@ function formatLocationBreadcrumb(district?: string, state?: string, region?: st
 // Function to get base URL
 const getBaseUrl = () => {
   if (process.env.NODE_ENV === 'production') {
-    return 'https://www.brahmakumaris.com/bkcenters';
+    return 'https://www.brahmakumaris.com/centers';
   }
-  return 'http://localhost:3000/bkcenters';
+  return 'http://localhost:3000/centers';
 };
 
 export async function GET(req: NextRequest) {
@@ -225,7 +225,7 @@ export async function GET(req: NextRequest) {
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
               }}
             >
-              www.brahmakumaris.com/bkcenters
+              www.brahmakumaris.com/centers
             </span>
           </div>
         </div>

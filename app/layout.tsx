@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: 'website',
       locale: 'en_US',
-      url: 'https://www.brahmakumaris.com/bkcenters',
+      url: 'https://www.brahmakumaris.com/centers',
       siteName: 'Brahma Kumaris Centers',
       title,
       description,
@@ -64,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: ['/bkcenters/brahma-kumaris-logo.webp'],
+      images: ['/centers/brahma-kumaris-logo.webp'],
     },
   };
 }

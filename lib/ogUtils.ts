@@ -2,9 +2,9 @@ import { headers } from 'next/headers';
 
 const getBaseUrl = () => {
   if (process.env.NODE_ENV === 'production') {
-    return 'https://www.brahmakumaris.com/bkcenters';
+    return 'https://www.brahmakumaris.com/centers';
   }
-  return 'http://localhost:3000/bkcenters';
+  return 'http://localhost:3000/centers';
 };
 
 export function getAbsoluteUrl(path: string = '') {

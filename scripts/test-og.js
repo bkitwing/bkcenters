@@ -1,7 +1,7 @@
 const http = require('http');
 const cheerio = require('cheerio');
 
-const testUrl = 'http://localhost:3000/bkcenters';
+const testUrl = 'http://localhost:3000/centers';
 
 function testOgTags() {
   http.get(testUrl, (resp) => {

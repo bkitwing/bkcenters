@@ -8,10 +8,10 @@ const nextConfig = {
   },
   // Set trailing slashes to false to avoid duplicate routes
   trailingSlash: false,
-  // Add basePath for deployment at /bkcenters
-  basePath: "/bkcenters",
+  // Add basePath for deployment at /centers
+  basePath: "/centers",
   // Configure asset prefix to match basePath
-  assetPrefix: isProd ? "https://www.brahmakumaris.com/bkcenters" : undefined,
+  assetPrefix: isProd ? "https://www.brahmakumaris.com/centers" : undefined,
   // Configure page build options
   experimental: {
     // Disable strict mode during build to avoid duplicate effects

@@ -11,7 +11,7 @@ This document contains step-by-step instructions for configuring OAuth 2.0 crede
 5. Set the application type to "Web application"
 6. Name your OAuth client (e.g., "BK Centers Email Service")
 7. Add authorized redirect URIs:
-   - https://www.brahmakumaris.com/bkcenters/api/auth/callback/google
+   - https://www.brahmakumaris.com/centers/api/auth/callback/google
    - http://localhost:3000/api/auth/callback/google (for development)
    - https://developers.google.com/oauthplayground (for getting the refresh token)
 8. Click "Create"
@@ -51,7 +51,7 @@ OAUTH_REFRESH_TOKEN=your_refresh_token_here
 EMAIL_FROM=admin@bkitwing.org
 
 # Keep existing variables
-NEXT_PUBLIC_BASE_PATH=/bkcenters
+NEXT_PUBLIC_BASE_PATH=/centers
 NODE_ENV=production
 ```
 
