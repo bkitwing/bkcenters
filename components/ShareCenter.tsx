@@ -14,8 +14,24 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [fullImageUrl, setFullImageUrl] = useState<string>('');
+  const [isMobile, setIsMobile] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const qrCardRef = useRef<HTMLDivElement>(null);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Generate QR code
   const generateQRCode = async () => {
@@ -86,24 +102,48 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
     }
   };
 
+  // Generate formatted share text
+  const getFormattedShareText = () => {
+    const regionText = center.region ? `${center.region}, ` : '';
+    return `✨ ${center.name} - Brahma Kumaris Rajyoga Meditation Center\n` +
+           `📍 ${center.district}, ${center.state}, ${regionText}\n\n` +
+           `Click Here to Visit Center\n` +
+           `🔗 ${pageUrl}\n\n` +
+           `To Find Nearby Centers, Kindly visit\n` +
+           `https://www.brahmakumaris.com/centers\n\n` +
+           `Om Shanti 🙏`;
+  };
+
   // Share functionality
   const handleShare = async () => {
-    const shareData = {
-      title: `${center.name} - Brahma Kumaris Meditation Center`,
-      text: `Visit ${center.name} - Brahma Kumaris Meditation Center in ${center.address?.city}, ${center.state}`,
-      url: pageUrl
-    };
-
+    const shareText = getFormattedShareText();
+    
     try {
       if (navigator.share) {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: `${center.name} - Brahma Kumaris`,
+          text: shareText,
+          url: pageUrl
+        });
       } else {
         // Fallback to copy to clipboard
-        await navigator.clipboard.writeText(`${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`);
-        alert('Link copied to clipboard!');
+        await navigator.clipboard.writeText(shareText);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 1500);
       }
     } catch (err) {
       console.error('Error sharing:', err);
+    }
+  };
+
+  // Copy to clipboard for desktop
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(getFormattedShareText());
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 1500);
+    } catch (err) {
+      console.error('Error copying to clipboard:', err);
     }
   };
 
@@ -134,7 +174,7 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
         // Share the image file
         await navigator.share({
           title: `${center.name} - QR Code`,
-          text: `QR Code for ${center.name} - Brahma Kumaris Meditation Center`,
+          text: getFormattedShareText(),
           files: [imageFile]
         });
       } else {
@@ -150,16 +190,43 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
     <div className="mt-8">
       <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Share Center</h2>
       <div className="flex items-center gap-4">
-        <button
-          onClick={handleShare}
-          className="bg-primary text-white p-3 rounded-full hover:bg-primary-dark transition-colors shadow-md"
-          aria-label="Share Center"
-          title="Share Center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-          </svg>
-        </button>
+        {isMobile ? (
+          <button
+            onClick={handleShare}
+            className="bg-primary text-white p-3 rounded-full hover:bg-primary-dark transition-colors shadow-md"
+            aria-label="Share Center"
+            title="Share Center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            onClick={handleCopy}
+            className={`relative p-3 rounded-full shadow-md transition-all duration-300 ${
+              isCopied 
+                ? 'bg-green-500 scale-110' 
+                : 'bg-primary hover:bg-primary-dark'
+            }`}
+            aria-label="Copy Center Info"
+            title="Copy Center Info"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className={`h-6 w-6 text-white transition-all duration-300 ${isCopied ? 'scale-110' : ''}`} 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              {isCopied ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              )}
+            </svg>
+          </button>
+        )}
         <button
           onClick={generateQRCode}
           className="bg-spirit-purple-600 text-white p-3 rounded-full hover:bg-spirit-purple-700 transition-colors shadow-md"

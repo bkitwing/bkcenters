@@ -414,7 +414,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
               </div>
               
               <div>
-                <div className="h-[350px] md:h-[400px] lg:h-[450px] border border-neutral-200 rounded-lg overflow-hidden">
+                <div className="h-[400px] md:h-[450px] lg:h-[500px] border border-neutral-200 rounded-lg overflow-hidden">
                   <CenterMap 
                     centers={mapCenters} 
                     height="100%" 
