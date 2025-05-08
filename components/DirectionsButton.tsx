@@ -18,6 +18,7 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [startLocation, setStartLocation] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLocationLoading, setIsLocationLoading] = useState(false);
   const [isSelectingPlace, setIsSelectingPlace] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,11 +119,43 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
   };
 
   const getDirectionsFromCurrentLocation = () => {
-    // Instead of using Geolocation API which can trigger popup blocker,
-    // directly open Google Maps with the destination and let Google handle location permission
-    const destination = getDestinationCoords();
-    const url = `https://www.google.com/maps/dir/Current+Location/${destination}`;
-    window.open(url, '_blank');
+    setIsLocationLoading(true);
+
+    // Use browser's Geolocation API to get the user's current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Successfully got location
+          const { latitude, longitude } = position.coords;
+          const destination = getDestinationCoords();
+          const url = `https://www.google.com/maps/dir/${latitude},${longitude}/${destination}`;
+          window.open(url, '_blank');
+          setIsLocationLoading(false);
+        },
+        (error) => {
+          // Error getting location
+          console.error("Error getting location:", error);
+          
+          // Fallback to Google's handling of Current Location
+          const destination = getDestinationCoords();
+          const url = `https://www.google.com/maps/dir/Current+Location/${destination}`;
+          window.open(url, '_blank');
+          setIsLocationLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      // Geolocation not supported - fallback
+      console.warn("Geolocation is not supported by this browser");
+      const destination = getDestinationCoords();
+      const url = `https://www.google.com/maps/dir/Current+Location/${destination}`;
+      window.open(url, '_blank');
+      setIsLocationLoading(false);
+    }
   };
 
   const getDirectionsFromInput = (address: string) => {
@@ -181,18 +214,17 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
   return (
     <div className="space-y-2" ref={containerRef}>
       <div className="flex gap-2 flex-wrap">
-        <a
-          href={`https://www.google.com/maps/dir/Current+Location/${getDestinationCoords()}`}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={getDirectionsFromCurrentLocation}
+          disabled={isLocationLoading}
           className={primaryClass}
           title="Get directions from your current location"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
           </svg>
-          From My Location
-        </a>
+          {isLocationLoading ? "Loading..." : "From My Location"}
+        </button>
         
         <button
           onClick={() => setShowSearchInput(!showSearchInput)}
