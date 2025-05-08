@@ -641,10 +641,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Only show Statistics Summary when not searching */}
-      {!lat || !lng ? <StatsSummary /> : null}
+      {/* Statistics Summary - Always show it, even when searching */}
+      <StatsSummary />
 
-      {/* Search Results (if user has searched) */}
       {lat && lng ? (
         <div ref={searchResultsRef} className="mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
@@ -781,249 +780,147 @@ export default function HomePage() {
           </div>
         </div>
       ) : (
-        /* Regions Section with State Cards - Only shown when not searching */
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-            <div className="flex flex-wrap gap-2">
-              <div className="flex space-x-1 bg-light rounded-md border border-neutral-200">
-                <button
-                  onClick={() => handleSortChange("centers")}
-                  className={`px-2 py-1 text-xs sm:text-sm ${
-                    sortBy === "centers"
-                      ? "bg-primary text-white rounded-md"
-                      : "text-neutral-600"
-                  }`}
-                >
-                  By Centers
-                </button>
-                <button
-                  onClick={() => handleSortChange("alpha")}
-                  className={`px-2 py-1 text-xs sm:text-sm ${
-                    sortBy === "alpha"
-                      ? "bg-primary text-white rounded-md"
-                      : "text-neutral-600"
-                  }`}
-                >
-                  Alphabetical
-                </button>
-              </div>
-
-              <div className="flex space-x-1 bg-light rounded-md border border-neutral-200">
-                <button
-                  onClick={() => handleRegionViewModeChange("list")}
-                  className={`px-2 py-1 text-xs sm:text-sm flex items-center ${
-                    regionViewMode === "list"
-                      ? "bg-primary text-white rounded-md"
-                      : "text-neutral-600"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                  List
-                </button>
-                <button
-                  onClick={() => handleRegionViewModeChange("map")}
-                  className={`px-2 py-1 text-xs sm:text-sm flex items-center ${
-                    regionViewMode === "map"
-                      ? "bg-primary text-white rounded-md"
-                      : "text-neutral-600"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                    />
-                  </svg>
-                  Map
-                </button>
-              </div>
+        /* Regions and States Section - Only shown when not searching */
+        <>
+          {/* India map for regions */}
+          <div className="bg-light rounded-lg shadow-md border border-neutral-200 overflow-hidden mb-8">
+            <div ref={regionMapRef} className="h-[500px] sm:h-[600px]">
+              <CenterMap
+                centers={stateMapMarkers}
+                autoZoom={true}
+                onCenterSelect={handleCenterSelect}
+                height="100%"
+                defaultZoom={5}
+              />
             </div>
           </div>
 
-          {regionViewMode === "list" ? (
-            <>
-              {getSortedRegions().map((region) => (
-                <div key={region.name} className="mb-8">
-                  <div className="flex items-center mb-4">
-                    <h3 className="text-xl font-bold text-spirit-blue-700">
-                      {region.name}
-                    </h3>
-                    <div className="ml-3 bg-spirit-blue-100 text-spirit-blue-800 text-xs font-medium rounded-full px-2.5 py-0.5">
-                      {region.stateCount} States/UT
-                    </div>
-                    <div className="ml-2 bg-primary text-white text-xs font-medium rounded-full px-2.5 py-0.5">
-                      {region.centerCount} Centers
-                    </div>
-                  </div>
+          {/* By Count/Alphabetical switcher */}
+          <div className="flex justify-center mb-6">
+            <div className="flex space-x-1 bg-light rounded-md border border-neutral-200">
+              <button
+                onClick={() => handleSortChange("centers")}
+                className={`px-4 py-2 text-sm ${
+                  sortBy === "centers"
+                    ? "bg-primary text-white rounded-md"
+                    : "text-neutral-600"
+                }`}
+              >
+                By Count
+              </button>
+              <button
+                onClick={() => handleSortChange("alpha")}
+                className={`px-4 py-2 text-sm ${
+                  sortBy === "alpha"
+                    ? "bg-primary text-white rounded-md"
+                    : "text-neutral-600"
+                }`}
+              >
+                In Alphabetical
+              </button>
+            </div>
+          </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                    {regionToStates[region.name] &&
-                      Object.keys(regionToStates[region.name].states)
-                        .sort((a, b) => {
-                          if (sortBy === "alpha") {
-                            return a.localeCompare(b);
-                          } else {
-                            const stateA = statesSummary.find(
-                              (s) => s.state === a
-                            );
-                            const stateB = statesSummary.find(
-                              (s) => s.state === b
-                            );
-                            return (
-                              (stateB?.centerCount || 0) -
-                              (stateA?.centerCount || 0)
-                            );
-                          }
-                        })
-                        .map((stateName) => {
-                          const stateData = statesSummary.find(
-                            (s) => s.state === stateName
-                          );
-                          return (
-                            <Link
-                              key={stateName}
-                              href={formatCenterUrl(region.name, stateName)}
-                              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-neutral-200 p-3 sm:p-4 block"
-                            >
-                              <h4 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 text-neutral-800 line-clamp-2">
-                                {stateName}
-                              </h4>
-                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                                <div className="flex items-center">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 text-spirit-blue-600 mr-1"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                    />
-                                  </svg>
-                                  <span className="text-neutral-700">
-                                    {stateData?.districtCount || 0} Districts
-                                  </span>
-                                </div>
-                                <div className="flex items-center">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 text-primary mr-1"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                    />
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                    />
-                                  </svg>
-                                  <span className="text-neutral-700">
-                                    {stateData?.centerCount || 0} Centers
-                                  </span>
-                                </div>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                  </div>
+          {/* Region and state cards */}
+          {getSortedRegions().map((region) => (
+            <div key={region.name} className="mb-8">
+              <div className="flex items-center mb-4">
+                <h3 className="text-xl font-bold text-spirit-blue-700">
+                  {region.name}
+                </h3>
+                <div className="ml-3 bg-spirit-blue-100 text-spirit-blue-800 text-xs font-medium rounded-full px-2.5 py-0.5">
+                  {region.stateCount} States/UT
                 </div>
-              ))}
-            </>
-          ) : (
-            <div className="bg-light rounded-lg shadow-md border border-neutral-200 overflow-hidden">
-              <div ref={regionMapRef} className="h-[500px] sm:h-[600px]">
-                <CenterMap
-                  centers={stateMapMarkers}
-                  autoZoom={true}
-                  onCenterSelect={handleCenterSelect}
-                  height="100%"
-                  defaultZoom={5}
-                />
+                <div className="ml-2 bg-primary text-white text-xs font-medium rounded-full px-2.5 py-0.5">
+                  {region.centerCount} Centers
+                </div>
               </div>
-              <div className="p-4 bg-white border-t border-neutral-200">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                  {getSortedRegions().map((region) => (
-                    <div
-                      key={region.name}
-                      className="border border-neutral-200 rounded-md overflow-hidden"
-                    >
-                      <div className="bg-spirit-blue-700 text-white text-sm font-medium p-2 text-center">
-                        {region.name}
-                      </div>
-                      <div className="p-2">
-                        <div className="grid grid-cols-2 gap-1 text-center">
-                          {Object.keys(
-                            regionToStates[region.name]?.states || {}
-                          )
-                            .slice(0, 4)
-                            .map((state) => (
-                              <Link
-                                key={state}
-                                href={formatCenterUrl(region.name, state)}
-                                className="text-xs truncate hover:text-primary hover:underline"
-                                title={state}
+
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                {regionToStates[region.name] &&
+                  Object.keys(regionToStates[region.name].states)
+                    .sort((a, b) => {
+                      if (sortBy === "alpha") {
+                        return a.localeCompare(b);
+                      } else {
+                        const stateA = statesSummary.find(
+                          (s) => s.state === a
+                        );
+                        const stateB = statesSummary.find(
+                          (s) => s.state === b
+                        );
+                        return (
+                          (stateB?.centerCount || 0) -
+                          (stateA?.centerCount || 0)
+                        );
+                      }
+                    })
+                    .map((stateName) => {
+                      const stateData = statesSummary.find(
+                        (s) => s.state === stateName
+                      );
+                      return (
+                        <Link
+                          key={stateName}
+                          href={formatCenterUrl(region.name, stateName)}
+                          className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-neutral-200 p-3 sm:p-4 block"
+                        >
+                          <h4 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 text-neutral-800 line-clamp-2">
+                            {stateName}
+                          </h4>
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                            <div className="flex items-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-spirit-blue-600 mr-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
                               >
-                                {state.length > 10
-                                  ? state.substring(0, 9) + "..."
-                                  : state}
-                              </Link>
-                            ))}
-                          {Object.keys(
-                            regionToStates[region.name]?.states || {}
-                          ).length > 4 && (
-                            <Link
-                              href={formatCenterUrl(region.name)}
-                              className="text-xs text-primary col-span-2 hover:underline"
-                            >
-                              +{" "}
-                              {Object.keys(
-                                regionToStates[region.name]?.states || {}
-                              ).length - 4}{" "}
-                              more
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                />
+                              </svg>
+                              <span className="text-neutral-700">
+                                {stateData?.districtCount || 0} Districts
+                              </span>
+                            </div>
+                            <div className="flex items-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-primary mr-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                              </svg>
+                              <span className="text-neutral-700">
+                                {stateData?.centerCount || 0} Centers
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
               </div>
             </div>
-          )}
-        </div>
+          ))}
+        </>
       )}
     </main>
   );
