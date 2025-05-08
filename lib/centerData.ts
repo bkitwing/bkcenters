@@ -22,6 +22,11 @@ let stateToDistrictMapping: StateDistrictMapping | null = null;
 let districtToCentersMapping: DistrictCentersMapping | null = null;
 let isDataMappingInitialized = false;
 
+// Constants for localStorage caching
+const LOCAL_STORAGE_CENTERS_KEY = 'bkcenters_data_cache';
+const LOCAL_STORAGE_TIMESTAMP_KEY = 'bkcenters_data_timestamp';
+const CACHE_EXPIRY_MS = 1000 * 60 * 60; // 1 hour cache validity
+
 const getOrigin = () => {
   const origin =
     process.env.NODE_ENV === "production"
@@ -181,13 +186,52 @@ const getEmptyData = (): CentersData => {
   };
 };
 
+// Helper function to save data to localStorage
+const saveToLocalStorage = (data: CentersData) => {
+  try {
+    if (isServerEnvironment()) {
+      return;
+    }
+    localStorage.setItem(LOCAL_STORAGE_CENTERS_KEY, JSON.stringify(data));
+    localStorage.setItem(LOCAL_STORAGE_TIMESTAMP_KEY, Date.now().toString());
+    console.log('Saved centers data to localStorage cache');
+  } catch (error) {
+    console.warn('Failed to save to localStorage:', error);
+  }
+};
+
+// Helper function to load data from localStorage
+const loadFromLocalStorage = (): { data: CentersData | null, isExpired: boolean } => {
+  try {
+    if (isServerEnvironment()) {
+      return { data: null, isExpired: true };
+    }
+    
+    const cachedData = localStorage.getItem(LOCAL_STORAGE_CENTERS_KEY);
+    const timestamp = localStorage.getItem(LOCAL_STORAGE_TIMESTAMP_KEY);
+    
+    if (!cachedData || !timestamp) {
+      return { data: null, isExpired: true };
+    }
+    
+    const isExpired = Date.now() - parseInt(timestamp) > CACHE_EXPIRY_MS;
+    return { 
+      data: JSON.parse(cachedData) as CentersData, 
+      isExpired 
+    };
+  } catch (error) {
+    console.warn('Failed to load from localStorage:', error);
+    return { data: null, isExpired: true };
+  }
+};
+
 // Function to fetch data from API only
 async function fetchCentersData(): Promise<CentersData> {
   console.log("fetchCentersData: Starting to fetch centers data");
   
   // Return cached data if available
   if (centersData !== null) {
-    console.log("fetchCentersData: Returning cached data");
+    console.log("fetchCentersData: Returning in-memory cached data");
     return centersData;
   }
 
@@ -200,76 +244,104 @@ async function fetchCentersData(): Promise<CentersData> {
     return emptyData;
   }
 
+  // Try to load from localStorage first if we're in the browser
+  if (!isServerEnvironment()) {
+    const { data: cachedData, isExpired } = loadFromLocalStorage();
+    
+    if (cachedData && cachedData.data && cachedData.data.length > 0) {
+      console.log(`fetchCentersData: Found cached data with ${cachedData.data.length} centers`);
+      
+      // Cache in memory for future requests
+      centersData = cachedData;
+      
+      // If cache is not expired, return it immediately
+      if (!isExpired) {
+        console.log('fetchCentersData: Using localStorage cached data (not expired)');
+        return cachedData;
+      }
+      
+      // If expired, use it temporarily but trigger a background refresh
+      console.log('fetchCentersData: Cache expired, returning cached data but refreshing in background');
+      
+      // Trigger background refresh without blocking
+      (async () => {
+        try {
+          const freshData = await fetchFreshCentersData();
+          if (freshData && freshData.data && freshData.data.length > 0) {
+            centersData = freshData; // Update memory cache
+            saveToLocalStorage(freshData); // Update localStorage cache
+            console.log('Background refresh of centers data completed');
+          }
+        } catch (err) {
+          console.error('Background data refresh failed:', err);
+        }
+      })();
+      
+      return cachedData;
+    }
+  }
+
+  // If no cache or cache expired, fetch fresh data
+  try {
+    const freshData = await fetchFreshCentersData();
+    return freshData;
+  } catch (error) {
+    console.error("Failed to fetch centers data:", error);
+    
+    // If we have stale data in localStorage, use it as fallback
+    if (!isServerEnvironment()) {
+      const { data: staleCachedData } = loadFromLocalStorage();
+      if (staleCachedData && staleCachedData.data && staleCachedData.data.length > 0) {
+        console.log('Using stale cache as fallback after fetch failure');
+        centersData = staleCachedData;
+        return staleCachedData;
+      }
+    }
+    
+    // Last resort - return empty data structure
+    const emptyData = getEmptyData();
+    centersData = emptyData;
+    return emptyData;
+  }
+}
+
+// Helper function to fetch fresh data from the API
+async function fetchFreshCentersData(): Promise<CentersData> {
   // Get the origin for absolute URLs
   const origin = getOrigin();
-  console.log(`fetchCentersData: API endpoint: ${origin}/api/centers?lightweight=false`);
+  console.log(`fetchFreshCentersData: API endpoint: ${origin}/api/centers?lightweight=false`);
   
-  try {
-    // Try to load from API endpoint with absolute URL
-    console.log("fetchCentersData: Fetching from API...");
-    const response = await fetch(`${origin}/api/centers?lightweight=false`, {
-      // Add cache: 'no-store' to avoid caching issues during build
-      cache: "no-store",
-    });
+  // Try to load from API endpoint with absolute URL
+  console.log("fetchFreshCentersData: Fetching from API...");
+  const response = await fetch(`${origin}/api/centers?lightweight=false`, {
+    cache: "no-store",
+  });
 
-    console.log(`fetchCentersData: API response status: ${response.status}`);
+  console.log(`fetchFreshCentersData: API response status: ${response.status}`);
+  
+  if (response.ok) {
+    const data = (await response.json()) as CentersData;
     
-    if (response.ok) {
-      const data = (await response.json()) as CentersData;
+    if (data.data && data.data.length > 0) {
+      console.log(`fetchFreshCentersData: Successfully loaded ${data.data.length} centers from API`);
       
-      if (data.data && data.data.length > 0) {
-        console.log(`fetchCentersData: Successfully loaded ${data.data.length} centers from API`);
-        centersData = data;
-        return data;
-      } else {
-        console.warn("API returned empty data, trying to load from file...");
+      // Cache in memory for future requests
+      centersData = data;
+      
+      // Cache in localStorage if we're in the browser
+      if (!isServerEnvironment()) {
+        saveToLocalStorage(data);
       }
-    } else {
-      console.error(
-        `Failed to fetch centers data: ${response.status} ${response.statusText}`
-      );
-      console.warn("Trying to load from file instead...");
-    }
-  } catch (error) {
-    console.error("API data loading error:", error);
-    console.warn("Trying to load from file instead...");
-  }
-  
-  // If we get here, the API call failed or returned empty data - try to load from file directly
-  try {
-    if (!isServerEnvironment()) {
-      // In browser environment, try fetching the file via a GET request
-      console.log(`fetchCentersData: Trying to fetch from file: ${origin}/Center-Processed.json`);
-      const fileResponse = await fetch(`${origin}/Center-Processed.json`, { 
-        cache: "no-store" 
-      });
       
-      console.log(`fetchCentersData: File response status: ${fileResponse.status}`);
-      
-      if (fileResponse.ok) {
-        const fileData = await fileResponse.json();
-        if (fileData && fileData.data && Array.isArray(fileData.data)) {
-          console.log(`fetchCentersData: Successfully loaded ${fileData.data.length} centers from file`);
-          centersData = fileData;
-          return fileData;
-        } else {
-          console.error("fetchCentersData: Invalid data structure in file");
-        }
-      } else {
-        console.error(`fetchCentersData: Failed to fetch from file: ${fileResponse.status} ${fileResponse.statusText}`);
-      }
+      return data;
     } else {
-      console.log("fetchCentersData: Not attempting to load file in server environment");
+      console.warn("API returned empty data");
+      throw new Error("API returned empty data");
     }
-  } catch (fileError) {
-    console.error("Failed to load from file:", fileError);
+  } else {
+    console.error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
   }
-  
-  // Return empty data if all attempts fail
-  console.error("All data loading attempts failed, returning empty data");
-  const emptyData = getEmptyData();
-  centersData = emptyData;
-  return emptyData;
 }
 
 // Get centers for a specific state

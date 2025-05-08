@@ -86,7 +86,7 @@ export async function GET(request: Request) {
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-store, max-age=0",
+          "Cache-Control": "public, max-age=60", // Cache error responses for shorter time (1 minute)
         },
       }
     );
@@ -99,7 +99,7 @@ function createResponse(data: any) {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "no-store, max-age=0",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600", // Cache for 1 hour (3600 seconds)
     },
   });
 }
