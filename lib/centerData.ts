@@ -183,8 +183,13 @@ const getEmptyData = (): CentersData => {
 
 // Function to fetch data from API only
 async function fetchCentersData(): Promise<CentersData> {
+  console.log("fetchCentersData: Starting to fetch centers data");
+  
   // Return cached data if available
-  if (centersData !== null) return centersData;
+  if (centersData !== null) {
+    console.log("fetchCentersData: Returning cached data");
+    return centersData;
+  }
 
   // If we're in a build environment or SSR, return empty data
   // This prevents API calls during static generation
@@ -197,33 +202,74 @@ async function fetchCentersData(): Promise<CentersData> {
 
   // Get the origin for absolute URLs
   const origin = getOrigin();
+  console.log(`fetchCentersData: API endpoint: ${origin}/api/centers?lightweight=false`);
+  
   try {
     // Try to load from API endpoint with absolute URL
+    console.log("fetchCentersData: Fetching from API...");
     const response = await fetch(`${origin}/api/centers?lightweight=false`, {
       // Add cache: 'no-store' to avoid caching issues during build
       cache: "no-store",
     });
 
+    console.log(`fetchCentersData: API response status: ${response.status}`);
+    
     if (response.ok) {
       const data = (await response.json()) as CentersData;
-      centersData = data;
-      return data;
+      
+      if (data.data && data.data.length > 0) {
+        console.log(`fetchCentersData: Successfully loaded ${data.data.length} centers from API`);
+        centersData = data;
+        return data;
+      } else {
+        console.warn("API returned empty data, trying to load from file...");
+      }
     } else {
       console.error(
         `Failed to fetch centers data: ${response.status} ${response.statusText}`
       );
-      // Return empty data on error to avoid build failures
-      const emptyData = getEmptyData();
-      centersData = emptyData;
-      return emptyData;
+      console.warn("Trying to load from file instead...");
     }
   } catch (error) {
     console.error("API data loading error:", error);
-    // Return empty data on error
-    const emptyData = getEmptyData();
-    centersData = emptyData;
-    return emptyData;
+    console.warn("Trying to load from file instead...");
   }
+  
+  // If we get here, the API call failed or returned empty data - try to load from file directly
+  try {
+    if (!isServerEnvironment()) {
+      // In browser environment, try fetching the file via a GET request
+      console.log(`fetchCentersData: Trying to fetch from file: ${origin}/Center-Processed.json`);
+      const fileResponse = await fetch(`${origin}/Center-Processed.json`, { 
+        cache: "no-store" 
+      });
+      
+      console.log(`fetchCentersData: File response status: ${fileResponse.status}`);
+      
+      if (fileResponse.ok) {
+        const fileData = await fileResponse.json();
+        if (fileData && fileData.data && Array.isArray(fileData.data)) {
+          console.log(`fetchCentersData: Successfully loaded ${fileData.data.length} centers from file`);
+          centersData = fileData;
+          return fileData;
+        } else {
+          console.error("fetchCentersData: Invalid data structure in file");
+        }
+      } else {
+        console.error(`fetchCentersData: Failed to fetch from file: ${fileResponse.status} ${fileResponse.statusText}`);
+      }
+    } else {
+      console.log("fetchCentersData: Not attempting to load file in server environment");
+    }
+  } catch (fileError) {
+    console.error("Failed to load from file:", fileError);
+  }
+  
+  // Return empty data if all attempts fail
+  console.error("All data loading attempts failed, returning empty data");
+  const emptyData = getEmptyData();
+  centersData = emptyData;
+  return emptyData;
 }
 
 // Get centers for a specific state
@@ -321,14 +367,23 @@ async function fetchCentersByDistrict(
 }
 
 export async function getAllCenters(): Promise<Center[]> {
+  console.log("getAllCenters: Starting to fetch all centers");
+  
   const data = await fetchCentersData();
+  
+  console.log(`getAllCenters: fetchCentersData returned ${data.data ? data.data.length : 0} centers`);
 
   // Update the state-region cache when we fetch all centers
-  data.data.forEach((center) => {
-    if (center.state && center.region) {
-      stateRegionCache[center.state] = center.region;
-    }
-  });
+  if (data.data && data.data.length > 0) {
+    console.log("getAllCenters: Updating state-region cache");
+    data.data.forEach((center) => {
+      if (center.state && center.region) {
+        stateRegionCache[center.state] = center.region;
+      }
+    });
+  } else {
+    console.warn("getAllCenters: No centers data to process");
+  }
 
   return data.data || [];
 }
@@ -806,9 +861,14 @@ export async function getDistrictBySlug(
 }
 
 export async function getRetreatCenters(): Promise<Center[]> {
+  console.log("==== getRetreatCenters: Starting to fetch retreat centers ====");
+  
   try {
     // Get all centers
+    console.log("getRetreatCenters: Calling getAllCenters");
     const allCenters = await getAllCenters();
+    
+    console.log(`getRetreatCenters: Retrieved ${allCenters.length} centers`);
     
     if (!allCenters || allCenters.length === 0) {
       console.warn('No centers found in the database');
@@ -816,9 +876,37 @@ export async function getRetreatCenters(): Promise<Center[]> {
     }
 
     // Filter centers that are retreat centers using the branch codes
+    console.log(`getRetreatCenters: Filtering using ${RETREAT_CENTER_BRANCH_CODES.length} retreat center branch codes`);
+    console.log("Retreat center branch codes:", RETREAT_CENTER_BRANCH_CODES.join(", "));
+    
     const retreatCenters = allCenters.filter(center => 
       center.branch_code && RETREAT_CENTER_BRANCH_CODES.includes(center.branch_code)
     );
+
+    console.log(`getRetreatCenters: Found ${retreatCenters.length} retreat centers after filtering`);
+    
+    if (retreatCenters.length === 0) {
+      // Try logging branch codes of all centers to see if they match what we expect
+      console.log("getRetreatCenters: No retreat centers found, checking branch codes from data:");
+      const allBranchCodes = allCenters
+        .filter(c => c.branch_code)
+        .map(c => c.branch_code);
+      
+      console.log(`getRetreatCenters: Sample of branch codes from data (first 10): ${allBranchCodes.slice(0, 10).join(", ")}`);
+      
+      // Check if any of our expected retreat centers exist in the data
+      const matchingCodes = RETREAT_CENTER_BRANCH_CODES.filter(code => 
+        allBranchCodes.includes(code)
+      );
+      
+      console.log(`getRetreatCenters: Matching branch codes between data and retreat centers: ${matchingCodes.join(", ")}`);
+    } else {
+      // Log the returned retreat centers for debugging
+      console.log("getRetreatCenters: Found these retreat centers:");
+      retreatCenters.forEach(center => {
+        console.log(`- ${center.name} (${center.branch_code})`);
+      });
+    }
 
     // Sort centers according to the order in RETREAT_CENTER_BRANCH_CODES
     return retreatCenters.sort((a, b) => {

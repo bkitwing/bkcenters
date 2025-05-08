@@ -20,6 +20,8 @@ export async function GET(request: Request) {
     const district = url.searchParams.get("district");
     const lightweight = url.searchParams.get("lightweight") === "true";
 
+    console.log(`API Request - state: ${state || 'none'}, district: ${district || 'none'}, lightweight: ${lightweight}`);
+
     // Try multiple locations for the data file
     const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
     const rootFilePath = path.join(process.cwd(), 'Center-Processed.json');
@@ -28,25 +30,40 @@ export async function GET(request: Request) {
     let filePath;
     if (fs.existsSync(publicFilePath)) {
       filePath = publicFilePath;
+      console.log('Using data file from public directory');
     } else if (fs.existsSync(rootFilePath)) {
       filePath = rootFilePath;
+      console.log('Using data file from root directory');
     } else {
+      console.error('Centers data file not found in any location');
       throw new Error('Centers data file not found in any location');
     }
     
     const adapter = new JSONFile<CentersData>(filePath);
     
-
     // @ts-expect-error
     const db = new LowWithLodash(adapter,{})
     await db.read();
 
+    if (!db.data || !db.data.data || !Array.isArray(db.data.data)) {
+      console.error('Invalid data structure in centers file');
+      throw new Error('Invalid data structure in centers file');
+    }
+    
+    console.log(`Loaded ${db.data.data.length} centers from file`);
+
     let query = db.chain.get('data');
    
     if(query){
-      query = query.filter(state ? (district ? { state,district  } : { state }) : {})
+      query = query.filter(state ? (district ? { state, district  } : { state }) : {})
     }
     const filteredData = await query.value();
+
+    if (!filteredData || filteredData.length === 0) {
+      console.log(`No centers found for query - state: ${state || 'none'}, district: ${district || 'none'}`);
+    } else {
+      console.log(`Found ${filteredData.length} centers for query`);
+    }
 
     // Prepare response
     const responseData = {
