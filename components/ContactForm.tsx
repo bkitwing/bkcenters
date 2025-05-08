@@ -8,7 +8,7 @@ interface ContactFormProps {
   pageUrl: string;
 }
 
-type ContactType = 'Feedback' | 'Query' | 'LearnMeditation';
+type ContactType = 'LearnMeditation' | 'Query' | 'AttendEvent' | 'Feedback' | 'Others';
 
 // Helper function to get the correct API base URL
 const getApiUrl = () => {
@@ -23,7 +23,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
-  const [contactType, setContactType] = useState<ContactType>('Feedback');
+  const [contactType, setContactType] = useState<ContactType>('LearnMeditation');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +104,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
     // Set default message templates based on contact type
     if (type === 'LearnMeditation') {
       setMessage("I'm interested in learning meditation. Please provide information about your classes and timings.");
+    } else if (type === 'AttendEvent') {
+      setMessage("I would like to attend an event. Please provide more information about upcoming events.");
     } else if (type === 'Query') {
       setMessage('');
     } else {
@@ -120,7 +122,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
         </svg>
         <h3 className="text-2xl font-bold mb-4 spiritual-text-gradient">Thank You!</h3>
         <p className="text-neutral-700 mb-4">
-          Your message has been sent to {center.name}. They will contact you shortly.
+          Your message has been sent to {center.name}.
         </p>
         <button
           onClick={() => setIsSubmitted(false)}
@@ -136,7 +138,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
     <div className="bg-light rounded-lg shadow-md p-6 border border-neutral-200">
       <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Contact Us</h2>
       <p className="text-neutral-600 mb-4">
-        Send a message to the meditation center. We'll do our best to respond to your query as soon as possible.
+        Send a message to the meditation center. We'll do our best to respond to your query.
       </p>
 
       {error && (
@@ -154,13 +156,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
             <button
               type="button"
               className={`py-2 px-4 rounded-md transition-colors ${
-                contactType === 'Feedback'
+                contactType === 'LearnMeditation'
                   ? 'bg-primary text-white'
                   : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
               }`}
-              onClick={() => handleContactTypeChange('Feedback')}
+              onClick={() => handleContactTypeChange('LearnMeditation')}
             >
-              Feedback
+              Learn Meditation
             </button>
             <button
               type="button"
@@ -176,13 +178,35 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
             <button
               type="button"
               className={`py-2 px-4 rounded-md transition-colors ${
-                contactType === 'LearnMeditation'
+                contactType === 'AttendEvent'
                   ? 'bg-primary text-white'
                   : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
               }`}
-              onClick={() => handleContactTypeChange('LearnMeditation')}
+              onClick={() => handleContactTypeChange('AttendEvent')}
             >
-              Learn Meditation
+              Attend Event
+            </button>
+            <button
+              type="button"
+              className={`py-2 px-4 rounded-md transition-colors ${
+                contactType === 'Feedback'
+                  ? 'bg-primary text-white'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+              onClick={() => handleContactTypeChange('Feedback')}
+            >
+              Feedback
+            </button>
+            <button
+              type="button"
+              className={`py-2 px-4 rounded-md transition-colors ${
+                contactType === 'Others'
+                  ? 'bg-primary text-white'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+              }`}
+              onClick={() => handleContactTypeChange('Others')}
+            >
+              Others
             </button>
           </div>
         </div>

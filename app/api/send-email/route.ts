@@ -10,12 +10,186 @@ interface EmailRequestBody {
   email: string;
   phone?: string;
   message: string;
-  contactType: 'Feedback' | 'Query' | 'LearnMeditation';
+  contactType: 'LearnMeditation' | 'Query' | 'AttendEvent' | 'Feedback' | 'Others';
   centerEmail: string;
   centerName: string;
   userAgent: string;
   pageUrl: string;
 }
+
+// Modern HTML template for center notification
+const getCenterEmailTemplate = (data: EmailRequestBody) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${data.contactType} from ${data.name}</title>
+  <style>
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    .header {
+      background: linear-gradient(135deg, #6b46c1 0%, #4299e1 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px 8px 0 0;
+    }
+    .content {
+      padding: 20px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 0 0 8px 8px;
+    }
+    .info-block {
+      margin: 15px 0;
+      padding: 15px;
+      background: #f7fafc;
+      border-radius: 6px;
+    }
+    .message-block {
+      margin: 20px 0;
+      padding: 20px;
+      background: #edf2f7;
+      border-radius: 6px;
+      border-left: 4px solid #4299e1;
+    }
+    .footer {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.875rem;
+      color: #718096;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h2 style="margin:0">${data.contactType} from ${data.name}</h2>
+    </div>
+    <div class="content">
+      <div class="info-block">
+        <p><strong>Name:</strong> ${data.name}</p>
+        <p><strong>Email:</strong> <a href="mailto:${data.email}" style="color: #4299e1;">${data.email}</a></p>
+        ${data.phone ? `<p><strong>Phone:</strong> ${data.phone}</p>` : ''}
+      </div>
+      
+      <div class="message-block">
+        <h3 style="margin-top:0">Message:</h3>
+        <p>${data.message.replace(/\n/g, '<br>')}</p>
+      </div>
+      
+      <div class="info-block">
+        <h4 style="margin-top:0">System Information:</h4>
+        <p><strong>Page URL:</strong> ${data.pageUrl}</p>
+        <p><strong>User Agent:</strong> ${data.userAgent}</p>
+      </div>
+      
+      <div class="footer">
+        <p>This email was sent from Brahma Kumaris website contact form on behalf of ${data.name} (${data.email}).</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+// Acknowledgment email template for the sender
+const getAcknowledgmentTemplate = (name: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank you for contacting Brahma Kumaris</title>
+  <style>
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    .header {
+      background: linear-gradient(135deg, #6b46c1 0%, #4299e1 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .content {
+      padding: 30px 20px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 0 0 8px 8px;
+      text-align: center;
+    }
+    .message {
+      margin: 20px 0;
+      font-size: 1.1em;
+      color: #2d3748;
+    }
+    .quote {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f7fafc;
+      border-radius: 8px;
+      font-style: italic;
+      color: #4a5568;
+    }
+    .button-container {
+      margin: 30px 0;
+      display: block;
+    }
+    .button {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 24px;
+      background: #4299e1;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .button:hover {
+      background: #3182ce;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1 style="margin:0">Thank You, ${name}!</h1>
+    </div>
+    <div class="content">
+      <div class="message">
+        <p>We have received your message and will get back to you soon.</p>
+      </div>
+      
+      <div class="quote">
+        <p>"Start your day with a breeze of positivity and stay motivated with these daily affirmations"</p>
+      </div>
+      
+      <div class="button-container">
+        <a href="https://www.brahmakumaris.com/join-sse/" class="button">Join in English</a>
+        <a href="https://www.brahmakumaris.com/join-ssh/" class="button">हिंदी में जुड़ें</a>
+      </div>
+      
+      <p style="color: #718096; font-size: 0.875rem;">
+        Om Shanti,<br>
+        Brahma Kumaris
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`;
 
 export async function POST(request: Request) {
   try {
@@ -49,7 +223,7 @@ export async function POST(request: Request) {
     const oauth2Client = new OAuth2(
       clientId,
       clientSecret,
-      'https://developers.google.com/oauthplayground' // Redirect URL used to get the refresh token
+      'https://developers.google.com/oauthplayground'
     );
     
     oauth2Client.setCredentials({
@@ -87,32 +261,25 @@ export async function POST(request: Request) {
         }
       });
       
-      // Format the email subject to include user's email
+      // Format the email subject
       const emailSubject = `[${contactType}] ${name} <${email}> - ${centerName}`;
       
-      // Include system information in message with prominent user email display
-      const emailHtml = `
-        <h2>${contactType} from ${name} &lt;${email}&gt;</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-        ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-        <h3>Message:</h3>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-        <hr>
-        <h4>System Information:</h4>
-        <p><strong>Page URL:</strong> ${pageUrl}</p>
-        <p><strong>User Agent:</strong> ${userAgent}</p>
-        <p><em>This email was sent from Brahma Kumaris website contact form on behalf of ${name} (${email}).</em></p>
-      `;
-      
-      // Send email - using user's name but admin email (limitation of Gmail OAuth)
+      // Send email to center
       await transporter.sendMail({
         from: `"${name} via Contact Form" <${emailFrom}>`,
         to: centerEmail,
         cc: 'contact@brahmakumaris.com',
-        replyTo: email, // This ensures replies go directly to the user
+        replyTo: email,
         subject: emailSubject,
-        html: emailHtml,
+        html: getCenterEmailTemplate(body),
+      });
+
+      // Send acknowledgment email to the sender
+      await transporter.sendMail({
+        from: `"Brahma Kumaris" <${emailFrom}>`,
+        to: email,
+        subject: 'Thank you for contacting Brahma Kumaris',
+        html: getAcknowledgmentTemplate(name),
       });
       
       return NextResponse.json({ success: true });

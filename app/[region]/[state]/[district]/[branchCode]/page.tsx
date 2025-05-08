@@ -477,15 +477,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     <div className="bg-light rounded-lg shadow-md p-6 border border-neutral-200">
                       <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">About Contacting Us</h3>
                       <p className="text-neutral-700 mb-4">
-                        You can use this form to send a message directly to the {center.name} meditation center. 
-                        Whether you want to provide feedback, have a query, or are interested in learning meditation, 
+                        You can use this form to send a message directly to the {center.name} Rajyog Meditation center. 
+                        Whether you want to provide feedback, have a query, or are interested in learning Rajyog Meditation, 
                         we're here to help.
                       </p>
                       
                       <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">What to Expect</h3>
                       <ul className="list-disc list-inside text-neutral-700 space-y-2 mb-4">
-                        <li>Our team will respond to your inquiry as soon as possible</li>
-                        <li>For urgent matters, consider calling the center directly</li>
                         <li>Free meditation sessions are available for beginners</li>
                         <li>All our programs are offered free of charge</li>
                       </ul>
