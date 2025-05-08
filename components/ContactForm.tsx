@@ -10,6 +10,14 @@ interface ContactFormProps {
 
 type ContactType = 'Feedback' | 'Query' | 'LearnMeditation';
 
+// Helper function to get the correct API base URL
+const getApiUrl = () => {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 
+    process.env.NODE_ENV === 'production' ? 'https://www.brahmakumaris.com' : 'http://localhost:3000';
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+  return `${origin}${basePath}`;
+};
+
 const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -33,7 +41,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
     setError(null);
 
     try {
-      const response = await fetch('/api/send-email', {
+      // Use the full API URL including the base path
+      const apiBaseUrl = getApiUrl();
+      console.log('Sending email using API endpoint:', `${apiBaseUrl}/api/send-email`);
+      
+      const response = await fetch(`${apiBaseUrl}/api/send-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,11 +63,26 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send email');
+        // Try to parse the error message from the response
+        let errorMessage = 'Failed to send email';
+        try {
+          const data = await response.json();
+          errorMessage = data.error || errorMessage;
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          // Handle non-JSON error responses (like HTML)
+          if (response.status === 404) {
+            errorMessage = 'Email service not found. Please try again later.';
+          } else {
+            errorMessage = `Server error (${response.status}). Please try again later.`;
+          }
+        }
+        throw new Error(errorMessage);
       }
+
+      // Parse the response data
+      const data = await response.json();
 
       // Success
       setIsSubmitted(true);
@@ -65,6 +92,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
       setPhone('');
       setMessage('');
     } catch (err: any) {
+      console.error('Email submission error:', err);
       setError(err.message || 'An error occurred while sending your message');
     } finally {
       setIsSubmitting(false);
