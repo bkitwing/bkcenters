@@ -297,6 +297,18 @@ export default async function CenterPage({ params }: CenterPageProps) {
         {/* Improved Responsive Breadcrumb Navigation */}
         <nav className="mb-4">
           <ol className="flex items-center text-sm flex-wrap">
+            {/* Home */}
+            <li className="flex items-center">
+              <Link 
+                href="/" 
+                className="text-neutral-500 hover:text-primary text-xs"
+                title="Home"
+              >
+                Home
+              </Link>
+              <span className="mx-2 text-neutral-400">&gt;</span>
+            </li>
+            
             {/* Region */}
             <li className="flex items-center">
               <Link 
