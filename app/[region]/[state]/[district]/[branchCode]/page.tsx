@@ -6,6 +6,7 @@ import CenterMap from '@/components/CenterMap';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
+import ShareCenter from '@/components/ShareCenter';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
@@ -407,10 +408,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Get Directions</h2>
                   <DirectionsButton center={center} address={formattedAddress} />
                 </div>
+
+                {/* Share and QR Code Section */}
+                <ShareCenter center={center} pageUrl={absoluteUrl} />
               </div>
               
               <div>
-                <div className="h-[300px] md:h-[400px] lg:h-[450px] border border-neutral-200 rounded-lg overflow-hidden">
+                <div className="h-[350px] md:h-[400px] lg:h-[450px] border border-neutral-200 rounded-lg overflow-hidden">
                   <CenterMap 
                     centers={mapCenters} 
                     height="100%" 
@@ -420,6 +424,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     showInfoWindowOnLoad={true}
                   />
                 </div>
+                <p className="text-xs italic text-neutral-500 mt-2">
+                  <span className="font-bold text-spirit-purple-600">Purple</span>: Your Center • 
+                  <span className="font-bold text-green-600">Green</span>: Nearby Centers — 
+                  Click green markers to highlight Nearby Center. Use icon in top right corner to measure distance between centers.
+                </p>
               </div>
             </div>
             

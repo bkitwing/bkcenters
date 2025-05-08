@@ -594,10 +594,10 @@ const CenterMap: React.FC<CenterMapProps> = ({
             {distanceMeasurementMode && (
               <div className="mt-2 w-48">
                 {!startPoint && (
-                  <p className="text-sm text-neutral-700">Click first center</p>
+                  <p className="text-sm text-neutral-700">Click on any center</p>
                 )}
                 {startPoint && !endPoint && (
-                  <p className="text-sm text-neutral-700">Click second center</p>
+                  <p className="text-sm text-neutral-700">Click on another center</p>
                 )}
                 {startPoint && endPoint && measuredDistance !== null && (
                   <div className="p-2 bg-neutral-100 rounded text-sm">
