@@ -70,8 +70,6 @@ const Header = () => {
         {/* Logo */}
         <Link
           href="https://www.brahmakumaris.com/"
-          target="_blank"
-          rel="noopener noreferrer"
           className="flex items-center"
         >
           <Image
@@ -92,8 +90,6 @@ const Header = () => {
                 href="https://www.brahmakumaris.com"
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
                 aria-label="Brahma Kumaris Home"
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 <FaHome size={22} className="text-gray-600" />
               </Link>
@@ -123,8 +119,6 @@ const Header = () => {
                 href="https://www.brahmakumaris.com/centers"
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
                 aria-label="Search Centers" 
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 <FaSearch size={20} className="text-gray-600" />
               </Link>
@@ -138,8 +132,6 @@ const Header = () => {
             href="https://www.brahmakumaris.com/centers"
             className="text-neutral-700 hover:text-primary transition-colors"
             aria-label="Search Centers"
-            target="_blank"
-            rel="noopener noreferrer"
           >
             <FaSearch size={20} className="text-gray-600" />
           </Link>
@@ -163,8 +155,6 @@ const Header = () => {
                   className="flex items-center text-neutral-700 hover:text-primary transition-colors"
                   onClick={toggleMenu}
                   aria-label="Brahma Kumaris Home"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   <FaHome size={22} className="text-gray-600 mr-2" />
                   <span className="text-gray-600 font-medium">Home</span>
