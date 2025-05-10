@@ -25,6 +25,20 @@ const nextConfig = {
     });
     return config;
   },
+  // Register public files that won't be processed by Next.js
+  // This ensures sitemap.xml and robots.txt are served correctly
+  async rewrites() {
+    return [
+      {
+        source: '/centers/sitemap.xml',
+        destination: '/centers/sitemap.xml',
+      },
+      {
+        source: '/centers/robots.txt',
+        destination: '/centers/robots.txt',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
