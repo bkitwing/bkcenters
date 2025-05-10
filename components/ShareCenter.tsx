@@ -40,7 +40,7 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
       const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || '';
       const fullUrl = pageUrl.startsWith('http') 
         ? (pageUrl.startsWith('https') ? pageUrl : `https${pageUrl.substring(pageUrl.indexOf(':'))}`)
-        : `https://www.brahmakumaris.com${baseUrl}${pageUrl.startsWith('/') ? pageUrl : '/' + pageUrl}`;
+        : `https://www.brahmakumaris.com/centers${baseUrl}${pageUrl.startsWith('/') ? pageUrl : '/' + pageUrl}`;
         
       const qrDataUrl = await QRCode.toDataURL(fullUrl, {
         width: 800, // Increased from 400 for higher quality
@@ -117,7 +117,7 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || '';
     const fullUrl = pageUrl.startsWith('http') 
       ? (pageUrl.startsWith('https') ? pageUrl : `https${pageUrl.substring(pageUrl.indexOf(':'))}`)
-      : `https://www.brahmakumaris.com${baseUrl}${pageUrl.startsWith('/') ? pageUrl : '/' + pageUrl}`;
+      : `https://www.brahmakumaris.com/centers${baseUrl}${pageUrl.startsWith('/') ? pageUrl : '/' + pageUrl}`;
     
     return `Om Shanti.\n\n` +
            `${center.name} - Brahma Kumaris Meditation Center - Details\n` +

@@ -287,7 +287,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         center.district || district, 
         center.name
       );
-      absoluteUrl = `${protocol}://${host}${centerUrl}`;
+      absoluteUrl = `${protocol}://${host}/centers${centerUrl}`;
     } else {
       // Fallback if center is not found
       absoluteUrl = `${protocol}://${host}/centers`;
