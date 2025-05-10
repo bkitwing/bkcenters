@@ -36,7 +36,13 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
   // Generate QR code
   const generateQRCode = async () => {
     try {
-      const qrDataUrl = await QRCode.toDataURL(pageUrl, {
+      // Create a proper URL with https and base path
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || '';
+      const fullUrl = pageUrl.startsWith('http') 
+        ? (pageUrl.startsWith('https') ? pageUrl : `https${pageUrl.substring(pageUrl.indexOf(':'))}`)
+        : `https://www.brahmakumaris.com${baseUrl}${pageUrl.startsWith('/') ? pageUrl : '/' + pageUrl}`;
+        
+      const qrDataUrl = await QRCode.toDataURL(fullUrl, {
         width: 800, // Increased from 400 for higher quality
         margin: 2,
         color: {
@@ -105,25 +111,41 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
   // Generate formatted share text
   const getFormattedShareText = () => {
     const regionText = center.region ? `${center.region}, ` : '';
-    return `✨ ${center.name} - Brahma Kumaris Rajyoga Meditation Center\n` +
-           `📍 ${center.district}, ${center.state}, ${regionText}\n\n` +
-           `Click Here to Visit Center\n` +
-           `🔗 ${pageUrl}\n\n` +
-           `To Find Nearby Centers, Kindly visit\n` +
+    const locationDetails = `${center.district}, ${center.state}${regionText ? `, ${regionText}` : ''}`;
+    
+    // Create a proper URL with https and base path
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    const fullUrl = pageUrl.startsWith('http') 
+      ? (pageUrl.startsWith('https') ? pageUrl : `https${pageUrl.substring(pageUrl.indexOf(':'))}`)
+      : `https://www.brahmakumaris.com${baseUrl}${pageUrl.startsWith('/') ? pageUrl : '/' + pageUrl}`;
+    
+    return `Om Shanti.\n\n` +
+           `${center.name} - Brahma Kumaris Meditation Center - Details\n` +
+           `${locationDetails}\n\n` +
+           `For more details, please click below\n` +
+           `${fullUrl}\n\n` +
+           `To find other Nearby Centers:\n` +
            `https://www.brahmakumaris.com/centers\n\n` +
-           `Om Shanti 🙏`;
+           `For any queries, contact following:\n` +
+           `contact@brahmakumaris.com`;
   };
 
   // Share functionality
   const handleShare = async () => {
     const shareText = getFormattedShareText();
     
+    // Create a proper URL with https and base path
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    const fullUrl = pageUrl.startsWith('http') 
+      ? (pageUrl.startsWith('https') ? pageUrl : `https${pageUrl.substring(pageUrl.indexOf(':'))}`)
+      : `https://www.brahmakumaris.com${baseUrl}${pageUrl.startsWith('/') ? pageUrl : '/' + pageUrl}`;
+      
     try {
       if (navigator.share) {
         await navigator.share({
           title: `${center.name} - Brahma Kumaris`,
           text: shareText,
-          url: pageUrl
+          url: fullUrl
         });
       } else {
         // Fallback to copy to clipboard
@@ -188,14 +210,14 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Share Center</h2>
+      <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Share Center Details</h2>
       <div className="flex items-center gap-4">
         {isMobile ? (
           <button
             onClick={handleShare}
             className="bg-primary text-white p-3 rounded-full hover:bg-primary-dark transition-colors shadow-md"
-            aria-label="Share Center"
-            title="Share Center"
+            aria-label="Share Center Details"
+            title="Share Center Details"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -209,8 +231,8 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
                 ? 'bg-green-500 scale-110' 
                 : 'bg-primary hover:bg-primary-dark'
             }`}
-            aria-label="Copy Center Info"
-            title="Copy Center Info"
+            aria-label="Copy Center Details"
+            title="Copy Center Details"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
