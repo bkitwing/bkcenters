@@ -51,7 +51,7 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
 
   // Share functionality
   const handleShare = async (center: Center) => {
-    const centerUrl = window.location.origin + formatCenterUrl(center.region, center.state, center.district, center.name);
+    const centerUrl = window.location.origin + '/centers' + formatCenterUrl(center.region, center.state, center.district, center.name);
     
     if (navigator.share) {
       try {

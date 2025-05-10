@@ -51,7 +51,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
   const handleShare = async () => {
     const centerName = center.name;
     const centerAddress = formatAddress(center);
-    const shareUrl = `${window.location.origin}${formatCenterUrl(center.region, center.state, center.district, center.name)}`;
+    const shareUrl = `${window.location.origin}/centers${formatCenterUrl(center.region, center.state, center.district, center.name)}`;
     
     const shareData = {
       title: `${centerName} - Brahma Kumaris Meditation Center`,
