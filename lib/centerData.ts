@@ -226,11 +226,11 @@ const loadFromLocalStorage = (): { data: CentersData | null, isExpired: boolean 
 };
 
 // Function to fetch data from API only
-async function fetchCentersData(): Promise<CentersData> {
+async function fetchCentersData(canUseCache: boolean = true): Promise<CentersData> {
   console.log("fetchCentersData: Starting to fetch centers data");
   
-  // Return cached data if available
-  if (centersData !== null) {
+  // Return cached data if available and cache usage is allowed
+  if (canUseCache && centersData !== null) {
     console.log("fetchCentersData: Returning in-memory cached data");
     return centersData;
   }
@@ -438,10 +438,10 @@ async function fetchCentersByDistrict(
   return filtered;
 }
 
-export async function getAllCenters(): Promise<Center[]> {
+export async function getAllCenters(useSharedData: boolean = true): Promise<Center[]> {
   console.log("getAllCenters: Starting to fetch all centers");
   
-  const data = await fetchCentersData();
+  const data = await fetchCentersData(useSharedData);
   
   console.log(`getAllCenters: fetchCentersData returned ${data.data ? data.data.length : 0} centers`);
 
@@ -533,9 +533,11 @@ const isServer = () => {
 export async function getNearestCenters(
   latitude: number,
   longitude: number,
-  limit: number = 5
+  limit: number = 5,
+  providedCenters?: Center[]
 ): Promise<Center[]> {
-  const centers = await getAllCenters();
+  // Use provided centers if available, otherwise fetch them
+  const centers = providedCenters || await getAllCenters(true);
 
   // Calculate distance between two points using Haversine formula
   const getDistance = (

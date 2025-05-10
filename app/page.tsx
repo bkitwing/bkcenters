@@ -142,16 +142,19 @@ export default function HomePage() {
           setAddress(addressParam);
         }
 
-        // Load data using the new optimized mapping structure
+        setLoading(true);
+        
+        // First, fetch all centers data once - this will be cached
+        const centers = await getAllCenters(true);
+        
+        // Then call other data functions that will reuse the same cached data
         const [
           summary,
-          centers,
           availableRegions,
           regionsWithDetails,
           regionStateMapping,
         ] = await Promise.all([
           getStatesSummary(),
-          getAllCenters(),
           getRegions(),
           getRegionsWithDetails(),
           getRegionToStateMapping(),
@@ -204,11 +207,11 @@ export default function HomePage() {
   // Fetch nearest centers when lat/lng change
   useEffect(() => {
     async function fetchCenters() {
-      if (lat && lng) {
+      if (lat && lng && allCenters.length > 0) {
         setLoading(true);
         try {
-          // Fetch up to 150 centers instead of 100
-          const centers = await getNearestCenters(lat, lng, 150);
+          // Fetch up to 150 centers instead of 100, passing already loaded centers
+          const centers = await getNearestCenters(lat, lng, 150, allCenters);
           setAllNearestCenters(centers);
 
           // Apply distance filter
@@ -228,7 +231,7 @@ export default function HomePage() {
     }
 
     fetchCenters();
-  }, [lat, lng, maxDistance]);
+  }, [lat, lng, maxDistance, allCenters]);
 
   // Intersection observer for lazy loading
   useEffect(() => {
