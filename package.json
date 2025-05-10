@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start-local": "IS_LOCAL=true next start",
     "lint": "next lint",
     "process-centers": "node process-centers.js",
     "generate-sitemap": "node scripts/generate-sitemap.js"

@@ -1,4 +1,5 @@
 const isProd = process.env.NODE_ENV === "production";
+const isLocalDev = process.env.IS_LOCAL === "true";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -8,20 +9,23 @@ const nextConfig = {
   },
   // Set trailing slashes to false to avoid duplicate routes
   trailingSlash: false,
-  // Add basePath for deployment at /centers
-  basePath: "/centers",
+  // Add basePath for deployment at /centers (only in production mode)
+  basePath: isProd && !isLocalDev ? "/centers" : "",
   // Configure asset prefix to match basePath
-  assetPrefix: isProd ? "https://www.brahmakumaris.com/centers" : undefined,
+  assetPrefix: isProd && !isLocalDev ? "https://www.brahmakumaris.com/centers" : "",
   // Configure page build options
   experimental: {
     // Disable strict mode during build to avoid duplicate effects
     strictNextHead: true,
   },
-  // Enable edge runtime for OpenGraph image generation
+  // Configure webpack to handle fonts properly
   webpack(config) {
     config.module.rules.push({
       test: /\.woff2$/,
       type: 'asset/resource',
+      generator: {
+        filename: 'static/media/[name][ext]',
+      },
     });
     return config;
   },
