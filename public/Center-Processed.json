@@ -555,28 +555,6 @@
     {
       "address": {
         "city": "Agartala",
-        "line1": "H.no: 1611268, Shanti Kunj",
-        "line2": "Ramnagar Road No:5",
-        "line3": "Agartala Sadar",
-        "pincode": "799002"
-      },
-      "branch_code": "05107",
-      "contact": "",
-      "coords": [
-        "23.8397470000",
-        "91.2681800000"
-      ],
-      "country": "India",
-      "district": "West Tripura",
-      "email": "",
-      "mobile": "8837349893, 7002919348",
-      "name": "Agartala Ramnagar",
-      "region": "India",
-      "state": "Tripura"
-    },
-    {
-      "address": {
-        "city": "Agartala",
         "line1": "H.no: 460395, Manav Kalyan Bhawan",
         "line2": "Near Godrej Showroom, Milanchakra",
         "line3": "Ward No: 46, Shillong Road, Badharghat",
@@ -659,6 +637,28 @@
       "email": "aralia.agt@bkivv.org",
       "mobile": "9862235202, 7005929178",
       "name": "Agartala Aralia",
+      "region": "India",
+      "state": "Tripura"
+    },
+    {
+      "address": {
+        "city": "Agartala",
+        "line1": "Shanti Kunj",
+        "line2": "Ramnagar Road No:5, After 4th Crossing",
+        "line3": "Agartala Sadar",
+        "pincode": "799002"
+      },
+      "branch_code": "05107",
+      "contact": "",
+      "coords": [
+        "23.8401800000",
+        "91.2646800000"
+      ],
+      "country": "India",
+      "district": "West Tripura",
+      "email": "",
+      "mobile": "8837349893",
+      "name": "Agartala Ramnagar",
       "region": "India",
       "state": "Tripura"
     },
@@ -1031,7 +1031,7 @@
       "country": "India",
       "district": "Agra",
       "email": "",
-      "mobile": "8393088449",
+      "mobile": "7037111222",
       "name": "Agra Tedi Bagiya",
       "region": "India",
       "state": "Uttar Pradesh"
@@ -10015,21 +10015,21 @@
     {
       "address": {
         "city": "Bangriposi",
-        "line1": "Plot No: 128, House Of Udayanath Mohanty",
-        "line2": "Near Busstand, P.w.d Road",
-        "line3": "Hanada",
+        "line1": "Plot No: 120/180, House Of Manas Kumar Behera",
+        "line2": "Near Post Office, Railway Station Road",
+        "line3": "Bangriposi, Tal: Hanada",
         "pincode": "757032"
       },
       "branch_code": "03124",
       "contact": "",
       "coords": [
-        "22.1533607000",
-        "86.5407466000"
+        "22.1502700000",
+        "86.5434090000"
       ],
       "country": "India",
       "district": "Mayurbhanj",
       "email": "",
-      "mobile": "9337588615, 8117081063",
+      "mobile": "9337588615",
       "name": "Bangriposi",
       "region": "India",
       "state": "Odisha"
@@ -11570,7 +11570,7 @@
       "district": "Jagatsinghapur",
       "email": "",
       "mobile": "9777846141",
-      "name": "Barti",
+      "name": "Barti (raghunathpur)",
       "region": "India",
       "state": "Odisha"
     },
@@ -18485,22 +18485,22 @@
     {
       "address": {
         "city": "Bhoma",
-        "line1": "H No: 308",
-        "line2": "Main Road",
-        "line3": "Opp: Bank Of Maharashtra",
+        "line1": "Brahma Kumaris",
+        "line2": "Mandla Road, Opp Army Petrol Pump",
+        "line3": "Bhoma",
         "pincode": "480990"
       },
       "branch_code": "05140",
       "contact": "",
       "coords": [
-        "22.1683090000",
-        "79.6904610000"
+        "22.1697180000",
+        "79.6937390000"
       ],
       "country": "India",
       "district": "Seoni",
       "email": "",
-      "mobile": "9424680861, 6266813262",
-      "name": "Bhoma",
+      "mobile": "6266813262, 7566447028",
+      "name": "Bhoma (seoni)",
       "region": "India",
       "state": "Madhya Pradesh"
     },
@@ -24337,21 +24337,21 @@
     {
       "address": {
         "city": "Chandigarh",
-        "line1": "H No: 2321/1, Gyan Dhara",
-        "line2": "Near Shree Sanatan Dham Temple",
+        "line1": "H No: 2131, Gyan Dhara",
+        "line2": "Near Government Hospital",
         "line3": "Sector 45-c",
         "pincode": "160047"
       },
       "branch_code": "05352",
-      "contact": "0172-2623385",
+      "contact": "",
       "coords": [
-        "30.7047880000",
-        "76.7567330000"
+        "30.7020840000",
+        "76.7574680000"
       ],
       "country": "India",
       "district": "Chandigarh",
       "email": "",
-      "mobile": "9216021894, 9417421894",
+      "mobile": "9216021894, 7814577167",
       "name": "Chandigarh Sector 45c",
       "region": "India",
       "state": "Chandigarh"
@@ -26462,7 +26462,7 @@
       ],
       "country": "India",
       "district": "Gautam Buddha Nagar",
-      "email": "",
+      "email": "chhapraula@bkiv.org",
       "mobile": "9560918746, 8510944346",
       "name": "Chhapraula",
       "region": "India",
@@ -34670,7 +34670,7 @@
       "district": "Narsinghpur",
       "email": "dobhi@bkivv.org",
       "mobile": "9302115911, 9131301341",
-      "name": "Dobhi",
+      "name": "Dobhi (tendukheda)",
       "region": "India",
       "state": "Madhya Pradesh"
     },
@@ -34691,7 +34691,7 @@
       "country": "India",
       "district": "Bengaluru Rural",
       "email": "",
-      "mobile": "9008853473",
+      "mobile": "8095011290, 9008853473",
       "name": "Doddaballapura Tyagaraj Nagar",
       "region": "India",
       "state": "Karnataka"
@@ -35733,8 +35733,8 @@
     {
       "address": {
         "city": "Ettumanoor",
-        "line1": "Gyan Vigyan Bhawan, Vattupura",
-        "line2": "Near Ebnizer Intl School, Kadapoor",
+        "line1": "H No: 336/a, Gyan Vigyan Bhawan, Vattupura",
+        "line2": "Near Ebnizer Intl School, Kadapoor, W.no: 6",
         "line3": "Meenachil",
         "pincode": "686631"
       },
@@ -36261,7 +36261,7 @@
     {
       "address": {
         "city": "Faridabad",
-        "line1": "H No: D1/211, ",
+        "line1": "H No: D1/211,",
         "line2": "Opp: Transformer, Near Kela Mandir",
         "line3": "Shiv Durga Vihar, Lakkarpur",
         "pincode": "121009"
@@ -36275,7 +36275,7 @@
       "country": "India",
       "district": "Faridabad",
       "email": "",
-      "mobile": "9971427788, 9971427788",
+      "mobile": "9971427788, 9818869118, 9971427788",
       "name": "Faridabad Lakkarpur",
       "region": "India",
       "state": "Haryana"
@@ -41393,7 +41393,7 @@
         "pincode": "311021"
       },
       "branch_code": "01131",
-      "contact": "01483- 223721",
+      "contact": "",
       "coords": [
         "25.9046275000",
         "74.6516190000"
@@ -41629,16 +41629,16 @@
     {
       "address": {
         "city": "Gumuda",
-        "line1": "H.no: 131/145",
-        "line2": "Near V.p. School, Sibarampur",
-        "line3": "U.g.bank Road, Gopalpur, Tal: Ramanaguda",
+        "line1": "Shiv Aradhana Bhawan",
+        "line2": "Om Shanti Colony",
+        "line3": "Gumuda",
         "pincode": "765024"
       },
       "branch_code": "03541",
       "contact": "",
       "coords": [
-        "19.2191733334",
-        "83.7626383334"
+        "19.2195350000",
+        "83.7640840000"
       ],
       "country": "India",
       "district": "Rayagada",
@@ -43227,7 +43227,7 @@
       "country": "India",
       "district": "Gurugram",
       "email": "hailymandi@bkivv.org",
-      "mobile": "9416236152,8813944242",
+      "mobile": "8447579098",
       "name": "Haily Mandi Pataudi",
       "region": "India",
       "state": "Haryana"
@@ -48053,16 +48053,16 @@
     {
       "address": {
         "city": "Indore",
-        "line1": "H No: 105, Guruji Chat",
-        "line2": "Near Shubh City, R.t.o. Road",
+        "line1": "H No: 10, Nexus Park",
+        "line2": "Near Sanskriti Palms, New R.t.o. Road",
         "line3": "Palda",
         "pincode": "452020"
       },
       "branch_code": "05243",
       "contact": "",
       "coords": [
-        "22.6783650000",
-        "75.8997570000"
+        "22.6798230000",
+        "75.8969320000"
       ],
       "country": "India",
       "district": "Indore",
@@ -48221,7 +48221,7 @@
       "country": "India",
       "district": "Indore",
       "email": "",
-      "mobile": "9669735567",
+      "mobile": "9826745504",
       "name": "Indore Dheeraj Nagar",
       "region": "India",
       "state": "Madhya Pradesh"
@@ -50459,8 +50459,8 @@
       "branch_code": "03757",
       "contact": "",
       "coords": [
-        "22.5762130000",
-        "76.5592820000"
+        "26.8871190000",
+        "75.8921740000"
       ],
       "country": "India",
       "district": "Jaipur",
@@ -52710,7 +52710,7 @@
       "district": "Khordha",
       "email": "",
       "mobile": "9337045006",
-      "name": "Janla",
+      "name": "Janla (khordha)",
       "region": "India",
       "state": "Odisha"
     },
@@ -56052,8 +56052,8 @@
       ],
       "country": "India",
       "district": "Malkangiri",
-      "email": "",
-      "mobile": "8763081836",
+      "email": "kalimela@bkivv.org",
+      "mobile": "8763081836, 8114915007",
       "name": "Kalimela",
       "region": "India",
       "state": "Odisha"
@@ -56963,21 +56963,21 @@
     {
       "address": {
         "city": "Kanchipuram",
-        "line1": "H No: 102",
-        "line2": "K.a.koil Street",
-        "line3": "Near Padavettamman Koil",
-        "pincode": "631501"
+        "line1": "H No: 21",
+        "line2": "Lingappan Street",
+        "line3": "Near Sri Ekambaranadar Temple",
+        "pincode": "631502"
       },
       "branch_code": "01605",
-      "contact": "044- 27232196",
+      "contact": "",
       "coords": [
-        "12.8267280000",
-        "79.7001691000"
+        "12.8454210000",
+        "79.6980380000"
       ],
       "country": "India",
       "district": "Kanchipuram",
       "email": "kancheepuram@bkivv.org",
-      "mobile": "9444691463, 9095332111",
+      "mobile": "9444691463",
       "name": "Kanchipuram",
       "region": "India",
       "state": "Tamil Nadu"
@@ -57205,21 +57205,21 @@
     {
       "address": {
         "city": "Kanhiwada",
-        "line1": "H No: 408",
-        "line2": "Bihar Mohalla Road",
-        "line3": "",
+        "line1": "Near Kanya Shala",
+        "line2": "Balaji Nagar",
+        "line3": "Kanhiwada",
         "pincode": "480990"
       },
       "branch_code": "04718",
       "contact": "",
       "coords": [
-        "22.2143114000",
-        "79.7356661000"
+        "22.2162500000",
+        "79.7383030000"
       ],
       "country": "India",
       "district": "Seoni",
       "email": "",
-      "mobile": "8103653563, 9753785250",
+      "mobile": "9753785250, 8103653563",
       "name": "Kanhiwada",
       "region": "India",
       "state": "Madhya Pradesh"
@@ -59097,22 +59097,22 @@
     {
       "address": {
         "city": "Karve",
-        "line1": "H No: 237, Karve Dushere Road",
-        "line2": "Near Savakar Basti",
+        "line1": "Shivratna",
+        "line2": "Near Sugar Karkhana Gat Office, Tasgaon Road",
         "line3": "Teh: Karad",
         "pincode": "415124"
       },
       "branch_code": "03315",
       "contact": "",
       "coords": [
-        "17.2441567000",
-        "74.2099567000"
+        "17.2500180000",
+        "74.2145480000"
       ],
       "country": "India",
       "district": "Satara",
       "email": "karve@bkivv.org",
       "mobile": "8411868028, 8668811621",
-      "name": "Karve",
+      "name": "Karve (satara)",
       "region": "India",
       "state": "Maharashtra"
     },
@@ -60373,22 +60373,22 @@
     {
       "address": {
         "city": "Kerur",
-        "line1": "Chinagundi Plot",
-        "line2": "Near Mallappa Oil Mill",
+        "line1": "H.no: 27, H/o Prashuram Lakmapur",
+        "line2": "Nandargi Plot, Hubballi Road",
         "line3": "Tal: Badami",
         "pincode": "587206"
       },
       "branch_code": "02935",
       "contact": "",
       "coords": [
-        "16.0118253000",
-        "75.5510787000"
+        "16.0062900000",
+        "75.5395750000"
       ],
       "country": "India",
       "district": "Bagalkot",
       "email": "",
-      "mobile": "9035121602, 9950716670",
-      "name": "Kerur",
+      "mobile": "9148115968",
+      "name": "Kerur (bagalkot)",
       "region": "India",
       "state": "Karnataka"
     },
@@ -61935,21 +61935,21 @@
     {
       "address": {
         "city": "Khorasa (gir)",
-        "line1": "Opp.gram Panchayat Office",
+        "line1": "Opp. Gram Panchayat Office",
         "line2": "",
         "line3": "",
         "pincode": "362258"
       },
       "branch_code": "02368",
-      "contact": "-",
+      "contact": "",
       "coords": [
         "21.0533325000",
         "70.3244643000"
       ],
       "country": "India",
       "district": "Gir Somnath",
-      "email": "",
-      "mobile": "9825922497",
+      "email": "bhalka.vrl@bkivv.org",
+      "mobile": "9328503489",
       "name": "Khorasa (gir)",
       "region": "India",
       "state": "Gujarat"
@@ -62619,7 +62619,7 @@
         "city": "Kodad",
         "line1": "H No: 27/134, Gyan Ganga Bhawan",
         "line2": "Rammurthy Nagar, Nagubandi",
-        "line3": "Suryapta Road, Tal-kodad",
+        "line3": "Suryapet Road, Tal-kodad",
         "pincode": "508206"
       },
       "branch_code": "03637",
@@ -62632,7 +62632,7 @@
       "district": "Suryapet",
       "email": "kodad@bkivv.org",
       "mobile": "8985928998",
-      "name": "Kodad",
+      "name": "Kodad Rammurthy Nagar",
       "region": "India",
       "state": "Telangana"
     },
@@ -66137,22 +66137,22 @@
     {
       "address": {
         "city": "Kurai",
-        "line1": "H No: 394",
-        "line2": "Near Shiv Mandir, Gali No:11",
-        "line3": "Pindkepar, Barapatthar",
+        "line1": "Brahma Kumaris",
+        "line2": "Behind Narmada Medical, Barapathar",
+        "line3": "Kurai",
         "pincode": "480880"
       },
       "branch_code": "04680",
       "contact": "",
       "coords": [
-        "21.8099200000",
-        "79.5050130000"
+        "21.8105290000",
+        "79.5027100000"
       ],
       "country": "India",
       "district": "Seoni",
       "email": "",
-      "mobile": "9098792987",
-      "name": "Kurai",
+      "mobile": "9098792987, 9340005008",
+      "name": "Kurai (seoni)",
       "region": "India",
       "state": "Madhya Pradesh"
     },
@@ -66658,7 +66658,7 @@
       "district": "Sundargarh",
       "email": "",
       "mobile": "7655898810, 7205276232",
-      "name": "Kutra",
+      "name": "Kutra (rajgangpur)",
       "region": "India",
       "state": "Odisha"
     },
@@ -70331,7 +70331,7 @@
       "country": "India",
       "district": "Davangere",
       "email": "malebennur@bkivv.org",
-      "mobile": "8722651619",
+      "mobile": "7349349586",
       "name": "Malebennur",
       "region": "India",
       "state": "Karnataka"
@@ -78757,7 +78757,7 @@
       "country": "India",
       "district": "Raigad",
       "email": "",
-      "mobile": "9604776684, 8097983393",
+      "mobile": "8805160228, 8097983393",
       "name": "Nagothane",
       "region": "India",
       "state": "Maharashtra"
@@ -79704,7 +79704,7 @@
       "district": "Ratlam",
       "email": "",
       "mobile": "6268062536",
-      "name": "Namli",
+      "name": "Namli (ratlam)",
       "region": "India",
       "state": "Madhya Pradesh"
     },
@@ -83385,21 +83385,21 @@
     {
       "address": {
         "city": "New Delhi",
-        "line1": "H No: T-24, Ff, Sunder Dham",
-        "line2": "Shukar Bazar, Gali No: 2",
-        "line3": "Uttam Nagar, Om Vihar",
+        "line1": "H No: T-05a",
+        "line2": "Gali No: 1, Near Jagran Chowk",
+        "line3": "Om Vihar, Uttam Nagar",
         "pincode": "110059"
       },
       "branch_code": "04369",
       "contact": "",
       "coords": [
-        "28.6168690000",
-        "77.0527950000"
+        "28.6173600000",
+        "77.0539120000"
       ],
       "country": "India",
       "district": "West Delhi",
       "email": "omvihar.del@bkivv.org",
-      "mobile": "9868121464,  9250178348",
+      "mobile": "9868121464",
       "name": "New Delhi Om Vihar",
       "region": "India",
       "state": "Delhi"
@@ -87213,16 +87213,16 @@
     {
       "address": {
         "city": "Palari Khaira",
-        "line1": "H No: 36",
-        "line2": "Awas Colony, Palan Road",
+        "line1": "Shivanjali Bhawan",
+        "line2": "Bhimgarh Road, Khaira Palari",
         "line3": "Tal: Keolari",
         "pincode": "480991"
       },
       "branch_code": "04521",
       "contact": "",
       "coords": [
-        "22.3029500000",
-        "79.8114200000"
+        "22.2993160000",
+        "79.8108610000"
       ],
       "country": "India",
       "district": "Seoni",
@@ -91980,7 +91980,7 @@
       "district": "Sindhudurg",
       "email": "",
       "mobile": "9420275498",
-      "name": "Poip",
+      "name": "Poip (sindhudurg)",
       "region": "India",
       "state": "Maharashtra"
     },
@@ -92288,7 +92288,7 @@
       "district": "Morena",
       "email": "porsa@bkivv.org",
       "mobile": "9691557798, 7224054934",
-      "name": "Porsa",
+      "name": "Porsa (morena)",
       "region": "India",
       "state": "Madhya Pradesh"
     },
@@ -96432,7 +96432,7 @@
       "address": {
         "city": "Raipur",
         "line1": "House No: 19, Near Sahayog Park",
-        "line2": "Pragati Vihar Colony",
+        "line2": "Pragati Vihar Colony, Om Shanti Road",
         "line3": "Mahavir Nagar",
         "pincode": "492001"
       },
@@ -96841,7 +96841,7 @@
       "country": "India",
       "district": "Bengaluru",
       "email": "",
-      "mobile": "9008444070",
+      "mobile": "9008853473, 8073724849",
       "name": "Rajanukunte",
       "region": "India",
       "state": "Karnataka"
@@ -99042,7 +99042,7 @@
       "district": "Dhenkanal",
       "email": "",
       "mobile": "8260679890",
-      "name": "Rasol",
+      "name": "Rasol (dhenkanal)",
       "region": "India",
       "state": "Odisha"
     },
@@ -99577,7 +99577,7 @@
     {
       "address": {
         "city": "Redhakhol",
-        "line1": "Plot No: 168/3701",
+        "line1": "Plot No: 168/3701, Prabhu Uphar Bhawan",
         "line2": "Near Maheswari Hospital",
         "line3": "Sambalpur-cuttack Road, Viswanathpur",
         "pincode": "768106"
@@ -100705,7 +100705,7 @@
         "pincode": "281306"
       },
       "branch_code": "00977",
-      "contact": "05661- 681777",
+      "contact": "",
       "coords": [
         "27.4369272000",
         "78.0367567000"
@@ -100713,7 +100713,7 @@
       "country": "India",
       "district": "Hathras",
       "email": "sadabad@bkivv.org",
-      "mobile": "9758213697, 8445785155",
+      "mobile": "9758213697, 7017752950",
       "name": "Sadabad",
       "region": "India",
       "state": "Uttar Pradesh"
@@ -106617,21 +106617,21 @@
     {
       "address": {
         "city": "Sikari",
-        "line1": "H.no: 20",
-        "line2": "Near Adarsh Tagore School",
-        "line3": "Kuttakpur Patti Sikri Road",
+        "line1": "H.no: 243, Shiv Shakti Bhawan",
+        "line2": "Near Tagore Sr. Sec. School",
+        "line3": "Kuttakpur Patti, Sikari",
         "pincode": "321024"
       },
       "branch_code": "04059",
       "contact": "",
       "coords": [
-        "27.5776550000",
-        "77.0708940000"
+        "27.5778770000",
+        "77.0712540000"
       ],
       "country": "India",
       "district": "Bharatpur",
       "email": "",
-      "mobile": "9587613147, 8477985860",
+      "mobile": "9587613147",
       "name": "Sikari",
       "region": "India",
       "state": "Rajasthan"
@@ -108405,15 +108405,15 @@
         "pincode": "362268"
       },
       "branch_code": "03322",
-      "contact": "02876-232544",
+      "contact": "",
       "coords": [
         "20.8919867000",
         "70.4023633000"
       ],
       "country": "India",
       "district": "Gir Somnath",
-      "email": "",
-      "mobile": "9328766904",
+      "email": "bhalka.vrl@bkivv.org",
+      "mobile": "9106860668",
       "name": "Somanath  (prabhas Patan)",
       "region": "India",
       "state": "Gujarat"
@@ -109653,21 +109653,21 @@
     {
       "address": {
         "city": "Sultanpur (mp)",
-        "line1": "H No: 0838, Pradeep Chowk",
-        "line2": "Benind Petrol Pump, Near Tehsil Office",
-        "line3": "Raisen Road, Ward No:9",
+        "line1": "Prabhu Darshan Bhawan",
+        "line2": "Near Galla Mandi, Raisen Road",
+        "line3": "Ward No:9",
         "pincode": "464986"
       },
       "branch_code": "03815",
       "contact": "",
       "coords": [
-        "23.1342698000",
-        "77.9321832000"
+        "23.1308680000",
+        "77.9297990000"
       ],
       "country": "India",
       "district": "Raisen",
       "email": "",
-      "mobile": "7489115826",
+      "mobile": "7489115826, 9399950259",
       "name": "Sultanpur (mp)",
       "region": "India",
       "state": "Madhya Pradesh"

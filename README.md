@@ -123,3 +123,11 @@ For production deployment, you may need to copy this file to the public director
 ```bash
 cp Center-Processed.json public/
 ```
+
+
+
+
+Local Run :
+
+./build.sh local
+npm run start-local

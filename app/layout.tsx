@@ -32,7 +32,7 @@ async function getHomeMetadata() {
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getHomeMetadata();
   const title = "Brahma Kumaris - Rajyog Meditation Center Locator";
-  const description = `Find the nearest Brahma Kumaris meditation center in your area across India. ${stats.totalCenters} centers in ${stats.totalStates} States/UTs and ${stats.totalDistricts} Districts.`;
+  const description = `Find the nearest Brahma Kumaris Rajyog Meditation Center in your area across India`;
 
   return {
     metadataBase: getMetadataBase(),
