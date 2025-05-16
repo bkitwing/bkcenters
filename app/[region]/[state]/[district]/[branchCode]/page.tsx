@@ -223,6 +223,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
       if (line3) parts.push(line3);
       if (city) parts.push(city);
       if (pincode) parts.push(pincode);
+      if (center.state) parts.push(center.state);
+      if (center.region) parts.push(center.region);
       
       return parts.join(', ');
     };

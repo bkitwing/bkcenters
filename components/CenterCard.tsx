@@ -31,6 +31,8 @@ const CenterCard: React.FC<CenterCardProps> = ({
     if (line3) addressParts.push(line3);
     if (city) addressParts.push(city);
     if (pincode) addressParts.push(pincode);
+    if (center.state) addressParts.push(center.state);
+    if (center.region) addressParts.push(center.region);
     
     return addressParts.join(', ');
   };
