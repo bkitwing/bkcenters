@@ -236,6 +236,8 @@ function formatAddress(center: Center) {
   if (line3) addressParts.push(line3);
   if (city) addressParts.push(city);
   if (pincode) addressParts.push(pincode);
+  if (center.state) addressParts.push(center.state);
+  if (center.region) addressParts.push(center.region);
   
   return addressParts.length > 0 ? addressParts.join(', ') : 'Address not available';
 }
