@@ -12,10 +12,21 @@ type ContactType = 'LearnMeditation' | 'Query' | 'AttendEvent' | 'Feedback' | 'O
 
 // Helper function to get the correct API base URL
 const getApiUrl = () => {
-  const origin = typeof window !== 'undefined' ? window.location.origin : 
-    process.env.NODE_ENV === 'production' ? 'https://www.brahmakumaris.com' : 'http://localhost:3000';
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-  return `${origin}${basePath}`;
+  const isLocal = process.env.IS_LOCAL === "true";
+  const isDev = process.env.NODE_ENV === "development";
+  
+  if (typeof window !== 'undefined') {
+    // On client side, use window.location.origin
+    return window.location.origin;
+  }
+  
+  // On server side, determine the correct origin
+  if (isLocal || isDev) {
+    return 'http://localhost:5400';
+  } else {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+    return `https://www.brahmakumaris.com${basePath}`;
+  }
 };
 
 const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {

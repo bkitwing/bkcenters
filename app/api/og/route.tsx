@@ -24,10 +24,16 @@ function formatLocationBreadcrumb(district?: string, state?: string, region?: st
 
 // Function to get base URL
 const getBaseUrl = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return 'https://www.brahmakumaris.com/centers';
+  const isLocal = process.env.IS_LOCAL === "true";
+  const isDev = process.env.NODE_ENV === "development";
+  
+  if (isLocal || isDev) {
+    // For local development, use port 5400 with no base path
+    return 'http://localhost:5400';
   }
-  return 'http://localhost:3000/centers';
+  
+  // For production, use the full production URL with base path
+  return 'https://www.brahmakumaris.com/centers';
 };
 
 export async function GET(req: NextRequest) {

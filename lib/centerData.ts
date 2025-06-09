@@ -28,11 +28,33 @@ const LOCAL_STORAGE_TIMESTAMP_KEY = 'bkcenters_data_timestamp';
 const CACHE_EXPIRY_MS = 1000 * 60 * 60; // 1 hour cache validity
 
 const getOrigin = () => {
-  const origin =
-    process.env.NODE_ENV === "production"
-      ? "https://www.brahmakumaris.com"
-      : "http://localhost:3000";
-  return origin + process.env.NEXT_PUBLIC_BASE_PATH;
+  // Check if we're in browser environment
+  const isBrowser = typeof window !== "undefined";
+  
+  // For client-side, check current location
+  if (isBrowser) {
+    const currentOrigin = window.location.origin;
+    console.log("getOrigin: Client-side, using window.location.origin:", currentOrigin);
+    return currentOrigin;
+  }
+  
+  // For server-side, check environment variables
+  const isLocal = process.env.IS_LOCAL === "true";
+  const isDev = process.env.NODE_ENV === "development";
+  
+  console.log("getOrigin: Server-side, IS_LOCAL =", isLocal);
+  console.log("getOrigin: Server-side, NODE_ENV =", process.env.NODE_ENV);
+  
+  if (isLocal || isDev) {
+    const origin = "http://localhost:5400";
+    console.log("getOrigin: Using local development origin:", origin);
+    return origin;
+  } else {
+    const origin = "https://www.brahmakumaris.com";
+    const fullOrigin = origin + (process.env.NEXT_PUBLIC_BASE_PATH || "");
+    console.log("getOrigin: Using production origin:", fullOrigin);
+    return fullOrigin;
+  }
 };
 
 // Function to build all data mappings - call this once at initialization
@@ -307,13 +329,24 @@ async function fetchCentersData(canUseCache: boolean = true): Promise<CentersDat
 
 // Helper function to fetch fresh data from the API
 async function fetchFreshCentersData(): Promise<CentersData> {
-  // Get the origin for absolute URLs
-  const origin = getOrigin();
-  console.log(`fetchFreshCentersData: API endpoint: ${origin}/api/centers?lightweight=false`);
+  // For client-side, always use relative URLs to avoid CORS issues
+  const isBrowser = typeof window !== "undefined";
+  let apiUrl: string;
   
-  // Try to load from API endpoint with absolute URL
+  if (isBrowser) {
+    // Client-side: use relative URL
+    apiUrl = "/api/centers?lightweight=false";
+    console.log(`fetchFreshCentersData: Client-side, using relative URL: ${apiUrl}`);
+  } else {
+    // Server-side: use absolute URL
+    const origin = getOrigin();
+    apiUrl = `${origin}/api/centers?lightweight=false`;
+    console.log(`fetchFreshCentersData: Server-side, using absolute URL: ${apiUrl}`);
+  }
+  
+  // Try to load from API endpoint
   console.log("fetchFreshCentersData: Fetching from API...");
-  const response = await fetch(`${origin}/api/centers?lightweight=false`, {
+  const response = await fetch(apiUrl, {
     cache: "no-store",
   });
 
@@ -357,18 +390,24 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
     return [];
   }
 
-  // Get the origin for absolute URLs
-  const origin = getOrigin();
+  // Use relative URLs on client-side, absolute on server-side
+  const isBrowser = typeof window !== "undefined";
+  let apiUrl: string;
+  
+  if (isBrowser) {
+    apiUrl = `/api/centers?state=${encodeURIComponent(state)}`;
+    console.log("fetchCentersByState: Client-side, using relative URL:", apiUrl);
+  } else {
+    const origin = getOrigin();
+    apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}`;
+    console.log("fetchCentersByState: Server-side, using absolute URL:", apiUrl);
+  }
 
-  console.log("Origin", origin);
   try {
     // Load directly from API with state filter
-    const response = await fetch(
-      `${origin}/api/centers?state=${encodeURIComponent(state)}`,
-      {
-        cache: "no-store",
-      }
-    );
+    const response = await fetch(apiUrl, {
+      cache: "no-store",
+    });
 
     if (response.ok) {
       const data = (await response.json()) as CentersData;
@@ -408,16 +447,22 @@ async function fetchCentersByDistrict(
     return [];
   }
 
-  // Get the origin for absolute URLs
-  const origin = getOrigin();
+  // Use relative URLs on client-side, absolute on server-side
+  const isBrowser = typeof window !== "undefined";
+  let apiUrl: string;
+  
+  if (isBrowser) {
+    apiUrl = `/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
+    console.log("fetchCentersByDistrict: Client-side, using relative URL:", apiUrl);
+  } else {
+    const origin = getOrigin();
+    apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
+    console.log("fetchCentersByDistrict: Server-side, using absolute URL:", apiUrl);
+  }
+  
   try {
     // Load directly from API with state and district filter
-    const response = await fetch(
-      `${origin}/api/centers?state=${encodeURIComponent(
-        state
-      )}&district=${encodeURIComponent(district)}`,
-      { cache: "no-store" }
-    );
+    const response = await fetch(apiUrl, { cache: "no-store" });
 
     if (response.ok) {
       const data = (await response.json()) as CentersData;

@@ -33,7 +33,8 @@ fi
 # Step 4: Check if this is a local build
 if [ "$IS_LOCAL" = true ]; then
   echo "===== Local build completed successfully ====="
-  echo "Run 'IS_LOCAL=true npm run start' to start the application"
+  echo "Run 'PORT=5400 IS_LOCAL=true npm run start' to start the application on port 5400"
+  echo "Or use: npm run start-local"
   exit 0
 fi
 
