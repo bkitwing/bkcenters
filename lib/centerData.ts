@@ -27,6 +27,31 @@ const LOCAL_STORAGE_CENTERS_KEY = 'bkcenters_data_cache';
 const LOCAL_STORAGE_TIMESTAMP_KEY = 'bkcenters_data_timestamp';
 const CACHE_EXPIRY_MS = 1000 * 60 * 60; // 1 hour cache validity
 
+// Helper function to get the correct base path for API calls
+const getBasePath = () => {
+  // Check if we're in browser environment
+  const isBrowser = typeof window !== "undefined";
+  
+  if (isBrowser) {
+    // For client-side, check if we're running in production with base path
+    const currentPath = window.location.pathname;
+    
+    // If the current path starts with /centers, we're running with base path
+    if (currentPath.startsWith('/centers')) {
+      return '/centers';
+    }
+    
+    // Otherwise, no base path needed
+    return '';
+  }
+  
+  // For server-side, check environment
+  const isProd = process.env.NODE_ENV === "production";
+  const isLocalDev = process.env.IS_LOCAL === "true";
+  
+  return isProd && !isLocalDev ? "/centers" : "";
+};
+
 const getOrigin = () => {
   // Check if we're in browser environment
   const isBrowser = typeof window !== "undefined";
@@ -334,8 +359,9 @@ async function fetchFreshCentersData(): Promise<CentersData> {
   let apiUrl: string;
   
   if (isBrowser) {
-    // Client-side: use relative URL
-    apiUrl = "/api/centers?lightweight=false";
+    // Client-side: use relative URL with correct base path
+    const basePath = getBasePath();
+    apiUrl = `${basePath}/api/centers?lightweight=false`;
     console.log(`fetchFreshCentersData: Client-side, using relative URL: ${apiUrl}`);
   } else {
     // Server-side: use absolute URL
@@ -395,7 +421,8 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
   let apiUrl: string;
   
   if (isBrowser) {
-    apiUrl = `/api/centers?state=${encodeURIComponent(state)}`;
+    const basePath = getBasePath();
+    apiUrl = `${basePath}/api/centers?state=${encodeURIComponent(state)}`;
     console.log("fetchCentersByState: Client-side, using relative URL:", apiUrl);
   } else {
     const origin = getOrigin();
@@ -452,7 +479,8 @@ async function fetchCentersByDistrict(
   let apiUrl: string;
   
   if (isBrowser) {
-    apiUrl = `/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
+    const basePath = getBasePath();
+    apiUrl = `${basePath}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
     console.log("fetchCentersByDistrict: Client-side, using relative URL:", apiUrl);
   } else {
     const origin = getOrigin();
