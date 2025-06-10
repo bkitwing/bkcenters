@@ -87,7 +87,7 @@ const Header = () => {
           <ul className="flex space-x-8 items-center">
             <li>
               <Link
-                href="https://www.brahmakumaris.com"
+                href="https://www.brahmakumaris.com/centers"
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
                 aria-label="Brahma Kumaris Home"
               >
@@ -151,7 +151,7 @@ const Header = () => {
             <ul className="space-y-4">
               <li>
                 <Link
-                  href="https://www.brahmakumaris.com"
+                  href="https://www.brahmakumaris.com/centers"
                   className="flex items-center text-neutral-700 hover:text-primary transition-colors"
                   onClick={toggleMenu}
                   aria-label="Brahma Kumaris Home"
