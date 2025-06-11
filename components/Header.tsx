@@ -86,15 +86,6 @@ const Header = () => {
         <nav className="hidden md:block">
           <ul className="flex space-x-8 items-center">
             <li>
-              <Link
-                href="https://www.brahmakumaris.com/centers"
-                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
-                aria-label="Brahma Kumaris Home"
-              >
-                <FaHome size={22} className="text-gray-600" />
-              </Link>
-            </li>
-            <li>
               <button
                 onClick={handleUseMyLocation}
                 className="flex items-center transition-colors focus:outline-none nearby-button"
@@ -116,7 +107,7 @@ const Header = () => {
             </li>
             <li>
               <Link
-                href="https://www.brahmakumaris.com/centers"
+                href="/"
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
                 aria-label="Search Centers" 
               >
@@ -129,7 +120,7 @@ const Header = () => {
         {/* Mobile Menu and Search Button */}
         <div className="md:hidden flex items-center space-x-4">
           <Link
-            href="https://www.brahmakumaris.com/centers"
+            href="/"
             className="text-neutral-700 hover:text-primary transition-colors"
             aria-label="Search Centers"
           >
@@ -149,17 +140,6 @@ const Header = () => {
         <div className="md:hidden bg-white shadow-lg">
           <nav className="container mx-auto px-4 py-3">
             <ul className="space-y-4">
-              <li>
-                <Link
-                  href="https://www.brahmakumaris.com/centers"
-                  className="flex items-center text-neutral-700 hover:text-primary transition-colors"
-                  onClick={toggleMenu}
-                  aria-label="Brahma Kumaris Home"
-                >
-                  <FaHome size={22} className="text-gray-600 mr-2" />
-                  <span className="text-gray-600 font-medium">Home</span>
-                </Link>
-              </li>
               <li>
                 <button
                   onClick={() => {

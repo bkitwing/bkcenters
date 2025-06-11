@@ -510,7 +510,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                       <p className="text-neutral-700 mb-4">
                         You can use this form to send a message directly to the {center.name} Rajyog Meditation center. 
                         Whether you want to provide feedback, have a query, or are interested in learning Rajyog Meditation, 
-                        we're here to help.
+                        we're here to help, but we would request you to reachout to center by calling first.
                       </p>
                       
                       <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">What to Expect</h3>
