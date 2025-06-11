@@ -423,11 +423,16 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
   if (isBrowser) {
     const basePath = getBasePath();
     apiUrl = `${basePath}/api/centers?state=${encodeURIComponent(state)}`;
-    console.log("fetchCentersByState: Client-side, using relative URL:", apiUrl);
+    // Reduced logging in development to avoid excessive output
+    if (process.env.NODE_ENV !== 'development') {
+      console.log("fetchCentersByState: Client-side, using relative URL:", apiUrl);
+    }
   } else {
     const origin = getOrigin();
     apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}`;
-    console.log("fetchCentersByState: Server-side, using absolute URL:", apiUrl);
+    if (process.env.NODE_ENV !== 'development') {
+      console.log("fetchCentersByState: Server-side, using absolute URL:", apiUrl);
+    }
   }
 
   try {
@@ -481,11 +486,16 @@ async function fetchCentersByDistrict(
   if (isBrowser) {
     const basePath = getBasePath();
     apiUrl = `${basePath}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
-    console.log("fetchCentersByDistrict: Client-side, using relative URL:", apiUrl);
+    // Reduced logging in development to avoid excessive output
+    if (process.env.NODE_ENV !== 'development') {
+      console.log("fetchCentersByDistrict: Client-side, using relative URL:", apiUrl);
+    }
   } else {
     const origin = getOrigin();
     apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
-    console.log("fetchCentersByDistrict: Server-side, using absolute URL:", apiUrl);
+    if (process.env.NODE_ENV !== 'development') {
+      console.log("fetchCentersByDistrict: Server-side, using absolute URL:", apiUrl);
+    }
   }
   
   try {
@@ -512,11 +522,15 @@ async function fetchCentersByDistrict(
 }
 
 export async function getAllCenters(useSharedData: boolean = true): Promise<Center[]> {
-  console.log("getAllCenters: Starting to fetch all centers");
+  if (process.env.NODE_ENV !== 'development') {
+    console.log("getAllCenters: Starting to fetch all centers");
+  }
   
   const data = await fetchCentersData(useSharedData);
   
-  console.log(`getAllCenters: fetchCentersData returned ${data.data ? data.data.length : 0} centers`);
+  if (process.env.NODE_ENV !== 'development') {
+    console.log(`getAllCenters: fetchCentersData returned ${data.data ? data.data.length : 0} centers`);
+  }
 
   // Update the state-region cache when we fetch all centers
   if (data.data && data.data.length > 0) {
