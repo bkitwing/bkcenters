@@ -8,6 +8,7 @@ import {
 } from "./types";
 import { deSlugify } from "./urlUtils";
 import { RETREAT_CENTER_BRANCH_CODES } from './retreatCenters';
+import { logger } from './logger';
 
 // Cache for data
 let centersData: CentersData | null = null;
@@ -59,7 +60,7 @@ const getOrigin = () => {
   // For client-side, check current location
   if (isBrowser) {
     const currentOrigin = window.location.origin;
-    console.log("getOrigin: Client-side, using window.location.origin:", currentOrigin);
+    logger.debug("getOrigin: Client-side, using window.location.origin:", currentOrigin);
     return currentOrigin;
   }
   
@@ -67,17 +68,17 @@ const getOrigin = () => {
   const isLocal = process.env.IS_LOCAL === "true";
   const isDev = process.env.NODE_ENV === "development";
   
-  console.log("getOrigin: Server-side, IS_LOCAL =", isLocal);
-  console.log("getOrigin: Server-side, NODE_ENV =", process.env.NODE_ENV);
+  logger.trace("getOrigin: Server-side, IS_LOCAL =", isLocal);
+  logger.trace("getOrigin: Server-side, NODE_ENV =", process.env.NODE_ENV);
   
   if (isLocal || isDev) {
     const origin = "http://localhost:5400";
-    console.log("getOrigin: Using local development origin:", origin);
+    logger.debug("getOrigin: Using local development origin:", origin);
     return origin;
   } else {
     const origin = "https://www.brahmakumaris.com";
     const fullOrigin = origin + (process.env.NEXT_PUBLIC_BASE_PATH || "");
-    console.log("getOrigin: Using production origin:", fullOrigin);
+    logger.debug("getOrigin: Using production origin:", fullOrigin);
     return fullOrigin;
   }
 };
@@ -86,9 +87,9 @@ const getOrigin = () => {
 async function initializeDataMappings(): Promise<void> {
   if (isDataMappingInitialized) return;
 
-  console.log("Initializing data mappings...");
+  logger.info("Initializing data mappings...");
   const centers = await getAllCenters();
-  console.log(`Loaded ${centers.length} centers for mapping`);
+  logger.info(`Loaded ${centers.length} centers for mapping`);
 
   // Build region to states mapping
   const regionMap: RegionStateMapping = {};
@@ -106,7 +107,7 @@ async function initializeDataMappings(): Promise<void> {
 
   // If we don't have regions, we need to use the default
   if (!hasRegions) {
-    console.warn("No regions found in data, using 'INDIA' as default region");
+    logger.warn("No regions found in data, using 'INDIA' as default region");
   }
 
   // Process all centers to build mappings
@@ -117,7 +118,7 @@ async function initializeDataMappings(): Promise<void> {
 
     // Skip entries without a region
     if (!region) {
-      console.warn(
+      logger.warn(
         `Center ${center.name} (${center.branch_code}) has no region assigned, skipping from mappings`
       );
       return;
@@ -154,7 +155,7 @@ async function initializeDataMappings(): Promise<void> {
 
       // Check if this state is already assigned to a different region
       if (stateMap[state].region !== region) {
-        console.warn(
+        logger.warn(
           `State "${state}" is assigned to multiple regions: "${stateMap[state].region}" and "${region}"`
         );
       }
@@ -189,13 +190,13 @@ async function initializeDataMappings(): Promise<void> {
     }
   });
 
-  console.log(
+  logger.info(
     `Mapping complete: ${Object.keys(regionMap).length} regions, ${
       Object.keys(stateMap).length
     } states`
   );
   Object.keys(regionMap).forEach((region) => {
-    console.log(
+    logger.debug(
       `Region "${region}": ${regionMap[region].centerCount} centers, ${
         Object.keys(regionMap[region].states).length
       } states`
@@ -274,18 +275,18 @@ const loadFromLocalStorage = (): { data: CentersData | null, isExpired: boolean 
 
 // Function to fetch data from API only
 async function fetchCentersData(canUseCache: boolean = true): Promise<CentersData> {
-  console.log("fetchCentersData: Starting to fetch centers data");
+  logger.debug("fetchCentersData: Starting to fetch centers data");
   
   // Return cached data if available and cache usage is allowed
   if (canUseCache && centersData !== null) {
-    console.log("fetchCentersData: Returning in-memory cached data");
+    logger.trace("fetchCentersData: Returning in-memory cached data");
     return centersData;
   }
 
   // If we're in a build environment or SSR, return empty data
   // This prevents API calls during static generation
   if (isServerEnvironment() && isStaticGeneration()) {
-    console.warn("Static generation detected - using empty centers data");
+    logger.warn("Static generation detected - using empty centers data");
     const emptyData = getEmptyData();
     centersData = emptyData;
     return emptyData;
@@ -296,19 +297,19 @@ async function fetchCentersData(canUseCache: boolean = true): Promise<CentersDat
     const { data: cachedData, isExpired } = loadFromLocalStorage();
     
     if (cachedData && cachedData.data && cachedData.data.length > 0) {
-      console.log(`fetchCentersData: Found cached data with ${cachedData.data.length} centers`);
+      logger.debug(`fetchCentersData: Found cached data with ${cachedData.data.length} centers`);
       
       // Cache in memory for future requests
       centersData = cachedData;
       
       // If cache is not expired, return it immediately
       if (!isExpired) {
-        console.log('fetchCentersData: Using localStorage cached data (not expired)');
+        logger.debug('fetchCentersData: Using localStorage cached data (not expired)');
         return cachedData;
       }
       
       // If expired, use it temporarily but trigger a background refresh
-      console.log('fetchCentersData: Cache expired, returning cached data but refreshing in background');
+      logger.debug('fetchCentersData: Cache expired, returning cached data but refreshing in background');
       
       // Trigger background refresh without blocking
       (async () => {
@@ -317,10 +318,10 @@ async function fetchCentersData(canUseCache: boolean = true): Promise<CentersDat
           if (freshData && freshData.data && freshData.data.length > 0) {
             centersData = freshData; // Update memory cache
             saveToLocalStorage(freshData); // Update localStorage cache
-            console.log('Background refresh of centers data completed');
+            logger.debug('Background refresh of centers data completed');
           }
         } catch (err) {
-          console.error('Background data refresh failed:', err);
+          logger.error('Background data refresh failed:', err);
         }
       })();
       
@@ -333,13 +334,13 @@ async function fetchCentersData(canUseCache: boolean = true): Promise<CentersDat
     const freshData = await fetchFreshCentersData();
     return freshData;
   } catch (error) {
-    console.error("Failed to fetch centers data:", error);
+    logger.error("Failed to fetch centers data:", error);
     
     // If we have stale data in localStorage, use it as fallback
     if (!isServerEnvironment()) {
       const { data: staleCachedData } = loadFromLocalStorage();
       if (staleCachedData && staleCachedData.data && staleCachedData.data.length > 0) {
-        console.log('Using stale cache as fallback after fetch failure');
+        logger.warn('Using stale cache as fallback after fetch failure');
         centersData = staleCachedData;
         return staleCachedData;
       }
@@ -362,27 +363,27 @@ async function fetchFreshCentersData(): Promise<CentersData> {
     // Client-side: use relative URL with correct base path
     const basePath = getBasePath();
     apiUrl = `${basePath}/api/centers?lightweight=false`;
-    console.log(`fetchFreshCentersData: Client-side, using relative URL: ${apiUrl}`);
+    logger.trace(`fetchFreshCentersData: Client-side, using relative URL: ${apiUrl}`);
   } else {
     // Server-side: use absolute URL
     const origin = getOrigin();
     apiUrl = `${origin}/api/centers?lightweight=false`;
-    console.log(`fetchFreshCentersData: Server-side, using absolute URL: ${apiUrl}`);
+    logger.trace(`fetchFreshCentersData: Server-side, using absolute URL: ${apiUrl}`);
   }
   
   // Try to load from API endpoint
-  console.log("fetchFreshCentersData: Fetching from API...");
+  logger.debug("fetchFreshCentersData: Fetching from API...");
   const response = await fetch(apiUrl, {
     cache: "no-store",
   });
 
-  console.log(`fetchFreshCentersData: API response status: ${response.status}`);
+  logger.debug(`fetchFreshCentersData: API response status: ${response.status}`);
   
   if (response.ok) {
     const data = (await response.json()) as CentersData;
     
     if (data.data && data.data.length > 0) {
-      console.log(`fetchFreshCentersData: Successfully loaded ${data.data.length} centers from API`);
+      logger.info(`fetchFreshCentersData: Successfully loaded ${data.data.length} centers from API`);
       
       // Cache in memory for future requests
       centersData = data;
@@ -394,10 +395,11 @@ async function fetchFreshCentersData(): Promise<CentersData> {
       
       return data;
     } else {
-      console.warn("API returned empty data");
+      logger.warn("API returned empty data");
       throw new Error("API returned empty data");
     }
   } else {
+    logger.error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
     console.error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
     throw new Error(`Failed to fetch centers data: ${response.status} ${response.statusText}`);
   }
@@ -423,16 +425,11 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
   if (isBrowser) {
     const basePath = getBasePath();
     apiUrl = `${basePath}/api/centers?state=${encodeURIComponent(state)}`;
-    // Reduced logging in development to avoid excessive output
-    if (process.env.NODE_ENV !== 'development') {
-      console.log("fetchCentersByState: Client-side, using relative URL:", apiUrl);
-    }
+    logger.trace("fetchCentersByState: Client-side, using relative URL:", apiUrl);
   } else {
     const origin = getOrigin();
     apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}`;
-    if (process.env.NODE_ENV !== 'development') {
-      console.log("fetchCentersByState: Server-side, using absolute URL:", apiUrl);
-    }
+    logger.trace("fetchCentersByState: Server-side, using absolute URL:", apiUrl);
   }
 
   try {
@@ -448,7 +445,7 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
       return data.data || [];
     }
   } catch (error) {
-    console.error(`Error fetching centers for state ${state}:`, error);
+    logger.error(`Error fetching centers for state ${state}:`, error);
   }
 
   // If direct state API fails, fall back to full data
@@ -486,16 +483,11 @@ async function fetchCentersByDistrict(
   if (isBrowser) {
     const basePath = getBasePath();
     apiUrl = `${basePath}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
-    // Reduced logging in development to avoid excessive output
-    if (process.env.NODE_ENV !== 'development') {
-      console.log("fetchCentersByDistrict: Client-side, using relative URL:", apiUrl);
-    }
+    logger.trace("fetchCentersByDistrict: Client-side, using relative URL:", apiUrl);
   } else {
     const origin = getOrigin();
     apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
-    if (process.env.NODE_ENV !== 'development') {
-      console.log("fetchCentersByDistrict: Server-side, using absolute URL:", apiUrl);
-    }
+    logger.trace("fetchCentersByDistrict: Server-side, using absolute URL:", apiUrl);
   }
   
   try {
@@ -509,7 +501,7 @@ async function fetchCentersByDistrict(
       return data.data || [];
     }
   } catch (error) {
-    console.error(`Error fetching centers for ${district}, ${state}:`, error);
+    logger.error(`Error fetching centers for ${district}, ${state}:`, error);
   }
 
   // If direct district API fails, fall back to state data
@@ -522,19 +514,15 @@ async function fetchCentersByDistrict(
 }
 
 export async function getAllCenters(useSharedData: boolean = true): Promise<Center[]> {
-  if (process.env.NODE_ENV !== 'development') {
-    console.log("getAllCenters: Starting to fetch all centers");
-  }
+  logger.debug("getAllCenters: Starting to fetch all centers");
   
   const data = await fetchCentersData(useSharedData);
   
-  if (process.env.NODE_ENV !== 'development') {
-    console.log(`getAllCenters: fetchCentersData returned ${data.data ? data.data.length : 0} centers`);
-  }
+  logger.debug(`getAllCenters: fetchCentersData returned ${data.data ? data.data.length : 0} centers`);
 
   // Update the state-region cache when we fetch all centers
   if (data.data && data.data.length > 0) {
-    console.log("getAllCenters: Updating state-region cache");
+    logger.debug("getAllCenters: Updating state-region cache");
     data.data.forEach((center) => {
       if (center.state && center.region) {
         stateRegionCache[center.state] = center.region;
@@ -1022,50 +1010,50 @@ export async function getDistrictBySlug(
 }
 
 export async function getRetreatCenters(): Promise<Center[]> {
-  console.log("==== getRetreatCenters: Starting to fetch retreat centers ====");
+  logger.debug("==== getRetreatCenters: Starting to fetch retreat centers ====");
   
   try {
     // Get all centers
-    console.log("getRetreatCenters: Calling getAllCenters");
+    logger.debug("getRetreatCenters: Calling getAllCenters");
     const allCenters = await getAllCenters();
     
-    console.log(`getRetreatCenters: Retrieved ${allCenters.length} centers`);
+    logger.debug(`getRetreatCenters: Retrieved ${allCenters.length} centers`);
     
     if (!allCenters || allCenters.length === 0) {
-      console.warn('No centers found in the database');
+      logger.warn('No centers found in the database');
       return [];
     }
 
     // Filter centers that are retreat centers using the branch codes
-    console.log(`getRetreatCenters: Filtering using ${RETREAT_CENTER_BRANCH_CODES.length} retreat center branch codes`);
-    console.log("Retreat center branch codes:", RETREAT_CENTER_BRANCH_CODES.join(", "));
+    logger.debug(`getRetreatCenters: Filtering using ${RETREAT_CENTER_BRANCH_CODES.length} retreat center branch codes`);
+    logger.debug("Retreat center branch codes:", RETREAT_CENTER_BRANCH_CODES.join(", "));
     
     const retreatCenters = allCenters.filter(center => 
       center.branch_code && RETREAT_CENTER_BRANCH_CODES.includes(center.branch_code)
     );
 
-    console.log(`getRetreatCenters: Found ${retreatCenters.length} retreat centers after filtering`);
+    logger.debug(`getRetreatCenters: Found ${retreatCenters.length} retreat centers after filtering`);
     
     if (retreatCenters.length === 0) {
       // Try logging branch codes of all centers to see if they match what we expect
-      console.log("getRetreatCenters: No retreat centers found, checking branch codes from data:");
+      logger.debug("getRetreatCenters: No retreat centers found, checking branch codes from data:");
       const allBranchCodes = allCenters
         .filter(c => c.branch_code)
         .map(c => c.branch_code);
       
-      console.log(`getRetreatCenters: Sample of branch codes from data (first 10): ${allBranchCodes.slice(0, 10).join(", ")}`);
+      logger.debug(`getRetreatCenters: Sample of branch codes from data (first 10): ${allBranchCodes.slice(0, 10).join(", ")}`);
       
       // Check if any of our expected retreat centers exist in the data
       const matchingCodes = RETREAT_CENTER_BRANCH_CODES.filter(code => 
         allBranchCodes.includes(code)
       );
       
-      console.log(`getRetreatCenters: Matching branch codes between data and retreat centers: ${matchingCodes.join(", ")}`);
+      logger.debug(`getRetreatCenters: Matching branch codes between data and retreat centers: ${matchingCodes.join(", ")}`);
     } else {
       // Log the returned retreat centers for debugging
-      console.log("getRetreatCenters: Found these retreat centers:");
+      logger.debug("getRetreatCenters: Found these retreat centers:");
       retreatCenters.forEach(center => {
-        console.log(`- ${center.name} (${center.branch_code})`);
+        logger.debug(`- ${center.name} (${center.branch_code})`);
       });
     }
 
@@ -1076,7 +1064,7 @@ export async function getRetreatCenters(): Promise<Center[]> {
       return indexA - indexB;
     });
   } catch (error) {
-    console.error('Error fetching retreat centers:', error);
+    logger.error('Error fetching retreat centers:', error);
     return [];
   }
 }

@@ -6,6 +6,7 @@ import { useGoogleMaps } from '@/lib/useGoogleMaps';
 import { hasValidCoordinates } from '@/lib/geocoding';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { calculateCenterDistance, formatDistance } from '@/lib/distanceUtils';
+import { logger } from '@/lib/logger';
 
 interface CenterMapProps {
   centers: Center[];
@@ -82,7 +83,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
         
         return () => clearTimeout(timeout);
       } catch (error) {
-        console.error('Error loading Google Maps components:', error);
+        logger.error('Error loading Google Maps components:', error);
       }
     }
   }, [isLoaded, loadError]);
@@ -92,24 +93,24 @@ const CenterMap: React.FC<CenterMapProps> = ({
     try {
       if (initialLat && initialLng) {
         setCenterPosition({ lat: initialLat, lng: initialLng });
-        console.log('Setting center from initialLat/initialLng:', initialLat, initialLng);
+        logger.trace('Setting center from initialLat/initialLng:', initialLat, initialLng);
       } else if (centers.length > 0 && centers[0]?.coords && Array.isArray(centers[0].coords) && centers[0].coords.length === 2) {
         const lat = parseFloat(centers[0].coords[0]);
         const lng = parseFloat(centers[0].coords[1]);
         if (!isNaN(lat) && !isNaN(lng)) {
           setCenterPosition({ lat, lng });
-          console.log('Setting center from first center coords:', lat, lng);
+          logger.trace('Setting center from first center coords:', lat, lng);
         } else {
-          console.warn('Invalid coordinates in first center:', centers[0].coords);
+          logger.warn('Invalid coordinates in first center:', centers[0].coords);
           setCenterPosition({ lat: 20.5937, lng: 78.9629 }); // Default to center of India
         }
       } else {
         // Default to center of India if no position available
-        console.log('No valid coordinates found, using default center of India');
+        logger.debug('No valid coordinates found, using default center of India');
         setCenterPosition({ lat: 20.5937, lng: 78.9629 });
       }
     } catch (error) {
-      console.error('Error setting center position:', error);
+      logger.error('Error setting center position:', error);
       setCenterPosition({ lat: 20.5937, lng: 78.9629 }); // Default to center of India
     }
   }, [centers, initialLat, initialLng]);
@@ -146,7 +147,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
             validCenterCount++;
           }
         } catch (e) {
-          console.error('Error adding point to bounds:', e);
+          logger.error('Error adding point to bounds:', e);
         }
       }
     });

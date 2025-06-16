@@ -5,6 +5,7 @@ import { JSONFile } from 'lowdb/node'
 import lodash from 'lodash'
 import path from 'path';
 import fs from 'fs';
+import { logger } from '@/lib/logger';
 
 // Add this export to tell Next.js that this route is dynamic and should be server-rendered
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     const district = url.searchParams.get("district");
     const lightweight = url.searchParams.get("lightweight") === "true";
 
-    console.log(`API Request - state: ${state || 'none'}, district: ${district || 'none'}, lightweight: ${lightweight}`);
+    logger.debug(`API Request - state: ${state || 'none'}, district: ${district || 'none'}, lightweight: ${lightweight}`);
 
     // Try multiple locations for the data file
     const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
@@ -30,12 +31,12 @@ export async function GET(request: Request) {
     let filePath;
     if (fs.existsSync(publicFilePath)) {
       filePath = publicFilePath;
-      console.log('Using data file from public directory');
+      logger.trace('Using data file from public directory');
     } else if (fs.existsSync(rootFilePath)) {
       filePath = rootFilePath;
-      console.log('Using data file from root directory');
+      logger.trace('Using data file from root directory');
     } else {
-      console.error('Centers data file not found in any location');
+      logger.error('Centers data file not found in any location');
       throw new Error('Centers data file not found in any location');
     }
     
@@ -46,11 +47,11 @@ export async function GET(request: Request) {
     await db.read();
 
     if (!db.data || !db.data.data || !Array.isArray(db.data.data)) {
-      console.error('Invalid data structure in centers file');
+      logger.error('Invalid data structure in centers file');
       throw new Error('Invalid data structure in centers file');
     }
     
-    console.log(`Loaded ${db.data.data.length} centers from file`);
+    logger.debug(`Loaded ${db.data.data.length} centers from file`);
 
     let query = db.chain.get('data');
    
@@ -60,9 +61,9 @@ export async function GET(request: Request) {
     const filteredData = await query.value();
 
     if (!filteredData || filteredData.length === 0) {
-      console.log(`No centers found for query - state: ${state || 'none'}, district: ${district || 'none'}`);
+      logger.debug(`No centers found for query - state: ${state || 'none'}, district: ${district || 'none'}`);
     } else {
-      console.log(`Found ${filteredData.length} centers for query`);
+      logger.debug(`Found ${filteredData.length} centers for query`);
     }
 
     // Prepare response
@@ -77,7 +78,7 @@ export async function GET(request: Request) {
   
     
   } catch (error) {
-    console.error("Error in API route:", error);
+    logger.error("Error in API route:", error);
     return new NextResponse(
       JSON.stringify({
         error: "Failed to load centers data",

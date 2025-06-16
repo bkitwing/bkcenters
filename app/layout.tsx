@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
 import { getAllCenters, getStatesSummary } from "@/lib/centerData";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 async function getHomeMetadata() {

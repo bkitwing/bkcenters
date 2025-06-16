@@ -10,6 +10,7 @@ import { generateOgImageUrl } from '@/lib/ogUtils';
 import RetreatPageClient from './RetreatPageClient';
 import path from 'path';
 import fs from 'fs';
+import { logger } from '@/lib/logger';
 
 export async function generateMetadata(): Promise<Metadata> {
   // Get retreat centers to count them
@@ -53,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 // Helper function to load centers directly from file
 async function loadRetreatCentersFromFile() {
-  console.log("Directly loading retreat centers from file");
+  logger.debug("Directly loading retreat centers from file");
   
   try {
     // Try multiple locations for the data file
@@ -64,12 +65,12 @@ async function loadRetreatCentersFromFile() {
     let filePath;
     if (fs.existsSync(publicFilePath)) {
       filePath = publicFilePath;
-      console.log('Using data file from public directory');
+      logger.trace('Using data file from public directory');
     } else if (fs.existsSync(rootFilePath)) {
       filePath = rootFilePath;
-      console.log('Using data file from root directory');
+      logger.trace('Using data file from root directory');
     } else {
-      console.error('Centers data file not found in any location');
+      logger.error('Centers data file not found in any location');
       return [];
     }
     
@@ -78,23 +79,23 @@ async function loadRetreatCentersFromFile() {
     const data = JSON.parse(fileContent);
     
     if (!data || !data.data || !Array.isArray(data.data)) {
-      console.error('Invalid data structure in centers file');
+      logger.error('Invalid data structure in centers file');
       return [];
     }
     
-    console.log(`Loaded ${data.data.length} centers from file`);
+    logger.debug(`Loaded ${data.data.length} centers from file`);
     
     // Filter retreat centers
     const retreatCenters = data.data.filter((center: Center) => 
       center.branch_code && RETREAT_CENTER_BRANCH_CODES.includes(center.branch_code)
     );
     
-    console.log(`Found ${retreatCenters.length} retreat centers`);
+    logger.debug(`Found ${retreatCenters.length} retreat centers`);
     
     if (retreatCenters.length > 0) {
-      console.log("Sample retreat centers:");
+      logger.debug("Sample retreat centers:");
       retreatCenters.slice(0, 3).forEach((center: Center) => {
-        console.log(`- ${center.name} (${center.branch_code})`);
+        logger.debug(`- ${center.name} (${center.branch_code})`);
       });
     } else {
       // Debug why no retreat centers were found
@@ -107,7 +108,7 @@ async function loadRetreatCentersFromFile() {
         allBranchCodes.includes(code)
       );
       
-      console.log(`Matching branch codes: ${matchingCodes.join(', ')}`);
+      logger.debug(`Matching branch codes: ${matchingCodes.join(', ')}`);
     }
     
     // Sort centers according to the order in RETREAT_CENTER_BRANCH_CODES
@@ -117,7 +118,7 @@ async function loadRetreatCentersFromFile() {
       return indexA - indexB;
     });
   } catch (error) {
-    console.error('Error loading retreat centers from file:', error);
+    logger.error('Error loading retreat centers from file:', error);
     return [];
   }
 }
@@ -180,7 +181,7 @@ export default async function RetreatCentersPage() {
       </div>
     );
   } catch (error) {
-    console.error('Error in RetreatCentersPage:', error);
+    logger.error('Error in RetreatCentersPage:', error);
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">

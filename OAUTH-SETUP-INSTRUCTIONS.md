@@ -12,7 +12,7 @@ This document contains step-by-step instructions for configuring OAuth 2.0 crede
 6. Name your OAuth client (e.g., "BK Centers Email Service")
 7. Add authorized redirect URIs:
    - https://www.brahmakumaris.com/centers/api/auth/callback/google
-   - http://localhost:3000/api/auth/callback/google (for development)
+   - http://localhost:5400/api/auth/callback/google (for development)
    - https://developers.google.com/oauthplayground (for getting the refresh token)
 8. Click "Create"
 9. Note the Client ID and Client Secret that are generated
