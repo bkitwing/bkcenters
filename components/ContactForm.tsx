@@ -24,8 +24,8 @@ const getApiUrl = () => {
   if (isLocal || isDev) {
     return 'http://localhost:5400';
   } else {
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-    return `https://www.brahmakumaris.com${basePath}`;
+    // In production, always include the /centers basePath
+    return 'https://www.brahmakumaris.com/centers';
   }
 };
 
@@ -54,9 +54,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
     try {
       // Use the full API URL including the base path
       const apiBaseUrl = getApiUrl();
-      console.log('Sending email using API endpoint:', `${apiBaseUrl}/api/send-email`);
+      const apiUrl = `${apiBaseUrl}/api/send-email`;
+      console.log('Sending email using API endpoint:', apiUrl);
       
-      const response = await fetch(`${apiBaseUrl}/api/send-email`, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
