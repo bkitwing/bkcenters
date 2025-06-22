@@ -41,6 +41,13 @@ const nextConfig = {
         source: '/centers/robots.txt',
         destination: '/centers/robots.txt',
       },
+      // Add this rewrite to ensure API routes work correctly with basePath
+      ...(isProd && !isLocalDev ? [
+        {
+          source: '/centers/api/:path*',
+          destination: '/api/:path*',
+        }
+      ] : [])
     ];
   },
 };

@@ -12,21 +12,26 @@ type ContactType = 'LearnMeditation' | 'Query' | 'AttendEvent' | 'Feedback' | 'O
 
 // Helper function to get the correct API base URL
 const getApiUrl = () => {
-  const isLocal = process.env.IS_LOCAL === "true";
-  const isDev = process.env.NODE_ENV === "development";
-  
+  // Check if we're in a client-side environment
   if (typeof window !== 'undefined') {
-    // On client side, use window.location.origin
-    return window.location.origin;
+    // On client side, we need to handle basePath correctly
+    const isProduction = window.location.hostname === 'www.brahmakumaris.com';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (isLocal) {
+      // For local development, use the current origin directly
+      return window.location.origin;
+    } else if (isProduction) {
+      // For production, we need to include the basePath in the API URL
+      return `${window.location.origin}/centers`;
+    } else {
+      // For other environments, use the current origin
+      return window.location.origin;
+    }
   }
   
-  // On server side, determine the correct origin
-  if (isLocal || isDev) {
-    return 'http://localhost:5400';
-  } else {
-    // In production, always include the /centers basePath
-    return 'https://www.brahmakumaris.com/centers';
-  }
+  // Server-side fallback (should not be reached in client components)
+  return 'https://www.brahmakumaris.com/centers';
 };
 
 const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
@@ -54,6 +59,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
     try {
       // Use the full API URL including the base path
       const apiBaseUrl = getApiUrl();
+      // Next.js will automatically handle the basePath configuration
       const apiUrl = `${apiBaseUrl}/api/send-email`;
       console.log('Sending email using API endpoint:', apiUrl);
       

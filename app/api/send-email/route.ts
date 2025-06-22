@@ -193,15 +193,18 @@ const getAcknowledgmentTemplate = (name: string) => `
 
 export async function POST(request: Request) {
   try {
+    console.log('Email API route called');
     const body: EmailRequestBody = await request.json();
     
     // Basic validation
     if (!body.name || !body.email || !body.message || !body.centerEmail) {
+      console.error('Missing required fields in email request:', { body });
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
     
     // Extract email info
     const { name, email, phone, message, contactType, centerEmail, centerName, userAgent, pageUrl } = body;
+    console.log('Processing email request for center:', centerName);
     
     // Get credentials from environment variables
     const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -211,7 +214,11 @@ export async function POST(request: Request) {
     
     // Check if email credentials are configured
     if (!clientId || !clientSecret || !refreshToken) {
-      console.error('OAuth credentials are not configured');
+      console.error('OAuth credentials are not configured', { 
+        hasClientId: !!clientId, 
+        hasClientSecret: !!clientSecret, 
+        hasRefreshToken: !!refreshToken 
+      });
       return NextResponse.json(
         { error: 'Email service is not properly configured. Please contact the administrator.' }, 
         { status: 500 }
@@ -231,6 +238,7 @@ export async function POST(request: Request) {
     });
     
     try {
+      console.log('Attempting to get OAuth access token');
       // Get access token
       const accessToken = await new Promise<string>((resolve, reject) => {
         oauth2Client.getAccessToken((err: Error | null, token: string | null | undefined) => {
@@ -239,13 +247,16 @@ export async function POST(request: Request) {
             reject(err);
           }
           if (!token) {
+            console.error('Access token is null or undefined');
             reject(new Error('Access token is null or undefined'));
             return;
           }
+          console.log('Successfully obtained access token');
           resolve(token);
         });
       });
       
+      console.log('Creating email transporter');
       // Create transporter using OAuth2
       const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
@@ -264,6 +275,7 @@ export async function POST(request: Request) {
       // Format the email subject
       const emailSubject = `[${contactType}] ${name} <${email}> - ${centerName}`;
       
+      console.log('Sending email to center:', centerEmail);
       // Send email to center
       await transporter.sendMail({
         from: `"${name} via Contact Form" <${emailFrom}>`,
@@ -274,6 +286,7 @@ export async function POST(request: Request) {
         html: getCenterEmailTemplate(body),
       });
 
+      console.log('Sending acknowledgment email to sender:', email);
       // Send acknowledgment email to the sender
       await transporter.sendMail({
         from: `"Brahma Kumaris" <${emailFrom}>`,
@@ -282,6 +295,7 @@ export async function POST(request: Request) {
         html: getAcknowledgmentTemplate(name),
       });
       
+      console.log('Email sent successfully');
       return NextResponse.json({ success: true });
     } catch (authError) {
       console.error('OAuth authentication error:', authError);
