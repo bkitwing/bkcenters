@@ -560,7 +560,7 @@ export default function HomePage() {
               {totalCenters.toLocaleString()}
             </div>
             <div className="stat-label text-neutral-600 text-xs sm:text-sm">
-              Total Centers
+              Meditation Centers
             </div>
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
@@ -576,7 +576,7 @@ export default function HomePage() {
               35
             </div>
             <div className="stat-label text-neutral-600 text-xs sm:text-sm">
-              States & UTs
+              In States & UTs
             </div>
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
