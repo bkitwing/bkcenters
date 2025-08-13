@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 // Google Analytics tracking ID
-const GA_TRACKING_ID = 'G-CSYYGVHXN0';
+const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-CSYYGVHXN0';
 
 // Google Analytics gtag function and dataLayer
 declare global {
@@ -17,6 +17,12 @@ declare global {
 // Initialize Google Analytics
 export function initGA() {
   if (typeof window === 'undefined') return;
+  
+  // Skip GA initialization if no tracking ID is provided
+  if (!GA_TRACKING_ID || GA_TRACKING_ID === '') {
+    console.warn('Google Analytics tracking ID is missing');
+    return;
+  }
   
   // Initialize dataLayer
   window.dataLayer = window.dataLayer || [];

@@ -6,6 +6,7 @@ import CenterMap from '@/components/CenterMap';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import SearchBar from '@/components/SearchBar';
+import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 
 interface StatePageClientProps {
   actualRegion: string;
@@ -59,6 +60,9 @@ export default function StatePageClient({
     const district = center.district;
     setSelectedDistrict(district);
     
+    // Track district selection
+    CenterLocatorAnalytics.useFilter('district', district);
+    
     // Find and highlight the corresponding card
     const districtElement = document.getElementById(`district-${district}`);
     if (districtElement) {
@@ -84,6 +88,14 @@ export default function StatePageClient({
   const handleClearSearch = () => {
     setSearchQuery("");
     setSelectedDistrict(null);
+  };
+  
+  // Handle search query change
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      CenterLocatorAnalytics.searchCenters(query, filteredDistricts.length, 'text');
+    }
   };
   
   // Filter districts based on search query
@@ -173,7 +185,7 @@ export default function StatePageClient({
                 showClearButton={searchQuery.length > 0}
                 disableVoiceInput={true}
                 isLocalSearch={true}
-                onTextChange={setSearchQuery}
+                onTextChange={handleSearchChange}
               />
             </div>
             
@@ -221,4 +233,4 @@ export default function StatePageClient({
       </div>
     </div>
   );
-} 
+}

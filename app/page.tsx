@@ -531,8 +531,9 @@ export default function HomePage() {
   const StatsSummary = () => {
     const [totalCenters, setTotalCenters] = useState<number>(0);
     const [retreatCenters, setRetreatCenters] = useState<number>(0);
+    const [totalDistricts, setTotalDistricts] = useState<number>(0);
 
-    // Fetch retreat centers count on component mount
+    // Fetch retreat centers count and calculate districts on component mount
     useEffect(() => {
       async function fetchRetreatCentersCount() {
         try {
@@ -545,7 +546,11 @@ export default function HomePage() {
 
       fetchRetreatCentersCount();
       setTotalCenters(allCenters.length);
-    }, [allCenters.length]);
+      
+      // Calculate total districts from states summary
+      const districts = statesSummary.reduce((sum, state) => sum + state.districtCount, 0);
+      setTotalDistricts(districts);
+    }, [allCenters.length, statesSummary]);
 
     return (
       <div className="stats-bar bg-white p-4 rounded-lg shadow-md mb-6">
@@ -560,18 +565,18 @@ export default function HomePage() {
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
             <div className="stat-value text-secondary text-lg sm:text-xl font-bold">
-              {statesSummary.length}
+              {totalDistricts.toLocaleString()}
             </div>
             <div className="stat-label text-neutral-600 text-xs sm:text-sm">
-              States
+              In Districts
             </div>
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
             <div className="stat-value text-accent text-lg sm:text-xl font-bold">
-              {regionDetails.length}
+              {statesSummary.length}
             </div>
             <div className="stat-label text-neutral-600 text-xs sm:text-sm">
-              Regions
+              States & UTs
             </div>
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">

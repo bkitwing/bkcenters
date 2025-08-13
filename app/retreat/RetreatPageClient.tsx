@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { Center } from '@/lib/types';
 import MapSection from '@/components/MapSection';
+import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 
 interface RetreatPageClientProps {
   centers: Center[];
@@ -17,6 +18,9 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
   // Handle marker click on map
   const handleCenterSelect = (center: Center) => {
     setSelectedCenter(center);
+    
+    // Track retreat center view from map
+    CenterLocatorAnalytics.retreatInteraction('view', center.name || 'Unknown');
     
     // Find and highlight the corresponding card
     const centerElement = document.getElementById(`retreat-center-${center.branch_code}`);
@@ -43,6 +47,9 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
   const handleCardClick = (center: Center) => {
     setSelectedCenter(center);
     
+    // Track retreat center view from card click
+    CenterLocatorAnalytics.retreatInteraction('view', center.name || 'Unknown');
+    
     // If on mobile, scroll map into view
     if (window.innerWidth < 768 && mapRef.current) {
       mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -52,6 +59,9 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
   // Share functionality
   const handleShare = async (center: Center) => {
     const centerUrl = window.location.origin + '/centers' + formatCenterUrl(center.region, center.state, center.district, center.name);
+    
+    // Track retreat center share
+    CenterLocatorAnalytics.retreatInteraction('contact', center.name || 'Unknown');
     
     if (navigator.share) {
       try {
@@ -73,6 +83,12 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
         console.error('Error copying to clipboard:', error);
       }
     }
+  };
+  
+  // Handle directions click
+  const handleDirectionsClick = (center: Center) => {
+    // Track retreat center directions
+    CenterLocatorAnalytics.retreatInteraction('directions', center.name || 'Unknown');
   };
 
   return (
@@ -153,7 +169,11 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
                         const cleanNumber = number.trim();
                         return (
                           <span key={index}>
-                            <a href={`tel:${cleanNumber}`} className="hover:underline">
+                            <a 
+                              href={`tel:${cleanNumber}`} 
+                              className="hover:underline"
+                              onClick={() => CenterLocatorAnalytics.retreatInteraction('contact', center.name || 'Unknown')}
+                            >
                               {cleanNumber}
                             </a>
                             {index < center.mobile.split(',').length - 1 && <span className="mx-1">,</span>}
@@ -169,7 +189,11 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <a href={`mailto:${center.email}`} className="hover:underline truncate">
+                    <a 
+                      href={`mailto:${center.email}`} 
+                      className="hover:underline truncate"
+                      onClick={() => CenterLocatorAnalytics.retreatInteraction('contact', center.name || 'Unknown')}
+                    >
                       {center.email}
                     </a>
                   </div>
@@ -195,6 +219,7 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-neutral-600 hover:text-spirit-purple-700 transition-colors"
+                    onClick={() => handleDirectionsClick(center)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -253,4 +278,4 @@ function getGoogleMapsUrl(center: Center) {
     const address = encodeURIComponent(formattedAddress);
     return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
   }
-} 
+}

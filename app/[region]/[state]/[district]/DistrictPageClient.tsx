@@ -7,6 +7,7 @@ import CenterCard from '@/components/CenterCard';
 import SearchBar from '@/components/SearchBar';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
+import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 
 interface DistrictPageClientProps {
   actualRegion: string;
@@ -60,6 +61,9 @@ export default function DistrictPageClient({
   const handleCenterSelect = (center: Center) => {
     setSelectedCenter(center);
     
+    // Track center view from map
+    CenterLocatorAnalytics.viewCenter(center);
+    
     // Find and highlight the corresponding card
     const centerElement = document.getElementById(`center-${center.branch_code}`);
     if (centerElement) {
@@ -85,6 +89,9 @@ export default function DistrictPageClient({
   const handleCardClick = (center: Center) => {
     setSelectedCenter(center);
     
+    // Track center view from card click
+    CenterLocatorAnalytics.viewCenter(center);
+    
     // Scroll to map if it's out of view
     if (mapRef.current) {
       const mapRect = mapRef.current.getBoundingClientRect();
@@ -99,6 +106,14 @@ export default function DistrictPageClient({
     setSearchQuery("");
     // Reset any selected center as well since we're clearing the filter
     setSelectedCenter(null);
+  };
+  
+  // Handle search query change
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      CenterLocatorAnalytics.searchCenters(query, filteredCenters.length, 'text');
+    }
   };
 
   // Create an enhanced version of centers with highlighting property
@@ -179,7 +194,7 @@ export default function DistrictPageClient({
               showClearButton={searchQuery.length > 0}
               disableVoiceInput={true}
               isLocalSearch={true}
-              onTextChange={setSearchQuery}
+              onTextChange={handleSearchChange}
             />
           </div>
           
@@ -235,4 +250,4 @@ export default function DistrictPageClient({
       </div>
     </div>
   );
-} 
+}
