@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
+import { CenterLocatorAnalytics } from './GoogleAnalytics';
 
 interface CenterCardProps {
   center: Center;
@@ -61,12 +62,18 @@ const CenterCard: React.FC<CenterCardProps> = ({
       url: shareUrl
     };
     
+    // Track share event
+    const shareMethod = (typeof navigator !== 'undefined' && 'share' in navigator) ? 'native_share' : 'clipboard';
+    CenterLocatorAnalytics.shareCenter(center, shareMethod);
+    
     try {
-      if (navigator.share) {
+      if (typeof navigator !== 'undefined' && 'share' in navigator) {
         await navigator.share(shareData);
       } else {
         // Fallback for browsers that don't support the Web Share API
-        navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
+        if (typeof window !== 'undefined' && window.navigator && window.navigator.clipboard) {
+          await window.navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
+        }
         setShowShareTooltip(true);
         setTimeout(() => setShowShareTooltip(false), 2000);
       }
@@ -107,7 +114,11 @@ const CenterCard: React.FC<CenterCardProps> = ({
                 const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
                 return (
                   <span key={index}>
-                    <a href={`tel:${cleanNumber}`} className="hover:underline">
+                    <a 
+                      href={`tel:${cleanNumber}`} 
+                      className="hover:underline"
+                      onClick={() => CenterLocatorAnalytics.contactCenter(center)}
+                    >
                       {number.trim()}
                     </a>
                     {index < center.contact.split(',').length - 1 && <span className="mx-1">,</span>}
@@ -128,7 +139,11 @@ const CenterCard: React.FC<CenterCardProps> = ({
                 const cleanNumber = number.trim();
                 return (
                   <span key={index}>
-                    <a href={`tel:${cleanNumber}`} className="hover:underline">
+                    <a 
+                      href={`tel:${cleanNumber}`} 
+                      className="hover:underline"
+                      onClick={() => CenterLocatorAnalytics.contactCenter(center)}
+                    >
                       {cleanNumber}
                     </a>
                     {index < center.mobile.split(',').length - 1 && <span className="mx-1">,</span>}
@@ -144,7 +159,11 @@ const CenterCard: React.FC<CenterCardProps> = ({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <a href={`mailto:${center.email}`} className="hover:underline truncate">
+            <a 
+              href={`mailto:${center.email}`} 
+              className="hover:underline truncate"
+              onClick={() => CenterLocatorAnalytics.contactCenter(center)}
+            >
               {center.email}
             </a>
           </div>
@@ -159,6 +178,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
             className="relative text-neutral-600 hover:text-spirit-purple-700 transition-colors"
             onMouseEnter={() => setShowViewTooltip(true)}
             onMouseLeave={() => setShowViewTooltip(false)}
+            onClick={() => CenterLocatorAnalytics.viewCenter(center)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -180,6 +200,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
               className="relative text-neutral-600 hover:text-spirit-purple-700 transition-colors"
               onMouseEnter={() => setShowLocationTooltip(true)}
               onMouseLeave={() => setShowLocationTooltip(false)}
+              onClick={() => CenterLocatorAnalytics.getDirections(center)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -215,4 +236,4 @@ const CenterCard: React.FC<CenterCardProps> = ({
   );
 };
 
-export default CenterCard; 
+export default CenterCard;

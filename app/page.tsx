@@ -23,6 +23,7 @@ import { formatCenterUrl } from "@/lib/urlUtils";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Metadata } from 'next';
 import { generateOgImageUrl } from '@/lib/ogUtils';
+import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 
 // Declare the google namespace globally
 declare global {
@@ -300,6 +301,7 @@ export default function HomePage() {
   // Handle sort change
   const handleSortChange = (option: SortOption) => {
     setSortBy(option);
+    CenterLocatorAnalytics.useFilter('sort', option);
   };
 
   // Handle view mode change
@@ -314,7 +316,13 @@ export default function HomePage() {
 
   // Handle region selection
   const handleRegionSelect = (regionName: string) => {
-    setActiveRegion(activeRegion === regionName ? null : regionName);
+    const newActiveRegion = activeRegion === regionName ? null : regionName;
+    setActiveRegion(newActiveRegion);
+    
+    // Track region selection
+    if (newActiveRegion) {
+      CenterLocatorAnalytics.useFilter('region', regionName);
+    }
   };
 
   // Get sorted states based on sort option
@@ -417,6 +425,9 @@ export default function HomePage() {
   // Handle center selection on map
   const handleCenterSelect = (center: Center) => {
     setSelectedCenter(center);
+    
+    // Track center view from map
+    CenterLocatorAnalytics.viewCenter(center);
 
     // Scroll to the center in the list of results if possible
     if (
@@ -447,6 +458,9 @@ export default function HomePage() {
   const handleCardClick = (center: Center) => {
     // Set selected center for highlighting
     setSelectedCenter(center);
+    
+    // Track center view from card click
+    CenterLocatorAnalytics.viewCenter(center);
 
     if (center.coords && center.coords.length === 2) {
       const [lat, lng] = center.coords.map(parseFloat);
@@ -583,6 +597,7 @@ export default function HomePage() {
     const value = parseInt(e.target.value);
     if (!isNaN(value)) {
       setMaxDistance(value);
+      CenterLocatorAnalytics.useFilter('distance', `${value}km`);
     }
   };
 

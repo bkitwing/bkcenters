@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Center } from '@/lib/types';
+import { CenterLocatorAnalytics } from './GoogleAnalytics';
 
 interface ContactFormProps {
   center: Center;
@@ -102,6 +103,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
       // Parse the response data
       const data = await response.json();
 
+      // Track successful form submission
+      CenterLocatorAnalytics.contactCenter(center);
+      
       // Success
       setIsSubmitted(true);
       // Clear form
@@ -119,6 +123,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
 
   const handleContactTypeChange = (type: ContactType) => {
     setContactType(type);
+    
+    // Track contact type selection
+    CenterLocatorAnalytics.useFilter('contact_type', type);
+    
     // Set default message templates based on contact type
     if (type === 'LearnMeditation') {
       setMessage("I'm interested in learning meditation. Please provide information about your classes and timings.");
@@ -307,4 +315,4 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   );
 };
 
-export default ContactForm; 
+export default ContactForm;

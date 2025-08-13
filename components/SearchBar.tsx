@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGoogleMaps } from '@/lib/useGoogleMaps';
+import { CenterLocatorAnalytics } from './GoogleAnalytics';
 
 declare global {
   interface Window {
@@ -200,6 +201,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         // Update input value to match selected place
         setInputValue(address);
         
+        // Track the search event
+        CenterLocatorAnalytics.searchCenters(address, 0, 'location');
+        
         if (onSearchResult) {
           onSearchResult(lat, lng, address);
         } else {
@@ -257,6 +261,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
             }
           }
           
+          // Track current location usage
+          CenterLocatorAnalytics.locationPermission(true);
+          CenterLocatorAnalytics.searchCenters(address, 0, 'location');
+          
           if (onSearchResult) {
             onSearchResult(latitude, longitude, address);
           } else {
@@ -282,6 +290,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = "Location access denied. Please allow location access in your browser.";
+            CenterLocatorAnalytics.locationPermission(false);
             break;
           case error.POSITION_UNAVAILABLE:
             errorMessage = "Location information is unavailable";
@@ -445,4 +454,4 @@ const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-export default SearchBar; 
+export default SearchBar;

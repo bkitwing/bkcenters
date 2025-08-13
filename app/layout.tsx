@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Header from "../components/Header";
+import GoogleAnalytics from "../components/GoogleAnalytics";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
 import { getAllCenters, getStatesSummary } from "@/lib/centerData";
 import Link from "next/link";
@@ -79,6 +80,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-neutral-50`}>
+        <GoogleAnalytics />
         <Header />
         <main>{children}</main>
         <footer className="bg-spirit-purple-50 mt-8 border-t border-spirit-purple-100">

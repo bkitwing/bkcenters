@@ -7,6 +7,7 @@ import { hasValidCoordinates } from '@/lib/geocoding';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { calculateCenterDistance, formatDistance } from '@/lib/distanceUtils';
 import { logger } from '@/lib/logger';
+import { CenterLocatorAnalytics } from './GoogleAnalytics';
 
 interface CenterMapProps {
   centers: Center[];
@@ -224,6 +225,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
       // If start point is not set, set it as start point
       if (!startPoint) {
         setStartPoint(center);
+        CenterLocatorAnalytics.mapInteraction('distance_start_point', center.name);
         return;
       }
       
@@ -233,6 +235,9 @@ const CenterMap: React.FC<CenterMapProps> = ({
         // Calculate and display the distance
         const distance = calculateCenterDistance(startPoint, center);
         setMeasuredDistance(distance);
+        
+        // Track distance measurement
+        CenterLocatorAnalytics.mapInteraction('distance_measured', `${formatDistance(distance)} between ${startPoint.name} and ${center.name}`);
         
         // Draw a line between the two points if we have coordinates
         if (mapRef && window.google?.maps && startPoint.coords && center.coords) {
@@ -288,6 +293,9 @@ const CenterMap: React.FC<CenterMapProps> = ({
     // Regular center selection behavior (when not measuring)
     setSelectedCenter(center);
     
+    // Track map marker click
+    CenterLocatorAnalytics.mapInteraction('marker_click', center.name);
+    
     // Find and highlight the corresponding card
     const centerElement = document.getElementById(`center-card-${center.branch_code}`);
     if (centerElement) {
@@ -323,6 +331,9 @@ const CenterMap: React.FC<CenterMapProps> = ({
   const toggleDistanceMeasurementMode = () => {
     // Toggle the mode
     setDistanceMeasurementMode(!distanceMeasurementMode);
+    
+    // Track distance measurement mode toggle
+    CenterLocatorAnalytics.mapInteraction(distanceMeasurementMode ? 'distance_mode_off' : 'distance_mode_on');
     
     // Reset measurement state when toggling off
     if (distanceMeasurementMode) {
@@ -388,6 +399,20 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
   const onMapLoad = (map: google.maps.Map) => {
     setMapRef(map);
+    
+    // Add zoom change listener for analytics
+    map.addListener('zoom_changed', () => {
+      const zoom = map.getZoom();
+      if (zoom) {
+        CenterLocatorAnalytics.mapInteraction(zoom > (map as any).previousZoom ? 'zoom_in' : 'zoom_out');
+        (map as any).previousZoom = zoom;
+      }
+    });
+    
+    // Add drag listener for analytics
+    map.addListener('dragend', () => {
+      CenterLocatorAnalytics.mapInteraction('pan');
+    });
     
     // Force redraw after map loads
     setTimeout(() => {
@@ -703,4 +728,4 @@ const CenterMap: React.FC<CenterMapProps> = ({
   );
 };
 
-export default CenterMap; 
+export default CenterMap;

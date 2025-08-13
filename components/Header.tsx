@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FaHome, FaBars, FaTimes, FaSearch } from "react-icons/fa";
 import { MdMyLocation } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import { CenterLocatorAnalytics } from './GoogleAnalytics';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,6 +26,10 @@ const Header = () => {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords;
+          
+          // Track successful location usage
+          CenterLocatorAnalytics.locationPermission(true);
+          CenterLocatorAnalytics.searchCenters('Current Location', 0, 'location');
 
           // Navigate to results page with query params
           router.push(
@@ -40,6 +45,11 @@ const Header = () => {
       (error) => {
         console.error("Error getting location:", error);
         let errorMessage = "Failed to get your location";
+        
+        // Track location permission denial
+        if (error.code === error.PERMISSION_DENIED) {
+          CenterLocatorAnalytics.locationPermission(false);
+        }
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
