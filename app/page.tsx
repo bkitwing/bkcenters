@@ -573,7 +573,7 @@ export default function HomePage() {
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
             <div className="stat-value text-accent text-lg sm:text-xl font-bold">
-              {statesSummary.length}
+              35
             </div>
             <div className="stat-label text-neutral-600 text-xs sm:text-sm">
               States & UTs
