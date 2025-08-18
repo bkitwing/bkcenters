@@ -7,12 +7,12 @@ import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
 import ShareCenter from '@/components/ShareCenter';
+import ContactLink from '@/components/ContactLink';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { headers } from 'next/headers';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 
 // Extended interface for centers with optional service and timing data
 interface CenterWithServices extends Center {
@@ -378,13 +378,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
                             const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
                             return (
                               <span key={index}>
-                                <a 
+                                <ContactLink 
                                    href={`tel:${cleanNumber}`} 
                                    className="text-primary hover:underline"
-                                   onClick={() => CenterLocatorAnalytics.contactCenter(center)}
+                                   center={center}
                                  >
                                   {number.trim()}
-                                </a>
+                                </ContactLink>
                                 {index < center.contact.split(',').length - 1 && <span className="mx-1">,</span>}
                               </span>
                             );
@@ -423,13 +423,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <a 
+                      <ContactLink 
                          href={`mailto:${center.email}`} 
                          className="text-primary hover:underline"
-                         onClick={() => CenterLocatorAnalytics.contactCenter(center)}
+                         center={center}
                        >
                         {center.email}
-                      </a>
+                      </ContactLink>
                     </div>
                   </div>
                 )}
