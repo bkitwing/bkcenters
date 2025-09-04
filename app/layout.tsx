@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Header from "../components/Header";
 import GoogleAnalytics from "../components/GoogleAnalytics";
+import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
 import { getAllCenters, getStatesSummary } from "@/lib/centerData";
 import Link from "next/link";
@@ -83,6 +84,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <Header />
         <main>{children}</main>
+        <GlobalStickyBottomNav />
         <footer className="bg-spirit-purple-50 mt-8 border-t border-spirit-purple-100">
           <div className="container mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-4">

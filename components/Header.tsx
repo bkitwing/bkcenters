@@ -107,6 +107,16 @@ const Header = () => {
             </li>
             <li>
               <Link
+                href="/india"
+                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+              >
+                <span className="text-gray-600 font-medium">
+                  All States
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/retreat"
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
               >
@@ -162,6 +172,17 @@ const Header = () => {
                     <span>Nearby Me</span>
                   </div>
                 </button>
+              </li>
+              <li>
+                <Link
+                  href="/india"
+                  className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                  onClick={toggleMenu}
+                >
+                  <span className="text-gray-600 font-medium">
+                    All States
+                  </span>
+                </Link>
               </li>
               <li>
                 <Link
