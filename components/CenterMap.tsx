@@ -299,6 +299,33 @@ const CenterMap: React.FC<CenterMapProps> = ({
     // Find and highlight the corresponding card
     const centerElement = document.getElementById(`center-card-${center.branch_code}`);
     if (centerElement) {
+      // First, check if the Nearby Centers section is collapsed and expand it
+      const nearbyCentersButton = document.querySelector('[aria-controls="nearby-centers-content"]') as HTMLButtonElement;
+      const nearbyCentersContent = document.getElementById('nearby-centers-content');
+      
+      if (nearbyCentersButton && nearbyCentersContent) {
+        const isExpanded = nearbyCentersButton.getAttribute('aria-expanded') === 'true';
+        
+        if (!isExpanded) {
+          // Expand the section first
+          nearbyCentersButton.click();
+          
+          // Wait for the expansion animation to complete before highlighting
+          setTimeout(() => {
+            highlightCenterCard(centerElement);
+          }, 350); // Wait for the 300ms transition + buffer
+        } else {
+          // Section is already expanded, highlight immediately
+          highlightCenterCard(centerElement);
+        }
+      } else {
+        // Fallback if section elements not found
+        highlightCenterCard(centerElement);
+      }
+    }
+    
+    // Helper function to highlight the center card
+    function highlightCenterCard(element: HTMLElement) {
       // First remove highlight from any previously highlighted cards
       document.querySelectorAll('.highlight-card').forEach(el => {
         el.classList.remove('highlight-card');
@@ -307,17 +334,17 @@ const CenterMap: React.FC<CenterMapProps> = ({
       // Add a small delay to ensure the scroll completes before highlighting
       setTimeout(() => {
         // Scroll into view with smooth behavior
-        centerElement.scrollIntoView({ 
+        element.scrollIntoView({ 
           behavior: 'smooth', 
           block: 'center'
         });
         
         // Add highlight class and ensure it's visible
-        centerElement.classList.add('highlight-card');
+        element.classList.add('highlight-card');
         
         // Remove highlight after animation
         setTimeout(() => {
-          centerElement.classList.remove('highlight-card');
+          element.classList.remove('highlight-card');
         }, 1500);
       }, 100);
     }

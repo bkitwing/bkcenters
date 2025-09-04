@@ -8,6 +8,9 @@ import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
 import ShareCenter from '@/components/ShareCenter';
 import ContactLink from '@/components/ContactLink';
+import FAQSection from '@/components/FAQSection';
+import CollapsibleSection from '@/components/CollapsibleSection';
+import StickyBottomNav from '@/components/StickyBottomNav';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
@@ -463,33 +466,50 @@ export default async function CenterPage({ params }: CenterPageProps) {
               </div>
             </div>
             
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {center.services && center.services.length > 0 && (
-                <div>
-                  <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Services</h2>
-                  <ul className="list-disc list-inside text-neutral-700 space-y-1">
-                    {center.services.map((service: string, idx: number) => (
-                      <li key={idx}>{service}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              
-              {center.timings && (
-                <div>
-                  <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Timings</h2>
-                  <div className="text-neutral-700 space-y-1">
-                    <p>{center.timings}</p>
+            {/* Services and Timings Section - Only show if content is available */}
+            {((center.services && center.services.length > 0) || center.timings) && (
+              <div className="mt-10 pt-10">
+                {/* Modern Section Divider */}
+                <div className="flex items-center mb-8">
+                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
+                  <div className="px-4">
+                    <h2 className="text-2xl font-bold text-spirit-purple-700 bg-white px-2">Center Information</h2>
                   </div>
+                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
                 </div>
-              )}
-            </div>
-            
-            {/* Nearby Centers Section */}
-            {nearbyCenters.length > 0 && (
-              <div className="mt-10">
-                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Nearby Centers</h2>
                 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {center.services && center.services.length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">Services</h3>
+                      <ul className="list-disc list-inside text-neutral-700 space-y-1">
+                        {center.services.map((service: string, idx: number) => (
+                          <li key={idx}>{service}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {center.timings && (
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">Timings</h3>
+                      <div className="text-neutral-700 space-y-1">
+                        <p>{center.timings}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Collapsible Nearby Centers Section */}
+            {nearbyCenters.length > 0 && (
+              <CollapsibleSection 
+                title="Nearby Centers" 
+                defaultExpanded={false}
+                sectionId="nearby-centers"
+                previewData={nearbyCenters}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {nearbyCenters.map((nearbyCenter) => (
                     <div 
@@ -505,13 +525,75 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     </div>
                   ))}
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
             
-            {/* Contact Form Section - Add only if the center has an email */}
+            {/* Collapsible FAQ Section */}
+            <CollapsibleSection 
+              title="FAQ" 
+              defaultExpanded={false}
+              sectionId="faq"
+              faqPreviewData={[
+                {
+                  question: "What is the Brahma Kumaris?",
+                  answer: "Brahma Kumaris is a worldwide spiritual movement led by women, dedicated to personal transformation and world renewal through Rajyoga Meditation. Founded in India in 1937, Brahma Kumaris has spread to over 110 countries on all continents and has had an extensive impact in many sectors as an international NGO."
+                },
+                {
+                  question: `How to Visit Meditation Center - ${center.name}?`,
+                  answer: `You can visit our center located at: ${formatAddress()}`
+                },
+                {
+                  question: "Can anyone visit a Brahma Kumaris center and try Rajyoga meditation?",
+                  answer: "Yes. Every soul is welcome. Whether young or old, student, professional, or homemaker — the doors are open for all. You can sit in silence, experience God's love, and learn meditation in a pure and peaceful atmosphere."
+                },
+                {
+                  question: "What do you teach in the meditation course?",
+                  answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul (Shiv Baba), the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
+                },
+                {
+                  question: "Do I need to wear any special dress when I come?",
+                  answer: "There is no special dress required. We lovingly suggest wearing clean, simple, and modest clothing that reflects purity and helps maintain the peaceful atmosphere of the center. What matters most is your intention to connect with God."
+                },
+                {
+                  question: "Do I have to become a full member to attend classes?",
+                  answer: "Not at all. At the Brahma Kumaris, every soul is welcome to attend classes freely, without any formal joining or commitment. This is a spiritual university of God, where you may come, listen, reflect, and take benefit as much as you wish, in your own time and comfort. Everything is offered with love and humility."
+                },
+                {
+                  question: "Do you ask for any money or donation?",
+                  answer: "No, there are no fees for any of the courses or services. As a voluntary organization, everything is offered as a service to the community. If someone wishes, they may contribute voluntarily to support the continuation of this spiritual work."
+                },
+                {
+                  question: "Is Brahma Kumaris connected to any one religion?",
+                  answer: "No. This is a spiritual path. God belongs to everyone, and all souls are His children. People of every background and faith come together here to experience peace, purity, and God's love."
+                },
+                {
+                  question: "What will I feel in the meditation class?",
+                  answer: "You may feel deep peace, lightness, or a sweet connection with God. Some feel God's love, others find clarity or strength to face challenges. Each soul's experience is unique, but always uplifting."
+                },
+                {
+                  question: "In which languages is the knowledge available?",
+                  answer: "Spiritual knowledge is available in many languages — Hindi, English, Tamil, Telugu, Gujarati, Marathi, Bengali, and more. Centers usually teach in the local language so that everyone can understand with ease."
+                },
+                {
+                  question: "If I visit the center, do I have to change my life?",
+                  answer: "There is no compulsion. You can practice at your own pace. Many souls naturally feel inspired to live peacefully, wake up early, speak sweetly, or adopt pure vegetarian food."
+                },
+                {
+                  question: "Is the Brahma Kumaris only for women?",
+                  answer: "No. The Brahma Kumaris is open to all — men, women, youth, and elders. Both brothers and sisters walk this spiritual path together, as equal souls and children of the one Supreme Father."
+                }
+              ]}
+            >
+              <FAQSection center={center} />
+            </CollapsibleSection>
+            
+            {/* Collapsible Contact Form Section */}
             {center.email && center.email.includes('@') && (
-              <div className="mt-10">
-                <h2 className="text-2xl font-bold mb-6 text-spirit-purple-700">Contact {center.name}</h2>
+              <CollapsibleSection 
+                title="Contact Us" 
+                defaultExpanded={true}
+                sectionId="contact"
+              >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="lg:order-2">
                     <div className="bg-light rounded-lg shadow-md p-6 border border-neutral-200">
@@ -556,7 +638,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     />
                   </div>
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
           </div>
         </div>
@@ -569,6 +651,9 @@ export default async function CenterPage({ params }: CenterPageProps) {
             Back to {center.district} District
           </Link>
         </div>
+        
+        {/* Sticky Bottom Navigation for Mobile */}
+        <StickyBottomNav center={center} />
       </div>
     );
   } catch (error) {
