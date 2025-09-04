@@ -95,16 +95,28 @@ export default function FAQSection({ center }: FAQSectionProps) {
   const faqs: FAQItem[] = [
     {
       question: "What is the Brahma Kumaris?",
-      answer: "Brahma Kumaris is a worldwide spiritual movement led by women, dedicated to personal transformation and world renewal through Rajyoga Meditation. Founded in India in 1937, Brahma Kumaris has spread to over 110 countries on all continents and has had an extensive impact in many sectors as an international NGO."
+      answer: (
+        <span>
+          <a href="https://www.brahmakumaris.com/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">Brahma Kumaris</a> is a worldwide spiritual movement led by women, dedicated to personal transformation and world renewal through <a href="https://www.brahmakumaris.com/meditation" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">Rajyoga Meditation</a>. Founded in India in 1937, Brahma Kumaris has spread to over 110 countries on all continents and has had an extensive impact in many sectors as an international NGO.
+        </span>
+      )
     },
     centerSpecificFAQ,
     {
       question: "Can anyone visit a Brahma Kumaris center and try Rajyoga meditation?",
-      answer: "Yes. Every soul is welcome. Whether young or old, student, professional, or homemaker — the doors are open for all. You can sit in silence, experience God's love, and learn meditation in a pure and peaceful atmosphere."
+      answer: (
+        <span>
+          Yes. Every soul is welcome. Whether young or old, student, professional, or homemaker — the doors are open for all. You can sit in silence, experience God's love, and <a href="https://www.brahmakumaris.com/meditation" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">learn meditation</a> in a pure and peaceful atmosphere.
+        </span>
+      )
     },
     {
       question: "What do you teach in the meditation course?",
-      answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul (Shiv Baba), the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
+      answer: (
+        <span>
+          In the introductory <a href="https://www.brahmakumaris.com/spiritual-knowledge/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">7-day Rajyoga course</a>, you learn about the soul, the Supreme Soul (Shiv Baba), the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength.
+        </span>
+      )
     },
     {
       question: "Do I need to wear any special dress when I come?",
@@ -116,7 +128,11 @@ export default function FAQSection({ center }: FAQSectionProps) {
     },
     {
       question: "Do you ask for any money or donation?",
-      answer: "No, there are no fees for any of the courses or services. As a voluntary organization, everything is offered as a service to the community. If someone wishes, they may contribute voluntarily to support the continuation of this spiritual work."
+      answer: (
+        <span>
+          No, there are no fees for any of the courses or services. As a voluntary organization, everything is offered as a service to the community. If someone wishes, they may <a href="https://www.brahmakumaris.com/contributions/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">contribute voluntarily</a> to support the continuation of this spiritual work.
+        </span>
+      )
     },
     {
       question: "Is Brahma Kumaris connected to any one religion?",
@@ -132,7 +148,11 @@ export default function FAQSection({ center }: FAQSectionProps) {
     },
     {
       question: "If I visit the center, do I have to change my life?",
-      answer: "There is no compulsion. You can practice at your own pace. Many souls naturally feel inspired to live peacefully, wake up early, speak sweetly, or adopt pure vegetarian food."
+      answer: (
+        <span>
+          There is no compulsion. You can practice at your own pace. Many souls naturally feel inspired to live peacefully, wake up early, speak sweetly, or adopt <a href="https://www.brahmakumaris.com/blog/environment/the-silent-impact-of-food-nourishing-the-self-nurturing-the-earth/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">pure vegetarian</a> food.
+        </span>
+      )
     },
     {
       question: "Is the Brahma Kumaris only for women?",
