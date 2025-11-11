@@ -275,12 +275,11 @@ export async function POST(request: Request) {
       // Format the email subject
       const emailSubject = `[${contactType}] ${name} <${email}> - ${centerName}`;
       
-      console.log('Sending email to center:', centerEmail);
-      // Send email to center
+      console.log('Sending email to contact@brahmakumaris.com');
+      // Send email to central contact instead of center
       await transporter.sendMail({
         from: `"${name} via Contact Form" <${emailFrom}>`,
-        to: centerEmail,
-        cc: 'contact@brahmakumaris.com',
+        to: 'contact@brahmakumaris.com',
         replyTo: email,
         subject: emailSubject,
         html: getCenterEmailTemplate(body),
@@ -291,6 +290,7 @@ export async function POST(request: Request) {
       await transporter.sendMail({
         from: `"Brahma Kumaris" <${emailFrom}>`,
         to: email,
+        replyTo: 'contact@brahmakumaris.com',
         subject: 'Thank you for contacting Brahma Kumaris',
         html: getAcknowledgmentTemplate(name),
       });
@@ -311,4 +311,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
