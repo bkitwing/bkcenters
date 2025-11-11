@@ -84,11 +84,14 @@ const getCenterEmailTemplate = (data: EmailRequestBody) => `
         <p>${data.message.replace(/\n/g, '<br>')}</p>
       </div>
       
-      <div class="info-block">
-        <h4 style="margin-top:0">System Information:</h4>
-        <p><strong>Page URL:</strong> ${data.pageUrl}</p>
-        <p><strong>User Agent:</strong> ${data.userAgent}</p>
-      </div>
+       <div class="info-block">
+         <h4 style="margin-top:0">System Information:</h4>
+         <p><strong>Page URL:</strong> ${data.pageUrl}</p>
+         <p><strong>User Agent:</strong> ${data.userAgent}</p>
+         ${data.centerEmail && data.centerEmail.includes('@') 
+           ? `<p><strong>Center Email:</strong> <a href="mailto:${data.centerEmail}" style="color: #4299e1;">${data.centerEmail}</a></p>` 
+           : ''}
+       </div>
       
       <div class="footer">
         <p>This email was sent from Brahma Kumaris website contact form on behalf of ${data.name} (${data.email}).</p>
