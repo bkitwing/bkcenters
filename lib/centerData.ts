@@ -64,23 +64,12 @@ const getOrigin = () => {
     return currentOrigin;
   }
   
-  // For server-side, check environment variables
-  const isLocal = process.env.IS_LOCAL === "true";
-  const isDev = process.env.NODE_ENV === "development";
-  
-  logger.trace("getOrigin: Server-side, IS_LOCAL =", isLocal);
-  logger.trace("getOrigin: Server-side, NODE_ENV =", process.env.NODE_ENV);
-  
-  if (isLocal || isDev) {
-    const origin = "http://localhost:5400";
-    logger.debug("getOrigin: Using local development origin:", origin);
-    return origin;
-  } else {
-    const origin = "https://www.brahmakumaris.com";
-    const fullOrigin = origin + (process.env.NEXT_PUBLIC_BASE_PATH || "");
-    logger.debug("getOrigin: Using production origin:", fullOrigin);
-    return fullOrigin;
-  }
+  // For server-side, we should use localhost for internal API calls
+  // This is because the server runs on the same machine and needs to call its own API
+  // Using the remote domain would fail with CORS or network errors
+  const origin = "http://localhost:5400";
+  logger.debug("getOrigin: Server-side, using localhost for internal API calls");
+  return origin;
 };
 
 // Function to build all data mappings - call this once at initialization
@@ -365,9 +354,10 @@ async function fetchFreshCentersData(): Promise<CentersData> {
     apiUrl = `${basePath}/api/centers?lightweight=false`;
     logger.trace(`fetchFreshCentersData: Client-side, using relative URL: ${apiUrl}`);
   } else {
-    // Server-side: use absolute URL
+    // Server-side: use absolute URL with base path
     const origin = getOrigin();
-    apiUrl = `${origin}/api/centers?lightweight=false`;
+    const basePath = getBasePath();
+    apiUrl = `${origin}${basePath}/api/centers?lightweight=false`;
     logger.trace(`fetchFreshCentersData: Server-side, using absolute URL: ${apiUrl}`);
   }
   
@@ -428,7 +418,8 @@ async function fetchCentersByState(state: string): Promise<Center[]> {
     logger.trace("fetchCentersByState: Client-side, using relative URL:", apiUrl);
   } else {
     const origin = getOrigin();
-    apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}`;
+    const basePath = getBasePath();
+    apiUrl = `${origin}${basePath}/api/centers?state=${encodeURIComponent(state)}`;
     logger.trace("fetchCentersByState: Server-side, using absolute URL:", apiUrl);
   }
 
@@ -486,7 +477,8 @@ async function fetchCentersByDistrict(
     logger.trace("fetchCentersByDistrict: Client-side, using relative URL:", apiUrl);
   } else {
     const origin = getOrigin();
-    apiUrl = `${origin}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
+    const basePath = getBasePath();
+    apiUrl = `${origin}${basePath}/api/centers?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}`;
     logger.trace("fetchCentersByDistrict: Server-side, using absolute URL:", apiUrl);
   }
   
