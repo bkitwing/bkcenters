@@ -64,12 +64,19 @@ const getOrigin = () => {
     return currentOrigin;
   }
   
-  // For server-side, we should use localhost for internal API calls
-  // This is because the server runs on the same machine and needs to call its own API
-  // Using the remote domain would fail with CORS or network errors
-  const origin = "http://localhost:5400";
-  logger.debug("getOrigin: Server-side, using localhost for internal API calls");
-  return origin;
+  // For server-side, check if we're in local development or production
+  const isLocal = process.env.IS_LOCAL === "true";
+  const isDev = process.env.NODE_ENV === "development";
+  
+  if (isLocal || isDev) {
+    // Local development: use localhost
+    logger.debug("getOrigin: Server-side (local), using localhost");
+    return "http://localhost:5400";
+  } else {
+    // Production: use the actual domain
+    logger.debug("getOrigin: Server-side (production), using production domain");
+    return "https://www.brahmakumaris.com";
+  }
 };
 
 // Function to build all data mappings - call this once at initialization
