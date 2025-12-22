@@ -12,6 +12,10 @@ import { formatCenterUrl } from '@/lib/urlUtils';
 import StatePageClient from './StatePageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 
+// ISR: Page will be generated on first request and cached until next build
+// Since Center-Processed.json only changes during build, we can cache indefinitely
+export const revalidate = false;
+
 interface StatePageProps {
   params: {
     region: string;

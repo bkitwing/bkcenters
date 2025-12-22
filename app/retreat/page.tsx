@@ -12,6 +12,10 @@ import path from 'path';
 import fs from 'fs';
 import { logger } from '@/lib/logger';
 
+// ISR: Page will be generated at build time and cached until next build
+// Since Center-Processed.json only changes during build, we can cache indefinitely
+export const revalidate = false;
+
 export async function generateMetadata(): Promise<Metadata> {
   // Get retreat centers to count them
   const retreatCenters = await getRetreatCenters();

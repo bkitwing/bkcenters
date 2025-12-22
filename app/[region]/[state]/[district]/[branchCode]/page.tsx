@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCenterByCode, getCentersByDistrict, getDistrictsByState, getStatesList, getRegions, getRegionForState, getNearestCenters } from '@/lib/centerData';
+import { getCenterByCode, getCentersByDistrict, getRegionForState, getNearestCenters } from '@/lib/centerData';
 import CenterMap from '@/components/CenterMap';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
@@ -14,8 +14,11 @@ import StickyBottomNav from '@/components/StickyBottomNav';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
-import { headers } from 'next/headers';
 import { generateOgImageUrl } from '@/lib/ogUtils';
+
+// ISR: Page will be generated on first request and cached until next build
+// Since Center-Processed.json only changes during build, we can cache indefinitely
+export const revalidate = false;
 
 // Extended interface for centers with optional service and timing data
 interface CenterWithServices extends Center {
@@ -31,8 +34,6 @@ interface CenterPageProps {
     branchCode: string;
   };
 }
-
-export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: CenterPageProps): Promise<Metadata> {
   try {
@@ -118,43 +119,27 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
   }
 }
 
+// ISR: Return empty array to skip pre-building at build time
+// Pages will be generated on-demand (first request) and then cached
+// This dramatically reduces build time while maintaining fast subsequent loads
 export async function generateStaticParams() {
-  try {
-    const regions = await getRegions();
-    const paths = [];
-    
-    // Limit the number of centers we pre-generate to avoid build timeouts
-    const MAX_CENTERS_PER_DISTRICT = 30;
-    
-    for (const region of regions) {
-      const states = await getStatesList(region);
-      
-      for (const state of states) {
-        const districts = await getDistrictsByState(state);
-        
-        for (const district of districts) {
-          const centers = await getCentersByDistrict(state, district);
-          
-          // Only pre-generate a limited number of centers per district
-          const limitedCenters = centers.slice(0, MAX_CENTERS_PER_DISTRICT);
-          
-          for (const center of limitedCenters) {
-            paths.push({
-              region: center.region.toLowerCase(),
-              state: state.toLowerCase().replace(/\s+/g, '-'),
-              district: district.toLowerCase().replace(/\s+/g, '-'),
-              branchCode: center.name.toLowerCase().replace(/\s+/g, '-'),
-            });
-          }
-        }
-      }
-    }
-    
-    return paths;
-  } catch (error) {
-    console.error('Error generating center params:', error);
-    return [];
+  // Return empty array - all center pages will be generated on first request
+  // and cached indefinitely (until next build) thanks to revalidate = false
+  return [];
+}
+
+// Helper function to get base URL for sharing (ISR-compatible, no headers() call)
+function getBaseUrl(): string {
+  // Use environment variable if available, otherwise use production URL
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
   }
+  // For local development
+  if (process.env.NODE_ENV === 'development' || process.env.IS_LOCAL === 'true') {
+    return 'http://localhost:5400/centers';
+  }
+  // Production default
+  return 'https://www.brahmakumaris.com/centers';
 }
 
 export default async function CenterPage({ params }: CenterPageProps) {
@@ -163,11 +148,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
   const district = decodeURIComponent(params.district);
   const branchCode = decodeURIComponent(params.branchCode);
   
-  // Get the host from headers for constructing absolute URLs
-  const headersList = headers();
-  const host = headersList.get('host') || 'brahmakumaris.org';
-  // const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-  const protocol = 'http' 
+  // Get base URL for constructing absolute URLs (ISR-compatible)
+  const baseUrl = getBaseUrl();
 
   // Initialize actualRegion with urlRegion as default
   let actualRegion = urlRegion;
@@ -283,8 +265,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
       }))
     ];
     
-    // Calculate the page URL for sharing in email
-    let absoluteUrl = `${protocol}://${host}`;
+    // Calculate the page URL for sharing in email (ISR-compatible)
+    let absoluteUrl = baseUrl;
     
     if (center) {
       const centerUrl = formatCenterUrl(
@@ -293,10 +275,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         center.district || district, 
         center.name
       );
-      absoluteUrl = `${protocol}://${host}/centers${centerUrl}`;
-    } else {
-      // Fallback if center is not found
-      absoluteUrl = `${protocol}://${host}/centers`;
+      absoluteUrl = `${baseUrl}${centerUrl}`;
     }
     
     return (

@@ -15,6 +15,10 @@ import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 
+// ISR: Page will be generated on first request and cached until next build
+// Since Center-Processed.json only changes during build, we can cache indefinitely
+export const revalidate = false;
+
 // Define a unified type for state data
 interface StateData {
   name: string;
