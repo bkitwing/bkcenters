@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { getRetreatCenters } from '@/lib/centerData';
+// Use server-side data functions that read directly from JSON file (ISR-compatible)
+import { getRetreatCenters } from '@/lib/serverCenterData';
 import { RETREAT_CENTER_BRANCH_CODES } from '@/lib/retreatCenters';
 import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';

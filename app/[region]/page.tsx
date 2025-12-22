@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+// Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { 
   getStatesByRegion, 
   getStatesSummary, 
@@ -8,7 +9,7 @@ import {
   getCentersByRegion,
   getStatesByRegionFast,
   getRegionBySlug
-} from '@/lib/centerData';
+} from '@/lib/serverCenterData';
 import { Metadata } from 'next';
 import CenterMap from '@/components/CenterMap';
 import { Center } from '@/lib/types';

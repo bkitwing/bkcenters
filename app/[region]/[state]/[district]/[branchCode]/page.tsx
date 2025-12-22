@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getCenterByCode, getCentersByDistrict, getRegionForState, getNearestCenters } from '@/lib/centerData';
+// Use server-side data functions that read directly from JSON file (ISR-compatible)
+import { getCenterByCode, getCentersByDistrict, getRegionForState, getNearestCenters } from '@/lib/serverCenterData';
 import CenterMap from '@/components/CenterMap';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';

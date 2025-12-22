@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+// Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { 
   getCentersByDistrict, 
   getDistrictsByState, 
@@ -7,7 +8,7 @@ import {
   getRegionBySlug,
   getStateBySlug,
   getDistrictBySlug
-} from '@/lib/centerData';
+} from '@/lib/serverCenterData';
 import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import DistrictPageClient from './DistrictPageClient';

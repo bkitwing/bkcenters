@@ -1,11 +1,13 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import Header from "../components/Header";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
-import { getAllCenters, getStatesSummary } from "@/lib/centerData";
+// Use server-side data functions that read directly from JSON file (ISR-compatible)
+import { getAllCenters, getStatesSummary } from "@/lib/serverCenterData";
 import Link from "next/link";
 
 
@@ -81,7 +83,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-neutral-50`}>
-        <GoogleAnalytics />
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+        </Suspense>
         <Header />
         <main>{children}</main>
         <GlobalStickyBottomNav />
