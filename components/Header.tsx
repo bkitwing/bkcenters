@@ -67,9 +67,9 @@ const Header = () => {
         alert(errorMessage);
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        enableHighAccuracy: false, // Use network location for faster response
+        timeout: 15000,
+        maximumAge: 60000, // Allow cached position up to 1 minute old
       }
     );
   };
@@ -96,6 +96,15 @@ const Header = () => {
         <nav className="hidden md:block">
           <ul className="flex space-x-8 items-center">
             <li>
+              <Link
+                href="/"
+                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                aria-label="Home"
+              >
+                <FaHome size={20} className="text-gray-600" />
+              </Link>
+            </li>
+            <li>
               <button
                 onClick={handleUseMyLocation}
                 className="flex items-center transition-colors focus:outline-none nearby-button"
@@ -121,7 +130,7 @@ const Header = () => {
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
               >
                 <span className="text-gray-600 font-medium">
-                  Retreat Centers
+                  HQ & Retreat Centers
                 </span>
               </Link>
             </li>
@@ -139,6 +148,13 @@ const Header = () => {
 
         {/* Mobile Menu and Search Button */}
         <div className="md:hidden flex items-center space-x-4">
+          <Link
+            href="/"
+            className="text-neutral-700 hover:text-primary transition-colors"
+            aria-label="Home"
+          >
+            <FaHome size={20} className="text-gray-600" />
+          </Link>
           <Link
             href="/"
             className="text-neutral-700 hover:text-primary transition-colors"
@@ -163,7 +179,7 @@ const Header = () => {
               <li>
                 <button
                   onClick={() => {
-                    toggleMenu();
+                    setIsMenuOpen(false);
                     handleUseMyLocation();
                   }}
                   className="flex items-center transition-colors focus:outline-none"

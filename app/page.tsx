@@ -8,6 +8,7 @@ import {
 } from "@/lib/centerData";
 import HomePageClient from "@/components/HomePageClient";
 import { Center, RegionStateMapping } from "@/lib/types";
+import { RETREAT_CENTER_BRANCH_CODES } from '@/lib/retreatCenters';
 import path from 'path';
 import fs from 'fs';
 
@@ -172,18 +173,6 @@ function buildRegionToStatesMapping(centers: Center[]): RegionStateMapping {
 
   return regionMap;
 }
-
-// Retreat center branch codes (imported from retreatCenters.ts logic)
-const RETREAT_CENTER_BRANCH_CODES = [
-  "BGMMW001", "BGRJJ002", "BGTNN005", "BGMHP016", "BGMHK008", 
-  "BGMHP005", "BGMHM027", "BGMHM001", "BGMHP017", "BGMHP018", 
-  "BGMPD001", "BGMHN002", "BGMHN001", "BGMHK004", "BGMHA001", 
-  "BGMHA004", "BGMHN012", "BGMHN018", "BGMHN003", "BGMHK009", 
-  "BGMHP001", "BGMHS004", "BGMHS003", "BGGJS001", "BGMHP009", 
-  "BGMHP019", "BGGJS003", "BGGJS014", "BGMHB007", "BGGJS002", 
-  "BGMPP001", "BGMPB006", "BGMPB005", "BGGJS021", "BGGJS017", 
-  "BGGJS018", "BGMUP005", "BGMPB002", "BGMPT001", "BGGJS024"
-];
 
 export default async function HomePage() {
   // Load all data directly from file at build time

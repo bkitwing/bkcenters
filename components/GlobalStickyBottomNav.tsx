@@ -18,28 +18,29 @@ export default function GlobalStickyBottomNav({}: GlobalStickyBottomNavProps) {
   }
 
   const handleNearbyClick = () => {
-    // Navigate to home page and trigger location search
-    router.push('/');
-    
-    // After navigation, trigger the nearby me functionality
-    setTimeout(() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            router.push(`/?lat=${latitude}&lng=${longitude}&address=Your Current Location`);
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-            // Fallback to just going to home page
-            router.push('/');
-          }
-        );
-      } else {
-        // Geolocation not supported, just go to home
-        router.push('/');
-      }
-    }, 100);
+    // Get location first, then navigate with coordinates
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          // Navigate directly with coordinates - no delay needed
+          router.push(`/?lat=${latitude}&lng=${longitude}&address=Your Current Location`);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          // Fallback to just going to home page
+          router.push('/');
+        },
+        {
+          enableHighAccuracy: false, // Use network location for faster response
+          timeout: 15000,
+          maximumAge: 60000, // Allow cached position up to 1 minute old
+        }
+      );
+    } else {
+      // Geolocation not supported, just go to home
+      router.push('/');
+    }
   };
 
   return (

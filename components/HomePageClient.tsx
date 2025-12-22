@@ -333,6 +333,11 @@ export default function HomePageClient({
           alert(
             "Could not get your current location. Please try the search box instead."
           );
+        },
+        {
+          enableHighAccuracy: false, // Use network location for faster response
+          timeout: 15000,
+          maximumAge: 60000, // Allow cached position up to 1 minute old
         }
       );
     } else {
@@ -479,7 +484,7 @@ export default function HomePageClient({
                 {retreatCentersCount}
               </div>
               <div className="stat-label text-neutral-600 text-xs sm:text-sm hover:text-primary-focus">
-                Retreat Centers
+                HQ & Retreat Centers
               </div>
             </Link>
           </div>
