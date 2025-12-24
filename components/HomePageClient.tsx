@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   getNearestCenters,
-  getRetreatCenters,
 } from "@/lib/centerData";
 import SearchBar from "@/components/SearchBar";
 import CenterCard from "@/components/CenterCard";
@@ -37,10 +36,22 @@ interface MapRef extends HTMLDivElement {
 const defaultZoom = 12;
 const markers = new Map<string, google.maps.Marker>();
 
+// Type for pre-computed state map markers (lightweight, one per state)
+type StateMapMarker = {
+  name: string;
+  state: string;
+  region: string;
+  coords: [string, string];
+  description: string;
+  summary: string;
+  centerCount: number;
+  districtCount: number;
+};
+
 // Props passed from Server Component
 interface HomePageClientProps {
   initialStatesSummary: StateSummary[];
-  initialAllCenters: Center[];
+  initialStateMapMarkers: StateMapMarker[];
   initialRegionDetails: { name: string; stateCount: number; centerCount: number }[];
   initialRegionToStates: RegionStateMapping;
   totalCenters: number;
@@ -51,7 +62,7 @@ interface HomePageClientProps {
 
 export default function HomePageClient({
   initialStatesSummary,
-  initialAllCenters,
+  initialStateMapMarkers,
   initialRegionDetails,
   initialRegionToStates,
   totalCenters,
@@ -74,11 +85,16 @@ export default function HomePageClient({
     (Center & { distance?: number })[]
   >([]);
   
-  // Use initial data from server
+  // Use initial data from server (lightweight - no full centers array)
   const [statesSummary] = useState<StateSummary[]>(initialStatesSummary);
-  const [allCenters] = useState<Center[]>(initialAllCenters);
+  const [stateMapMarkers] = useState<StateMapMarker[]>(initialStateMapMarkers);
   const [regionDetails] = useState<{ name: string; stateCount: number; centerCount: number }[]>(initialRegionDetails);
   const [regionToStates] = useState<RegionStateMapping>(initialRegionToStates);
+  
+  // All centers - lazy loaded when user searches
+  const [allCenters, setAllCenters] = useState<Center[]>([]);
+  const [centersLoaded, setCentersLoaded] = useState(false);
+  const [centersLoading, setCentersLoading] = useState(false);
   
   const [sortBy, setSortBy] = useState<SortOption>("centers");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -94,44 +110,48 @@ export default function HomePageClient({
   const mapRef = useRef<MapRef>(null);
   const regionMapRef = useRef<HTMLDivElement>(null);
 
-  // Get summarized center data for map markers
-  const stateMapMarkers = useMemo(() => {
-    return statesSummary
-      .map((state) => {
-        // Find a center in this state to use as reference point
-        const stateCenter = allCenters.find(
-          (center) => center.state === state.state && 
-          center.coords && 
-          Array.isArray(center.coords) && 
-          center.coords.length === 2 &&
-          center.coords[0] !== null &&
-          center.coords[1] !== null &&
-          !isNaN(parseFloat(center.coords[0])) &&
-          !isNaN(parseFloat(center.coords[1]))
-        );
+  // Convert pre-computed state map markers to Center-like objects for the CenterMap component
+  // These are lightweight markers (one per state) pre-computed on the server
+  const stateMapMarkersForMap = stateMapMarkers.map((marker) => ({
+    name: marker.name,
+    state: marker.state,
+    region: marker.region,
+    coords: marker.coords,
+    description: marker.description,
+    summary: marker.summary,
+    district_total: marker.centerCount,
+    is_district_summary: true,
+    is_state_summary: true,
+    branch_code: `state-${marker.state.toLowerCase().replace(/\s+/g, '-')}`,
+  })) as Center[];
 
-        if (stateCenter) {
-          return {
-            ...stateCenter,
-            name: state.state,
-            description: `${state.centerCount} meditation ${
-              state.centerCount === 1 ? "center" : "centers"
-            }`,
-            summary: `${state.centerCount} ${
-              state.centerCount === 1 ? "center" : "centers"
-            } across ${state.districtCount} districts`,
-            district_total: state.centerCount,
-            is_district_summary: true,
-            is_state_summary: true,
-            region: stateCenter.region,
-          };
+  // Lazy load all centers when user needs them for search
+  const loadAllCenters = useCallback(async () => {
+    if (centersLoaded || centersLoading) return allCenters;
+    
+    setCentersLoading(true);
+    try {
+      // Determine the correct base path
+      const basePath = typeof window !== 'undefined' && window.location.pathname.startsWith('/centers') 
+        ? '/centers' 
+        : '';
+      
+      const response = await fetch(`${basePath}/api/centers?lightweight=false`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data && Array.isArray(data.data)) {
+          setAllCenters(data.data);
+          setCentersLoaded(true);
+          return data.data;
         }
-
-        console.warn(`No center with valid coordinates found for state: ${state.state}`);
-        return null;
-      })
-      .filter(Boolean) as Center[];
-  }, [statesSummary, allCenters]);
+      }
+    } catch (error) {
+      console.error('Error loading centers:', error);
+    } finally {
+      setCentersLoading(false);
+    }
+    return [];
+  }, [centersLoaded, centersLoading, allCenters]);
 
   // Handle URL params on mount
   useEffect(() => {
@@ -149,21 +169,29 @@ export default function HomePageClient({
     }
   }, [searchParams]);
 
-  // Fetch nearest centers when lat/lng change
+  // Fetch nearest centers when lat/lng change (lazy loads centers if not already loaded)
   useEffect(() => {
     async function fetchCenters() {
-      if (lat && lng && allCenters.length > 0) {
+      if (lat && lng) {
         setLoading(true);
         try {
-          const centers = await getNearestCenters(lat, lng, 150, allCenters);
-          setAllNearestCenters(centers);
+          // Lazy load centers if not already loaded
+          let centers = allCenters;
+          if (!centersLoaded && allCenters.length === 0) {
+            centers = await loadAllCenters();
+          }
+          
+          if (centers.length > 0) {
+            const nearestResults = await getNearestCenters(lat, lng, 150, centers);
+            setAllNearestCenters(nearestResults);
 
-          const filteredCenters = centers.filter(
-            (c) => typeof c.distance === "number" && c.distance <= maxDistance
-          );
+            const filteredCenters = nearestResults.filter(
+              (c) => typeof c.distance === "number" && c.distance <= maxDistance
+            );
 
-          setNearestCenters(filteredCenters.slice(0, 10));
-          setDisplayLimit(10);
+            setNearestCenters(filteredCenters.slice(0, 10));
+            setDisplayLimit(10);
+          }
         } catch (error) {
           console.error("Error fetching nearest centers:", error);
         } finally {
@@ -173,7 +201,7 @@ export default function HomePageClient({
     }
 
     fetchCenters();
-  }, [lat, lng, maxDistance, allCenters]);
+  }, [lat, lng, maxDistance, allCenters, centersLoaded, loadAllCenters]);
 
   // Intersection observer for lazy loading
   useEffect(() => {
@@ -432,15 +460,17 @@ export default function HomePageClient({
 
   // Helper function to get region for a state from loaded data
   const getRegionForStateLocal = (stateName: string): string => {
+    // First check the region to states mapping (most reliable)
     for (const [region, data] of Object.entries(regionToStates)) {
       if (data.states[stateName]) {
         return region;
       }
     }
 
-    const center = allCenters.find((c) => c.state === stateName);
-    if (center?.region) {
-      return center.region;
+    // Fallback: check state map markers (pre-computed on server)
+    const stateMarker = stateMapMarkers.find((m) => m.state === stateName);
+    if (stateMarker?.region) {
+      return stateMarker.region;
     }
 
     return "INDIA";
@@ -484,7 +514,7 @@ export default function HomePageClient({
                 {retreatCentersCount}
               </div>
               <div className="stat-label text-neutral-600 text-xs sm:text-sm hover:text-primary-focus">
-                HQ & Retreat Centers
+                HQ Campuses
               </div>
             </Link>
           </div>
@@ -705,7 +735,7 @@ export default function HomePageClient({
           <div className="bg-light rounded-lg shadow-md border border-neutral-200 overflow-hidden mb-8">
             <div ref={regionMapRef} className="h-[500px] sm:h-[600px]">
               <CenterMap
-                centers={stateMapMarkers}
+                centers={stateMapMarkersForMap}
                 autoZoom={true}
                 onCenterSelect={handleCenterSelect}
                 height="100%"

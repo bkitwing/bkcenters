@@ -174,6 +174,60 @@ function buildRegionToStatesMapping(centers: Center[]): RegionStateMapping {
   return regionMap;
 }
 
+// Type for lightweight state map marker (minimal data needed for map display)
+type StateMapMarker = {
+  name: string;
+  state: string;
+  region: string;
+  coords: [string, string];
+  description: string;
+  summary: string;
+  centerCount: number;
+  districtCount: number;
+};
+
+// Helper function to build state map markers (one per state with valid coordinates)
+function buildStateMapMarkers(
+  centers: Center[],
+  statesSummary: { state: string; centerCount: number; districtCount: number }[]
+): StateMapMarker[] {
+  return statesSummary
+    .map((stateSummary) => {
+      // Find a center in this state to use as reference point for the map marker
+      const stateCenter = centers.find(
+        (center) =>
+          center.state === stateSummary.state &&
+          center.coords &&
+          Array.isArray(center.coords) &&
+          center.coords.length === 2 &&
+          center.coords[0] !== null &&
+          center.coords[1] !== null &&
+          !isNaN(parseFloat(center.coords[0])) &&
+          !isNaN(parseFloat(center.coords[1]))
+      );
+
+      if (stateCenter && stateCenter.coords) {
+        return {
+          name: stateSummary.state,
+          state: stateSummary.state,
+          region: stateCenter.region || 'INDIA',
+          coords: stateCenter.coords as [string, string],
+          description: `${stateSummary.centerCount} meditation ${
+            stateSummary.centerCount === 1 ? "center" : "centers"
+          }`,
+          summary: `${stateSummary.centerCount} ${
+            stateSummary.centerCount === 1 ? "center" : "centers"
+          } across ${stateSummary.districtCount} districts`,
+          centerCount: stateSummary.centerCount,
+          districtCount: stateSummary.districtCount,
+        };
+      }
+
+      return null;
+    })
+    .filter((marker): marker is StateMapMarker => marker !== null);
+}
+
 export default async function HomePage() {
   // Load all data directly from file at build time
   const allCenters = await loadCentersFromFile();
@@ -182,6 +236,10 @@ export default async function HomePage() {
   const statesSummary = buildStatesSummary(allCenters);
   const regionDetails = buildRegionDetails(allCenters);
   const regionToStates = buildRegionToStatesMapping(allCenters);
+  
+  // Pre-compute state map markers (one lightweight marker per state for the map)
+  // This avoids sending all 9000+ centers to the client
+  const stateMapMarkers = buildStateMapMarkers(allCenters, statesSummary);
   
   // Calculate totals
   const totalCenters = allCenters.length;
@@ -206,7 +264,7 @@ export default async function HomePage() {
     }>
       <HomePageClient
         initialStatesSummary={statesSummary}
-        initialAllCenters={allCenters}
+        initialStateMapMarkers={stateMapMarkers}
         initialRegionDetails={regionDetails}
         initialRegionToStates={regionToStates}
         totalCenters={totalCenters}

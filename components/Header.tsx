@@ -130,7 +130,7 @@ const Header = () => {
                 className="flex items-center text-neutral-700 hover:text-primary transition-colors"
               >
                 <span className="text-gray-600 font-medium">
-                  HQ & Retreat Centers
+                  HQ Campuses
                 </span>
               </Link>
             </li>
@@ -207,7 +207,7 @@ const Header = () => {
                   onClick={toggleMenu}
                 >
                   <span className="text-gray-600 font-medium">
-                    Retreat Centers
+                    HQ Campuses
                   </span>
                 </Link>
               </li>
