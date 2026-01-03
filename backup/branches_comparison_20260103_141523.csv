@@ -1,0 +1,169 @@
+ChangeType,branch_code,FieldName,OldValue,NewValue
+Added,03529,,,"{""name"": ""CHHATA"", ""branch_code"": ""03529"", ""address"": {""line1"": ""KHASRA NO: 1358, SHIV DARSHAN BHAWAN"", ""line2"": ""AGRA DELHI HIGHWAY ROAD"", ""line3"": ""BARSANA CHOURAHA"", ""city"": ""CHHATA"", ""pincode"": ""2"
+Added,05712,,,"{""name"": ""NEW MUMBAI TALVALI"", ""branch_code"": ""05712"", ""address"": {""line1"": ""FLAT NO: 101, H NO: 34, GANESH RESIDENCY"", ""line2"": ""NEAR KHETESWAR TEMPLE, GANESH NAGAR"", ""line3"": ""TALVALI, GHANSOLI"", ""c"
+Added,05721,,,"{""name"": ""SAID NAGLI"", ""branch_code"": ""05721"", ""address"": {""line1"": ""KHASRA NO-75"", ""line2"": ""SABJI MANDI WALI GALLI"", ""line3"": ""MAIN MARKET, TAL: HASANPUR"", ""city"": ""SAID NAGLI"", ""pincode"": ""244242""}"
+Added,05717,,,"{""name"": ""BANIATANGI"", ""branch_code"": ""05717"", ""address"": {""line1"": ""H NO: 53"", ""line2"": ""NEAR MADAN MOHAN TEMPLE"", ""line3"": ""KAMARPATNA"", ""city"": ""BANIATANGI"", ""pincode"": ""752060""}, ""email"": """", ""con"
+Added,05716,,,"{""name"": ""MUKTAPUR"", ""branch_code"": ""05716"", ""address"": {""line1"": ""H NO: 37"", ""line2"": ""NEAR MANGALA TEMPLE"", ""line3"": ""DALABEHERA SAHI"", ""city"": ""MUKTAPUR"", ""pincode"": ""752057""}, ""email"": """", ""contac"
+Added,05715,,,"{""name"": ""HINDOL ROAD"", ""branch_code"": ""05715"", ""address"": {""line1"": ""PLOT N0.-4739/6289"", ""line2"": ""SAMBALPUR-CUTTACK HWY"", ""line3"": ""NEAR HINDUSTAN PETROL PUMP, NUA ODAPADA"", ""city"": ""HINDOL ROAD"", "
+Added,05714,,,"{""name"": ""HARIPUR HAT (JAJPUR)"", ""branch_code"": ""05714"", ""address"": {""line1"": ""H.NO.-T286M-77"", ""line2"": ""NEAR MAHADEV TEMPLE, GOURSHYAMPATANA"", ""line3"": ""NH-20, TAL: RASULPUR"", ""city"": ""HARIPUR HAT"","
+Added,05713,,,"{""name"": ""KUAKHIA"", ""branch_code"": ""05713"", ""address"": {""line1"": ""H NO: 42"", ""line2"": ""NEAR HINDUSTAN PETROL PUMP, KOLATHALA"", ""line3"": ""MADHUBAN ROAD"", ""city"": ""KUAKHIA"", ""pincode"": ""755051""}, ""email"
+Added,05718,,,"{""name"": ""GUDUM (KHORDHA)"", ""branch_code"": ""05718"", ""address"": {""line1"": ""H NO: 6"", ""line2"": ""NEAR POST OFFICE"", ""line3"": ""NARSINGPUR SAHI"", ""city"": ""GUDUM"", ""pincode"": ""752056""}, ""email"": """", ""contac"
+Added,05719,,,"{""name"": ""SIMORE"", ""branch_code"": ""05719"", ""address"": {""line1"": ""H NO: 23"", ""line2"": ""KHORDHA KANTILO ROAD"", ""line3"": ""NEAR KHUNTIA TIFFIN CENTRE, TAL: BEGUNIA"", ""city"": ""SIMORE"", ""pincode"": ""752061""}"
+Added,05723,,,"{""name"": ""TODGARH"", ""branch_code"": ""05723"", ""address"": {""line1"": ""NEAR FAUJI DHARAMSHALA"", ""line2"": ""BUS STAND ROAD"", ""line3"": """", ""city"": ""TODGARH"", ""pincode"": ""305924""}, ""email"": """", ""contact"": """", "
+Added,05722,,,"{""name"": ""BHIM (RAJSAMAND)"", ""branch_code"": ""05722"", ""address"": {""line1"": ""SECOND FLOOR"", ""line2"": ""ABOVE TARA AUTOMOBILE"", ""line3"": ""BUS STAND"", ""city"": ""BHIM"", ""pincode"": ""305921""}, ""email"": """", ""co"
+Added,05720,,,"{""name"": ""UDAIPUR HIRAN MAGRI"", ""branch_code"": ""05720"", ""address"": {""line1"": ""H NO: 10, GANPATI VIHAR"", ""line2"": ""BEHIND GUMAR GARDEN"", ""line3"": ""HIRAN MAGRI, SECTOR 4"", ""city"": ""UDAIPUR"", ""pincode"": "
+Modified,04076,address.line1,"H NO: 229, CAT ROAD","H NO: 241, SECTOR B, CAT ROAD"
+Modified,04076,address.line3,"SECTOR-B, SURYADEV NAGAR",SURYADEV NAGAR
+Modified,04076,address.line2,OPP: MADAN MAST SWEET HOTEL,NEAR PATEL KIRANA STORE
+Modified,04076,coords,"['22.6808750000', '75.8237740000']","['22.6791910000', '75.8233900000']"
+Modified,03853,mobile,8285353320,"8285353320, 9599864020"
+Modified,05297,mobile,"8439551747, 6395196796",6395196796
+Modified,05297,address.line1,H NO: JF 598,"PARMATAM ANUBHUTI BHAWAN, H NO: J-347"
+Modified,05297,coords,"['29.0075260000', '77.7595080000']","['29.0073900000', '77.7595490000']"
+Modified,00286,address.line1,OM SHIVALAYA,"TENANMENT NO: 10099/1193, OM SHIVALAYA"
+Modified,00286,contact,02746-277525,
+Modified,02761,email,,gohad@bkivv.org
+Modified,02761,address.line1,NEAR JAIN ELECTRICALS,H.NO : 48
+Modified,02761,address.line3,"GURUDWARA GALLI, GOHAD CHOURAHA","WARD NO: 18, GOHAD CHOURAHA"
+Modified,02761,address.line2,"STATION ROAD, WARD NO: 15","REHMAN WALI GALLI, STATION ROAD"
+Modified,02761,coords,"['26.4623740000', '78.4212420000']","['26.4632360000', '78.4185200000']"
+Modified,03651,mobile,"9680139438, 9414086947","9680139438, 9829983119"
+Modified,03651,address.line1,"GUEST HOUSE, OUT SIDE MARU DARWAJA","H.NO : 01, PRABHU DARSHAN BHAWAN"
+Modified,03651,address.line3,,"KAMALIGHAT ROAD, WARD NO:25, DEOGARH"
+Modified,03651,address.line2,NEAR BUS STAND,"INDRAPRASTA COLONY, NEAR MAHAVEER HOSPITAL"
+Modified,03651,coords,"['25.5325582000', '73.9072150000']","['25.5369780000', '73.8912080000']"
+Modified,03733,mobile,9719166874,"8077954686, 9456635460"
+Modified,00066,contact,011- 25257926,
+Modified,00011,mobile,"7987843722, 9893897050","7987843722, 7247663626"
+Modified,00933,district_id,389,7847
+Modified,00933,email,,nagar@bkivv.org
+Modified,00933,address.line1,"BUILDING NO: 81, 'OM SHANTI BHAWAN'","BUILDING NO: 81, OM SHANTI BHAWAN"
+Modified,00933,address.line3,ADRASH COLONY,8 ADRASH COLONY
+Modified,00933,address.line2,"OLD BUS STAND, JALEBI CHOWK",OLD BUS STAND
+Modified,00933,district,Bharatpur,Deeg
+Modified,00084,mobile,"9899283427, 6372001102",9899283427
+Modified,04744,mobile,"8763306931, 7008819016","9437337564, 9692073982"
+Modified,90001,region,INDIA,MADHUBAN SISTER CONCERNS
+Modified,04090,mobile,"9074373315, 9497044162",9074373315
+Modified,03281,contact,11-26301100,
+Modified,00080,mobile,9650924612,"9220808809, 9220170614"
+Modified,00080,contact,"011-26490417, 011-41001013",011-41001013
+Modified,04423,mobile,9796824657,9596686826
+Modified,01667,mobile,"7550568180, 9136362077",9560166860
+Modified,01667,address.line1,"HOUSE. NO: 182, KH.NO:132-133","H.NO: 182, KH.NO:132-133"
+Modified,02461,mobile,7999805952,"7999805952, 7987843722"
+Modified,05439,mobile,"8105968409, 6364312504","6361916200, 9740233982"
+Modified,05439,address.line1,GANGA SADAN,"H.NO: 37, KHATA NO:1408"
+Modified,05439,address.line3,TAL: TUMKUR,OPP: LAKSHMI DEVI TEMPLE ROAD
+Modified,05439,address.line2,OLD POST OFFICE BUILDING,SIDDHANAYAKANA PALYA
+Modified,05439,coords,"['13.1543540000', '77.0322050000']","['13.1462800000', '77.0304260000']"
+Modified,01008,mobile,"9861183342, 8280140978",8280140978
+Modified,01008,address.line3,,MANGULI ANUGUL ROAD
+Modified,01008,address.line2,"O.T.M. STAFF COLONY, MANGULI ANUGUL ROAD",O.T.M. STAFF COLONY
+Modified,04705,mobile,"9646163464, 9815605511",9646163464
+Modified,04705,address.line1,H.NO: 154,"H.NO: 154, PAWAN DHAM"
+Modified,04705,address.line3,"DABWALI ROAD, NEAR BADAL ROAD",NARUANA
+Modified,04705,address.line2,HOUSEFED COLONY,BADAL ROAD
+Modified,04705,coords,"['30.1785678864', '74.9449691772']","['30.1698170000', '74.8951690000']"
+Modified,00973,mobile,"9411281463, 8859978357","9411281463, 8859978357, 8077307277"
+Modified,00973,address.line1,"H NO: 498-656, 'TAPASYA DHAM'","H NO: 498-656, TAPASYA DHAM"
+Modified,00973,contact,01232-260751,
+Modified,02417,mobile,"8280213969, 7978128881","7978128881, 8280213969"
+Modified,00099,section,00090,00099
+Modified,00099,address.line2,,NEAR WATER TANK
+Modified,00099,contact,05735-257851,
+Modified,04111,mobile,"8130076171, 9910154470","8130076171, 8448015901"
+Modified,04111,address.line1,H NO: 201,"H NO: 179, 3RD FLOOR"
+Modified,04111,address.line2,NEAR 7-10 CHOWK,"7/10 CHOWK, NEAR SWAMI SATYANAND HOSPITAL"
+Modified,04111,coords,"['28.3684200000', '77.3257350000']","['28.3682400000', '77.3263820000']"
+Modified,02198,address.line3,K.C.MORE,BISHNAH BYPASS ROAD
+Modified,02198,address.line2,WARD NO: 5,WARD NO: 3
+Modified,02198,coords,"['32.6119661000', '74.8582005000']","['32.6143710000', '74.8602390000']"
+Modified,04577,mobile,7086528029,"9859263171, 8638751602"
+Modified,00030,mobile,8077954686,"9456235232, 8077954686"
+Modified,01673,mobile,9871778278,"9871778278, 8766213838"
+Modified,01673,contact,0129-4904910,
+Modified,90007,region,INDIA,MADHUBAN SISTER CONCERNS
+Modified,03206,mobile,"9634522518, 8273420489","9634522518, 6395196796"
+Modified,03206,address.line1,PRABHU MILAN BHAWAN,"PRABHU MILAN BHAWAN, H.NO: 2798/1B"
+Modified,03206,contact,121-2527070,
+Modified,00101,mobile,"9411666145, 9650690505","9411666145,9306168541"
+Modified,00101,contact,0565- 2425746,
+Modified,00071,contact,"011-26865264,",
+Modified,00960,address.city,GOHANA,GOHANA BARODA ROAD
+Modified,00960,name,GOHANA,GOHANA BARODA ROAD
+Modified,05411,mobile,"8130076367, 9540040499",8130076367
+Modified,05411,address.line1,"D-61, GROUND FLOOR","D-15, GROUND FLOOR"
+Modified,05411,coords,"['28.4149940000', '77.3516080000']","['28.4149400000', '77.3536300000']"
+Modified,04535,mobile,9625115030,8813944242
+Modified,00081,contact,"011-22540611, 43051307",011-43051307
+Modified,00105,contact,05942- 233353,
+Modified,03892,mobile,6378133006,"6378133006, 9917338588"
+Modified,03787,email,nuasantha@bkivv.org,sandhagorada@bkivv.org
+Modified,03787,address.line2,"WARD NO: 10, AT:SANDHAGORADA, PO:NUASANTHA","WARD NO: 10, AT: SANDHAGORADA, PO: NUASANTHA"
+Modified,02536,mobile,9313051999,"9313051999, 8585967732"
+Modified,02536,contact,011-26172025,
+Modified,01702,mobile,8441994443,7975738484
+Modified,01702,contact,,080-26603355
+Modified,00091,contact,"0120- 2710588,",
+Modified,03920,mobile,9407826255,8871905218
+Modified,04453,mobile,9358618377,"9358618377, 6378762433"
+Modified,04453,address.line1,"H.NO: 51, NEW SHIV COLONY","H.NO: 126, RAM NIWAS COLONY"
+Modified,04453,address.line3,"WARD NO: 8, TAL: ROOPBAS",DHORAIYA ROAD
+Modified,04453,address.line2,"NEAR BUS STAND, NAGLA TULA ROAD",NEAR RAJESH PILOT COLLEGE
+Modified,04453,coords,"['26.9632190000', '77.4229400000']","['26.9592040000', '77.4233400000']"
+Modified,01651,contact,05832-265782,
+Modified,00141,mobile,9437026249,"7978128881, 9439470999"
+Modified,05167,mobile,"8700552076, 9992957368","8700552076, 9625242584"
+Modified,04884,mobile,8532992373,"8532992373, 8218922860"
+Modified,02038,mobile,"9456235232, 6396609899","8865083873, 9456235232"
+Modified,90006,region,INDIA,MADHUBAN SISTER CONCERNS
+Modified,02289,address.line1,'OM SHANTI BHAWAN',"B-194, OM SHANTI BHAWAN"
+Modified,02289,address.line2,"B-194, GALI NO. 3",GALI NO. 3
+Modified,02289,contact,011-22248146,
+Modified,03380,mobile,8986691963,7004857359
+Modified,03130,mobile,9074373315,"9895163539, 9074373315"
+Modified,01957,address.line1,'DIVYA THIRTH',"PLOT NO: 20/140, DIVYA THIRTH"
+Modified,01957,address.line2,OPP. NEW POLICE STATION,OPP: NEW POLICE STATION
+Modified,01957,contact,2735-244525,
+Modified,05227,mobile,8057300519,8957740895
+Modified,04866,mobile,"9826229544,  8435502260","7869229254, 9826229544"
+Modified,04866,address.line1,H NO: 256,H NO: 142
+Modified,04866,address.line2,BESIDE JAYA HOSPITAL,OPP: JAYA HOSPITAL
+Modified,04866,coords,"['25.6534949000', '78.4637962000']","['25.6532800000', '78.4639120000']"
+Modified,02684,mobile,"9425109466, 7049068024","7049068024, 6265096751"
+Modified,02684,address.line1,NEAR RAJEEV GANDHI SCHOOL,H.NO : 574
+Modified,02684,address.line3,,SHEOPUR
+Modified,02684,address.line2,BY PASS ROAD,"MADHUVAN COLONY, BY PASS ROAD"
+Modified,02684,coords,"['25.6802840000', '76.6950350000']","['25.6823180000', '76.6977820000']"
+Modified,02262,mobile,"7828030381,7869229254","7974692748, 7869229254"
+Modified,02262,email,,mehgaon@bkivv.org
+Modified,02262,address.line1,HOUSE OF MAHAVEER CHOUDARY,HOUSE NO: 89
+Modified,02262,address.line2,"NEAR SARASWATI SCHOOL, NO:2",NEAR SHARDA COMPUTER
+Modified,02262,coords,"['26.4980813000', '78.6098829000']","['26.4983370000', '78.6101860000']"
+Modified,03429,mobile,9755006319,"9755006319, 9755006319"
+Modified,03429,address.line1,"H NO: A-396, NEW MINAL RESIDENCY","H NO: ROSE 246/C, NEW MINAL RESIDENCY"
+Modified,03429,address.line3,"PO: GOVINDPURA, NEAR AYODHYA NAGAR","PO: GOVINDPURA, AYODHYA NAGAR"
+Modified,03429,address.line2,"J.K.ROAD, NEAR GATE NO: 4","J.K.ROAD, OPP N.M.R ACCUPRESSURE PARK"
+Modified,03429,coords,"['23.2717340000', '77.4560990000']","['23.2776440000', '77.4544180000']"
+Modified,05166,email,,bhondsi.grg@bkivv.org
+Modified,04010,address.line1,"D-526, PRAKASH BHAWAN","BLOCK NO: D-526, PRAKASH BHAWAN"
+Modified,03013,mobile,7978849425,"7978849425, 9437410318"
+Modified,03013,address.line1,PLOT NO: 261/E,"SHAKTI KUNJ, PLOT NO:870/2845, DUPLEX NO. 23"
+Modified,03013,address.line3,NEW FOREST PARK ROAD,"BANK OF BARODA KI GALI, NEW VIP AIRPORT SQUARE"
+Modified,03013,address.line2,NEAR SMRUTI GAS,"BHIMPUR DUPLEX COLONY, FOREST PARK"
+Modified,03013,address.pincode,751009,751020
+Modified,03013,coords,"['20.2539920000', '85.8288990000']","['20.2559500000', '85.8229400000']"
+Modified,02083,address.line1,"'OM SHANTI BHAWAN', HOUSE NO: 53/2","OM SHANTI BHAWAN, H.NO: 53/2"
+Modified,02083,address.line3,,OPP: CHANDAUSI ROAD
+Modified,00092,mobile,"8076393539, 9813564546",8076393539
+Modified,00092,address.line1,"SHIV SHAKTI BHAWAN, H NO: 919/4","SHIV SHAKTI BHAWAN, H.NO: 919/4"
+Modified,00092,contact,0124- 2323201,
+Modified,00957,contact,05734- 265436,
+Modified,03426,mobile,9111339186,"9111339186, 9303486535"
+Modified,03426,email,,anjaninagar.ind@bkivv.org
+Modified,03426,address.line1,"H.NO: 143, URMILA KUNJ",H.NO: 139 B
+Modified,03426,address.line3,SUKHDEV NAGAR,"NEAR SUKHDEV NAGAR, ANJANI NAGAR"
+Modified,03426,address.line2,NEAR PANCHA MUKHI HANUMAN MANDIR,NEAR MALVA HOSPITAL JAIN MANDIR
+Modified,03426,address.pincode,452006,452005
+Modified,03426,coords,"['22.7268700000', '75.8239400000']","['22.7273290000', '75.8256200000']"
