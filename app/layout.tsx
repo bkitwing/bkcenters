@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import Header from "../components/Header";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
+import { OrganizationSchema, WebSiteSchema } from "../components/StructuredData";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { getAllCenters, getStatesSummary } from "@/lib/serverCenterData";
@@ -38,14 +39,27 @@ async function getHomeMetadata() {
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getHomeMetadata();
   const title = "Brahma Kumaris - Rajyog Meditation Center Locator";
-  const description = `Find the nearest Brahma Kumaris Rajyog Meditation Center in your area across India`;
+  const description = `Find the nearest Brahma Kumaris Rajyog Meditation Center. ${stats.totalCenters} centers across ${stats.totalStates} states and ${stats.totalDistricts} districts in India & Nepal. Free meditation classes available.`;
 
   return {
     metadataBase: getMetadataBase(),
     title,
     description,
-    keywords:
-      "Brahma Kumaris, meditation, center locator, Nearby Meditation Centers, Brahma Kumaris Rajyog Meditation Centers, Learn Meditation, Om Shanti, Seva Kendra, 7 day courses, meditation retreats",
+    keywords: `Brahma Kumaris, meditation, center locator, ${stats.totalCenters} meditation centers, ${stats.totalStates} states, ${stats.totalDistricts} districts, Nearby Meditation Centers, Brahma Kumaris Rajyog Meditation Centers, Learn Meditation, Om Shanti, Seva Kendra, 7 day courses, meditation retreats, India, Nepal`,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    alternates: {
+      canonical: 'https://www.brahmakumaris.com/centers',
+    },
     openGraph: {
       type: 'website',
       locale: 'en_US',
@@ -70,7 +84,11 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: ['/centers/brahma-kumaris-logo.webp'],
+      images: [generateOgImageUrl({
+        title: 'Brahma Kumaris Centers',
+        description: `${stats.totalCenters} Centers in ${stats.totalStates} States/UTs & ${stats.totalDistricts} Districts`,
+        type: 'home'
+      })],
     },
   };
 }
@@ -82,6 +100,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <OrganizationSchema />
+        <WebSiteSchema />
+      </head>
       <body className={`${inter.className} bg-neutral-50`}>
         <Suspense fallback={null}>
           <GoogleAnalytics />

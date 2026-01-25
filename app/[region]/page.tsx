@@ -15,6 +15,7 @@ import CenterMap from '@/components/CenterMap';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
+import { BreadcrumbSchema, PlaceSchema } from '@/components/StructuredData';
 
 // ISR: Page will be generated on first request and cached until next build
 // Since Center-Processed.json only changes during build, we can cache indefinitely
@@ -57,14 +58,31 @@ export async function generateMetadata({ params }: RegionPageProps): Promise<Met
     region: actualRegion,
   });
 
+  const canonicalUrl = `https://www.brahmakumaris.com/centers/${actualRegion.toLowerCase().replace(/\s+/g, '-')}`;
+
   return {
     title,
     description,
     keywords: `Brahma Kumaris, Rajyog Meditation Centers, ${actualRegion}, spiritual centers, meditation centers`,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: 'website',
+      url: canonicalUrl,
       images: [
         {
           url: ogImage,
@@ -169,8 +187,31 @@ export default async function RegionPage({ params }: RegionPageProps) {
     totalDistricts = states.reduce((sum, state) => sum + state.districtCount, 0);
   }
   
+  // Base URL for structured data
+  const baseUrl = process.env.NODE_ENV === 'development' || process.env.IS_LOCAL === 'true' 
+    ? 'http://localhost:5400' 
+    : 'https://www.brahmakumaris.com/centers';
+
+  // Breadcrumb items for structured data
+  const breadcrumbItems = [
+    { name: 'Home', url: baseUrl },
+    { name: region, url: `${baseUrl}${formatCenterUrl(region)}` },
+  ];
+
+  // Page URL for Place schema
+  const pageUrl = `${baseUrl}${formatCenterUrl(region)}`;
+
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Structured Data for SEO */}
+      <BreadcrumbSchema items={breadcrumbItems} />
+      <PlaceSchema 
+        name={region}
+        description={`Explore ${totalCenters} Brahma Kumaris Rajyoga Meditation Centers across ${states.length} states in ${region}.`}
+        centerCount={totalCenters}
+        pageUrl={pageUrl}
+      />
+
       {/* Breadcrumb Navigation */}
       <nav className="flex mb-6 text-sm">
         <ol className="flex items-center space-x-2">

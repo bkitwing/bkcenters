@@ -547,6 +547,11 @@ export default function HomePageClient({
 
   return (
     <main className="container mx-auto px-4 py-8">
+      {/* H1 Header for SEO */}
+      <h1 className="text-3xl sm:text-4xl font-bold text-center spiritual-text-gradient mb-6">
+        Brahma Kumaris Rajyoga Meditation Centers
+      </h1>
+      
       {/* Search Bar - First on the page */}
       <div className="bg-light rounded-lg shadow-md p-4 sm:p-8 border border-neutral-200 mb-8">
         <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center spiritual-text-gradient">

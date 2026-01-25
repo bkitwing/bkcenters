@@ -63,6 +63,12 @@ export async function GET(req: NextRequest) {
     headers.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
     headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     
+    // Parse stats from description if available (e.g., "611 Centers in 31 Districts")
+    const statsMatch = description.match(/(\d+)\s*Centers?\s*in\s*(\d+)\s*(Districts?|States?)/i);
+    const centersNum = statsMatch ? statsMatch[1] : '';
+    const locationsNum = statsMatch ? statsMatch[2] : '';
+    const locationType = statsMatch ? statsMatch[3] : '';
+
     return new ImageResponse(
       (
         <div
@@ -71,168 +77,264 @@ export async function GET(req: NextRequest) {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            backgroundColor: '#F8FAFC',
+            backgroundColor: '#FFFFFF',
             backgroundImage: `
-              radial-gradient(circle at 20px 20px, #E2E8F0 2px, transparent 2px),
-              radial-gradient(circle at 60px 60px, #E2E8F0 2px, transparent 2px),
-              radial-gradient(circle at 40px 40px, #EFF6FF 3px, transparent 3px),
-              radial-gradient(circle at 80px 80px, #EFF6FF 3px, transparent 3px),
-              linear-gradient(to right, rgba(99, 102, 241, 0.02), rgba(168, 85, 247, 0.02))
+              linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 40%, #EDE9FE 80%, #DDD6FE 100%)
             `,
-            backgroundSize: '80px 80px, 80px 80px, 80px 80px, 80px 80px, 100% 100%',
-            backgroundPosition: '0 0, 40px 40px, 20px 20px, 60px 60px, 0 0',
-            padding: '40px 0',
+            padding: '0',
+            position: 'relative',
           }}
         >
-          {/* Header */}
+          {/* Decorative gradient overlay */}
           <div
             style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `
+                radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 30%)
+              `,
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '32px',
-              padding: '16px 32px',
-              borderRadius: '24px',
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
             }}
-          >
-            <span
-              style={{
-                fontSize: '48px',
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #6366F1 0%, #A855F7 100%)',
-                backgroundClip: 'text',
-                color: 'transparent',
-                textAlign: 'center',
-              }}
-            >
-              Brahma Kumaris
-            </span>
-          </div>
+          />
 
-          {/* Main Content */}
+          {/* Main Content Container */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              padding: '32px',
-              borderRadius: '24px',
-              backgroundColor: 'rgba(255, 255, 255, 0.97)',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              margin: '0 48px',
-              width: '90%',
-              maxWidth: '1000px',
+              height: '100%',
+              width: '100%',
+              padding: '48px 60px',
               position: 'relative',
-              minHeight: '300px',
             }}
           >
-            {/* Title */}
-            <h1
+            {/* Top Section - Brand */}
+            <div
               style={{
-                fontSize: '48px',
-                fontWeight: '900',
-                color: '#1F2937',
-                margin: '0 0 16px 0',
-                lineHeight: '1.1',
-                maxWidth: '900px',
-                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.1)',
-                wordWrap: 'break-word',
-                overflowWrap: 'break-word',
-                display: '-webkit-box',
-                WebkitLineClamp: '2',
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '24px',
               }}
             >
-              {truncatedTitle}
-            </h1>
-
-            {/* Description */}
-            <p
-              style={{
-                fontSize: '28px',
-                color: '#4B5563',
-                margin: '0 0 20px 0',
-                maxWidth: '800px',
-                lineHeight: '1.3',
-                display: '-webkit-box',
-                WebkitLineClamp: '3',
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-            >
-              {description}
-            </p>
-
-            {/* Location Info */}
-            {locationText && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '24px',
-                  color: '#6B7280',
-                  marginTop: 'auto',
-                  padding: '10px 20px',
-                  borderRadius: '12px',
-                  backgroundColor: 'rgba(249, 250, 251, 0.8)',
-                  maxWidth: '95%',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  padding: '12px 28px',
+                  borderRadius: '50px',
+                  backgroundColor: '#4F46E5',
+                  border: 'none',
                 }}
               >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  style={{ flexShrink: 0 }}
+                <span
+                  style={{
+                    fontSize: '28px',
+                    fontWeight: '700',
+                    color: '#FFFFFF',
+                    letterSpacing: '-0.5px',
+                  }}
                 >
-                  <path
-                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                    fill="#6366F1"
-                  />
-                </svg>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {locationText}
-                  {centerCount && ` • ${centerCount} Centers`}
+                  🙏 Brahma Kumaris
                 </span>
               </div>
-            )}
-          </div>
+              
+              {/* Location badge */}
+              {(region || location) && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginLeft: '20px',
+                    padding: '12px 24px',
+                    borderRadius: '50px',
+                    backgroundColor: '#7C3AED',
+                    border: 'none',
+                  }}
+                >
+                  <span style={{ fontSize: '24px', color: '#FFFFFF' }}>
+                    📍 {region || location}
+                  </span>
+                </div>
+              )}
+            </div>
 
-          {/* Footer */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              padding: '0 20px',
-            }}
-          >
-            <span
+            {/* Middle Section - Main Title */}
+            <div
               style={{
-                fontSize: '18px',
-                color: '#6B7280',
-                padding: '6px 20px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                justifyContent: 'center',
               }}
             >
-              www.brahmakumaris.com/centers
-            </span>
+              <h1
+                style={{
+                  fontSize: type === 'home' ? '72px' : '80px',
+                  fontWeight: '900',
+                  color: '#1F2937',
+                  margin: '0 0 20px 0',
+                  lineHeight: '1.05',
+                  letterSpacing: '-2px',
+                  textShadow: 'none',
+                  maxWidth: '1000px',
+                }}
+              >
+                {truncatedTitle}
+              </h1>
+
+              {/* Stats Row - Large Numbers */}
+              {centersNum && locationsNum && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '40px',
+                    marginTop: '16px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: '12px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '64px',
+                        fontWeight: '900',
+                        color: '#7C3AED',
+                        letterSpacing: '-2px',
+                      }}
+                    >
+                      {centersNum}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '32px',
+                        fontWeight: '700',
+                        color: '#374151',
+                      }}
+                    >
+                      Centers
+                    </span>
+                  </div>
+                  
+                  <div
+                    style={{
+                      width: '4px',
+                      height: '50px',
+                      backgroundColor: '#7C3AED',
+                      borderRadius: '2px',
+                      display: 'flex',
+                    }}
+                  />
+                  
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: '12px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '64px',
+                        fontWeight: '900',
+                        color: '#7C3AED',
+                        letterSpacing: '-2px',
+                      }}
+                    >
+                      {locationsNum}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '32px',
+                        fontWeight: '700',
+                        color: '#374151',
+                      }}
+                    >
+                      {locationType}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Description for non-stats pages */}
+              {!centersNum && description && (
+                <p
+                  style={{
+                    fontSize: '36px',
+                    fontWeight: '600',
+                    color: '#374151',
+                    margin: '16px 0 0 0',
+                    lineHeight: '1.4',
+                    maxWidth: '900px',
+                  }}
+                >
+                  {description.length > 100 ? description.substring(0, 100) + '...' : description}
+                </p>
+              )}
+            </div>
+
+            {/* Bottom Section - CTA & URL */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 'auto',
+              }}
+            >
+              {/* Free Classes Badge */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '14px 28px',
+                  borderRadius: '16px',
+                  backgroundColor: '#059669',
+                  border: 'none',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: '700',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  ✨ Free Meditation Classes
+                </span>
+              </div>
+
+              {/* Website URL */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '14px 28px',
+                  borderRadius: '16px',
+                  backgroundColor: '#4F46E5',
+                  border: 'none',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '22px',
+                    fontWeight: '600',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  brahmakumaris.com/centers
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       ),

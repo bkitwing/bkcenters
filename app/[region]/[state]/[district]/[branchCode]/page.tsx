@@ -12,6 +12,7 @@ import ContactLink from '@/components/ContactLink';
 import FAQSection from '@/components/FAQSection';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
+import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema } from '@/components/StructuredData';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
@@ -87,14 +88,35 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       location: `${center.address?.city || ''}, ${center.state}`,
     });
 
+    // Build canonical URL
+    const canonicalRegionSlug = (center.region || '').toLowerCase().replace(/\s+/g, '-');
+    const canonicalStateSlug = (center.state || '').toLowerCase().replace(/\s+/g, '-');
+    const canonicalDistrictSlug = (center.district || '').toLowerCase().replace(/\s+/g, '-');
+    const canonicalUrl = `https://www.brahmakumaris.com/centers/${canonicalRegionSlug}/${canonicalStateSlug}/${canonicalDistrictSlug}/${params.branchCode}`;
+
     return {
       title,
       description,
-      keywords: `Brahma Kumaris, meditation, ${center.name}, ${center.address?.city || ''}, ${center.state}, spiritual center`,
+      keywords: `Brahma Kumaris, meditation, ${center.name}, ${center.district}, ${center.state}, ${center.address?.city ? center.address.city + ', ' : ''}spiritual center, Rajyoga, free meditation classes, 7 day course`,
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      },
+      alternates: {
+        canonical: canonicalUrl,
+      },
       openGraph: {
         title, // Keep original full title for meta tags
         description,
         type: 'website',
+        url: canonicalUrl,
         images: [
           {
             url: ogImage,
@@ -279,8 +301,46 @@ export default async function CenterPage({ params }: CenterPageProps) {
       absoluteUrl = `${baseUrl}${centerUrl}`;
     }
     
+    // Prepare breadcrumb data for structured data
+    const breadcrumbItems = [
+      { name: 'Home', url: `${baseUrl}` },
+      { name: center.region || actualRegion, url: `${baseUrl}${formatCenterUrl(center.region || actualRegion, "", "", "")}` },
+      { name: center.state, url: `${baseUrl}${formatCenterUrl(center.region || actualRegion, center.state, "", "")}` },
+      { name: center.district, url: `${baseUrl}${formatCenterUrl(center.region || actualRegion, center.state, center.district, "")}` },
+      { name: center.name, url: absoluteUrl },
+    ];
+
+    // Prepare FAQ data for structured data (plain text versions)
+    const faqData = [
+      {
+        question: "What is the Brahma Kumaris?",
+        answer: "Brahma Kumaris is a worldwide spiritual movement led by women, dedicated to personal transformation and world renewal through Rajyoga Meditation. Founded in India in 1937, Brahma Kumaris has spread to over 110 countries on all continents and has had an extensive impact in many sectors as an international NGO."
+      },
+      {
+        question: `How to Visit Meditation Center - ${center.name}?`,
+        answer: `You can visit our center located at: ${formattedAddress}. ${center.contact || center.mobile ? `Contact: ${center.contact || center.mobile}` : ''}`
+      },
+      {
+        question: "Can anyone visit a Brahma Kumaris center and try Rajyoga meditation?",
+        answer: "Yes. Every soul is welcome. Whether young or old, student, professional, or homemaker — the doors are open for all. You can sit in silence, experience God's love, and learn meditation in a pure and peaceful atmosphere."
+      },
+      {
+        question: "What do you teach in the meditation course?",
+        answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul (Shiv Baba), the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
+      },
+      {
+        question: "Do you ask for any money or donation?",
+        answer: "No, there are no fees for any of the courses or services. As a voluntary organization, everything is offered as a service to the community. If someone wishes, they may contribute voluntarily to support the continuation of this spiritual work."
+      },
+    ];
+
     return (
       <div className="container mx-auto px-4 py-8">
+        {/* Structured Data for SEO */}
+        <LocalBusinessSchema center={center} pageUrl={absoluteUrl} />
+        <BreadcrumbSchema items={breadcrumbItems} />
+        <FAQPageSchema faqs={faqData} />
+
         {/* Improved Responsive Breadcrumb Navigation */}
         <nav className="mb-4">
           <ol className="flex items-center text-sm flex-wrap">

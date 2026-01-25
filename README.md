@@ -127,7 +127,79 @@ cp Center-Processed.json public/
 
 
 
-Local Run :
+## Development Commands
 
-./build.sh local
+### Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server on default port (3000) |
+| `npm run dev-local` | Start development server on port 5400 with local config |
+| `npm run build` | Build for production |
+| `npm run build-local` | Build for local/staging environment |
+| `npm run start` | Start production server |
+| `npm run start-local` | Start production server on port 5400 |
+| `npm run serve-local` | Build and start local server (one command) |
+| `npm run lint` | Run ESLint |
+| `npm run test-seo` | Test SEO meta tags on running server |
+| `npm run process-centers` | Process center data from raw JSON |
+| `npm run generate-sitemap` | Generate sitemap.xml |
+
+### Local Development
+
+```bash
+# Option 1: Development mode (hot reload)
+npm run dev-local
+
+# Option 2: Production mode locally
+npm run serve-local
+
+# Or step by step:
+npm run build-local
 npm run start-local
+```
+
+Open [http://localhost:5400](http://localhost:5400) in your browser.
+
+### Testing SEO
+
+After starting the server, test SEO elements:
+
+```bash
+# Test meta tags and structured data
+npm run test-seo
+
+# Test specific page OG image
+curl -o test-og.png "http://localhost:5400/api/og?title=Test&description=Test+Description&type=home"
+
+# Validate structured data
+curl -s http://localhost:5400 | grep -o '<script type="application/ld+json">[^<]*</script>'
+```
+
+### Production Build
+
+```bash
+# Build for production
+npm run build
+
+# Start production server
+npm run start
+```
+
+## SEO Features
+
+This application includes comprehensive SEO optimization:
+
+- **Dynamic Meta Tags**: Title, description, keywords per page
+- **Open Graph Images**: Auto-generated OG images with stats
+- **Twitter Cards**: summary_large_image for all pages
+- **Structured Data (JSON-LD)**:
+  - `Organization` - Brahma Kumaris organization info
+  - `WebSite` - Site search action
+  - `LocalBusiness` - Individual center details with geo coordinates
+  - `BreadcrumbList` - Navigation breadcrumbs
+  - `FAQPage` - FAQ rich snippets
+  - `Place` - Region/State/District pages
+- **Canonical URLs**: Prevent duplicate content
+- **Robots Meta**: index, follow with googleBot directives
+- **Sitemap**: 48,000+ URLs for all centers

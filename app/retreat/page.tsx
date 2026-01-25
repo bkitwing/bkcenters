@@ -28,14 +28,31 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = 'Retreat Centers - Brahma Kumaris Rajyog Meditation Centers';
   const description = `Find and explore ${retreatCenters.length} Brahma Kumaris retreat centers across ${stateCount} states in India. View locations, contact information, and more.`;
 
+  const canonicalUrl = 'https://www.brahmakumaris.com/centers/retreat';
+
   return {
     title,
     description,
     keywords: 'Brahma Kumaris, retreat centers, spiritual retreats, meditation retreats, India',
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: 'website',
+      url: canonicalUrl,
       images: [
         {
           url: generateOgImageUrl({

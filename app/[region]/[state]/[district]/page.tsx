@@ -13,6 +13,7 @@ import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import DistrictPageClient from './DistrictPageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
+import { BreadcrumbSchema, PlaceSchema } from '@/components/StructuredData';
 
 // ISR: Page will be generated on first request and cached until next build
 // Since Center-Processed.json only changes during build, we can cache indefinitely
@@ -48,14 +49,34 @@ export async function generateMetadata({ params }: DistrictPageProps): Promise<M
     region: actualRegion,
   });
 
+  const canonicalRegionSlug = actualRegion.toLowerCase().replace(/\s+/g, '-');
+  const canonicalStateSlug = actualState.toLowerCase().replace(/\s+/g, '-');
+  const canonicalDistrictSlug = actualDistrict.toLowerCase().replace(/\s+/g, '-');
+  const canonicalUrl = `https://www.brahmakumaris.com/centers/${canonicalRegionSlug}/${canonicalStateSlug}/${canonicalDistrictSlug}`;
+
   return {
     title,
     description,
     keywords: `Brahma Kumaris, Rajyog Meditation centers, ${actualDistrict}, ${actualState}, spiritual centers, 7 day courses, meditation retreats`,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: 'website',
+      url: canonicalUrl,
       images: [
         {
           url: ogImage,
@@ -106,13 +127,41 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
     );
   }
   
+  // Base URL for structured data
+  const baseUrl = process.env.NODE_ENV === 'development' || process.env.IS_LOCAL === 'true' 
+    ? 'http://localhost:5400' 
+    : 'https://www.brahmakumaris.com/centers';
+
+  // Breadcrumb items for structured data
+  const breadcrumbItems = [
+    { name: 'Home', url: baseUrl },
+    { name: actualRegion, url: `${baseUrl}${formatCenterUrl(actualRegion)}` },
+    { name: actualState, url: `${baseUrl}${formatCenterUrl(actualRegion, actualState)}` },
+    { name: actualDistrict, url: `${baseUrl}${formatCenterUrl(actualRegion, actualState, actualDistrict)}` },
+  ];
+
+  // Page URL for Place schema
+  const pageUrl = `${baseUrl}${formatCenterUrl(actualRegion, actualState, actualDistrict)}`;
+
   return (
-    <DistrictPageClient
-      actualRegion={actualRegion}
-      actualState={actualState}
-      actualDistrict={actualDistrict}
-      stateRegion={stateRegion}
-      centers={centers}
-    />
+    <>
+      {/* Structured Data for SEO */}
+      <BreadcrumbSchema items={breadcrumbItems} />
+      <PlaceSchema 
+        name={actualDistrict}
+        description={`Discover ${centers.length} Brahma Kumaris Rajyoga Meditation Centers in ${actualDistrict}, ${actualState}.`}
+        state={actualState}
+        region={actualRegion}
+        centerCount={centers.length}
+        pageUrl={pageUrl}
+      />
+      <DistrictPageClient
+        actualRegion={actualRegion}
+        actualState={actualState}
+        actualDistrict={actualDistrict}
+        stateRegion={stateRegion}
+        centers={centers}
+      />
+    </>
   );
 } 

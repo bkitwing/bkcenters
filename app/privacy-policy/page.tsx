@@ -2,10 +2,40 @@ import type { Metadata } from "next";
 import { getMetadataBase } from "@/lib/ogUtils";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const title = "Privacy Policy - Brahma Kumaris Meditation Center Locator";
+  const description = "Privacy Policy for the Brahma Kumaris Meditation Center Locator Application. Learn how we collect, use, and protect your personal information.";
+  const canonicalUrl = 'https://www.brahmakumaris.com/centers/privacy-policy';
+
   return {
     metadataBase: getMetadataBase(),
-    title: "Privacy Policy - Brahma Kumaris Meditation Center Locator",
-    description: "Privacy Policy for the Brahma Kumaris Meditation Center Locator Application",
+    title,
+    description,
+    keywords: "Brahma Kumaris, privacy policy, data protection, meditation center locator, personal information",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: canonicalUrl,
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
   };
 }
 

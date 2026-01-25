@@ -6,9 +6,12 @@
     "dev": "next dev",
     "dev-local": "PORT=5400 IS_LOCAL=true next dev",
     "build": "next build",
+    "build-local": "IS_LOCAL=true next build",
     "start": "next start",
     "start-local": "PORT=5400 IS_LOCAL=true next start",
+    "serve-local": "npm run build-local && npm run start-local",
     "lint": "next lint",
+    "test-seo": "curl -s http://localhost:5400 | grep -E '<title>|<meta name=\"description\"|application/ld\\+json' | head -20",
     "process-centers": "node process-centers.js",
     "generate-sitemap": "node scripts/generate-sitemap.js"
   },

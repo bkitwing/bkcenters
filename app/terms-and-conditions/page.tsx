@@ -2,10 +2,40 @@ import type { Metadata } from "next";
 import { getMetadataBase } from "@/lib/ogUtils";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const title = "Terms and Conditions - Brahma Kumaris Meditation Center Locator";
+  const description = "Terms and Conditions for the Brahma Kumaris Meditation Center Locator Application. Read our terms of use, intellectual property rights, and user guidelines.";
+  const canonicalUrl = 'https://www.brahmakumaris.com/centers/terms-and-conditions';
+
   return {
     metadataBase: getMetadataBase(),
-    title: "Terms and Conditions - Brahma Kumaris Meditation Center Locator",
-    description: "Terms and Conditions for the Brahma Kumaris Meditation Center Locator Application",
+    title,
+    description,
+    keywords: "Brahma Kumaris, terms and conditions, terms of use, meditation center locator, user agreement",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: canonicalUrl,
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
   };
 }
 
