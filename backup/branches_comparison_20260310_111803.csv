@@ -1,0 +1,51 @@
+ChangeType,branch_code,FieldName,OldValue,NewValue
+Added,05747,,,"{""name"": ""SANGOD"", ""branch_code"": ""05747"", ""address"": {""line1"": ""KALVAN RAI MEHTA NIVAS"", ""line2"": ""BAPAWAR ROAD"", ""line3"": ""MAHARUSHI DAYANAND COLONY"", ""city"": ""SANGOD"", ""pincode"": ""325601""}, ""email"""
+Added,05750,,,"{""name"": ""FARIDABAD SECTOR 87 "", ""branch_code"": ""05750"", ""address"": {""line1"": ""H.NO: 25, RAJYOG SUKH SHANTI BHAWAN"", ""line2"": ""BEHIND RAGHAV HOSPITAL, COLONEL VIHAR-1"", ""line3"": ""GALI NO: 6, BHARAT CO"
+Added,05749,,,"{""name"": ""CHHAPIHEDA"", ""branch_code"": ""05749"", ""address"": {""line1"": ""HOUSE OF GUPTA'S "", ""line2"": ""OLD POST OFFICE GALI"", ""line3"": ""WARD NO-5"", ""city"": ""CHHAPIHEDA"", ""pincode"": ""465689""}, ""email"": """","
+Added,05745,,,"{""name"": ""DESHGAON"", ""branch_code"": ""05745"", ""address"": {""line1"": ""H.NO: 337, WARD NO: 05"", ""line2"": ""MAIN ROAD"", ""line3"": ""OPP: VISHWAKARMA WELDING WORKSHOP"", ""city"": ""DESHGAON"", ""pincode"": ""450771""}"
+Added,05743,,,"{""name"": ""BARAMKELA"", ""branch_code"": ""05743"", ""address"": {""line1"": ""H NO: 11, NEAR BY MOKSH HOSTEL"", ""line2"": ""CHANDRAPUR ROAD"", ""line3"": ""VILL: KANCHANPUR"", ""city"": ""BARAMKELA"", ""pincode"": ""496551""},"
+Added,05748,,,"{""name"": ""KHUJNER"", ""branch_code"": ""05748"", ""address"": {""line1"": ""BABA AMARNATH HOUSE, IST FLOOR"", ""line2"": ""ZIRAPUR ROAD, NEAR BANK OF INDIA"", ""line3"": ""WARD NO-14"", ""city"": ""KHUJNER"", ""pincode"": ""46"
+Added,05744,,,"{""name"": ""KHALWA (KHANDWA)"", ""branch_code"": ""05744"", ""address"": {""line1"": ""NO: 665/1"", ""line2"": ""KUMBI MOHALLA, MAIN MARKET"", ""line3"": ""WARD NO:17"", ""city"": ""KHALWA"", ""pincode"": ""450117""}, ""email"": """""
+Added,05746,,,"{""name"": ""ATRU  (BARAN)"", ""branch_code"": ""05746"", ""address"": {""line1"": ""PLOT NO: 266, NANDLAL NAGAR NIWAS"", ""line2"": ""NEAR AGGARWAL KIRANA STORE"", ""line3"": ""HAT MARKET"", ""city"": ""ATRU"", ""pincode"": ""32"
+Modified,04208,mobile,"9011223582,  7597325984","9881000440, 9175301677"
+Modified,04718,address.line2,BALAJI NAGAR,"BALAJI NAGAR, WARD NO-4"
+Modified,00629,mobile,"9869480233, 8879904144",9869480233
+Modified,00629,contact,"022- 22830494, 22816956",
+Modified,00002,mobile,"9425110771, 7999663225","8319247113, 9425124193"
+Modified,02974,mobile,9766353725,"9766353725, 7263055961"
+Modified,02974,coords,"['21.1649430000', '73.7959140000']","['21.1649490000', '73.7967410000']"
+Modified,02974,email,,navapur@bkivv.org
+Modified,02974,address.line2,GALLI NO: 5,GALLI NO: 7
+Modified,02974,address.line1,PLOT NO: 291,"PLOT NO: 366, SARASWATI"
+Modified,03073,mobile,"8331902916, 8490246766",7892664056
+Modified,03073,contact,08626- 243558,
+Modified,02973,mobile,9423217926,7350152682
+Modified,02973,coords,"['21.1563103000', '74.4330755000']","['21.1562600000', '74.4336000000']"
+Modified,02973,email,,dusane@bkivv.org
+Modified,02973,address.line2,"BRAHMAN WADA, MAIN ROAD",
+Modified,02973,address.line1,H NO: 256,GANDHI CHAUK
+Modified,90007,region,INDIA,MADHUBAN SISTER CONCERNS
+Modified,90001,region,INDIA,MADHUBAN SISTER CONCERNS
+Modified,01291,coords,"['14.5365221000', '79.8775743000']","['14.5384950000', '79.8801330000']"
+Modified,01291,address.line2,VASAVI KANYAKA PARAMESWARI TEMPLE ROAD,GIRIJA HALL OPP STREET
+Modified,01291,address.line1,"D NO: 11/367, AVASITOTHA",SRI BALAJI NILAYAM
+Modified,01291,address.line3,"NEAR REGISTRATION OFFICE, PUTAVEEDI",BEHIND SURI BABU RATION SHOP
+Modified,04704,address.line2,OPPOSITE POLICE STATION,"OPPOSITE POLICE STATION, WARD NO-1"
+Modified,04704,address.line1,SHIV SHAKTI SAROVAR,"H NO: 11, SHIV SHAKTI SAROVAR"
+Modified,04521,address.line2,"BHIMGARH ROAD, KHAIRA PALARI","BHIMGARH ROAD, WARD NO-5, KHAIRA PALARI"
+Modified,04521,address.line1,SHIVANJALI BHAWAN,"H NO: 217, SHIVANJALI BHAWAN"
+Modified,05435,mobile,"9309934583, 9766993420","9309934583, 9079298181"
+Modified,05435,coords,"['21.0337170000', '74.8093220000']","['21.0313460000', '74.8111220000']"
+Modified,05435,address.line2,BORSE GALLI,BAJAR PETH
+Modified,05435,address.line1,HOUSE NO: 811,JHANDA CHAUK
+Modified,90006,region,INDIA,MADHUBAN SISTER CONCERNS
+Modified,05720,mobile,"9833512922,8955893570",9928097712
+Modified,00915,mobile,"8319495563, 8319371377","8319371377, 8319495563"
+Modified,04680,address.line2,"BEHIND NARMADA MEDICAL, BARAPATHAR","BEHIND NARMADA MEDICAL, WARD NO-11, BARAPATHAR"
+Modified,04680,address.line1,BRAHMA KUMARIS,"BRAHMA KUMARIS, H NO: 211"
+Modified,02912,address.line2,NEAR STATION,NEAR BADSHAHPUR STATION ROAD
+Modified,02912,address.line1,"DIVYA PRAKASH, 150/A","DIVYA PRAKASH, H NO: 150/A"
+Modified,02912,address.line3,PAKDI,TAL: MACHHALI SHAHAR
+Modified,04830,mobile,"8319247113, 8319495563","8319495563, 8319247113"
+Modified,04114,email,,koregaon@bkivv.org
+Modified,04961,mobile,"7204467726, 9481004044",9019068208
