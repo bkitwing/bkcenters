@@ -35,6 +35,11 @@ async function generateSitemap() {
   
   console.log(`Loaded ${data.data.length} centers from file`);
   
+  // Use the data file's last modification time as lastmod for all URLs.
+  // This way lastmod only changes when the actual centers data changes, not on every build.
+  const fileStats = fs.statSync(filePath);
+  const dataLastmod = fileStats.mtime.toISOString();
+  
   // Extract all regions, states, districts, and centers
   const regions = new Set();
   const states = new Map(); // state -> region
@@ -105,7 +110,7 @@ async function generateSitemap() {
     });
   });
   
-  // Add center pages - using center name instead of branch code
+  // Add center pages - using center name as the final URL segment
   centers.forEach((center) => {
     const { region, state, district, name } = center;
     
@@ -134,7 +139,7 @@ ${urls
     <loc>${url.url}</loc>
     <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <lastmod>${dataLastmod}</lastmod>
   </url>`)
   .join('\n')}
 </urlset>`;
@@ -185,8 +190,8 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
-# Block all parameters to avoid duplicate content
-Disallow: /*?*
+# Block form submission endpoint only - not needed by crawlers
+Disallow: /api/send-email
 
 # Sitemaps
 Sitemap: https://www.brahmakumaris.com/centers/sitemap.xml

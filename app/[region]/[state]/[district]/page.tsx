@@ -13,7 +13,7 @@ import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import DistrictPageClient from './DistrictPageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { BreadcrumbSchema, PlaceSchema } from '@/components/StructuredData';
+import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
 
 // ISR: Page will be generated on first request and cached until next build
 // Since Center-Processed.json only changes during build, we can cache indefinitely
@@ -143,6 +143,12 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
   // Page URL for Place schema
   const pageUrl = `${baseUrl}${formatCenterUrl(actualRegion, actualState, actualDistrict)}`;
 
+  const itemListItems = centers.map((center, idx) => ({
+    name: center.name,
+    url: `${baseUrl}${formatCenterUrl(actualRegion, actualState, actualDistrict, center.name)}`,
+    position: idx + 1,
+  }));
+
   return (
     <>
       {/* Structured Data for SEO */}
@@ -154,6 +160,13 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
         region={actualRegion}
         centerCount={centers.length}
         pageUrl={pageUrl}
+        placeType="AdministrativeArea"
+      />
+      <ItemListSchema
+        name={`Brahma Kumaris Meditation Centers in ${actualDistrict}, ${actualState}`}
+        description={`${centers.length} Brahma Kumaris Rajyoga meditation centers in ${actualDistrict} district, ${actualState}.`}
+        url={pageUrl}
+        items={itemListItems}
       />
       <DistrictPageClient
         actualRegion={actualRegion}

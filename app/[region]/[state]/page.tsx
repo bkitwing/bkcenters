@@ -12,7 +12,7 @@ import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import StatePageClient from './StatePageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { BreadcrumbSchema, PlaceSchema } from '@/components/StructuredData';
+import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
 
 // ISR: Page will be generated on first request and cached until next build
 // Since Center-Processed.json only changes during build, we can cache indefinitely
@@ -146,6 +146,12 @@ export default async function StatePage({ params }: StatePageProps) {
   // Page URL for Place schema
   const pageUrl = `${baseUrl}${formatCenterUrl(actualRegion, actualState)}`;
 
+  const itemListItems = districtSummary.map((d, idx) => ({
+    name: d.district,
+    url: `${baseUrl}${formatCenterUrl(actualRegion, actualState, d.district)}`,
+    position: idx + 1,
+  }));
+
   return (
     <>
       {/* Structured Data for SEO */}
@@ -156,6 +162,13 @@ export default async function StatePage({ params }: StatePageProps) {
         region={actualRegion}
         centerCount={centers.length}
         pageUrl={pageUrl}
+        placeType="AdministrativeArea"
+      />
+      <ItemListSchema
+        name={`Brahma Kumaris Centers in ${actualState} — Districts List`}
+        description={`${districts.length} districts with Brahma Kumaris Rajyoga meditation centers in ${actualState}.`}
+        url={pageUrl}
+        items={itemListItems}
       />
       <StatePageClient 
         actualRegion={actualRegion}

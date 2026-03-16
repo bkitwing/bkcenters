@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import Header from "../components/Header";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
-import { OrganizationSchema, WebSiteSchema } from "../components/StructuredData";
+import { OrganizationSchema, WebSiteSchema, DatasetSchema } from "../components/StructuredData";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { getAllCenters, getStatesSummary } from "@/lib/serverCenterData";
@@ -93,16 +93,20 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { totalCenters } = await getHomeMetadata();
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+        <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
         <OrganizationSchema />
         <WebSiteSchema />
+        <DatasetSchema totalCenters={totalCenters} />
       </head>
       <body className={`${inter.className} bg-neutral-50`}>
         <Suspense fallback={null}>

@@ -3,15 +3,20 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import dynamic from 'next/dynamic';
 import {
   getNearestCenters,
 } from "@/lib/centerData";
 import SearchBar from "@/components/SearchBar";
 import CenterCard from "@/components/CenterCard";
-import CenterMap from "@/components/CenterMap";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
+
+const CenterMap = dynamic(() => import('@/components/CenterMap'), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-neutral-100 rounded-lg animate-pulse" />,
+});
 
 // Declare the google namespace globally
 declare global {
@@ -548,15 +553,17 @@ export default function HomePageClient({
   return (
     <main className="container mx-auto px-4 py-8">
       {/* H1 Header for SEO */}
-      <h1 className="text-3xl sm:text-4xl font-bold text-center spiritual-text-gradient mb-6">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center spiritual-text-gradient mb-3">
         Brahma Kumaris Rajyoga Meditation Centers
       </h1>
-      
+
+      {/* AI-citable prose summary — kept visible for crawlers and AI Overview citations */}
+      <p className="text-center text-neutral-600 text-sm sm:text-base max-w-2xl mx-auto mb-6">
+        Brahma Kumaris operates <strong>{totalCenters.toLocaleString()} Rajyoga Meditation Centers</strong> across {totalStates} states and union territories in India and Nepal, covering {totalDistricts.toLocaleString()} districts. Find your nearest center offering free meditation classes and 7-day Rajyoga courses — open to everyone, free of charge.
+      </p>
+
       {/* Search Bar - First on the page */}
       <div className="bg-light rounded-lg shadow-md p-4 sm:p-8 border border-neutral-200 mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center spiritual-text-gradient">
-          Find a Center Near You
-        </h2>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex-1">
             <SearchBar

@@ -28,8 +28,8 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
-# Block all parameters to avoid duplicate content
-Disallow: /*?*
+# Block form submission endpoint only - not needed by crawlers
+Disallow: /api/send-email
 
 # Sitemaps
 Sitemap: https://www.brahmakumaris.com/centers/sitemap.xml

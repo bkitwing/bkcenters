@@ -1,9 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import dynamic from 'next/dynamic';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { getCenterByCode, getCentersByDistrict, getRegionForState, getNearestCenters } from '@/lib/serverCenterData';
-import CenterMap from '@/components/CenterMap';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
@@ -12,11 +12,16 @@ import ContactLink from '@/components/ContactLink';
 import FAQSection from '@/components/FAQSection';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
-import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema } from '@/components/StructuredData';
+import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema } from '@/components/StructuredData';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
+
+const CenterMap = dynamic(() => import('@/components/CenterMap'), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-neutral-100 rounded-lg animate-pulse" />,
+});
 
 // ISR: Page will be generated on first request and cached until next build
 // Since Center-Processed.json only changes during build, we can cache indefinitely
@@ -340,6 +345,9 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <LocalBusinessSchema center={center} pageUrl={absoluteUrl} />
         <BreadcrumbSchema items={breadcrumbItems} />
         <FAQPageSchema faqs={faqData} />
+        <CourseSchema centerName={center.name} centerUrl={absoluteUrl} />
+        <EventSchema center={center} centerUrl={absoluteUrl} />
+        <HowToSchema center={center} centerUrl={absoluteUrl} />
 
         {/* Improved Responsive Breadcrumb Navigation */}
         <nav className="mb-4">

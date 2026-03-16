@@ -15,7 +15,7 @@ import CenterMap from '@/components/CenterMap';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { BreadcrumbSchema, PlaceSchema } from '@/components/StructuredData';
+import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
 
 // ISR: Page will be generated on first request and cached until next build
 // Since Center-Processed.json only changes during build, we can cache indefinitely
@@ -201,6 +201,12 @@ export default async function RegionPage({ params }: RegionPageProps) {
   // Page URL for Place schema
   const pageUrl = `${baseUrl}${formatCenterUrl(region)}`;
 
+  const itemListItems = states.map((state, idx) => ({
+    name: state.name,
+    url: `${baseUrl}${formatCenterUrl(region, state.name)}`,
+    position: idx + 1,
+  }));
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Structured Data for SEO */}
@@ -210,6 +216,12 @@ export default async function RegionPage({ params }: RegionPageProps) {
         description={`Explore ${totalCenters} Brahma Kumaris Rajyoga Meditation Centers across ${states.length} states in ${region}.`}
         centerCount={totalCenters}
         pageUrl={pageUrl}
+      />
+      <ItemListSchema
+        name={`Brahma Kumaris Centers in ${region} — States List`}
+        description={`${states.length} states with Brahma Kumaris Rajyoga meditation centers in ${region}.`}
+        url={pageUrl}
+        items={itemListItems}
       />
 
       {/* Breadcrumb Navigation */}
