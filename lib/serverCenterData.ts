@@ -1,60 +1,40 @@
 /**
  * Server-side only data access functions for center data.
- * These functions read directly from the JSON file and are safe to use with ISR/static generation.
+ * Fetches data from Strapi CMS API.
  * 
  * IMPORTANT: This file should only be imported in Server Components, not in Client Components.
- * It uses Node.js fs module which is not available in the browser.
  */
 
-import path from 'path';
-import fs from 'fs';
 import { Center, CentersData, RegionStateMapping } from './types';
 import { logger } from './logger';
 import { deSlugify } from './urlUtils';
 import { RETREAT_CENTER_BRANCH_CODES } from './retreatCenters';
-
-// Cache for loaded data (per-request in production, persistent in development)
-let centersCache: Center[] | null = null;
+import {
+  loadCentersFromStrapi,
+  fetchCenterByBranchCode,
+  fetchCentersByState,
+  fetchCentersByDistrict,
+  fetchCentersByRegion,
+  fetchRetreatCenters,
+  fetchCenterCount,
+  fetchRegionNames,
+  fetchStateNames,
+  fetchDistrictNamesByState,
+  fetchStatAndDistrictCounts,
+} from './strapiClient';
 
 /**
- * Load all centers directly from the JSON file.
+ * Load all centers from Strapi CMS.
  * This is the primary data loading function for server-side rendering.
+ * All downstream functions in this file depend on this.
  */
 export async function loadCentersFromFile(): Promise<Center[]> {
-  // Return cached data if available
-  if (centersCache !== null) {
-    return centersCache;
-  }
-
   try {
-    const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
-    const rootFilePath = path.join(process.cwd(), 'Center-Processed.json');
-    
-    let filePath: string;
-    if (fs.existsSync(publicFilePath)) {
-      filePath = publicFilePath;
-      logger.trace('serverCenterData: Using data file from public directory');
-    } else if (fs.existsSync(rootFilePath)) {
-      filePath = rootFilePath;
-      logger.trace('serverCenterData: Using data file from root directory');
-    } else {
-      logger.error('serverCenterData: Centers data file not found in any location');
-      return [];
-    }
-    
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const data: CentersData = JSON.parse(fileContent);
-    
-    if (!data || !data.data || !Array.isArray(data.data)) {
-      logger.error('serverCenterData: Invalid data structure in centers file');
-      return [];
-    }
-    
-    logger.debug(`serverCenterData: Loaded ${data.data.length} centers from file`);
-    centersCache = data.data;
-    return data.data;
+    const centers = await loadCentersFromStrapi();
+    logger.debug(`serverCenterData: Loaded ${centers.length} centers from Strapi`);
+    return centers;
   } catch (error) {
-    logger.error('serverCenterData: Error loading centers from file:', error);
+    logger.error('serverCenterData: Error loading centers from Strapi:', error);
     return [];
   }
 }
@@ -63,19 +43,15 @@ export async function loadCentersFromFile(): Promise<Center[]> {
  * Get a center by its branch code or name slug.
  */
 export async function getCenterByCode(branchCodeOrName: string): Promise<Center | undefined> {
-  const centers = await loadCentersFromFile();
-  
-  // First try to find by branch_code (exact match)
-  const centerByCode = centers.find(
-    (center) => center.branch_code === branchCodeOrName
-  );
-  if (centerByCode) return centerByCode;
+  // Try targeted Strapi query by branch_code first (1 API call)
+  const center = await fetchCenterByBranchCode(branchCodeOrName);
+  if (center) return center;
 
-  // If not found, try to find by name slug
+  // Fallback: search by name slug (needs all centers)
   const nameSlug = branchCodeOrName.toLowerCase().replace(/\s+/g, '-');
-  
-  return centers.find((center) => {
-    const centerNameSlug = center.name.toLowerCase().replace(/\s+/g, '-');
+  const centers = await loadCentersFromFile();
+  return centers.find((c) => {
+    const centerNameSlug = c.name.toLowerCase().replace(/\s+/g, '-');
     return centerNameSlug === nameSlug;
   });
 }
@@ -84,26 +60,22 @@ export async function getCenterByCode(branchCodeOrName: string): Promise<Center 
  * Get all centers for a specific state.
  */
 export async function getCentersByState(state: string): Promise<Center[]> {
-  const centers = await loadCentersFromFile();
-  return centers.filter((center) => center.state === state);
+  return fetchCentersByState(state);
 }
 
 /**
  * Get all centers for a specific district within a state.
  */
 export async function getCentersByDistrict(state: string, district: string): Promise<Center[]> {
-  const centers = await loadCentersFromFile();
-  return centers.filter(
-    (center) => center.state === state && center.district === district
-  );
+  return fetchCentersByDistrict(state, district);
 }
 
 /**
  * Get the region for a specific state.
  */
 export async function getRegionForState(state: string): Promise<string> {
-  const centers = await loadCentersFromFile();
-  const center = centers.find((c) => c.state === state);
+  const centers = await fetchCentersByState(state);
+  const center = centers[0];
   
   if (center?.region) {
     return center.region;
@@ -174,34 +146,14 @@ export async function getNearestCenters(
  * Get list of available regions.
  */
 export async function getRegions(): Promise<string[]> {
-  const centers = await loadCentersFromFile();
-  const regions = new Set<string>();
-
-  centers.forEach((center) => {
-    if (center.region) {
-      regions.add(center.region);
-    }
-  });
-
-  return Array.from(regions).sort();
+  return fetchRegionNames();
 }
 
 /**
  * Get districts for a specific state.
  */
 export async function getDistrictsByState(state: string): Promise<string[]> {
-  const centers = await loadCentersFromFile();
-  const districts = new Set<string>();
-
-  centers
-    .filter((center) => center.state === state)
-    .forEach((center) => {
-      if (center.district) {
-        districts.add(center.district);
-      }
-    });
-
-  return Array.from(districts).sort();
+  return fetchDistrictNamesByState(state);
 }
 
 /**
@@ -214,8 +166,7 @@ export async function getStateData(state: string): Promise<{
     centerCount: number;
   }[];
 }> {
-  const centers = await loadCentersFromFile();
-  const stateData = centers.filter((center) => center.state === state);
+  const stateData = await fetchCentersByState(state);
 
   const districts = new Map<string, number>();
 
@@ -247,13 +198,13 @@ export async function getStatesByRegion(region: string): Promise<
     districtCount: number;
   }[]
 > {
-  const allCenters = await loadCentersFromFile();
+  const allCenters = await fetchCentersByRegion(region);
   
   // Find states in this region
   const stateDataMap = new Map<string, { centerCount: number; districts: Set<string> }>();
   
   allCenters.forEach((center) => {
-    if (center.region === region && center.state) {
+    if (center.state) {
       if (!stateDataMap.has(center.state)) {
         stateDataMap.set(center.state, { centerCount: 0, districts: new Set() });
       }
@@ -285,36 +236,21 @@ export async function getStatesSummary(): Promise<
     districtCount: number;
   }[]
 > {
-  const centers = await loadCentersFromFile();
-  const stateMap = new Map<
-    string,
-    {
-      centerCount: number;
-      districts: Set<string>;
-    }
-  >();
-
-  centers.forEach((center) => {
-    if (center.state) {
-      const stateData = stateMap.get(center.state) || {
-        centerCount: 0,
-        districts: new Set<string>(),
+  // Use state names list + targeted per-state district counts
+  // This avoids loading all 5612 centers
+  const stateNames = await fetchStateNames();
+  const results = await Promise.all(
+    stateNames.map(async ({ name }) => {
+      const districts = await fetchDistrictNamesByState(name);
+      const centers = await fetchCentersByState(name);
+      return {
+        state: name,
+        centerCount: centers.length,
+        districtCount: districts.length,
       };
-
-      stateData.centerCount++;
-      if (center.district) {
-        stateData.districts.add(center.district);
-      }
-
-      stateMap.set(center.state, stateData);
-    }
-  });
-
-  return Array.from(stateMap.entries()).map(([state, data]) => ({
-    state,
-    centerCount: data.centerCount,
-    districtCount: data.districts.size,
-  }));
+    })
+  );
+  return results;
 }
 
 /**
@@ -328,8 +264,7 @@ export async function getAllCenters(): Promise<Center[]> {
  * Get centers filtered by region.
  */
 export async function getCentersByRegion(region: string): Promise<Center[]> {
-  const centers = await loadCentersFromFile();
-  return centers.filter((center) => center.region === region);
+  return fetchCentersByRegion(region);
 }
 
 /**
@@ -380,12 +315,12 @@ export async function getStatesByRegionFast(region: string): Promise<
     districtCount: number;
   }[]
 > {
-  const allCenters = await loadCentersFromFile();
+  const allCenters = await fetchCentersByRegion(region);
   
   const stateDataMap = new Map<string, { centerCount: number; districts: Set<string> }>();
   
   allCenters.forEach((center) => {
-    if (center.region === region && center.state) {
+    if (center.state) {
       if (!stateDataMap.has(center.state)) {
         stateDataMap.set(center.state, { centerCount: 0, districts: new Set() });
       }
@@ -459,7 +394,7 @@ export async function getRegionToStateMapping(): Promise<RegionStateMapping> {
  * Find a region by its slug.
  */
 export async function getRegionBySlug(regionSlug: string): Promise<string | null> {
-  const regions = await getRegions();
+  const regions = await fetchRegionNames();
   const possibleFormats = deSlugify(regionSlug);
 
   for (const format of possibleFormats) {
@@ -476,19 +411,12 @@ export async function getRegionBySlug(regionSlug: string): Promise<string | null
  * Find a state by its slug.
  */
 export async function getStateBySlug(stateSlug: string): Promise<string | null> {
-  const centers = await loadCentersFromFile();
-  const states = new Set<string>();
-  
-  centers.forEach((center) => {
-    if (center.state) {
-      states.add(center.state);
-    }
-  });
-
+  const stateEntries = await fetchStateNames();
+  const stateNames = stateEntries.map(s => s.name);
   const possibleFormats = deSlugify(stateSlug);
 
   for (const format of possibleFormats) {
-    const match = Array.from(states).find(
+    const match = stateNames.find(
       (state) => state.toLowerCase() === format.toLowerCase()
     );
     if (match) return match;
@@ -507,7 +435,7 @@ export async function getDistrictBySlug(
   const state = await getStateBySlug(stateSlug);
   if (!state) return null;
 
-  const districts = await getDistrictsByState(state);
+  const districts = await fetchDistrictNamesByState(state);
   const possibleFormats = deSlugify(districtSlug);
 
   for (const format of possibleFormats) {
@@ -524,12 +452,7 @@ export async function getDistrictBySlug(
  * Get retreat centers.
  */
 export async function getRetreatCenters(): Promise<Center[]> {
-  const allCenters = await loadCentersFromFile();
-
-  const retreatCenters = allCenters.filter(
-    (center) =>
-      center.branch_code && RETREAT_CENTER_BRANCH_CODES.includes(center.branch_code)
-  );
+  const retreatCenters = await fetchRetreatCenters();
 
   // Sort centers according to the order in RETREAT_CENTER_BRANCH_CODES
   return retreatCenters.sort((a, b) => {

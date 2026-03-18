@@ -1,18 +1,10 @@
 import { NextResponse } from "next/server";
 import { CentersData, Center } from "@/lib/types";
-import { Low } from 'lowdb'
-import { JSONFile } from 'lowdb/node'
-import lodash from 'lodash'
-import path from 'path';
-import fs from 'fs';
 import { logger } from '@/lib/logger';
+import { loadCentersFromStrapi, fetchCentersByState, fetchCentersByDistrict } from '@/lib/strapiClient';
 
 // Add this export to tell Next.js that this route is dynamic and should be server-rendered
 export const dynamic = "force-dynamic";
-
-class LowWithLodash<T> extends Low<T> {
-  chain: lodash.ExpChain<this['data']> = lodash.chain(this).get('data')
-}
 
 export async function GET(request: Request) {
   try {
@@ -23,44 +15,19 @@ export async function GET(request: Request) {
 
     logger.debug(`API Request - state: ${state || 'none'}, district: ${district || 'none'}, lightweight: ${lightweight}`);
 
-    // Try multiple locations for the data file
-    const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
-    const rootFilePath = path.join(process.cwd(), 'Center-Processed.json');
-    
-    // Check which file exists and use that one
-    let filePath;
-    if (fs.existsSync(publicFilePath)) {
-      filePath = publicFilePath;
-      logger.trace('Using data file from public directory');
-    } else if (fs.existsSync(rootFilePath)) {
-      filePath = rootFilePath;
-      logger.trace('Using data file from root directory');
+    // Targeted Strapi queries — only fetch what's needed
+    let filteredData: Center[];
+    if (state && district) {
+      filteredData = await fetchCentersByDistrict(state, district);
+    } else if (state) {
+      filteredData = await fetchCentersByState(state);
     } else {
-      logger.error('Centers data file not found in any location');
-      throw new Error('Centers data file not found in any location');
+      filteredData = await loadCentersFromStrapi();
     }
-    
-    const adapter = new JSONFile<CentersData>(filePath);
-    
-    // @ts-expect-error
-    const db = new LowWithLodash(adapter,{})
-    await db.read();
 
-    if (!db.data || !db.data.data || !Array.isArray(db.data.data)) {
-      logger.error('Invalid data structure in centers file');
-      throw new Error('Invalid data structure in centers file');
-    }
-    
-    logger.debug(`Loaded ${db.data.data.length} centers from file`);
+    logger.debug(`Loaded ${filteredData.length} centers from Strapi`);
 
-    let query = db.chain.get('data');
-   
-    if(query){
-      query = query.filter(state ? (district ? { state, district  } : { state }) : {})
-    }
-    const filteredData = await query.value();
-
-    if (!filteredData || filteredData.length === 0) {
+    if (filteredData.length === 0) {
       logger.debug(`No centers found for query - state: ${state || 'none'}, district: ${district || 'none'}`);
     } else {
       logger.debug(`Found ${filteredData.length} centers for query`);
@@ -75,7 +42,6 @@ export async function GET(request: Request) {
     };
 
     return createResponse(responseData);
-  
     
   } catch (error) {
     logger.error("Error in API route:", error);
@@ -87,7 +53,7 @@ export async function GET(request: Request) {
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=60", // Cache error responses for shorter time (1 minute)
+          "Cache-Control": "public, max-age=60",
         },
       }
     );
@@ -143,24 +109,3 @@ function optimizeCenter(center: Center, lightweight: boolean): Center {
   // Return full center data
   return center;
 }
-
-// Load centers data from file system
-// async function loadCentersData(): Promise<CentersData> {
-//   console.log(process.cwd());
-//   // Load only from the main data file
-//   const mainFilePath = path.join(process.cwd(), "Center-Processed.json");
-//   if (fs.existsSync(mainFilePath)) {
-//     try {
-//       const fileContents = fs.readFileSync(mainFilePath, "utf8");
-//       return JSON.parse(fileContents) as CentersData;
-//     } catch (error) {
-//       console.error("Error reading centers data:", error);
-//       throw new Error("Failed to load centers data");
-//     }
-//   } else {
-//     console.error("Centers data file not found at:", mainFilePath);
-//     throw new Error("Centers data file not found");
-//   }
-// }
-
-

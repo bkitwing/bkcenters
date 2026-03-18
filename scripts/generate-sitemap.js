@@ -1,50 +1,86 @@
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 const prettier = require('prettier');
+require('dotenv').config();
 
 // Base URL for the website
 const BASE_URL = 'https://www.brahmakumaris.com/centers';
 
+const STRAPI_BASE_URL = process.env.STRAPI_BASE_URL;
+const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
+
+function parseBaseUrl(url) {
+  const parsed = new URL(url);
+  return { hostname: parsed.hostname, basePath: parsed.pathname.replace(/\/$/, '') };
+}
+
+function strapiGet(endpoint) {
+  const { hostname, basePath } = parseBaseUrl(STRAPI_BASE_URL);
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname,
+      path: basePath + '/' + endpoint,
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + STRAPI_TOKEN },
+      timeout: 30000
+    };
+    const req = https.request(options, res => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(d)); }
+        catch (e) { reject(new Error(`Parse error: ${d.substring(0, 200)}`)); }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Request timeout')); });
+    req.end();
+  });
+}
+
+async function fetchAllCenters() {
+  let all = [];
+  let page = 1;
+  const pop = 'populate=district_center.state_center.region_center';
+  while (true) {
+    const res = await strapiGet(`centers?${pop}&pagination[page]=${page}&pagination[pageSize]=100`);
+    all = all.concat(res.data || []);
+    if (page >= (res.meta?.pagination?.pageCount || 0)) break;
+    page++;
+  }
+  return all.map(entry => {
+    const a = entry.attributes;
+    const district = a.district_center?.data?.attributes;
+    const state = district?.state_center?.data?.attributes;
+    const region = state?.region_center?.data?.attributes;
+    return {
+      name: a.name || '',
+      branch_code: a.branch_code || '',
+      region: region?.name || '',
+      state: state?.name || '',
+      district: district?.name || '',
+    };
+  });
+}
+
 async function generateSitemap() {
-  console.log('Generating sitemap...');
+  console.log('Generating sitemap from Strapi...');
   
-  // Try to find the centers data file
-  const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
-  const rootFilePath = path.join(process.cwd(), 'Center-Processed.json');
-  
-  let filePath;
-  if (fs.existsSync(publicFilePath)) {
-    filePath = publicFilePath;
-    console.log('Using data file from public directory');
-  } else if (fs.existsSync(rootFilePath)) {
-    filePath = rootFilePath;
-    console.log('Using data file from root directory');
-  } else {
-    console.error('Centers data file not found in any location');
-    throw new Error('Centers data file not found in any location');
+  if (!STRAPI_BASE_URL || !STRAPI_TOKEN) {
+    console.error('Missing STRAPI_BASE_URL or STRAPI_TOKEN in .env');
+    process.exit(1);
   }
+
+  const centers = await fetchAllCenters();
+  console.log(`Loaded ${centers.length} centers from Strapi`);
   
-  // Read and parse the file
-  const fileContent = fs.readFileSync(filePath, 'utf8');
-  const data = JSON.parse(fileContent);
+  const dataLastmod = new Date().toISOString();
   
-  if (!data || !data.data || !Array.isArray(data.data)) {
-    console.error('Invalid data structure in centers file');
-    throw new Error('Invalid data structure in centers file');
-  }
-  
-  console.log(`Loaded ${data.data.length} centers from file`);
-  
-  // Use the data file's last modification time as lastmod for all URLs.
-  // This way lastmod only changes when the actual centers data changes, not on every build.
-  const fileStats = fs.statSync(filePath);
-  const dataLastmod = fileStats.mtime.toISOString();
-  
-  // Extract all regions, states, districts, and centers
+  // Extract all regions, states, districts
   const regions = new Set();
   const states = new Map(); // state -> region
   const districts = new Map(); // `${state}:${district}` -> state
-  const centers = data.data;
   
   // Process centers to build mappings
   centers.forEach((center) => {

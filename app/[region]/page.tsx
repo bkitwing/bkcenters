@@ -1,11 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-// Use server-side data functions that read directly from JSON file (ISR-compatible)
+// Use server-side data functions — targeted Strapi queries per page
 import { 
-  getStatesByRegion, 
-  getStatesSummary, 
-  getAllCenters, 
-  getRegions,
   getCentersByRegion,
   getStatesByRegionFast,
   getRegionBySlug
@@ -17,9 +13,8 @@ import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
 
-// ISR: Page will be generated on first request and cached until next build
-// Since Center-Processed.json only changes during build, we can cache indefinitely
-export const revalidate = false;
+// Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
+export const revalidate = 86400;
 
 // Define a unified type for state data
 interface StateData {
@@ -105,91 +100,19 @@ export default async function RegionPage({ params }: RegionPageProps) {
   const regionSlug = decodeURIComponent(params.region);
   const region = await getRegionBySlug(regionSlug) || regionSlug;
   
-  // If the region is INDIA, show all states grouped by their regions
-  let states;
-  let statesByRegion: Record<string, StateData[]> = {};
-  let totalCenters = 0;
-  let totalDistricts = 0;
-  let availableRegions: string[] = [];
+  // Targeted Strapi query: fetch only centers for this region
+  const regionStates = await getStatesByRegionFast(region);
   
-  if (region === 'INDIA') {
-    // Get all states with summary data
-    const statesSummary = await getStatesSummary();
-    
-    // Get all centers to find region data - but filter out non-India centers
-    const allCenters = await getAllCenters();
-    const indiaCenters = allCenters.filter(c => c.country === 'INDIA' && (!c.region || c.region === 'INDIA'));
-    
-    // Get all available regions
-    availableRegions = await getRegions();
-    
-    // Create a mapping of state to region
-    const stateToRegion: Record<string, string> = {};
-    allCenters.forEach(center => {
-      if (center.state && center.region && center.country === 'INDIA') {
-        stateToRegion[center.state] = center.region;
-      }
-    });
-    
-    // Group states by region - only for India-related regions
-    availableRegions
-      .filter(r => r === 'INDIA')
-      .forEach(regionName => {
-        statesByRegion[regionName] = [];
-      });
-    
-    // Add states to their regions - only for INDIA region
-    statesSummary.forEach(state => {
-      // Only process states that belong to India region
-      const centerInState = allCenters.find(c => c.state === state.state);
-      if (!centerInState || centerInState.country !== 'INDIA') {
-        return; // Skip non-India states
-      }
-      
-      // Only include in INDIA region if explicitly set or missing
-      const stateRegion = stateToRegion[state.state];
-      if (stateRegion && stateRegion !== 'INDIA') {
-        return; // Skip states that belong to other specific regions
-      }
-      
-      const regionToUse = 'INDIA';
-      
-      if (!statesByRegion[regionToUse]) {
-        statesByRegion[regionToUse] = [];
-      }
-      
-      statesByRegion[regionToUse].push({
-        name: state.state,
-        centerCount: state.centerCount,
-        districtCount: state.districtCount
-      });
-      
-      totalCenters += state.centerCount;
-      totalDistricts += state.districtCount;
-    });
-    
-    // Use the same interface for both cases
-    states = Object.values(statesByRegion).flat();
-  } else {
-    // For specific regions, just show states in that region
-    // Use the faster function that works with our mapping
-    const regionStates = await getStatesByRegionFast(region);
-    
-    // Filter centers to only include those from this specific region
-    const regionCenters = await getCentersByRegion(region);
-    console.log(`Found ${regionCenters.length} centers for region "${region}"`);
-    
-    states = regionStates;
-    statesByRegion[region] = states;
-    
-    // Calculate totals
-    totalCenters = states.reduce((sum, state) => sum + state.centerCount, 0);
-    totalDistricts = states.reduce((sum, state) => sum + state.districtCount, 0);
-  }
+  const states = regionStates;
+  const statesByRegion: Record<string, StateData[]> = { [region]: states };
+  
+  // Calculate totals
+  const totalCenters = states.reduce((sum, state) => sum + state.centerCount, 0);
+  const totalDistricts = states.reduce((sum, state) => sum + state.districtCount, 0);
   
   // Base URL for structured data
-  const baseUrl = process.env.NODE_ENV === 'development' || process.env.IS_LOCAL === 'true' 
-    ? 'http://localhost:5400' 
+  const baseUrl = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5400/centers' 
     : 'https://www.brahmakumaris.com/centers';
 
   // Breadcrumb items for structured data
@@ -257,7 +180,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
           </div>
           <div className="bg-spirit-blue-50 p-3 rounded-lg border border-spirit-blue-100">
             <div className="text-secondary text-2xl font-bold">
-              {region === 'INDIA' ? Object.keys(statesByRegion).reduce((sum, r) => sum + statesByRegion[r].length, 0) : states.length}
+              {states.length}
             </div>
             <div className="text-neutral-600 text-sm">States & UT</div>
           </div>

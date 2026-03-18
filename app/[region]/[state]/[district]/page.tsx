@@ -15,9 +15,8 @@ import DistrictPageClient from './DistrictPageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
 
-// ISR: Page will be generated on first request and cached until next build
-// Since Center-Processed.json only changes during build, we can cache indefinitely
-export const revalidate = false;
+// Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
+export const revalidate = 86400;
 
 interface DistrictPageProps {
   params: {
@@ -128,8 +127,8 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
   }
   
   // Base URL for structured data
-  const baseUrl = process.env.NODE_ENV === 'development' || process.env.IS_LOCAL === 'true' 
-    ? 'http://localhost:5400' 
+  const baseUrl = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5400/centers' 
     : 'https://www.brahmakumaris.com/centers';
 
   // Breadcrumb items for structured data

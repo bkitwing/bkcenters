@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
-import { getCenterByCode, getCentersByDistrict, getRegionForState, getNearestCenters } from '@/lib/serverCenterData';
+import { getCenterByCode, getCentersByDistrict, getRegionForState } from '@/lib/serverCenterData';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
@@ -23,9 +23,8 @@ const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   loading: () => <div className="h-full w-full bg-neutral-100 rounded-lg animate-pulse" />,
 });
 
-// ISR: Page will be generated on first request and cached until next build
-// Since Center-Processed.json only changes during build, we can cache indefinitely
-export const revalidate = false;
+// Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
+export const revalidate = 86400;
 
 // Extended interface for centers with optional service and timing data
 interface CenterWithServices extends Center {
@@ -163,7 +162,7 @@ function getBaseUrl(): string {
     return process.env.NEXT_PUBLIC_BASE_URL;
   }
   // For local development
-  if (process.env.NODE_ENV === 'development' || process.env.IS_LOCAL === 'true') {
+  if (process.env.NODE_ENV === 'development') {
     return 'http://localhost:5400/centers';
   }
   // Production default
@@ -267,19 +266,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
       description: formattedAddress
     };
 
-    // Get nearby centers
-    let nearbyCenters: Center[] = [];
-    if (center?.coords && Array.isArray(center.coords) && center.coords.length === 2) {
-      const [lat, lng] = center.coords.map(parseFloat);
-      if (!isNaN(lat) && !isNaN(lng)) {
-        // Get 7 nearest centers (including the current one)
-        const allNearbyCenters = await getNearestCenters(lat, lng, 7);
-        // Filter out the current center
-        nearbyCenters = allNearbyCenters
-          .filter(nearbyCenter => nearbyCenter.branch_code !== center.branch_code)
-          .slice(0, 6); // Limit to 6 centers
-      }
-    }
+    // Get nearby centers from same district (targeted query, no bulk fetch)
+    const districtCenters = await getCentersByDistrict(center.state, center.district);
+    const nearbyCenters = districtCenters
+      .filter(c => c.branch_code !== center.branch_code)
+      .slice(0, 6);
 
     // Prepare centers for map display
     const mapCenters = [

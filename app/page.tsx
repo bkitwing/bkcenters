@@ -1,20 +1,11 @@
 import { Suspense } from "react";
-import {
-  getStatesSummary,
-  getAllCenters,
-  getRegionsWithDetails,
-  getRegionToStateMapping,
-  getRetreatCenters,
-} from "@/lib/centerData";
 import HomePageClient from "@/components/HomePageClient";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { RETREAT_CENTER_BRANCH_CODES } from '@/lib/retreatCenters';
-import path from 'path';
-import fs from 'fs';
+import { loadCentersLightweight } from '@/lib/strapiClient';
 
-// ISR: Page will be generated at build time and cached until next build
-// Since Center-Processed.json only changes during build, we can cache indefinitely
-export const revalidate = false;
+// Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
+export const revalidate = 86400;
 
 // Type for state summary
 type StateSummary = {
@@ -23,33 +14,12 @@ type StateSummary = {
   districtCount: number;
 };
 
-// Helper function to load centers directly from file (for server-side)
+// Load lightweight center data for aggregation (2 API calls instead of 12)
 async function loadCentersFromFile(): Promise<Center[]> {
   try {
-    const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
-    const rootFilePath = path.join(process.cwd(), 'Center-Processed.json');
-    
-    let filePath;
-    if (fs.existsSync(publicFilePath)) {
-      filePath = publicFilePath;
-    } else if (fs.existsSync(rootFilePath)) {
-      filePath = rootFilePath;
-    } else {
-      console.error('Centers data file not found');
-      return [];
-    }
-    
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(fileContent);
-    
-    if (!data || !data.data || !Array.isArray(data.data)) {
-      console.error('Invalid data structure in centers file');
-      return [];
-    }
-    
-    return data.data;
+    return await loadCentersLightweight();
   } catch (error) {
-    console.error('Error loading centers from file:', error);
+    console.error('Error loading centers from Strapi:', error);
     return [];
   }
 }

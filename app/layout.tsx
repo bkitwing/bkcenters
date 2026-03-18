@@ -7,27 +7,19 @@ import GoogleAnalytics from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
 import { OrganizationSchema, WebSiteSchema, DatasetSchema } from "../components/StructuredData";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
-// Use server-side data functions that read directly from JSON file (ISR-compatible)
-import { getAllCenters, getStatesSummary } from "@/lib/serverCenterData";
+// Lightweight Strapi queries — only fetch counts, not all 5612 centers
+import { fetchCenterCount, fetchStatAndDistrictCounts } from "@/lib/strapiClient";
 import Link from "next/link";
 
 
 const inter = Inter({ subsets: ["latin"] });
 
 async function getHomeMetadata() {
-  // Get all centers and state summary
-  const allCenters = await getAllCenters();
-  const statesSummary = await getStatesSummary();
-  
-  // Count total centers
-  const totalCenters = allCenters.length;
-  
-  // Count unique states/UTs
-  const uniqueStates = new Set(allCenters.map(center => center.state));
-  const totalStates = uniqueStates.size;
-  
-  // Count total districts from state summary
-  const totalDistricts = statesSummary.reduce((sum, state) => sum + state.districtCount, 0);
+  // 3 tiny API calls instead of loading all centers
+  const [totalCenters, { stateCount: totalStates, districtCount: totalDistricts }] = await Promise.all([
+    fetchCenterCount(),
+    fetchStatAndDistrictCounts(),
+  ]);
   
   return {
     totalCenters,

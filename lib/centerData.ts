@@ -28,55 +28,18 @@ const LOCAL_STORAGE_CENTERS_KEY = 'bkcenters_data_cache';
 const LOCAL_STORAGE_TIMESTAMP_KEY = 'bkcenters_data_timestamp';
 const CACHE_EXPIRY_MS = 1000 * 60 * 60; // 1 hour cache validity
 
-// Helper function to get the correct base path for API calls
-const getBasePath = () => {
-  // Check if we're in browser environment
-  const isBrowser = typeof window !== "undefined";
-  
-  if (isBrowser) {
-    // For client-side, check if we're running in production with base path
-    const currentPath = window.location.pathname;
-    
-    // If the current path starts with /centers, we're running with base path
-    if (currentPath.startsWith('/centers')) {
-      return '/centers';
-    }
-    
-    // Otherwise, no base path needed
-    return '';
-  }
-  
-  // For server-side, check environment
-  const isProd = process.env.NODE_ENV === "production";
-  const isLocalDev = process.env.IS_LOCAL === "true";
-  
-  return isProd && !isLocalDev ? "/centers" : "";
-};
+// basePath is always /centers (matches next.config.js)
+const getBasePath = () => "/centers";
 
 const getOrigin = () => {
-  // Check if we're in browser environment
-  const isBrowser = typeof window !== "undefined";
-  
-  // For client-side, check current location
-  if (isBrowser) {
-    const currentOrigin = window.location.origin;
-    logger.debug("getOrigin: Client-side, using window.location.origin:", currentOrigin);
-    return currentOrigin;
+  // Client-side: use browser's origin
+  if (typeof window !== "undefined") {
+    return window.location.origin;
   }
-  
-  // For server-side, check if we're in local development or production
-  const isLocal = process.env.IS_LOCAL === "true";
-  const isDev = process.env.NODE_ENV === "development";
-  
-  if (isLocal || isDev) {
-    // Local development: use localhost
-    logger.debug("getOrigin: Server-side (local), using localhost");
-    return "http://localhost:5400";
-  } else {
-    // Production: use the actual domain
-    logger.debug("getOrigin: Server-side (production), using production domain");
-    return "https://www.brahmakumaris.com";
-  }
+  // Server-side: detect by environment
+  return process.env.NODE_ENV === "development"
+    ? "http://localhost:5400"
+    : "https://www.brahmakumaris.com";
 };
 
 // Function to build all data mappings - call this once at initialization

@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-// Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { getRetreatCenters } from '@/lib/serverCenterData';
 import { RETREAT_CENTER_BRANCH_CODES } from '@/lib/retreatCenters';
 import { Metadata } from 'next';
@@ -9,13 +8,10 @@ import { Center } from '@/lib/types';
 import MapSection from '@/components/MapSection';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import RetreatPageClient from './RetreatPageClient';
-import path from 'path';
-import fs from 'fs';
 import { logger } from '@/lib/logger';
 
-// ISR: Page will be generated at build time and cached until next build
-// Since Center-Processed.json only changes during build, we can cache indefinitely
-export const revalidate = false;
+// Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   // Get retreat centers to count them
@@ -74,75 +70,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Helper function to load centers directly from file
+// Load retreat centers from Strapi via serverCenterData
 async function loadRetreatCentersFromFile() {
-  logger.debug("Directly loading retreat centers from file");
-  
-  try {
-    // Try multiple locations for the data file
-    const publicFilePath = path.join(process.cwd(), 'public', 'Center-Processed.json');
-    const rootFilePath = path.join(process.cwd(), 'Center-Processed.json');
-    
-    // Check which file exists and use that one
-    let filePath;
-    if (fs.existsSync(publicFilePath)) {
-      filePath = publicFilePath;
-      logger.trace('Using data file from public directory');
-    } else if (fs.existsSync(rootFilePath)) {
-      filePath = rootFilePath;
-      logger.trace('Using data file from root directory');
-    } else {
-      logger.error('Centers data file not found in any location');
-      return [];
-    }
-    
-    // Read and parse the file
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(fileContent);
-    
-    if (!data || !data.data || !Array.isArray(data.data)) {
-      logger.error('Invalid data structure in centers file');
-      return [];
-    }
-    
-    logger.debug(`Loaded ${data.data.length} centers from file`);
-    
-    // Filter retreat centers
-    const retreatCenters = data.data.filter((center: Center) => 
-      center.branch_code && RETREAT_CENTER_BRANCH_CODES.includes(center.branch_code)
-    );
-    
-    logger.debug(`Found ${retreatCenters.length} retreat centers`);
-    
-    if (retreatCenters.length > 0) {
-      logger.debug("Sample retreat centers:");
-      retreatCenters.slice(0, 3).forEach((center: Center) => {
-        logger.debug(`- ${center.name} (${center.branch_code})`);
-      });
-    } else {
-      // Debug why no retreat centers were found
-      const allBranchCodes = data.data
-        .filter((c: Center) => c.branch_code)
-        .map((c: Center) => c.branch_code);
-      
-      // Check if any of our expected retreat centers exist in the data
-      const matchingCodes = RETREAT_CENTER_BRANCH_CODES.filter(code => 
-        allBranchCodes.includes(code)
-      );
-      
-      logger.debug(`Matching branch codes: ${matchingCodes.join(', ')}`);
-    }
-    
-    // Sort centers according to the order in RETREAT_CENTER_BRANCH_CODES
-    return retreatCenters.sort((a: Center, b: Center) => {
-      const indexA = RETREAT_CENTER_BRANCH_CODES.indexOf(a.branch_code);
-      const indexB = RETREAT_CENTER_BRANCH_CODES.indexOf(b.branch_code);
-      return indexA - indexB;
-    });
-  } catch (error) {
-    logger.error('Error loading retreat centers from file:', error);
-    return [];
-  }
+  return getRetreatCenters();
 }
 
 export default async function RetreatCentersPage() {
