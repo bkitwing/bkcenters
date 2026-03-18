@@ -3,55 +3,39 @@
 # Exit on error
 set -e
 
-# Check if script is running in local development mode
-if [ "$1" = "local" ]; then
-  IS_LOCAL=true
-  echo "===== Building for local development ====="
-else
-  IS_LOCAL=false
-  echo "===== Building for production deployment ====="
-fi
+echo "===== Starting production deployment ====="
 
-echo "===== Starting deployment process ====="
+# Step 1: Pull latest code
+echo "Pulling latest code..."
+git pull
 
-# Step 1: Install dependencies
+# Step 2: Install dependencies
 echo "Installing dependencies..."
 npm i
 
-# Step 2: Generate sitemap and robots.txt
-echo "Generating sitemap and robots.txt..."
+# Step 3: Generate sitemap (fetches from Strapi — requires STRAPI_TOKEN in .env)
+echo "Generating sitemap..."
 npm run generate-sitemap
 
-# Step 3: Build the application
+# Step 4: Build the application
+# Next.js automatically loads .env.production (STRAPI_BASE_URL, REVALIDATE_SECRET, NEXT_APP_URL)
 echo "Building the application..."
-if [ "$IS_LOCAL" = true ]; then
-  IS_LOCAL=true npm run build
-else
-  npm run build
-fi
+npm run build
 
-# Step 4: Check if this is a local build
-if [ "$IS_LOCAL" = true ]; then
-  echo "===== Local build completed successfully ====="
-  echo "Run 'PORT=5400 IS_LOCAL=true npm run start' to start the application on port 5400"
-  echo "Or use: npm run start-local"
-  exit 0
-fi
-
-# Step 5: Check if PM2 process exists and stop it
+# Step 5: Restart PM2 (zero-downtime swap)
 if pm2 list | grep -q "bkcenters"; then
-    echo "Stopping existing PM2 process..."
-    pm2 stop bkcenters
-    pm2 delete bkcenters
+    echo "Restarting existing PM2 process..."
+    pm2 restart bkcenters
+else
+    echo "Starting application with PM2 on port 5400..."
+    PORT=5400 pm2 start npm --name bkcenters -- start
 fi
 
-# Step 6: Start the application with PM2 on port 5400
-echo "Starting application with PM2 on port 5400..."
-PORT=5400 pm2 start npm --name bkcenters -- start
-
-# Step 7: Save PM2 configuration
+# Step 6: Save PM2 configuration
 echo "Saving PM2 configuration..."
 pm2 save
 
 echo "===== Deployment completed successfully ====="
-echo "Application is running on port 5400" 
+echo "Application is running on port 5400"
+echo ""
+echo "To update data without rebuilding, run: npm run strapi-sync"
