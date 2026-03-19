@@ -3,7 +3,7 @@ import Link from 'next/link';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { 
   getDistrictsByState, 
-  getCentersByState, 
+  getStateCentersLightweight, 
   getRegionForState, 
   getRegionBySlug,
   getStateBySlug
@@ -28,17 +28,19 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
   const stateSlug = decodeURIComponent(params.state);
   const actualState = await getStateBySlug(stateSlug) || stateSlug;
   
-  // Get all centers in this state to determine the correct region
-  const centers = await getCentersByState(actualState);
-  const districts = await getDistrictsByState(actualState);
-  const actualRegion = centers.length > 0 ? centers[0].region : decodeURIComponent(params.region);
+  // Lightweight: get region from state→region relation (1 tiny API call)
+  const [districts, lightCenters, actualRegion] = await Promise.all([
+    getDistrictsByState(actualState),
+    getStateCentersLightweight(actualState),
+    getRegionForState(actualState),
+  ]);
   
   const title = `${actualState} - Brahma Kumaris Rajyog Meditation Centers - ${actualRegion}`;
-  const description = `Find Brahma Kumaris Rajyog meditation centers in ${actualState}. ${centers.length} centers across ${districts.length} districts.`;
+  const description = `Find Brahma Kumaris Rajyog meditation centers in ${actualState}. ${lightCenters.length} centers across ${districts.length} districts.`;
 
   const ogImage = generateOgImageUrl({
     title: actualState,
-    description: `${centers.length} Centers in ${districts.length} Districts`,
+    description: `${lightCenters.length} Centers in ${districts.length} Districts`,
     type: 'state',
     region: actualRegion,
   });
@@ -99,8 +101,10 @@ export default async function StatePage({ params }: StatePageProps) {
   // Get the actual region for this state from our data
   const stateRegion = await getRegionForState(actualState);
   
-  const districts = await getDistrictsByState(actualState);
-  const centers = await getCentersByState(actualState);
+  const [districts, lightCenters] = await Promise.all([
+    getDistrictsByState(actualState),
+    getStateCentersLightweight(actualState),
+  ]);
   
   // Check if the URL region matches the actual region
   if (actualRegion !== stateRegion && stateRegion !== 'INDIA') {
@@ -119,13 +123,12 @@ export default async function StatePage({ params }: StatePageProps) {
     );
   }
   
-  // Summarize centers by district
+  // Summarize centers by district (using lightweight data — no full Center objects)
   const districtSummary = districts.map(district => {
-    const centersInDistrict = centers.filter(center => center.district === district);
+    const centersInDistrict = lightCenters.filter(c => c.district === district);
     return {
       district,
       centerCount: centersInDistrict.length,
-      // Use the first center's coordinates for the district marker
       coords: centersInDistrict.length > 0 ? centersInDistrict[0].coords : null
     };
   }).sort((a, b) => b.centerCount - a.centerCount); // Sort by number of centers (most first)
@@ -157,9 +160,9 @@ export default async function StatePage({ params }: StatePageProps) {
       <BreadcrumbSchema items={breadcrumbItems} />
       <PlaceSchema 
         name={actualState}
-        description={`Find ${centers.length} Brahma Kumaris Rajyoga Meditation Centers across ${districts.length} districts in ${actualState}.`}
+        description={`Find ${lightCenters.length} Brahma Kumaris Rajyoga Meditation Centers across ${districts.length} districts in ${actualState}.`}
         region={actualRegion}
-        centerCount={centers.length}
+        centerCount={lightCenters.length}
         pageUrl={pageUrl}
         placeType="AdministrativeArea"
       />
@@ -174,7 +177,7 @@ export default async function StatePage({ params }: StatePageProps) {
         actualState={actualState}
         stateRegion={stateRegion}
         districts={districts}
-        centers={centers}
+        totalCenters={lightCenters.length}
         districtSummary={districtSummary}
       />
     </>

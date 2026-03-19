@@ -58,6 +58,7 @@ async function strapiGet<T>(
 
 interface StrapiCenterAttributes {
   name: string;
+  slug: string | null;
   branch_code: string;
   address_line1: string;
   address_line2: string;
@@ -118,6 +119,7 @@ function transformStrapiCenter(entry: StrapiCenterEntry): Center {
 
   return {
     name: a.name || '',
+    slug: a.slug || (a.name || '').toLowerCase().replace(/\s+/g, '-'),
     branch_code: a.branch_code || '',
     address: {
       line1: a.address_line1 || '',
@@ -215,6 +217,31 @@ export async function fetchCenterByBranchCode(branchCode: string): Promise<Cente
 }
 
 /**
+ * Fetch a single center by slug. (1 API call)
+ * When state/district are provided, scopes the query to disambiguate
+ * duplicate names (e.g. "Shahpura" exists in multiple districts).
+ */
+export async function fetchCenterBySlug(
+  slug: string,
+  state?: string,
+  district?: string
+): Promise<Center | null> {
+  let query = `centers?filters[slug][$eq]=${encodeURIComponent(slug)}&${POPULATE}&pagination[pageSize]=1`;
+  if (state) {
+    query += `&filters[district_center][state_center][name][$eq]=${encodeURIComponent(state)}`;
+  }
+  if (district) {
+    query += `&filters[district_center][name][$eq]=${encodeURIComponent(district)}`;
+  }
+  const res = await strapiGet<StrapiCenterEntry[]>(
+    query,
+    { revalidate: 86400, tags: [`center-slug-${slug}`] }
+  );
+  if (!res.data?.length) return null;
+  return transformStrapiCenter(res.data[0]);
+}
+
+/**
  * Fetch centers filtered by state name. (1-2 API calls)
  */
 export async function fetchCentersByState(state: string): Promise<Center[]> {
@@ -264,6 +291,141 @@ export async function fetchRetreatCenters(): Promise<Center[]> {
 // =====================================================
 // LIGHTWEIGHT QUERIES — counts & name lists (1 API call each)
 // =====================================================
+
+// Minimal populate: only hierarchy names, no coords/address/contact (for counting)
+const POPULATE_STATS = 'fields[0]=branch_code&populate[district_center][fields][0]=name&populate[district_center][populate][state_center][fields][0]=name';
+
+// Medium populate: name + slug + coords + district name (for map markers)
+const POPULATE_MAP = 'fields[0]=name&fields[1]=slug&fields[2]=latitude&fields[3]=longitude&populate[district_center][fields][0]=name&populate[district_center][populate][state_center][fields][0]=name';
+
+// Nearby populate: CenterCard-essential fields (name, slug, coords, address, contact, hierarchy)
+const POPULATE_NEARBY = [
+  'fields[0]=name', 'fields[1]=slug', 'fields[2]=branch_code',
+  'fields[3]=latitude', 'fields[4]=longitude',
+  'fields[5]=address_line1', 'fields[6]=address_line2', 'fields[7]=address_line3',
+  'fields[8]=city', 'fields[9]=pincode',
+  'fields[10]=email', 'fields[11]=contact', 'fields[12]=mobile',
+  'fields[13]=country',
+  'populate[district_center][fields][0]=name',
+  'populate[district_center][populate][state_center][fields][0]=name',
+  'populate[district_center][populate][state_center][populate][region_center][fields][0]=name',
+].join('&');
+
+/**
+ * Load all centers with CenterCard-essential fields only.
+ * ~5x smaller payload than full populate, uses page size 2000 (~3 API calls instead of 12).
+ * Used by the /api/centers/nearby endpoint.
+ */
+export async function loadCentersForNearby(): Promise<Center[]> {
+  let all: StrapiCenterEntry[] = [];
+  let page = 1;
+  while (true) {
+    const res = await strapiGet<StrapiCenterEntry[]>(
+      `centers?${POPULATE_NEARBY}&pagination[page]=${page}&pagination[pageSize]=2000`,
+      { revalidate: 86400, tags: ['centers-nearby'] }
+    );
+    all = all.concat(res.data || []);
+    if (page >= res.meta.pagination.pageCount) break;
+    page++;
+  }
+  return all.map(transformStrapiCenter);
+}
+
+/**
+ * Fetch state-level stats for a region (name, centerCount, districtCount).
+ * Uses minimal fields — ~10x smaller payload than full populate.
+ * Region page only needs this, not full center objects.
+ */
+export async function fetchRegionStats(
+  region: string
+): Promise<{ name: string; centerCount: number; districtCount: number }[]> {
+  // Fetch all centers for the region with MINIMAL fields
+  let all: any[] = [];
+  let page = 1;
+  const filter = `centers?filters[district_center][state_center][region_center][name][$eq]=${encodeURIComponent(region)}&${POPULATE_STATS}`;
+  while (true) {
+    const res = await strapiGet<any[]>(
+      `${filter}&pagination[page]=${page}&pagination[pageSize]=2000`,
+      { revalidate: 86400, tags: [`region-stats-${region}`] }
+    );
+    all = all.concat(res.data || []);
+    if (page >= res.meta.pagination.pageCount) break;
+    page++;
+  }
+
+  // Group by state → count centers and unique districts
+  const stateMap = new Map<string, { centerCount: number; districts: Set<string> }>();
+  for (const entry of all) {
+    const district = entry.attributes?.district_center?.data?.attributes;
+    const state = district?.state_center?.data?.attributes;
+    const stateName = state?.name || '';
+    const districtName = district?.name || '';
+    if (!stateName) continue;
+    if (!stateMap.has(stateName)) {
+      stateMap.set(stateName, { centerCount: 0, districts: new Set() });
+    }
+    const sd = stateMap.get(stateName)!;
+    sd.centerCount++;
+    if (districtName) sd.districts.add(districtName);
+  }
+
+  return Array.from(stateMap.entries())
+    .map(([name, data]) => ({
+      name,
+      centerCount: data.centerCount,
+      districtCount: data.districts.size,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Fetch centers for a state with only map-essential fields:
+ * name, slug, coords, district name. No address/email/contact.
+ * ~5x smaller payload than full populate.
+ */
+export async function fetchStateCentersLightweight(
+  state: string
+): Promise<{ name: string; slug: string; district: string; coords: [string, string] }[]> {
+  let all: any[] = [];
+  let page = 1;
+  const filter = `centers?filters[district_center][state_center][name][$eq]=${encodeURIComponent(state)}&${POPULATE_MAP}`;
+  while (true) {
+    const res = await strapiGet<any[]>(
+      `${filter}&pagination[page]=${page}&pagination[pageSize]=2000`,
+      { revalidate: 86400, tags: [`state-centers-light-${state}`] }
+    );
+    all = all.concat(res.data || []);
+    if (page >= res.meta.pagination.pageCount) break;
+    page++;
+  }
+
+  return all.map(entry => {
+    const a = entry.attributes;
+    const district = a.district_center?.data?.attributes;
+    return {
+      name: a.name || '',
+      slug: a.slug || (a.name || '').toLowerCase().replace(/\s+/g, '-'),
+      district: district?.name || '',
+      coords: [
+        a.latitude != null ? String(a.latitude) : '',
+        a.longitude != null ? String(a.longitude) : '',
+      ] as [string, string],
+    };
+  });
+}
+
+/**
+ * Get the region name for a state. (1 API call via state-centers relation)
+ * Replaces the old approach of fetching ALL state centers just for centers[0].region.
+ */
+export async function fetchRegionForState(stateSlug: string): Promise<string | null> {
+  const res = await strapiGet<StrapiNameEntry[]>(
+    `state-centers?filters[slug][$eq]=${encodeURIComponent(stateSlug)}&populate[region_center][fields][0]=name&fields[0]=name&pagination[pageSize]=1`,
+    { revalidate: 86400, tags: [`state-region-${stateSlug}`] }
+  );
+  if (!res.data?.length) return null;
+  return res.data[0].attributes.region_center?.data?.attributes?.name || null;
+}
 
 interface StrapiNameEntry {
   id: number;
@@ -315,6 +477,42 @@ export async function fetchDistrictNamesByState(state: string): Promise<string[]
     { revalidate: 86400, tags: [`district-names-${state}`] }
   );
   return (res.data || []).map(e => e.attributes.name).sort();
+}
+
+/**
+ * Find a region name by its slug. (1 API call)
+ */
+export async function fetchRegionBySlug(slug: string): Promise<string | null> {
+  const res = await strapiGet<StrapiNameEntry[]>(
+    `region-centers?filters[slug][$eq]=${encodeURIComponent(slug)}&fields[0]=name&pagination[pageSize]=1`,
+    { revalidate: 86400, tags: [`region-slug-${slug}`] }
+  );
+  if (!res.data?.length) return null;
+  return res.data[0].attributes.name;
+}
+
+/**
+ * Find a state name by its slug. (1 API call)
+ */
+export async function fetchStateBySlug(slug: string): Promise<string | null> {
+  const res = await strapiGet<StrapiNameEntry[]>(
+    `state-centers?filters[slug][$eq]=${encodeURIComponent(slug)}&fields[0]=name&pagination[pageSize]=1`,
+    { revalidate: 86400, tags: [`state-slug-${slug}`] }
+  );
+  if (!res.data?.length) return null;
+  return res.data[0].attributes.name;
+}
+
+/**
+ * Find a district name by its slug (scoped to state slug). (1 API call)
+ */
+export async function fetchDistrictBySlug(districtSlug: string, stateSlug: string): Promise<string | null> {
+  const res = await strapiGet<StrapiNameEntry[]>(
+    `district-centers?filters[slug][$eq]=${encodeURIComponent(districtSlug)}&filters[state_center][slug][$eq]=${encodeURIComponent(stateSlug)}&fields[0]=name&pagination[pageSize]=1`,
+    { revalidate: 86400, tags: [`district-slug-${districtSlug}-${stateSlug}`] }
+  );
+  if (!res.data?.length) return null;
+  return res.data[0].attributes.name;
 }
 
 // =====================================================

@@ -58,6 +58,12 @@ function extractFirstEmail(emailStr) {
   return null;
 }
 
+// Generate URL-friendly slug from center name (same formula used in formatCenterUrl & sitemap)
+function generateSlug(name) {
+  if (!name) return '';
+  return capitalizeString(name).toLowerCase().replace(/\s+/g, '-');
+}
+
 // Create a hash of the center data to detect changes
 function hashCenter(entry) {
   const key = [
@@ -139,6 +145,7 @@ function buildCenterBody(entry, districtStrapiId) {
 
   const body = {
     name: capitalizeString(entry.name),
+    slug: generateSlug(entry.name),
     branch_code: entry.branch_code || '',
     address_line1: capitalizeString(entry.address?.line1) || '',
     address_line2: capitalizeString(entry.address?.line2) || '',
@@ -242,6 +249,7 @@ async function sync() {
         a.section !== expected.section ||
         a.country_id !== expected.country_id ||
         a.is_retreat !== expected.is_retreat ||
+        (a.slug || '') !== expected.slug ||
         (a.email || null) !== expected.email ||
         (a.latitude != null ? a.latitude : null) !== expected.latitude ||
         (a.longitude != null ? a.longitude : null) !== expected.longitude;
@@ -251,6 +259,7 @@ async function sync() {
         const diffs = [];
         const fields = [
           ['name', a.name, expected.name],
+          ['slug', a.slug || '', expected.slug],
           ['branch_code', a.branch_code, expected.branch_code],
           ['address_line1', a.address_line1, expected.address_line1],
           ['address_line2', a.address_line2, expected.address_line2],
@@ -336,14 +345,14 @@ async function sync() {
 
       // Create region if needed
       if (regionName && !regionByName[regionName]) {
-        const res = await strapiRequest('POST', 'region-centers', { name: regionName });
+        const res = await strapiRequest('POST', 'region-centers', { name: regionName, slug: generateSlug(regionName) });
         regionByName[regionName] = res.data.id;
         console.log(`  + Region: ${regionName}`);
       }
 
       // Create state if needed
       if (stateName && !stateByName[stateName]) {
-        const body = { name: stateName, state_id: entry.state_id || '' };
+        const body = { name: stateName, slug: generateSlug(stateName), state_id: entry.state_id || '' };
         if (regionName && regionByName[regionName]) body.region_center = regionByName[regionName];
         const res = await strapiRequest('POST', 'state-centers', body);
         stateByName[stateName] = res.data.id;
@@ -353,7 +362,7 @@ async function sync() {
       // Create district if needed
       const distKey = stateName + '::' + districtName;
       if (districtName && !districtByKey[distKey]) {
-        const body = { name: districtName, district_id: entry.district_id || '' };
+        const body = { name: districtName, slug: generateSlug(districtName), district_id: entry.district_id || '' };
         if (stateName && stateByName[stateName]) body.state_center = stateByName[stateName];
         const res = await strapiRequest('POST', 'district-centers', body);
         districtByKey[distKey] = res.data.id;

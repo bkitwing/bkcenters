@@ -56,6 +56,7 @@ async function fetchAllCenters() {
     const region = state?.region_center?.data?.attributes;
     return {
       name: a.name || '',
+      slug: a.slug || (a.name || '').toLowerCase().replace(/\s+/g, '-'),
       branch_code: a.branch_code || '',
       region: region?.name || '',
       state: state?.name || '',
@@ -154,8 +155,8 @@ async function generateSitemap() {
       const regionSlug = encodeURIComponent(region.toLowerCase().replace(/\s+/g, '-'));
       const stateSlug = encodeURIComponent(state.toLowerCase().replace(/\s+/g, '-'));
       const districtSlug = encodeURIComponent(district.toLowerCase().replace(/\s+/g, '-'));
-      // Convert center name to URL-friendly slug
-      const centerSlug = encodeURIComponent(name.toLowerCase().replace(/\s+/g, '-'));
+      // Use the slug stored in Strapi (set by sync script)
+      const centerSlug = encodeURIComponent(center.slug);
       
       urls.push({
         url: `${BASE_URL}/${regionSlug}/${stateSlug}/${districtSlug}/${centerSlug}`,

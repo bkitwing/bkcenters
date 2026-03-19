@@ -4,9 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
-import {
-  getNearestCenters,
-} from "@/lib/centerData";
+// getNearestCenters removed — now handled server-side via /api/centers/nearby
 import SearchBar from "@/components/SearchBar";
 import CenterCard from "@/components/CenterCard";
 import { Center, RegionStateMapping } from "@/lib/types";
@@ -96,10 +94,8 @@ export default function HomePageClient({
   const [regionDetails] = useState<{ name: string; stateCount: number; centerCount: number }[]>(initialRegionDetails);
   const [regionToStates] = useState<RegionStateMapping>(initialRegionToStates);
   
-  // All centers - lazy loaded when user searches
-  const [allCenters, setAllCenters] = useState<Center[]>([]);
-  const [centersLoaded, setCentersLoaded] = useState(false);
-  const [centersLoading, setCentersLoading] = useState(false);
+  // Nearby fetch abort controller ref
+  const nearbyAbortRef = useRef<AbortController | null>(null);
   
   const [sortBy, setSortBy] = useState<SortOption>("centers");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -119,6 +115,7 @@ export default function HomePageClient({
   // These are lightweight markers (one per state) pre-computed on the server
   const stateMapMarkersForMap = stateMapMarkers.map((marker) => ({
     name: marker.name,
+    slug: '',
     state: marker.state,
     region: marker.region,
     coords: marker.coords,
@@ -129,34 +126,6 @@ export default function HomePageClient({
     is_state_summary: true,
     branch_code: `state-${marker.state.toLowerCase().replace(/\s+/g, '-')}`,
   })) as Center[];
-
-  // Lazy load all centers when user needs them for search
-  const loadAllCenters = useCallback(async () => {
-    if (centersLoaded || centersLoading) return allCenters;
-    
-    setCentersLoading(true);
-    try {
-      // Determine the correct base path
-      const basePath = typeof window !== 'undefined' && window.location.pathname.startsWith('/centers') 
-        ? '/centers' 
-        : '';
-      
-      const response = await fetch(`${basePath}/api/centers?lightweight=false`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.data && Array.isArray(data.data)) {
-          setAllCenters(data.data);
-          setCentersLoaded(true);
-          return data.data;
-        }
-      }
-    } catch (error) {
-      console.error('Error loading centers:', error);
-    } finally {
-      setCentersLoading(false);
-    }
-    return [];
-  }, [centersLoaded, centersLoading, allCenters]);
 
   // Handle URL params on mount
   useEffect(() => {
@@ -174,39 +143,62 @@ export default function HomePageClient({
     }
   }, [searchParams]);
 
-  // Fetch nearest centers when lat/lng change (lazy loads centers if not already loaded)
+  // Fetch nearest centers from server-side API (no client-side distance calc)
   useEffect(() => {
-    async function fetchCenters() {
-      if (lat && lng) {
-        setLoading(true);
-        try {
-          // Lazy load centers if not already loaded
-          let centers = allCenters;
-          if (!centersLoaded && allCenters.length === 0) {
-            centers = await loadAllCenters();
-          }
-          
-          if (centers.length > 0) {
-            const nearestResults = await getNearestCenters(lat, lng, 150, centers);
-            setAllNearestCenters(nearestResults);
+    if (!lat || !lng) return;
 
-            const filteredCenters = nearestResults.filter(
-              (c) => typeof c.distance === "number" && c.distance <= maxDistance
-            );
+    // Abort any in-flight request
+    nearbyAbortRef.current?.abort();
+    const controller = new AbortController();
+    nearbyAbortRef.current = controller;
 
-            setNearestCenters(filteredCenters.slice(0, 10));
-            setDisplayLimit(10);
-          }
-        } catch (error) {
-          console.error("Error fetching nearest centers:", error);
-        } finally {
+    async function fetchNearby() {
+      setLoading(true);
+      try {
+        const basePath = typeof window !== 'undefined' && window.location.pathname.startsWith('/centers')
+          ? '/centers'
+          : '';
+        const res = await fetch(
+          `${basePath}/api/centers/nearby?lat=${lat}&lng=${lng}&maxDistance=150&limit=50`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const results: (Center & { distance?: number })[] = json.data || [];
+
+        setAllNearestCenters(results);
+
+        const filtered = results.filter(
+          (c) => typeof c.distance === "number" && c.distance <= maxDistance
+        );
+        setNearestCenters(filtered.slice(0, 10));
+        setDisplayLimit(10);
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error("Error fetching nearby centers:", error);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
     }
 
-    fetchCenters();
-  }, [lat, lng, maxDistance, allCenters, centersLoaded, loadAllCenters]);
+    fetchNearby();
+
+    return () => controller.abort();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lat, lng]);
+
+  // Re-filter when maxDistance slider changes (no new API call)
+  useEffect(() => {
+    if (allNearestCenters.length === 0) return;
+    const filtered = allNearestCenters.filter(
+      (c) => typeof c.distance === "number" && c.distance <= maxDistance
+    );
+    setNearestCenters(filtered.slice(0, 10));
+    setDisplayLimit(10);
+  }, [maxDistance, allNearestCenters]);
 
   // Intersection observer for lazy loading
   useEffect(() => {

@@ -2,13 +2,10 @@ import React from 'react';
 import Link from 'next/link';
 // Use server-side data functions — targeted Strapi queries per page
 import { 
-  getCentersByRegion,
   getStatesByRegionFast,
   getRegionBySlug
 } from '@/lib/serverCenterData';
 import { Metadata } from 'next';
-import CenterMap from '@/components/CenterMap';
-import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
@@ -33,12 +30,12 @@ export async function generateMetadata({ params }: RegionPageProps): Promise<Met
   const regionSlug = decodeURIComponent(params.region);
   const actualRegion = await getRegionBySlug(regionSlug) || regionSlug;
   
-  // Get centers and states for this region
-  const centers = await getCentersByRegion(actualRegion);
+  // Get state stats (lightweight — no full center objects)
   const states = await getStatesByRegionFast(actualRegion);
+  const totalCenters = states.reduce((sum, state) => sum + state.centerCount, 0);
   
   const title = `${actualRegion} - Brahma Kumaris Rajyog Meditation Centers`;
-  const description = `Explore Brahma Kumaris Rajyog meditation centers in ${actualRegion}. ${centers.length} centers across ${states.length} states.`;
+  const description = `Explore Brahma Kumaris Rajyog meditation centers in ${actualRegion}. ${totalCenters} centers across ${states.length} states.`;
 
   // Calculate total districts
   const districts = states.reduce((sum, state) => sum + state.districtCount, 0);
@@ -48,7 +45,7 @@ export async function generateMetadata({ params }: RegionPageProps): Promise<Met
 
   const ogImage = generateOgImageUrl({
     title: actualRegion,
-    description: `${centers.length} Centers in ( ${states.length} States-Uts & ${districts} Districts)`,
+    description: `${totalCenters} Centers in ( ${states.length} States-Uts & ${districts} Districts)`,
     type: 'region',
     region: actualRegion,
   });

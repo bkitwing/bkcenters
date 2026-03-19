@@ -7,11 +7,11 @@
 
 import { Center, CentersData, RegionStateMapping, NewsPost } from './types';
 import { logger } from './logger';
-import { deSlugify } from './urlUtils';
 import { RETREAT_CENTER_BRANCH_CODES } from './retreatCenters';
 import {
   loadCentersFromStrapi,
   fetchCenterByBranchCode,
+  fetchCenterBySlug,
   fetchCentersByState,
   fetchCentersByDistrict,
   fetchCentersByRegion,
@@ -22,6 +22,12 @@ import {
   fetchDistrictNamesByState,
   fetchStatAndDistrictCounts,
   fetchNewsByEmail,
+  fetchRegionBySlug,
+  fetchStateBySlug,
+  fetchDistrictBySlug,
+  fetchRegionStats,
+  fetchStateCentersLightweight,
+  fetchRegionForState as fetchRegionForStateFromStrapi,
 } from './strapiClient';
 
 /**
@@ -52,29 +58,19 @@ export async function getCenterByCode(
   const center = await fetchCenterByBranchCode(branchCodeOrName);
   if (center) return center;
 
-  // Fallback: search by name slug
-  const nameSlug = branchCodeOrName.toLowerCase().replace(/\s+/g, '-');
+  // Try slug-based lookup (1 API call) — slug is stored in Strapi by sync script
+  // URL params are lowercase (haryana); Strapi stores Title Case (Haryana)
+  const titleCase = (s: string) => s.replace(/-/g, ' ').split(' ')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const slug = branchCodeOrName.toLowerCase().replace(/\s+/g, '-');
+  const bySlug = await fetchCenterBySlug(
+    slug,
+    state ? titleCase(state) : undefined,
+    district ? titleCase(district) : undefined
+  );
+  if (bySlug) return bySlug;
 
-  // If state & district are available, use a fast district-scoped query (~200ms)
-  // instead of loading ALL 5600+ centers (~10s)
-  // URL params are lowercase (haryana, gurugram); Strapi stores Title Case (Haryana, Gurugram)
-  if (state && district) {
-    const titleCase = (s: string) => s.replace(/-/g, ' ').split(' ')
-      .map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    const districtCenters = await fetchCentersByDistrict(titleCase(state), titleCase(district));
-    const match = districtCenters.find((c) => {
-      const centerNameSlug = c.name.toLowerCase().replace(/\s+/g, '-');
-      return centerNameSlug === nameSlug;
-    });
-    if (match) return match;
-  }
-
-  // Last resort: load all centers (only if district query didn't match)
-  const centers = await loadCentersFromFile();
-  return centers.find((c) => {
-    const centerNameSlug = c.name.toLowerCase().replace(/\s+/g, '-');
-    return centerNameSlug === nameSlug;
-  });
+  return undefined;
 }
 
 /**
@@ -92,17 +88,22 @@ export async function getCentersByDistrict(state: string, district: string): Pro
 }
 
 /**
+ * Get lightweight center data for a state (map markers + district grouping).
+ * Returns only name, slug, district, coords — no address/email/contact.
+ */
+export async function getStateCentersLightweight(state: string) {
+  return fetchStateCentersLightweight(state);
+}
+
+/**
  * Get the region for a specific state.
+ * Uses state→region relation (1 tiny API call) instead of fetching all state centers.
  */
 export async function getRegionForState(state: string): Promise<string> {
-  const centers = await fetchCentersByState(state);
-  const center = centers[0];
-  
-  if (center?.region) {
-    return center.region;
-  }
-  
-  return 'Unknown';
+  // state could be a name ("Haryana") or a slug ("haryana")
+  const slug = state.toLowerCase().replace(/\s+/g, '-');
+  const region = await fetchRegionForStateFromStrapi(slug);
+  return region || 'Unknown';
 }
 
 /**
@@ -328,6 +329,7 @@ export async function getRegionsWithDetails(): Promise<
 
 /**
  * Fast function to get states by region.
+ * Uses lightweight stats query (~10x smaller payload than full center fetch).
  */
 export async function getStatesByRegionFast(region: string): Promise<
   {
@@ -336,31 +338,7 @@ export async function getStatesByRegionFast(region: string): Promise<
     districtCount: number;
   }[]
 > {
-  const allCenters = await fetchCentersByRegion(region);
-  
-  const stateDataMap = new Map<string, { centerCount: number; districts: Set<string> }>();
-  
-  allCenters.forEach((center) => {
-    if (center.state) {
-      if (!stateDataMap.has(center.state)) {
-        stateDataMap.set(center.state, { centerCount: 0, districts: new Set() });
-      }
-      
-      const stateData = stateDataMap.get(center.state)!;
-      stateData.centerCount++;
-      if (center.district) {
-        stateData.districts.add(center.district);
-      }
-    }
-  });
-
-  return Array.from(stateDataMap.entries())
-    .map(([name, data]) => ({
-      name,
-      centerCount: data.centerCount,
-      districtCount: data.districts.size,
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  return fetchRegionStats(region);
 }
 
 /**
@@ -412,61 +390,27 @@ export async function getRegionToStateMapping(): Promise<RegionStateMapping> {
 }
 
 /**
- * Find a region by its slug.
+ * Find a region by its slug. (1 API call via slug field)
  */
 export async function getRegionBySlug(regionSlug: string): Promise<string | null> {
-  const regions = await fetchRegionNames();
-  const possibleFormats = deSlugify(regionSlug);
-
-  for (const format of possibleFormats) {
-    const match = regions.find(
-      (region) => region.toLowerCase() === format.toLowerCase()
-    );
-    if (match) return match;
-  }
-
-  return null;
+  return fetchRegionBySlug(regionSlug);
 }
 
 /**
- * Find a state by its slug.
+ * Find a state by its slug. (1 API call via slug field)
  */
 export async function getStateBySlug(stateSlug: string): Promise<string | null> {
-  const stateEntries = await fetchStateNames();
-  const stateNames = stateEntries.map(s => s.name);
-  const possibleFormats = deSlugify(stateSlug);
-
-  for (const format of possibleFormats) {
-    const match = stateNames.find(
-      (state) => state.toLowerCase() === format.toLowerCase()
-    );
-    if (match) return match;
-  }
-
-  return null;
+  return fetchStateBySlug(stateSlug);
 }
 
 /**
- * Find a district by its slug.
+ * Find a district by its slug (scoped by state slug). (1 API call via slug field)
  */
 export async function getDistrictBySlug(
   stateSlug: string,
   districtSlug: string
 ): Promise<string | null> {
-  const state = await getStateBySlug(stateSlug);
-  if (!state) return null;
-
-  const districts = await fetchDistrictNamesByState(state);
-  const possibleFormats = deSlugify(districtSlug);
-
-  for (const format of possibleFormats) {
-    const match = districts.find(
-      (district) => district.toLowerCase() === format.toLowerCase()
-    );
-    if (match) return match;
-  }
-
-  return null;
+  return fetchDistrictBySlug(districtSlug, stateSlug);
 }
 
 /**

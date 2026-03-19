@@ -13,11 +13,11 @@ interface StatePageClientProps {
   actualState: string;
   stateRegion: string;
   districts: string[];
-  centers: Center[];
+  totalCenters: number;
   districtSummary: {
     district: string;
     centerCount: number;
-    coords: any | null;
+    coords: [string, string] | null;
   }[];
 }
 
@@ -26,34 +26,37 @@ export default function StatePageClient({
   actualState,
   stateRegion,
   districts,
-  centers,
+  totalCenters,
   districtSummary
 }: StatePageClientProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
   
   // Prepare all district map markers - computed once
+  // Built from districtSummary directly (no full Center objects needed)
   const allDistrictMarkers = useMemo(() => {
     return districtSummary.map(item => {
       if (!item.coords) return null;
       
-      // Find a center to use as the base for the marker
-      const sampleCenter = centers.find(center => center.district === item.district);
-      if (!sampleCenter) return null;
-      
       return {
-        ...sampleCenter,
         name: item.district,
+        slug: '',
+        branch_code: `district-${item.district.toLowerCase().replace(/\s+/g, '-')}`,
+        address: { line1: '', line2: '', line3: '', city: '', pincode: '' },
+        email: '', contact: '', mobile: '',
+        country: '', zone: '', sub_zone: '', section: '',
+        district_id: '', state_id: '', country_id: '',
+        coords: item.coords,
+        state: actualState,
+        region: actualRegion,
+        district: item.district,
         description: `${item.centerCount} meditation ${item.centerCount === 1 ? 'center' : 'centers'}`,
         district_total: item.centerCount,
         is_district_summary: true,
-        // Add the district name for filtering
-        district: item.district,
-        // Add highlighting property
         is_highlighted: selectedDistrict === item.district
       };
     }).filter(Boolean) as Center[];
-  }, [centers, districtSummary, selectedDistrict]);
+  }, [districtSummary, selectedDistrict, actualState, actualRegion]);
 
   // Handle district selection from map
   const handleDistrictSelect = (center: Center) => {
@@ -153,7 +156,7 @@ export default function StatePageClient({
       
       <h1 className="text-3xl font-bold spiritual-text-gradient">{actualState} Centers</h1>
       <p className="text-sm text-neutral-600 mb-6">
-        {centers.length} Brahma Kumaris meditation {centers.length === 1 ? 'center' : 'centers'} across {districts.length} {districts.length === 1 ? 'district' : 'districts'} in {actualState}, {stateRegion}
+        {totalCenters} Brahma Kumaris meditation {totalCenters === 1 ? 'center' : 'centers'} across {districts.length} {districts.length === 1 ? 'district' : 'districts'} in {actualState}, {stateRegion}
       </p>
       
       <div className="grid md:grid-cols-5 gap-6 mb-8">

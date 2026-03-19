@@ -33,9 +33,11 @@ export async function generateMetadata({ params }: DistrictPageProps): Promise<M
   const actualState = await getStateBySlug(stateSlug) || stateSlug;
   const actualDistrict = await getDistrictBySlug(stateSlug, districtSlug) || districtSlug;
   
-  // Get all centers in this district to determine the correct region
-  const centers = await getCentersByDistrict(actualState, actualDistrict);
-  const actualRegion = centers.length > 0 ? centers[0].region : decodeURIComponent(params.region);
+  // Parallel: fetch centers + region (lightweight state→region relation)
+  const [centers, actualRegion] = await Promise.all([
+    getCentersByDistrict(actualState, actualDistrict),
+    getRegionForState(actualState),
+  ]);
   
   const title = `${actualDistrict} - Brahma Kumaris Rajyog Meditation Centers - ${actualState}`;
   const description = `Discover ${centers.length} Brahma Kumaris Rajyog meditation centers in ${actualDistrict}, ${actualState}.`;

@@ -8,6 +8,7 @@ export interface CenterAddress {
 
 export interface Center {
   name: string;
+  slug: string;
   branch_code: string;
   address: CenterAddress;
   email: string;

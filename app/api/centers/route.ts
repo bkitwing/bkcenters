@@ -77,6 +77,7 @@ function optimizeCenter(center: Center, lightweight: boolean): Center {
     // Return only essential fields for listing and maps
     return {
       name: center.name,
+      slug: center.slug || '',
       branch_code: center.branch_code,
       district: center.district,
       state: center.state,
