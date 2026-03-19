@@ -7,7 +7,7 @@
  *   - Targeted queries per page — each page fetches only what it needs
  */
 
-import { Center } from './types';
+import { Center, NewsPost } from './types';
 import { logger } from './logger';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
@@ -317,9 +317,100 @@ export async function fetchDistrictNamesByState(state: string): Promise<string[]
   return (res.data || []).map(e => e.attributes.name).sort();
 }
 
+// =====================================================
+// NEWS POSTS — fetched by email match (no relation needed)
+// =====================================================
+
+interface StrapiNewsPostEntry {
+  id: number;
+  title: string;
+  slug: string;
+  date: string;
+  Featured: boolean;
+  featuredImage: {
+    id: number;
+    url: string;
+    alternativeText: string | null;
+    formats: {
+      thumbnail?: { url: string; width: number; height: number };
+      Thumbnail?: { url: string; width: number; height: number };
+      microHD?: { url: string; width: number; height: number };
+      miniHD?: { url: string; width: number; height: number };
+      HD?: { url: string; width: number; height: number };
+      FullHD?: { url: string; width: number; height: number };
+    } | null;
+  } | null;
+}
+
+function transformNewsPost(entry: StrapiNewsPostEntry): NewsPost {
+  return {
+    id: entry.id,
+    title: entry.title || '',
+    slug: entry.slug || '',
+    date: entry.date || '',
+    Featured: entry.Featured || false,
+    featuredImage: entry.featuredImage
+      ? {
+          url: entry.featuredImage.url,
+          alternativeText: entry.featuredImage.alternativeText,
+          formats: entry.featuredImage.formats,
+        }
+      : null,
+  };
+}
+
 /**
- * Get state count and district count. (2 tiny API calls)
+ * Fetch news posts by center email. (1 API call)
+ * Returns latest news sorted by date descending.
+ * Only fetches: title, slug, date, Featured, featuredImage (with formats).
  */
+export async function fetchNewsByEmail(
+  email: string,
+  limit: number = 6
+): Promise<{ posts: NewsPost[]; total: number }> {
+  if (!email || !email.includes('@')) return { posts: [], total: 0 };
+
+  try {
+    const res = await strapiGet<StrapiNewsPostEntry[]>(
+      `news-posts?filters[email][$eq]=${encodeURIComponent(email)}&sort=date:desc&pagination[pageSize]=${limit}&fields[0]=title&fields[1]=slug&fields[2]=date&fields[3]=Featured&populate[featuredImage][fields][0]=url&populate[featuredImage][fields][1]=formats&populate[featuredImage][fields][2]=alternativeText`,
+      { revalidate: 3600, tags: [`news-${email}`] }
+    );
+    return {
+      posts: (res.data || []).map(transformNewsPost),
+      total: res.meta?.pagination?.total || 0,
+    };
+  } catch (error) {
+    logger.error(`strapiClient: Error fetching news for email ${email}:`, error);
+    return { posts: [], total: 0 };
+  }
+}
+
+/**
+ * Fetch news posts by email with pagination support. (1 API call)
+ * Returns { posts, total } for client-side "Load More".
+ */
+export async function fetchNewsByEmailPaginated(
+  email: string,
+  page: number = 1,
+  pageSize: number = 6
+): Promise<{ posts: NewsPost[]; total: number }> {
+  if (!email || !email.includes('@')) return { posts: [], total: 0 };
+
+  try {
+    const res = await strapiGet<StrapiNewsPostEntry[]>(
+      `news-posts?filters[email][$eq]=${encodeURIComponent(email)}&sort=date:desc&pagination[page]=${page}&pagination[pageSize]=${pageSize}&fields[0]=title&fields[1]=slug&fields[2]=date&fields[3]=Featured&populate[featuredImage][fields][0]=url&populate[featuredImage][fields][1]=formats&populate[featuredImage][fields][2]=alternativeText`,
+      { revalidate: 3600, tags: [`news-${email}-p${page}`] }
+    );
+    return {
+      posts: (res.data || []).map(transformNewsPost),
+      total: res.meta?.pagination?.total || 0,
+    };
+  } catch (error) {
+    logger.error(`strapiClient: Error fetching paginated news for email ${email}:`, error);
+    return { posts: [], total: 0 };
+  }
+}
+
 export async function fetchStatAndDistrictCounts(): Promise<{ stateCount: number; districtCount: number }> {
   const [stateRes, districtRes] = await Promise.all([
     strapiGet<StrapiNameEntry[]>(

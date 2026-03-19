@@ -5,7 +5,7 @@
  * IMPORTANT: This file should only be imported in Server Components, not in Client Components.
  */
 
-import { Center, CentersData, RegionStateMapping } from './types';
+import { Center, CentersData, RegionStateMapping, NewsPost } from './types';
 import { logger } from './logger';
 import { deSlugify } from './urlUtils';
 import { RETREAT_CENTER_BRANCH_CODES } from './retreatCenters';
@@ -21,6 +21,7 @@ import {
   fetchStateNames,
   fetchDistrictNamesByState,
   fetchStatAndDistrictCounts,
+  fetchNewsByEmail,
 } from './strapiClient';
 
 /**
@@ -42,13 +43,33 @@ export async function loadCentersFromFile(): Promise<Center[]> {
 /**
  * Get a center by its branch code or name slug.
  */
-export async function getCenterByCode(branchCodeOrName: string): Promise<Center | undefined> {
+export async function getCenterByCode(
+  branchCodeOrName: string,
+  state?: string,
+  district?: string
+): Promise<Center | undefined> {
   // Try targeted Strapi query by branch_code first (1 API call)
   const center = await fetchCenterByBranchCode(branchCodeOrName);
   if (center) return center;
 
-  // Fallback: search by name slug (needs all centers)
+  // Fallback: search by name slug
   const nameSlug = branchCodeOrName.toLowerCase().replace(/\s+/g, '-');
+
+  // If state & district are available, use a fast district-scoped query (~200ms)
+  // instead of loading ALL 5600+ centers (~10s)
+  // URL params are lowercase (haryana, gurugram); Strapi stores Title Case (Haryana, Gurugram)
+  if (state && district) {
+    const titleCase = (s: string) => s.replace(/-/g, ' ').split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const districtCenters = await fetchCentersByDistrict(titleCase(state), titleCase(district));
+    const match = districtCenters.find((c) => {
+      const centerNameSlug = c.name.toLowerCase().replace(/\s+/g, '-');
+      return centerNameSlug === nameSlug;
+    });
+    if (match) return match;
+  }
+
+  // Last resort: load all centers (only if district query didn't match)
   const centers = await loadCentersFromFile();
   return centers.find((c) => {
     const centerNameSlug = c.name.toLowerCase().replace(/\s+/g, '-');
@@ -460,5 +481,13 @@ export async function getRetreatCenters(): Promise<Center[]> {
     const indexB = RETREAT_CENTER_BRANCH_CODES.indexOf(b.branch_code);
     return indexA - indexB;
   });
+}
+
+/**
+ * Get news posts for a center by email match.
+ * Returns latest news sorted by date descending (default limit: 6).
+ */
+export async function getNewsByEmail(email: string, limit?: number): Promise<{ posts: NewsPost[]; total: number }> {
+  return fetchNewsByEmail(email, limit);
 }
 

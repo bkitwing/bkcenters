@@ -1,6 +1,6 @@
 'use client';
 
-import { Center } from '@/lib/types';
+import { Center, NewsPost } from '@/lib/types';
 
 interface OrganizationSchemaProps {
   baseUrl?: string;
@@ -535,6 +535,83 @@ export function DatasetSchema({ totalCenters }: DatasetSchemaProps) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+interface NewsArticleListSchemaProps {
+  posts: NewsPost[];
+  centerName: string;
+  centerUrl: string;
+}
+
+export function NewsArticleListSchema({ posts, centerName, centerUrl }: NewsArticleListSchemaProps) {
+  if (!posts || posts.length === 0) return null;
+
+  const NEWS_BASE_URL = 'https://www.brahmakumaris.com/news/post';
+
+  const articleSchemas = posts.map((post) => {
+    const imageUrl =
+      post.featuredImage?.formats?.HD?.url ||
+      post.featuredImage?.formats?.miniHD?.url ||
+      post.featuredImage?.url ||
+      undefined;
+
+    const schema: Record<string, any> = {
+      '@type': 'NewsArticle',
+      headline: post.title,
+      url: `${NEWS_BASE_URL}/${post.slug}`,
+      datePublished: post.date,
+      publisher: {
+        '@type': 'Organization',
+        '@id': 'https://www.brahmakumaris.com/#organization',
+        name: 'Brahma Kumaris',
+        url: 'https://www.brahmakumaris.com',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://www.brahmakumaris.com/centers/brahma-kumaris-logo.webp',
+        },
+      },
+      author: {
+        '@type': 'Organization',
+        name: 'Brahma Kumaris',
+        url: 'https://www.brahmakumaris.com',
+      },
+      about: {
+        '@type': 'Place',
+        name: centerName,
+        url: centerUrl,
+      },
+    };
+
+    if (imageUrl) {
+      schema.image = {
+        '@type': 'ImageObject',
+        url: imageUrl,
+        caption: post.featuredImage?.alternativeText || post.title,
+      };
+    }
+
+    return schema;
+  });
+
+  const listSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `News & Updates from ${centerName}`,
+    description: `Latest news and updates from ${centerName}, a Brahma Kumaris Rajyoga Meditation Center.`,
+    numberOfItems: posts.length,
+    itemListElement: articleSchemas.map((article, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: article,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(listSchema) }}
     />
   );
 }

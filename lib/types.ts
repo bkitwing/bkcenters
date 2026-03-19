@@ -35,6 +35,28 @@ export interface Center {
   distance?: number; // For distance calculations
 }
 
+export interface NewsPostImage {
+  url: string;
+  alternativeText: string | null;
+  formats: {
+    thumbnail?: { url: string; width: number; height: number };
+    Thumbnail?: { url: string; width: number; height: number };
+    microHD?: { url: string; width: number; height: number };
+    miniHD?: { url: string; width: number; height: number };
+    HD?: { url: string; width: number; height: number };
+    FullHD?: { url: string; width: number; height: number };
+  } | null;
+}
+
+export interface NewsPost {
+  id: number;
+  title: string;
+  slug: string;
+  date: string;
+  Featured: boolean;
+  featuredImage: NewsPostImage | null;
+}
+
 export interface CentersData {
   map(arg0: (center: any) => Center): unknown;
   length: any;

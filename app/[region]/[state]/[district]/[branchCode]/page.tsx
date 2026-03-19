@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
-import { getCenterByCode, getCentersByDistrict, getRegionForState } from '@/lib/serverCenterData';
+import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmail } from '@/lib/serverCenterData';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
@@ -12,9 +12,10 @@ import ContactLink from '@/components/ContactLink';
 import FAQSection from '@/components/FAQSection';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
-import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema } from '@/components/StructuredData';
+import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema, NewsArticleListSchema } from '@/components/StructuredData';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
+import NewsSection from '@/components/NewsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 
@@ -43,7 +44,7 @@ interface CenterPageProps {
 
 export async function generateMetadata({ params }: CenterPageProps): Promise<Metadata> {
   try {
-    const center = await getCenterByCode(params.branchCode) as CenterWithServices;
+    const center = await getCenterByCode(params.branchCode, params.state, params.district) as CenterWithServices;
     
     if (!center) {
       return {
@@ -182,7 +183,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
   let actualRegion = urlRegion;
 
   try {
-    const center = await getCenterByCode(branchCode) as CenterWithServices;
+    const center = await getCenterByCode(branchCode, state, district) as CenterWithServices;
     
     // Try to get the region from the center data
     if (center?.region) {
@@ -267,7 +268,12 @@ export default async function CenterPage({ params }: CenterPageProps) {
     };
 
     // Get nearby centers from same district (targeted query, no bulk fetch)
-    const districtCenters = await getCentersByDistrict(center.state, center.district);
+    // Fetch news posts in parallel with nearby centers for performance
+    const [districtCenters, newsData] = await Promise.all([
+      getCentersByDistrict(center.state, center.district),
+      getNewsByEmail(center.email, 6),
+    ]);
+    const { posts: newsPosts, total: newsTotalCount } = newsData;
     const nearbyCenters = districtCenters
       .filter(c => c.branch_code !== center.branch_code)
       .slice(0, 6);
@@ -339,6 +345,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <CourseSchema centerName={center.name} centerUrl={absoluteUrl} />
         <EventSchema center={center} centerUrl={absoluteUrl} />
         <HowToSchema center={center} centerUrl={absoluteUrl} />
+        <NewsArticleListSchema posts={newsPosts} centerName={center.name} centerUrl={absoluteUrl} />
 
         {/* Improved Responsive Breadcrumb Navigation */}
         <nav className="mb-4">
@@ -541,6 +548,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
               </div>
             )}
             
+            {/* News & Updates Section */}
+            <NewsSection
+              initialPosts={newsPosts}
+              totalCount={newsTotalCount}
+              email={center.email}
+            />
+
             {/* Collapsible Nearby Centers Section */}
             {nearbyCenters.length > 0 && (
               <CollapsibleSection 
