@@ -543,7 +543,7 @@ export default function HomePageClient({
 
       {/* AI-citable prose summary — kept visible for crawlers and AI Overview citations */}
       <p className="text-center text-neutral-600 text-sm sm:text-base max-w-2xl mx-auto mb-6">
-        Brahma Kumaris offers spiritual learning to all through its Rajyoga Meditation Centers across India and in 110+ countries worldwide. In India, its presence spans 36 states and union territories, and <strong>{totalCenters.toLocaleString()} centers</strong>. Find your nearest center for free meditation classes and 7-day Rajyoga courses.
+        Offers spiritual learning to all across India and in 110+ countries worldwide. In India, its presence spans 36 states and union territories, and <strong>{totalCenters.toLocaleString()} centers</strong>. Find your nearest center for free meditation classes and 7-day Rajyoga courses.
       </p>
 
       {/* Search Bar - First on the page */}
