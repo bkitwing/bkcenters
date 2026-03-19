@@ -13,22 +13,10 @@ type ContactType = 'LearnMeditation' | 'Query' | 'AttendEvent' | 'Feedback' | 'O
 
 // Helper function to get the correct API base URL
 const getApiUrl = () => {
-  // Check if we're in a client-side environment
+  // basePath is always /centers in next.config.js, so all API routes
+  // are served under /centers/api/... in both dev and production
   if (typeof window !== 'undefined') {
-    // On client side, we need to handle basePath correctly
-    const isProduction = window.location.hostname === 'www.brahmakumaris.com';
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
-    if (isLocal) {
-      // For local development, use the current origin directly
-      return window.location.origin;
-    } else if (isProduction) {
-      // For production, we need to include the basePath in the API URL
-      return `${window.location.origin}/centers`;
-    } else {
-      // For other environments, use the current origin
-      return window.location.origin;
-    }
+    return `${window.location.origin}/centers`;
   }
   
   // Server-side fallback (should not be reached in client components)
