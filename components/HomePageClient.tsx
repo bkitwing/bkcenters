@@ -477,21 +477,13 @@ export default function HomePageClient({
   const StatsSummary = () => {
     return (
       <div className="stats-bar bg-white p-4 rounded-lg shadow-md mb-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
             <div className="stat-value text-primary text-lg sm:text-xl font-bold">
               {totalCenters.toLocaleString()}
             </div>
             <div className="stat-label text-neutral-600 text-xs sm:text-sm">
               Meditation Centers
-            </div>
-          </div>
-          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
-            <div className="stat-value text-secondary text-lg sm:text-xl font-bold">
-              {totalDistricts.toLocaleString()}
-            </div>
-            <div className="stat-label text-neutral-600 text-xs sm:text-sm">
-              In Districts
             </div>
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
@@ -551,7 +543,7 @@ export default function HomePageClient({
 
       {/* AI-citable prose summary — kept visible for crawlers and AI Overview citations */}
       <p className="text-center text-neutral-600 text-sm sm:text-base max-w-2xl mx-auto mb-6">
-        Brahma Kumaris operates <strong>{totalCenters.toLocaleString()} Rajyoga Meditation Centers</strong> across {totalStates} states and union territories in India and Nepal, covering {totalDistricts.toLocaleString()} districts. Find your nearest center offering free meditation classes and 7-day Rajyoga courses — open to everyone, free of charge.
+        Brahma Kumaris offers spiritual learning to all through its Rajyoga Meditation Centers across India and in 110+ countries worldwide. In India, its presence spans 36 states and union territories, and <strong>{totalCenters.toLocaleString()} centers</strong>. Find your nearest center for free meditation classes and 7-day Rajyoga courses.
       </p>
 
       {/* Search Bar - First on the page */}

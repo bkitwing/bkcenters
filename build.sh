@@ -6,8 +6,8 @@ set -e
 echo "===== Starting production deployment ====="
 
 # Step 1: Pull latest code
-echo "Pulling latest code..."
-git pull
+#echo "Pulling latest code..."
+#git pull
 
 # Step 2: Install dependencies
 echo "Installing dependencies..."
@@ -18,7 +18,7 @@ echo "Generating sitemap..."
 npm run generate-sitemap
 
 # Step 4: Build the application
-# Next.js automatically loads .env.production (STRAPI_BASE_URL, REVALIDATE_SECRET, NEXT_APP_URL)
+# Next.js loads .env (base config) + .env.production (overrides STRAPI_BASE_URL, NEXT_APP_URL)
 echo "Building the application..."
 npm run build
 

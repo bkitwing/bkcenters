@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { Center } from "@/lib/types";
 import { loadCentersForNearby } from "@/lib/strapiClient";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Server-side nearby center search.
  * Computes distances on the server and returns only the nearest centers.
