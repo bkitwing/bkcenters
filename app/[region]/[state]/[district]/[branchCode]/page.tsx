@@ -425,7 +425,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         </div>
 
         {/* ===== SECTION NAVIGATION (Sticky) ===== */}
-        <div className="sticky top-0 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <div className="sticky top-14 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 shadow-sm">
           <div className="container mx-auto px-4">
             <div className="flex overflow-x-auto scrollbar-hide -mb-px">
               {[
