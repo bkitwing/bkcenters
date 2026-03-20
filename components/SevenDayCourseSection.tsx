@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { BookOpen, Clock, Users, Sparkles, ChevronRight, Calendar, Sun, Circle, Hexagon, Triangle, Diamond, Octagon, Pentagon, Square } from 'lucide-react';
+import CallNowButton from './CallNowButton';
 
 interface SevenDayCourseSectionProps {
   centerName: string;
@@ -208,13 +209,14 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             {(contact || mobile) && (
-              <a
-                href={`tel:${(mobile || contact || '').split(',')[0].trim().replace(/[^0-9+]/g, '')}`}
+              <CallNowButton 
+                contact={contact}
+                mobile={mobile}
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-spirit-purple-600 to-spirit-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
               >
                 <Sun className="w-4 h-4" />
                 Visit Center &amp; Start Learning
-              </a>
+              </CallNowButton>
             )}
           </div>
 

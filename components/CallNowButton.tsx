@@ -8,9 +8,10 @@ interface CallNowButtonProps {
   mobile?: string;
   contact?: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export default function CallNowButton({ mobile, contact, className }: CallNowButtonProps) {
+export default function CallNowButton({ mobile, contact, className, children }: CallNowButtonProps) {
   const [showModal, setShowModal] = useState(false);
 
   const getAllPhoneNumbers = useCallback(() => {
@@ -73,8 +74,12 @@ export default function CallNowButton({ mobile, contact, className }: CallNowBut
         onClick={handleClick}
         className={className || "inline-flex items-center gap-2 bg-white text-spirit-purple-700 px-5 py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"}
       >
-        <Phone className="w-4 h-4" />
-        Call Now
+        {children || (
+          <>
+            <Phone className="w-4 h-4" />
+            Call Now
+          </>
+        )}
       </button>
 
       {/* Phone Selection Modal — portaled to body to escape all stacking contexts */}
