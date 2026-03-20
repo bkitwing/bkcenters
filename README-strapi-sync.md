@@ -78,6 +78,7 @@ Strapi Base URL: `https://webapp.brahmakumaris.com/api`
 2. **Run sync**:
    ```bash
    npm run strapi-sync
+   npm run strapi-sync:dry
    ```
 3. The script will automatically:
    - Detect **new** centers → create them in Strapi

@@ -33,6 +33,8 @@ const DELAY_MS = 200;
 const RETREAT_BRANCH_CODES = ['90001', '90007', '90006'];
 const REPORT_FILE = path.join(__dirname, 'sync-report.json');
 const DETAILED = process.argv.includes('--detailed') || process.argv.includes('-d');
+const AUTO_YES = process.argv.includes('--yes') || process.argv.includes('-y');
+const DRY_RUN = process.argv.includes('--dry-run');
 const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET;
 // Default to local; override with NEXT_APP_URL env var for production
 const NEXT_APP_URL = process.env.NEXT_APP_URL || 'http://localhost:5400';
@@ -167,6 +169,44 @@ function buildCenterBody(entry, districtStrapiId) {
 
   if (districtStrapiId) body.district_center = districtStrapiId;
   return body;
+}
+
+// --- Interactive Prompt ---
+const readline = require('readline');
+
+function askUser(question) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => {
+    rl.question(question, answer => {
+      rl.close();
+      resolve(answer);
+    });
+  });
+}
+
+// Build report object for saving
+function buildReport(toCreate, toUpdate, toDelete) {
+  return {
+    timestamp: new Date().toISOString(),
+    summary: {
+      created: toCreate.length,
+      updated: toUpdate.length,
+      deleted: toDelete.length
+    },
+    created: toCreate.map(e => ({
+      branch_code: e.branch_code,
+      name: capitalizeString(e.name),
+      district: capitalizeString(e.district),
+      state: capitalizeString(e.state),
+      region: capitalizeString(e.region)
+    })),
+    updated: toUpdate.map(({ entry, diffs }) => ({
+      branch_code: entry.branch_code,
+      name: capitalizeString(entry.name),
+      changes: diffs.map(d => ({ field: d.field, from: d.from, to: d.to }))
+    })),
+    deleted: toDelete.map(({ code, name }) => ({ branch_code: code, name }))
+  };
 }
 
 // --- Main Sync ---
@@ -334,6 +374,50 @@ async function sync() {
     return;
   }
 
+  // --- Dry run mode ---
+  if (DRY_RUN) {
+    console.log('🔍 DRY RUN — No changes were made. Review the plan above.\n');
+    const report = buildReport(toCreate, toUpdate, toDelete);
+    fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2), 'utf8');
+    console.log(`  Report saved to: scripts/sync-report.json\n`);
+    return;
+  }
+
+  // --- Confirmation Prompt ---
+  if (!AUTO_YES) {
+    console.log('╔══════════════════════════════════════════════════════════════╗');
+    console.log('║                    ⚠️  CONFIRMATION REQUIRED                 ║');
+    console.log('╠══════════════════════════════════════════════════════════════╣');
+    console.log(`║  CREATE : ${String(toCreate.length).padStart(4)} center(s)                                    ║`);
+    console.log(`║  UPDATE : ${String(toUpdate.length).padStart(4)} center(s)                                    ║`);
+    console.log(`║  DELETE : ${String(toDelete.length).padStart(4)} center(s)                                    ║`);
+    console.log('╠══════════════════════════════════════════════════════════════╣');
+    console.log('║  [y] Yes, proceed with ALL changes                         ║');
+    if (toDelete.length > 0) {
+      console.log('║  [s] Skip deletes — only create & update                   ║');
+    }
+    console.log('║  [n] No, abort — make no changes                           ║');
+    console.log('╚══════════════════════════════════════════════════════════════╝');
+    console.log('');
+
+    const answer = await askUser('Proceed? (y/s/n): ');
+    const choice = answer.trim().toLowerCase();
+
+    if (choice === 'n' || choice === 'no') {
+      console.log('\n❌ Aborted. No changes were made.\n');
+      return;
+    }
+    if (choice === 's' || choice === 'skip') {
+      console.log('\n⏭️  Skipping deletes. Will only create & update.\n');
+      toDelete.length = 0; // Clear the delete list
+    } else if (choice !== 'y' && choice !== 'yes') {
+      console.log('\n❌ Unrecognized input. Aborting for safety. No changes were made.\n');
+      return;
+    } else {
+      console.log('\n✅ Confirmed. Starting sync...\n');
+    }
+  }
+
   // Step 4: Ensure regions/states/districts exist for new entries
   if (toCreate.length > 0) {
     console.log('Ensuring regions/states/districts exist for new entries...');
@@ -426,28 +510,7 @@ async function sync() {
   }
 
   // Summary & Report
-  const report = {
-    timestamp: new Date().toISOString(),
-    summary: {
-      created: toCreate.length,
-      updated: toUpdate.length,
-      deleted: toDelete.length
-    },
-    created: toCreate.map(e => ({
-      branch_code: e.branch_code,
-      name: capitalizeString(e.name),
-      district: capitalizeString(e.district),
-      state: capitalizeString(e.state),
-      region: capitalizeString(e.region)
-    })),
-    updated: toUpdate.map(({ entry, diffs }) => ({
-      branch_code: entry.branch_code,
-      name: capitalizeString(entry.name),
-      changes: diffs.map(d => ({ field: d.field, from: d.from, to: d.to }))
-    })),
-    deleted: toDelete.map(({ code, name }) => ({ branch_code: code, name }))
-  };
-
+  const report = buildReport(toCreate, toUpdate, toDelete);
   fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2), 'utf8');
 
   console.log('=== Sync Complete ===');

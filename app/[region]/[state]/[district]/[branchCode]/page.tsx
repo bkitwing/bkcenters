@@ -14,6 +14,7 @@ import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
 import SevenDayCourseSection from '@/components/SevenDayCourseSection';
 import SoulSustenance from '@/components/SoulSustenance';
+import CallNowButton from '@/components/CallNowButton';
 import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema, NewsArticleListSchema, EventListSchema } from '@/components/StructuredData';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
@@ -400,13 +401,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
             {/* Quick Action Buttons */}
             <div className="flex flex-wrap gap-3">
               {hasMobileOrContact && (
-                <a
-                  href={`tel:${(center.mobile || center.contact || '').split(',')[0].trim().replace(/[^0-9+]/g, '')}`}
-                  className="inline-flex items-center gap-2 bg-white text-spirit-purple-700 px-5 py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
-                >
-                  <Phone className="w-4 h-4" />
-                  Call Now
-                </a>
+                <CallNowButton
+                  mobile={center.mobile}
+                  contact={center.contact}
+                  className="inline-flex items-center gap-2 bg-white text-spirit-purple-700 px-5 py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+                />
               )}
               <a
                 href={getGoogleMapsUrl()}

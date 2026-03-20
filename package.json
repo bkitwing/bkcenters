@@ -10,7 +10,8 @@
     "lint": "next lint",
     "test-seo": "curl -s http://localhost:5400/centers | grep -E '<title>|<meta name=\"description\"|application/ld\\+json' | head -20",
     "generate-sitemap": "node scripts/generate-sitemap.js",
-    "strapi-sync": "node scripts/strapi-sync.js"
+    "strapi-sync": "node scripts/strapi-sync.js",
+    "strapi-sync:dry": "node scripts/strapi-sync.js --dry-run"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.18.1",
