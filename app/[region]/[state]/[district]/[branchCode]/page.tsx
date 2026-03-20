@@ -15,6 +15,7 @@ import StickyBottomNav from '@/components/StickyBottomNav';
 import SevenDayCourseSection from '@/components/SevenDayCourseSection';
 import SoulSustenance from '@/components/SoulSustenance';
 import CallNowButton from '@/components/CallNowButton';
+import GuidedMeditationSection from '@/components/GuidedMeditationSection';
 import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema, NewsArticleListSchema, EventListSchema } from '@/components/StructuredData';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
@@ -22,7 +23,7 @@ import NewsSection from '@/components/NewsSection';
 import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays } from 'lucide-react';
+import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   ssr: false,
@@ -434,6 +435,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
               {[
                 { id: 'info', label: 'Info', icon: MapPin },
                 { id: 'seven-day-course', label: '7-Day Course', icon: BookOpen },
+                { id: 'guided-meditation', label: 'Meditation', icon: Headphones },
                 ...(eventPosts.length > 0 ? [{ id: 'events', label: 'Events', icon: CalendarDays }] : []),
                 ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', icon: Newspaper }] : []),
                 ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', icon: Map }] : []),
@@ -614,6 +616,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
               />
             </div>
           )}
+
+          {/* ===== GUIDED MEDITATION SECTION ===== */}
+          <section id="guided-meditation" className="scroll-mt-20">
+            <GuidedMeditationSection />
+          </section>
 
           {/* ===== NEARBY CENTERS SECTION ===== */}
           {nearbyCenters.length > 0 && (

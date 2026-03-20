@@ -119,13 +119,49 @@ export default function StickyBottomNav({ center }: StickyBottomNavProps) {
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       {/* Background with blur effect */}
       <div className="bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm border-t border-spirit-purple-200 dark:border-neutral-700 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+        {/* Quick-scroll section links */}
+        <div className="flex items-center justify-center gap-1 px-3 pt-2 pb-1.5 border-b border-neutral-100 dark:border-neutral-700/50">
+          <a
+            href="#guided-meditation"
+            onClick={(e) => { e.preventDefault(); document.getElementById('guided-meditation')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-spirit-purple-50 dark:bg-spirit-purple-900/20 text-spirit-purple-700 dark:text-spirit-purple-300 hover:bg-spirit-purple-100 dark:hover:bg-spirit-purple-900/40 transition-colors"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+            Meditation
+          </a>
+          <a
+            href="#seven-day-course"
+            onClick={(e) => { e.preventDefault(); document.getElementById('seven-day-course')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-spirit-gold-50 dark:bg-spirit-gold-900/20 text-spirit-gold-700 dark:text-spirit-gold-300 hover:bg-spirit-gold-100 dark:hover:bg-spirit-gold-900/40 transition-colors"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            7-Day Course
+          </a>
+          <a
+            href="#nearby"
+            onClick={(e) => { e.preventDefault(); document.getElementById('nearby')?.scrollIntoView({ behavior: 'smooth' }); }}
+            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Nearby
+          </a>
+        </div>
+
+        {/* Action buttons */}
         <div className="flex">
           {/* Navigation Button */}
           <a
             href={getGoogleMapsUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center py-4 px-4 bg-gradient-to-r from-spirit-purple-600 to-spirit-purple-700 dark:from-spirit-purple-700 dark:to-spirit-purple-800 text-white font-semibold transition-all duration-200 hover:from-spirit-purple-700 hover:to-spirit-purple-800 active:scale-95"
+            className="flex-1 flex items-center justify-center py-3.5 px-4 bg-gradient-to-r from-spirit-purple-600 to-spirit-purple-700 dark:from-spirit-purple-700 dark:to-spirit-purple-800 text-white font-semibold transition-all duration-200 hover:from-spirit-purple-700 hover:to-spirit-purple-800 active:scale-95"
           >
             <svg 
               className="w-5 h-5 mr-2" 
@@ -136,13 +172,13 @@ export default function StickyBottomNav({ center }: StickyBottomNavProps) {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
-            <span>Get Directions</span>
+            <span>Directions</span>
           </a>
           
           {/* Call Button */}
           <button
             onClick={handleCallClick}
-            className="flex-1 flex items-center justify-center py-4 px-4 bg-gradient-to-r from-spirit-gold-500 to-spirit-gold-600 dark:from-spirit-gold-600 dark:to-spirit-gold-700 text-white font-semibold transition-all duration-200 hover:from-spirit-gold-600 hover:to-spirit-gold-700 active:scale-95"
+            className="flex-1 flex items-center justify-center py-3.5 px-4 bg-gradient-to-r from-spirit-gold-500 to-spirit-gold-600 dark:from-spirit-gold-600 dark:to-spirit-gold-700 text-white font-semibold transition-all duration-200 hover:from-spirit-gold-600 hover:to-spirit-gold-700 active:scale-95"
           >
             <svg 
               className="w-5 h-5 mr-2" 
