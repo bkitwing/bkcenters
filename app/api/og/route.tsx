@@ -71,9 +71,9 @@ export async function GET(req: NextRequest) {
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: '#FFFFFF',
+            backgroundColor: '#FFFBF0',
             backgroundImage: `
-              linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 40%, #EDE9FE 80%, #DDD6FE 100%)
+              linear-gradient(135deg, #FFFBF0 0%, #FEF3C7 30%, #FDE68A40 60%, #F5F0E0 100%)
             `,
             padding: '0',
             position: 'relative',
@@ -88,10 +88,23 @@ export async function GET(req: NextRequest) {
               right: 0,
               bottom: 0,
               backgroundImage: `
-                radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 30%)
+                radial-gradient(ellipse at top right, rgba(184, 134, 11, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(139, 105, 20, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 168, 75, 0.06) 0%, transparent 30%)
               `,
+              display: 'flex',
+            }}
+          />
+
+          {/* Golden accent line at top */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '5px',
+              backgroundImage: 'linear-gradient(90deg, #8B6914, #DAA520, #B8860B)',
               display: 'flex',
             }}
           />
@@ -121,10 +134,11 @@ export async function GET(req: NextRequest) {
                   alignItems: 'center',
                   padding: '12px 28px',
                   borderRadius: '50px',
-                  backgroundColor: '#4F46E5',
+                  backgroundImage: 'linear-gradient(135deg, #8B6914, #B8860B)',
                   border: 'none',
                 }}
               >
+                {/* Om symbol as brand icon */}
                 <span
                   style={{
                     fontSize: '28px',
@@ -133,7 +147,7 @@ export async function GET(req: NextRequest) {
                     letterSpacing: '-0.5px',
                   }}
                 >
-                  🙏 Brahma Kumaris
+                  Brahma Kumaris
                 </span>
               </div>
               
@@ -146,12 +160,13 @@ export async function GET(req: NextRequest) {
                     marginLeft: '20px',
                     padding: '12px 24px',
                     borderRadius: '50px',
-                    backgroundColor: '#7C3AED',
+                    backgroundColor: '#92400E',
                     border: 'none',
                   }}
                 >
-                  <span style={{ fontSize: '24px', color: '#FFFFFF' }}>
-                    📍 {region || location}
+                  <span style={{ fontSize: '24px', color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {region || location}
                   </span>
                 </div>
               )}
@@ -170,7 +185,7 @@ export async function GET(req: NextRequest) {
                 style={{
                   fontSize: type === 'home' ? '72px' : '80px',
                   fontWeight: '900',
-                  color: '#1F2937',
+                  color: '#1C1917',
                   margin: '0 0 20px 0',
                   lineHeight: '1.05',
                   letterSpacing: '-2px',
@@ -202,7 +217,7 @@ export async function GET(req: NextRequest) {
                       style={{
                         fontSize: '64px',
                         fontWeight: '900',
-                        color: '#7C3AED',
+                        color: '#92400E',
                         letterSpacing: '-2px',
                       }}
                     >
@@ -212,7 +227,7 @@ export async function GET(req: NextRequest) {
                       style={{
                         fontSize: '32px',
                         fontWeight: '700',
-                        color: '#374151',
+                        color: '#44403C',
                       }}
                     >
                       Centers
@@ -223,7 +238,7 @@ export async function GET(req: NextRequest) {
                     style={{
                       width: '4px',
                       height: '50px',
-                      backgroundColor: '#7C3AED',
+                      backgroundImage: 'linear-gradient(180deg, #DAA520, #8B6914)',
                       borderRadius: '2px',
                       display: 'flex',
                     }}
@@ -240,7 +255,7 @@ export async function GET(req: NextRequest) {
                       style={{
                         fontSize: '64px',
                         fontWeight: '900',
-                        color: '#7C3AED',
+                        color: '#92400E',
                         letterSpacing: '-2px',
                       }}
                     >
@@ -250,7 +265,7 @@ export async function GET(req: NextRequest) {
                       style={{
                         fontSize: '32px',
                         fontWeight: '700',
-                        color: '#374151',
+                        color: '#44403C',
                       }}
                     >
                       {locationType}
@@ -265,7 +280,7 @@ export async function GET(req: NextRequest) {
                   style={{
                     fontSize: '36px',
                     fontWeight: '600',
-                    color: '#374151',
+                    color: '#44403C',
                     margin: '16px 0 0 0',
                     lineHeight: '1.4',
                     maxWidth: '900px',
@@ -290,12 +305,14 @@ export async function GET(req: NextRequest) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  gap: '10px',
                   padding: '14px 28px',
                   borderRadius: '16px',
-                  backgroundColor: '#059669',
+                  backgroundColor: '#065F46',
                   border: 'none',
                 }}
               >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                 <span
                   style={{
                     fontSize: '24px',
@@ -303,7 +320,7 @@ export async function GET(req: NextRequest) {
                     color: '#FFFFFF',
                   }}
                 >
-                  ✨ Free Meditation Classes
+                  Free Meditation Classes
                 </span>
               </div>
 
@@ -312,12 +329,14 @@ export async function GET(req: NextRequest) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
+                  gap: '10px',
                   padding: '14px 28px',
                   borderRadius: '16px',
-                  backgroundColor: '#4F46E5',
+                  backgroundImage: 'linear-gradient(135deg, #8B6914, #B8860B)',
                   border: 'none',
                 }}
               >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                 <span
                   style={{
                     fontSize: '22px',

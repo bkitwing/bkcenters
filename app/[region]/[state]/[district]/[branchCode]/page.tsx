@@ -79,14 +79,14 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
 
     const completeAddress = getCompleteAddress();
     
-    // Format contact info for OG image with modern minimal icons
+    // Format contact info for OG image with clean text labels
     const contactLines = [
-      `📍 ${completeAddress}`,  // Location pin
+      completeAddress,
       [
-        center.contact ? `📞 ${center.contact}` : null,  // Phone
-        center.mobile ? `📱 ${center.mobile}` : null,    // Mobile
-        center.email ? `✉️ ${center.email}` : null       // Email
-      ].filter(Boolean).join('\n')
+        center.contact ? `Tel: ${center.contact}` : null,
+        center.mobile ? `Mob: ${center.mobile}` : null,
+        center.email ? `Email: ${center.email}` : null
+      ].filter(Boolean).join(' | ')
     ].filter(Boolean).join('\n');
 
     const ogImage = generateOgImageUrl({
