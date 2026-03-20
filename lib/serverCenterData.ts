@@ -5,7 +5,7 @@
  * IMPORTANT: This file should only be imported in Server Components, not in Client Components.
  */
 
-import { Center, CentersData, RegionStateMapping, NewsPost } from './types';
+import { Center, CentersData, RegionStateMapping, NewsPost, EventPost } from './types';
 import { logger } from './logger';
 import { RETREAT_CENTER_BRANCH_CODES } from './retreatCenters';
 import {
@@ -22,6 +22,7 @@ import {
   fetchDistrictNamesByState,
   fetchStatAndDistrictCounts,
   fetchNewsByEmail,
+  fetchEventsByEmail,
   fetchRegionBySlug,
   fetchStateBySlug,
   fetchDistrictBySlug,
@@ -433,5 +434,13 @@ export async function getRetreatCenters(): Promise<Center[]> {
  */
 export async function getNewsByEmail(email: string, limit?: number): Promise<{ posts: NewsPost[]; total: number }> {
   return fetchNewsByEmail(email, limit);
+}
+
+/**
+ * Get events for a center by centeremail match.
+ * Returns events sorted by start_date descending (default limit: 20).
+ */
+export async function getEventsByEmail(email: string, limit?: number): Promise<{ events: EventPost[]; total: number }> {
+  return fetchEventsByEmail(email, limit);
 }
 

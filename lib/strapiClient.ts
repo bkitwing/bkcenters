@@ -7,7 +7,7 @@
  *   - Targeted queries per page — each page fetches only what it needs
  */
 
-import { Center, NewsPost } from './types';
+import { Center, NewsPost, EventPost } from './types';
 import { logger } from './logger';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
@@ -651,6 +651,114 @@ export async function fetchNewsByEmailPaginated(
   } catch (error) {
     logger.error(`strapiClient: Error fetching paginated news for email ${email}:`, error);
     return { posts: [], total: 0 };
+  }
+}
+
+// =====================================================
+// EVENTS — fetched by centeremail match
+// =====================================================
+
+interface StrapiEventImageFormats {
+  thumbnail?: { url: string; width: number; height: number };
+  Thumbnail?: { url: string; width: number; height: number };
+  microHD?: { url: string; width: number; height: number };
+  miniHD?: { url: string; width: number; height: number };
+  HD?: { url: string; width: number; height: number };
+  FullHD?: { url: string; width: number; height: number };
+}
+
+interface StrapiEventPostEntry {
+  id: number;
+  attributes: {
+    title: string;
+    slug: string;
+    start_date: string;
+    end_date: string;
+    more_infor: string | null;
+    registration_link: string | null;
+    centeremail: string | null;
+    featured_image: {
+      data: {
+        id: number;
+        attributes: {
+          url: string;
+          alternativeText: string | null;
+          formats: StrapiEventImageFormats | null;
+        };
+      } | null;
+    };
+  };
+}
+
+function transformEventPost(entry: StrapiEventPostEntry): EventPost {
+  const a = entry.attributes;
+  const imgData = a.featured_image?.data?.attributes;
+  return {
+    id: entry.id,
+    title: a.title || '',
+    slug: a.slug || '',
+    start_date: a.start_date || '',
+    end_date: a.end_date || '',
+    more_infor: a.more_infor || null,
+    registration_link: a.registration_link || null,
+    centeremail: a.centeremail || '',
+    featuredImage: imgData
+      ? {
+          url: imgData.url,
+          alternativeText: imgData.alternativeText,
+          formats: imgData.formats,
+        }
+      : null,
+  };
+}
+
+/**
+ * Fetch events by center email (centeremail field). (1 API call)
+ * Returns events sorted by start_date descending.
+ */
+export async function fetchEventsByEmail(
+  email: string,
+  limit: number = 20
+): Promise<{ events: EventPost[]; total: number }> {
+  if (!email || !email.includes('@')) return { events: [], total: 0 };
+
+  try {
+    const res = await strapiGet<StrapiEventPostEntry[]>(
+      `events?filters[centeremail][$eq]=${encodeURIComponent(email)}&sort=start_date:desc&pagination[pageSize]=${limit}&fields[0]=title&fields[1]=slug&fields[2]=start_date&fields[3]=end_date&fields[4]=more_infor&fields[5]=registration_link&fields[6]=centeremail&populate[featured_image][fields][0]=url&populate[featured_image][fields][1]=formats&populate[featured_image][fields][2]=alternativeText`,
+      { revalidate: 3600, tags: [`events-${email}`] }
+    );
+    return {
+      events: (res.data || []).map(transformEventPost),
+      total: res.meta?.pagination?.total || 0,
+    };
+  } catch (error) {
+    logger.error(`strapiClient: Error fetching events for email ${email}:`, error);
+    return { events: [], total: 0 };
+  }
+}
+
+/**
+ * Fetch events by email with pagination support. (1 API call)
+ */
+export async function fetchEventsByEmailPaginated(
+  email: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<{ events: EventPost[]; total: number }> {
+  if (!email || !email.includes('@')) return { events: [], total: 0 };
+
+  try {
+    const res = await strapiGet<StrapiEventPostEntry[]>(
+      `events?filters[centeremail][$eq]=${encodeURIComponent(email)}&sort=start_date:desc&pagination[page]=${page}&pagination[pageSize]=${pageSize}&fields[0]=title&fields[1]=slug&fields[2]=start_date&fields[3]=end_date&fields[4]=more_infor&fields[5]=registration_link&fields[6]=centeremail&populate[featured_image][fields][0]=url&populate[featured_image][fields][1]=formats&populate[featured_image][fields][2]=alternativeText`,
+      { revalidate: 3600, tags: [`events-${email}-p${page}`] }
+    );
+    return {
+      events: (res.data || []).map(transformEventPost),
+      total: res.meta?.pagination?.total || 0,
+    };
+  } catch (error) {
+    logger.error(`strapiClient: Error fetching paginated events for email ${email}:`, error);
+    return { events: [], total: 0 };
   }
 }
 

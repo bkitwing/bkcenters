@@ -1,6 +1,6 @@
 'use client';
 
-import { Center, NewsPost } from '@/lib/types';
+import { Center, NewsPost, EventPost } from '@/lib/types';
 
 interface OrganizationSchemaProps {
   baseUrl?: string;
@@ -77,7 +77,7 @@ export function LocalBusinessSchema({ center, pageUrl }: LocalBusinessSchemaProp
 
   const schema: Record<string, any> = {
     '@context': 'https://schema.org',
-    '@type': ['LocalBusiness', 'Place', 'ReligiousOrganization'],
+    '@type': ['LocalBusiness', 'Place', 'SpiritualOrganization'],
     '@id': pageUrl,
     name: center.name,
     description: `Brahma Kumaris Rajyoga Meditation Center - ${center.name}. Free meditation classes and spiritual courses available.`,
@@ -588,6 +588,109 @@ interface NewsArticleListSchemaProps {
   posts: NewsPost[];
   centerName: string;
   centerUrl: string;
+}
+
+interface EventListSchemaProps {
+  events: EventPost[];
+  center: Center;
+  centerUrl: string;
+}
+
+export function EventListSchema({ events, center, centerUrl }: EventListSchemaProps) {
+  if (!events || events.length === 0) return null;
+
+  const EVENTS_BASE_URL = 'https://www.brahmakumaris.com/events';
+
+  const address = {
+    '@type': 'PostalAddress',
+    streetAddress: [center.address?.line1, center.address?.line2, center.address?.line3].filter(Boolean).join(', '),
+    addressLocality: center.address?.city || center.district,
+    addressRegion: center.state,
+    postalCode: center.address?.pincode || '',
+    addressCountry: center.country || 'IN',
+  };
+
+  const eventSchemas = events.map((event) => {
+    const imageUrl =
+      event.featuredImage?.formats?.miniHD?.url ||
+      event.featuredImage?.formats?.HD?.url ||
+      event.featuredImage?.formats?.FullHD?.url ||
+      event.featuredImage?.url ||
+      undefined;
+
+    const hasValidMoreInfor = event.more_infor && (event.more_infor.startsWith('http://') || event.more_infor.startsWith('https://'));
+    const eventUrl = hasValidMoreInfor ? event.more_infor! : `${EVENTS_BASE_URL}/${event.slug}`;
+    const hasValidRegLink = event.registration_link && (event.registration_link.startsWith('http://') || event.registration_link.startsWith('https://'));
+
+    const eventStatus = 'https://schema.org/EventScheduled';
+
+    const schema: Record<string, any> = {
+      '@type': 'Event',
+      name: event.title,
+      startDate: event.start_date,
+      endDate: event.end_date,
+      url: eventUrl,
+      eventStatus,
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      location: {
+        '@type': 'Place',
+        name: center.name,
+        address,
+        ...(center.coords && center.coords.length === 2 && center.coords[0] && center.coords[1] ? {
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: parseFloat(center.coords[0]),
+            longitude: parseFloat(center.coords[1]),
+          },
+        } : {}),
+      },
+      organizer: {
+        '@type': 'Organization',
+        '@id': 'https://www.brahmakumaris.com/#organization',
+        name: 'Brahma Kumaris',
+        url: 'https://www.brahmakumaris.com',
+      },
+      isAccessibleForFree: true,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'INR',
+        availability: 'https://schema.org/InStock',
+        url: hasValidRegLink ? event.registration_link! : eventUrl,
+        validFrom: event.start_date,
+      },
+    };
+
+    if (imageUrl) {
+      schema.image = {
+        '@type': 'ImageObject',
+        url: imageUrl,
+        caption: event.featuredImage?.alternativeText || event.title,
+      };
+    }
+
+    return schema;
+  });
+
+  const listSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Events at ${center.name}`,
+    description: `Upcoming and recent events at ${center.name}, a Brahma Kumaris Rajyoga Meditation Center.`,
+    numberOfItems: events.length,
+    itemListElement: eventSchemas.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(listSchema) }}
+    />
+  );
 }
 
 export function NewsArticleListSchema({ posts, centerName, centerUrl }: NewsArticleListSchemaProps) {

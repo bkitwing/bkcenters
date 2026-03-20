@@ -58,6 +58,18 @@ export interface NewsPost {
   featuredImage: NewsPostImage | null;
 }
 
+export interface EventPost {
+  id: number;
+  title: string;
+  slug: string;
+  start_date: string;
+  end_date: string;
+  more_infor: string | null;
+  registration_link: string | null;
+  centeremail: string;
+  featuredImage: NewsPostImage | null;
+}
+
 export interface CentersData {
   map(arg0: (center: any) => Center): unknown;
   length: any;

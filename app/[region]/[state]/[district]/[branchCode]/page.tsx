@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
-import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmail } from '@/lib/serverCenterData';
+import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmail, getEventsByEmail } from '@/lib/serverCenterData';
 import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
@@ -14,13 +14,14 @@ import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
 import SevenDayCourseSection from '@/components/SevenDayCourseSection';
 import SoulSustenance from '@/components/SoulSustenance';
-import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema, NewsArticleListSchema } from '@/components/StructuredData';
+import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema, NewsArticleListSchema, EventListSchema } from '@/components/StructuredData';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import NewsSection from '@/components/NewsSection';
+import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map } from 'lucide-react';
+import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays } from 'lucide-react';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   ssr: false,
@@ -272,11 +273,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
 
     // Get nearby centers from same district (targeted query, no bulk fetch)
     // Fetch news posts in parallel with nearby centers for performance
-    const [districtCenters, newsData] = await Promise.all([
+    const [districtCenters, newsData, eventsData] = await Promise.all([
       getCentersByDistrict(center.state, center.district),
       getNewsByEmail(center.email, 6),
+      getEventsByEmail(center.email, 20),
     ]);
     const { posts: newsPosts, total: newsTotalCount } = newsData;
+    const { events: eventPosts, total: eventsTotalCount } = eventsData;
     const nearbyCenters = districtCenters
       .filter(c => c.branch_code !== center.branch_code)
       .slice(0, 6);
@@ -349,6 +352,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <EventSchema center={center} centerUrl={absoluteUrl} />
         <HowToSchema center={center} centerUrl={absoluteUrl} />
         <NewsArticleListSchema posts={newsPosts} centerName={center.name} centerUrl={absoluteUrl} />
+        <EventListSchema events={eventPosts} center={center} centerUrl={absoluteUrl} />
 
         {/* ===== HERO SECTION ===== */}
         <div className="relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
@@ -431,6 +435,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
               {[
                 { id: 'info', label: 'Info', icon: MapPin },
                 { id: 'seven-day-course', label: '7-Day Course', icon: BookOpen },
+                ...(eventPosts.length > 0 ? [{ id: 'events', label: 'Events', icon: CalendarDays }] : []),
                 ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', icon: Newspaper }] : []),
                 ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', icon: Map }] : []),
                 { id: 'faq', label: 'FAQ', icon: HelpCircle },
@@ -588,6 +593,17 @@ export default async function CenterPage({ params }: CenterPageProps) {
             contact={center.contact}
             mobile={center.mobile}
           />
+
+          {/* ===== EVENTS SECTION ===== */}
+          {eventPosts.length > 0 && (
+            <div id="events" className="scroll-mt-20">
+              <EventsSection
+                initialEvents={eventPosts}
+                totalCount={eventsTotalCount}
+                email={center.email}
+              />
+            </div>
+          )}
 
           {/* ===== NEWS SECTION ===== */}
           {newsPosts.length > 0 && (
