@@ -210,7 +210,7 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Share Center Details</h2>
+      <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700 dark:text-spirit-blue-400">Share Center Details</h2>
       <div className="flex items-center gap-4">
         {isMobile ? (
           <button
@@ -269,13 +269,13 @@ export default function ShareCenter({ center, pageUrl }: ShareCenterProps) {
         >
           <div 
             ref={modalRef}
-            className="bg-white rounded-xl p-6 max-w-sm w-full mx-auto shadow-2xl"
+            className="bg-white dark:bg-neutral-800 rounded-xl p-6 max-w-sm w-full mx-auto shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-end">
               <button
                 onClick={closeModal}
-                className="text-neutral-500 hover:text-neutral-700 focus:outline-none"
+                className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 focus:outline-none"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

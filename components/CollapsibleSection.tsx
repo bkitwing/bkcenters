@@ -63,28 +63,28 @@ export default function CollapsibleSection({
       <div>
         {/* Modern Section Divider */}
         <div className="flex items-center mb-8">
-          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
+          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
           <div className="px-4">
             <button
               onClick={toggleExpand}
-              className="flex items-center space-x-2 text-2xl font-bold text-spirit-purple-700 bg-white px-2 transition-colors hover:text-spirit-purple-800"
+              className="flex items-center space-x-2 text-2xl font-bold text-spirit-purple-700 dark:text-spirit-purple-400 bg-white dark:bg-neutral-900 px-2 transition-colors hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300"
               aria-expanded={isExpanded}
               aria-controls={`${sectionId || 'section'}-content`}
             >
               <span>{title}</span>
               {previewData && previewData.length > 0 && (
-                <span className="text-sm font-normal text-spirit-purple-500 ml-2">
+                <span className="text-sm font-normal text-spirit-purple-500 dark:text-spirit-purple-400 ml-2">
                   ({previewData.length})
                 </span>
               )}
               {faqPreviewData && faqPreviewData.length > 0 && (
-                <span className="text-sm font-normal text-spirit-purple-500 ml-2">
+                <span className="text-sm font-normal text-spirit-purple-500 dark:text-spirit-purple-400 ml-2">
                   ({faqPreviewData.length} Questions)
                 </span>
               )}
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
-                className={`h-6 w-6 text-spirit-purple-600 transition-transform ${isExpanded ? 'transform rotate-180' : ''}`} 
+                className={`h-6 w-6 text-spirit-purple-600 dark:text-spirit-purple-400 transition-transform ${isExpanded ? 'transform rotate-180' : ''}`} 
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"
@@ -93,7 +93,7 @@ export default function CollapsibleSection({
               </svg>
             </button>
           </div>
-          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
+          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
         </div>
         
         {/* Preview Section for Nearby Centers */}
@@ -104,7 +104,7 @@ export default function CollapsibleSection({
               {previewCenters.map((center, index) => (
                 <div 
                   key={center.branch_code}
-                  className={`block h-full transition-all duration-200 rounded-lg border border-neutral-200 hover:shadow-md ${
+                  className={`block h-full transition-all duration-200 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:shadow-md ${
                     index === 2 ? 'lg:block hidden' : ''
                   } ${
                     index === 1 ? 'md:block hidden' : ''
@@ -120,13 +120,13 @@ export default function CollapsibleSection({
             </div>
             
             {/* Glass Effect Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/90 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/90 dark:to-neutral-900/90 pointer-events-none"></div>
             
             {/* Load More Button */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-4">
               <button
                 onClick={toggleExpand}
-                className="bg-white/80 backdrop-blur-sm border border-spirit-purple-200 text-spirit-purple-700 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+                className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm border border-spirit-purple-200 dark:border-spirit-purple-700 text-spirit-purple-700 dark:text-spirit-purple-300 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-white dark:hover:bg-neutral-800 hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
               >
                 <span>View All {previewData?.length} Centers</span>
                 <svg 
@@ -151,7 +151,7 @@ export default function CollapsibleSection({
                {previewFAQs.map((faq, index) => (
                  <div 
                    key={index}
-                   className="border border-neutral-200 rounded-xl overflow-hidden shadow-sm bg-white"
+                   className="border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-neutral-800"
                  >
                    <div className={`px-5 py-4 ${
                      index % 2 === 0 
@@ -159,10 +159,10 @@ export default function CollapsibleSection({
                        : 'bg-gradient-to-r from-spirit-purple-50/30 to-spirit-blue-50/30'
                    }`}>
                      <div className="flex justify-between items-center">
-                       <span className="font-semibold text-gray-800 pr-4 leading-relaxed">
+                       <span className="font-semibold text-gray-800 dark:text-neutral-200 pr-4 leading-relaxed">
                          {faq.question}
                        </span>
-                       <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-500">
+                       <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 dark:bg-neutral-700 text-gray-500 dark:text-neutral-400">
                          <svg 
                            className="w-4 h-4" 
                            fill="none" 
@@ -180,13 +180,13 @@ export default function CollapsibleSection({
              </div>
              
              {/* Glass Effect Overlay */}
-             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/90 pointer-events-none"></div>
+             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/90 dark:to-neutral-900/90 pointer-events-none"></div>
              
              {/* Load More Button */}
              <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-4">
                <button
                  onClick={toggleExpand}
-                 className="bg-white/80 backdrop-blur-sm border border-spirit-purple-200 text-spirit-purple-700 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
+                 className="bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm border border-spirit-purple-200 dark:border-spirit-purple-700 text-spirit-purple-700 dark:text-spirit-purple-300 px-6 py-3 rounded-full font-semibold shadow-lg hover:bg-white dark:hover:bg-neutral-800 hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
                >
                  <span>View All {faqPreviewData?.length} Questions</span>
                  <svg 

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -8,98 +9,106 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary spiritual colors
-        'primary': '#7E57C2', // Spiritual purple - represents enlightenment and higher consciousness
-        'secondary': '#4FC3F7', // Celestial blue - represents peace and tranquility
-        'accent': '#FFD54F', // Golden light - represents divine energy
+        // Primary — Deep Golden (aligned with wisdom-app)
+        'primary': '#B8860B',
+        'primary-dark': '#8B6914',
+        // Secondary — Warm Gold
+        'secondary': '#D4A84B',
+        // Accent — Light Gold
+        'accent': '#E6C87A',
         
-        // Spiritual color palette
+        // Spiritual color palette — wisdom-app golden family
         'spirit': {
           'purple': {
-            50: '#F3E5F5',
-            100: '#E1BEE7',
-            200: '#CE93D8',
-            300: '#BA68C8',
-            400: '#AB47BC',
-            500: '#9C27B0', // Spiritual purple - divine wisdom
-            600: '#8E24AA',
-            700: '#7B1FA2',
-            800: '#6A1B9A',
-            900: '#4A148C',
+            // Remapped to golden shades (primary golden accent)
+            50: '#FBF5E6',
+            100: '#F5E6CC',
+            200: '#ECCE8E',
+            300: '#E0B85C',
+            400: '#D4A84B',
+            500: '#B8860B',
+            600: '#A67C00',
+            700: '#8B6914',
+            800: '#705410',
+            900: '#4A3609',
           },
           'blue': {
-            50: '#E1F5FE',
-            100: '#B3E5FC',
-            200: '#81D4FA',
-            300: '#4FC3F7',
-            400: '#29B6F6',
-            500: '#03A9F4', // Peaceful blue - higher communication
-            600: '#039BE5',
-            700: '#0288D1',
-            800: '#0277BD',
-            900: '#01579B',
+            // Remapped to warm earth shades (secondary warm accent)
+            50: '#FAF7F2',
+            100: '#F5F0E6',
+            200: '#E8E2D6',
+            300: '#D6CCBC',
+            400: '#C0B49E',
+            500: '#A09080',
+            600: '#857766',
+            700: '#6B6050',
+            800: '#504840',
+            900: '#352F28',
           },
-          'teal': { 
-            50: '#E0F2F1',
-            100: '#B2DFDB',
-            200: '#80CBC4',
-            300: '#4DB6AC',
-            400: '#26A69A',
-            500: '#009688', // Healing teal - healing energy
-            600: '#00897B',
-            700: '#00796B',
-            800: '#00695C',
-            900: '#004D40',
+          'teal': {
+            // Warm olive-green accent
+            50: '#F5F7F0',
+            100: '#E8EDDB',
+            200: '#D1DBC0',
+            300: '#B5C49A',
+            400: '#96AA72',
+            500: '#7A9050',
+            600: '#627840',
+            700: '#4A5C30',
+            800: '#384828',
+            900: '#263018',
           },
           'gold': {
-            50: '#FFF8E1',
-            100: '#FFECB3',
-            200: '#FFE082',
-            300: '#FFD54F',
-            400: '#FFCA28',
-            500: '#FFC107', // Divine gold - spiritual enlightenment
-            600: '#FFB300',
-            700: '#FFA000',
-            800: '#FF8F00',
-            900: '#FF6F00',
+            // Bright amber-gold (complementary accent)
+            50: '#FFFBEB',
+            100: '#FEF3C7',
+            200: '#FDE68A',
+            300: '#FCD34D',
+            400: '#FBBF24',
+            500: '#F59E0B',
+            600: '#D97706',
+            700: '#B45309',
+            800: '#92400E',
+            900: '#78350F',
           },
           'rose': {
-            50: '#FCE4EC',
-            100: '#F8BBD0',
-            200: '#F48FB1',
-            300: '#F06292',
-            400: '#EC407A',
-            500: '#E91E63', // Rose - unconditional love
-            600: '#D81B60',
-            700: '#C2185B',
-            800: '#AD1457',
-            900: '#880E4F',
+            // Warm terracotta-rose
+            50: '#FDF2F0',
+            100: '#F9DDD8',
+            200: '#F0BAB0',
+            300: '#E49585',
+            400: '#D47663',
+            500: '#C05E45',
+            600: '#A44D38',
+            700: '#863E2E',
+            800: '#6B3225',
+            900: '#4D231A',
           }
         },
         
-        // Neutral colors for balance
+        // Neutral colors — warm neutrals (aligned with wisdom-app)
         'neutral': {
-          50: '#FAFAFA',
-          100: '#F5F5F5',
-          200: '#EEEEEE',
-          300: '#E0E0E0',
-          400: '#BDBDBD',
-          500: '#9E9E9E',
-          600: '#757575',
-          700: '#616161',
-          800: '#424242',
-          900: '#212121',
+          50: '#FDFBF7',
+          100: '#FAF7F2',
+          200: '#F0EBE1',
+          300: '#E8E2D6',
+          400: '#A09890',
+          500: '#6B6560',
+          600: '#504840',
+          700: '#3D3835',
+          800: '#2D2A26',
+          900: '#1A1815',
         },
         
         // Semantic colors
-        'success': '#66BB6A', // Nature green - growth and abundance
-        'warning': '#FFA726', // Amber - awareness and caution 
-        'error': '#EF5350', // Soft red - grounding but not harsh
-        'info': '#42A5F5', // Gentle blue - intuition
+        'success': '#66BB6A',
+        'warning': '#F59E0B',
+        'error': '#EF5350',
+        'info': '#D4A84B',
         
         // Light and dark modes
         'light': '#FFFFFF',
-        'dark': '#212121',
+        'dark': '#1A1815',
       },
     },
   },

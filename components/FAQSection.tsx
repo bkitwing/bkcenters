@@ -42,16 +42,16 @@ export default function FAQSection({ center }: FAQSectionProps) {
     question: `How to Visit Meditation Center - ${center.name}?`,
     answer: (
       <div className="space-y-3">
-        <p className="text-gray-700">
+        <p className="text-gray-700 dark:text-neutral-300">
           You can visit our center located at:
         </p>
-        <div className="bg-gray-50 p-3 rounded-lg border-l-4 border-spirit-purple-400">
-           <p className="font-medium text-gray-800 mb-2">{formatAddress()}</p>
+        <div className="bg-gray-50 dark:bg-neutral-700/50 p-3 rounded-lg border-l-4 border-spirit-purple-400">
+           <p className="font-medium text-gray-800 dark:text-neutral-200 mb-2">{formatAddress()}</p>
            <div className="flex flex-wrap gap-3 text-sm">
              {(center.mobile || center.contact) && (
                <a 
                  href={`tel:${center.mobile || center.contact}`}
-                 className="inline-flex items-center gap-1 text-spirit-purple-600 hover:text-spirit-purple-800 font-medium transition-colors"
+                 className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
                >
                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
@@ -62,7 +62,7 @@ export default function FAQSection({ center }: FAQSectionProps) {
              {center.email && center.email.includes('@') && (
                <a 
                  href={`mailto:${center.email}`}
-                 className="inline-flex items-center gap-1 text-spirit-purple-600 hover:text-spirit-purple-800 font-medium transition-colors"
+                 className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
                >
                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
@@ -75,7 +75,7 @@ export default function FAQSection({ center }: FAQSectionProps) {
                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress())}`}
                target="_blank"
                rel="noopener noreferrer"
-               className="inline-flex items-center gap-1 text-spirit-purple-600 hover:text-spirit-purple-800 font-medium transition-colors"
+               className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
              >
                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -84,7 +84,7 @@ export default function FAQSection({ center }: FAQSectionProps) {
              </a>
            </div>
          </div>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 dark:text-neutral-400 text-sm">
           Feel free to contact us if you need any assistance or have questions about visiting our center.
         </p>
       </div>
@@ -114,7 +114,7 @@ export default function FAQSection({ center }: FAQSectionProps) {
       question: "What do you teach in the meditation course?",
       answer: (
         <span>
-          In the introductory <a href="https://www.brahmakumaris.com/spiritual-knowledge/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">7-day Rajyoga course</a>, you learn about the soul, the Supreme Soul (Shiv Baba), the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength.
+          In the introductory <a href="https://www.brahmakumaris.com/spiritual-knowledge/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">7-day Rajyoga course</a>, you learn about the soul, the Supreme Soul, the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength.
         </span>
       )
     },
@@ -167,7 +167,7 @@ export default function FAQSection({ center }: FAQSectionProps) {
         {faqs.map((faq, index) => (
           <div 
             key={index} 
-            className="border border-neutral-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 bg-white"
+            className="border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 bg-white dark:bg-neutral-800"
             itemScope 
             itemType="https://schema.org/Question"
           >
@@ -175,10 +175,10 @@ export default function FAQSection({ center }: FAQSectionProps) {
               onClick={() => toggleItem(index)}
               className={`w-full text-left px-5 py-4 flex justify-between items-center transition-all duration-200 group ${
                 expandedItem === index 
-                  ? 'bg-gradient-to-r from-spirit-purple-50 to-spirit-blue-50 text-spirit-purple-700' 
+                  ? 'bg-gradient-to-r from-spirit-purple-50 to-spirit-blue-50 dark:from-spirit-purple-900/20 dark:to-spirit-blue-900/20 text-spirit-purple-700 dark:text-spirit-purple-400' 
                   : index % 2 === 0 
-                    ? 'bg-gradient-to-r from-spirit-blue-50/30 to-spirit-purple-50/30 hover:from-spirit-purple-50 hover:to-spirit-blue-50 text-gray-800'
-                    : 'bg-gradient-to-r from-spirit-purple-50/30 to-spirit-blue-50/30 hover:from-spirit-blue-50 hover:to-spirit-purple-50 text-gray-800'
+                    ? 'bg-gradient-to-r from-spirit-blue-50/30 to-spirit-purple-50/30 dark:from-spirit-blue-900/10 dark:to-spirit-purple-900/10 hover:from-spirit-purple-50 hover:to-spirit-blue-50 dark:hover:from-spirit-purple-900/20 dark:hover:to-spirit-blue-900/20 text-gray-800 dark:text-neutral-200'
+                    : 'bg-gradient-to-r from-spirit-purple-50/30 to-spirit-blue-50/30 dark:from-spirit-purple-900/10 dark:to-spirit-blue-900/10 hover:from-spirit-blue-50 hover:to-spirit-purple-50 dark:hover:from-spirit-blue-900/20 dark:hover:to-spirit-purple-900/20 text-gray-800 dark:text-neutral-200'
               }`}
               aria-expanded={expandedItem === index}
               aria-controls={`faq-answer-${index}`}
@@ -186,8 +186,8 @@ export default function FAQSection({ center }: FAQSectionProps) {
               <span className="font-semibold text-left pr-4 leading-relaxed" itemProp="name">{faq.question}</span>
               <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                  expandedItem === index 
-                   ? 'bg-spirit-purple-100 text-spirit-purple-600 rotate-180' 
-                   : 'bg-gray-100 text-gray-500 group-hover:bg-spirit-purple-100 group-hover:text-spirit-purple-600'
+                   ? 'bg-spirit-purple-100 dark:bg-spirit-purple-900/30 text-spirit-purple-600 dark:text-spirit-purple-400 rotate-180' 
+                   : 'bg-gray-100 dark:bg-neutral-700 text-gray-500 dark:text-neutral-400 group-hover:bg-spirit-purple-100 dark:group-hover:bg-spirit-purple-900/30 group-hover:text-spirit-purple-600 dark:group-hover:text-spirit-purple-400'
                }`}>
                 <svg 
                   className="w-4 h-4 transition-transform duration-200" 
@@ -210,8 +210,8 @@ export default function FAQSection({ center }: FAQSectionProps) {
               itemProp="acceptedAnswer" 
               itemType="https://schema.org/Answer"
             >
-              <div className="px-5 pb-5 pt-1 bg-gradient-to-b from-white to-gray-50" itemProp="text">
-                <div className="text-gray-700 leading-relaxed">
+              <div className="px-5 pb-5 pt-1 bg-gradient-to-b from-white to-gray-50 dark:from-neutral-800 dark:to-neutral-800/80" itemProp="text">
+                <div className="text-gray-700 dark:text-neutral-300 leading-relaxed">
                   {faq.answer}
                 </div>
               </div>

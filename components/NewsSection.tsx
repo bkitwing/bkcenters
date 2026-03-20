@@ -32,10 +32,10 @@ function NewsCard({ post }: { post: NewsPost }) {
       href={newsUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-xl overflow-hidden border border-neutral-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+      className="group block rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
     >
       {/* Image */}
-      <div className="relative aspect-[16/9] bg-neutral-100 overflow-hidden">
+      <div className="relative aspect-[16/9] bg-neutral-100 dark:bg-neutral-700 overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -44,7 +44,7 @@ function NewsCard({ post }: { post: NewsPost }) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-spirit-purple-50 to-spirit-blue-50">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-spirit-purple-50 to-spirit-blue-50 dark:from-spirit-purple-900/20 dark:to-spirit-blue-900/20">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-spirit-purple-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
             </svg>
@@ -60,12 +60,12 @@ function NewsCard({ post }: { post: NewsPost }) {
       {/* Content */}
       <div className="p-4">
         {formattedDate && (
-          <p className="text-xs text-neutral-500 mb-1.5">{formattedDate}</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">{formattedDate}</p>
         )}
-        <h3 className="text-sm font-semibold text-neutral-800 leading-snug line-clamp-2 group-hover:text-spirit-purple-700 transition-colors duration-200">
+        <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 leading-snug line-clamp-2 group-hover:text-spirit-purple-700 dark:group-hover:text-spirit-purple-400 transition-colors duration-200">
           {post.title}
         </h3>
-        <span className="inline-flex items-center mt-3 text-xs font-medium text-spirit-purple-600 group-hover:text-spirit-purple-800 transition-colors">
+        <span className="inline-flex items-center mt-3 text-xs font-medium text-spirit-purple-600 dark:text-spirit-purple-400 group-hover:text-spirit-purple-800 dark:group-hover:text-spirit-purple-300 transition-colors">
           Read more
           <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -110,11 +110,11 @@ export default function NewsSection({ initialPosts, totalCount, email, pageSize 
     <div className="mt-10 pt-10">
       {/* Section Divider */}
       <div className="flex items-center mb-8">
-        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
+        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
         <div className="px-4">
-          <h2 className="text-2xl font-bold text-spirit-purple-700 bg-white px-2">News &amp; Updates</h2>
+          <h2 className="text-2xl font-bold text-spirit-purple-700 dark:text-spirit-purple-400 bg-white dark:bg-neutral-900 px-2">News &amp; Updates</h2>
         </div>
-        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
+        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
       </div>
 
       {/* News Grid */}
@@ -130,7 +130,7 @@ export default function NewsSection({ initialPosts, totalCount, email, pageSize 
           <button
             onClick={loadMore}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-spirit-purple-300 text-spirit-purple-700 bg-white hover:bg-spirit-purple-50 hover:border-spirit-purple-400 transition-all duration-200 text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-spirit-purple-300 dark:border-spirit-purple-700 text-spirit-purple-700 dark:text-spirit-purple-300 bg-white dark:bg-neutral-800 hover:bg-spirit-purple-50 dark:hover:bg-spirit-purple-900/20 hover:border-spirit-purple-400 transition-all duration-200 text-sm font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>

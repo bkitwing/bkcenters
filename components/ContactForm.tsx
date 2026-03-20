@@ -130,12 +130,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   // If the message was successfully submitted, show a success message
   if (isSubmitted) {
     return (
-      <div className="bg-light rounded-lg shadow-md p-6 border border-spirit-blue-200 text-center">
+      <div className="bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-spirit-blue-200 dark:border-spirit-blue-800 text-center">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-spirit-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <h3 className="text-2xl font-bold mb-4 spiritual-text-gradient">Thank You!</h3>
-        <p className="text-neutral-700 mb-4">
+        <p className="text-neutral-700 dark:text-neutral-300 mb-4">
           Your message has been sent to {center.name}.
         </p>
         <button
@@ -149,21 +149,21 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   }
 
   return (
-    <div className="bg-light rounded-lg shadow-md p-6 border border-neutral-200">
+    <div className="bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-neutral-200 dark:border-neutral-700">
       <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Contact Us</h2>
-      <p className="text-neutral-600 mb-4">
+      <p className="text-neutral-600 dark:text-neutral-400 mb-4">
         Send a message to the meditation center. We'll do our best to respond to your query.
       </p>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md mb-4">
           <p>{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="contactType" className="block text-neutral-700 font-medium mb-2">
+          <label htmlFor="contactType" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
             How can we help you?
           </label>
           <div className="flex flex-wrap gap-2">
@@ -172,7 +172,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
               className={`py-2 px-4 rounded-md transition-colors ${
                 contactType === 'LearnMeditation'
                   ? 'bg-primary text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
               }`}
               onClick={() => handleContactTypeChange('LearnMeditation')}
             >
@@ -183,7 +183,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
               className={`py-2 px-4 rounded-md transition-colors ${
                 contactType === 'Query'
                   ? 'bg-primary text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
               }`}
               onClick={() => handleContactTypeChange('Query')}
             >
@@ -194,7 +194,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
               className={`py-2 px-4 rounded-md transition-colors ${
                 contactType === 'AttendEvent'
                   ? 'bg-primary text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
               }`}
               onClick={() => handleContactTypeChange('AttendEvent')}
             >
@@ -205,7 +205,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
               className={`py-2 px-4 rounded-md transition-colors ${
                 contactType === 'Feedback'
                   ? 'bg-primary text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
               }`}
               onClick={() => handleContactTypeChange('Feedback')}
             >
@@ -216,7 +216,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
               className={`py-2 px-4 rounded-md transition-colors ${
                 contactType === 'Others'
                   ? 'bg-primary text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
               }`}
               onClick={() => handleContactTypeChange('Others')}
             >
@@ -226,13 +226,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="name" className="block text-neutral-700 font-medium mb-2">
+          <label htmlFor="name" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
             Name <span className="text-primary">*</span>
           </label>
           <input
             type="text"
             id="name"
-            className="w-full p-3 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder="Your name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -241,13 +241,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-neutral-700 font-medium mb-2">
+          <label htmlFor="email" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
             Email <span className="text-primary">*</span>
           </label>
           <input
             type="email"
             id="email"
-            className="w-full p-3 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder="Your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -256,13 +256,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="phone" className="block text-neutral-700 font-medium mb-2">
+          <label htmlFor="phone" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
             Phone Number
           </label>
           <input
             type="tel"
             id="phone"
-            className="w-full p-3 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder="Your phone number (optional)"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -270,12 +270,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="message" className="block text-neutral-700 font-medium mb-2">
+          <label htmlFor="message" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
             Message <span className="text-primary">*</span>
           </label>
           <textarea
             id="message"
-            className="w-full p-3 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder="Your message"
             rows={5}
             value={message}

@@ -12,12 +12,15 @@ import ContactLink from '@/components/ContactLink';
 import FAQSection from '@/components/FAQSection';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
+import SevenDayCourseSection from '@/components/SevenDayCourseSection';
+import SoulSustenance from '@/components/SoulSustenance';
 import { LocalBusinessSchema, BreadcrumbSchema, FAQPageSchema, CourseSchema, EventSchema, HowToSchema, NewsArticleListSchema } from '@/components/StructuredData';
 import { Metadata } from 'next';
 import { Center } from '@/lib/types';
 import NewsSection from '@/components/NewsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
+import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map } from 'lucide-react';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   ssr: false,
@@ -328,7 +331,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
       },
       {
         question: "What do you teach in the meditation course?",
-        answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul (Shiv Baba), the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
+        answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul, the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
       },
       {
         question: "Do you ask for any money or donation?",
@@ -337,7 +340,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
     ];
 
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
         {/* Structured Data for SEO */}
         <LocalBusinessSchema center={center} pageUrl={absoluteUrl} />
         <BreadcrumbSchema items={breadcrumbItems} />
@@ -347,216 +350,259 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <HowToSchema center={center} centerUrl={absoluteUrl} />
         <NewsArticleListSchema posts={newsPosts} centerName={center.name} centerUrl={absoluteUrl} />
 
-        {/* Improved Responsive Breadcrumb Navigation */}
-        <nav className="mb-4">
-          <ol className="flex items-center text-sm flex-wrap">
-            {/* Home */}
-            <li className="flex items-center">
-              <Link 
-                href="/" 
-                className="text-neutral-500 hover:text-primary text-xs"
-                title="Home"
-              >
-                Home
-              </Link>
-              <span className="mx-2 text-neutral-400">&gt;</span>
-            </li>
-            
-            {/* Region */}
-            <li className="flex items-center">
-              <Link 
-                href={formatCenterUrl(center.region || actualRegion, "", "", "")} 
-                className="text-neutral-500 hover:text-primary text-xs"
-                title={center.region || actualRegion}
-              >
-                {center.region || actualRegion}
-              </Link>
-              <span className="mx-2 text-neutral-400">&gt;</span>
-            </li>
-            
-            {/* State */}
-            <li className="flex items-center">
-              <Link 
-                href={formatCenterUrl(center.region || actualRegion, center.state, "", "")} 
-                className="text-neutral-500 hover:text-primary text-xs"
-                title={center.state}
-              >
-                {center.state}
-              </Link>
-              <span className="mx-2 text-neutral-400">&gt;</span>
-            </li>
-            
-            {/* District */}
-            <li className="flex items-center">
-              <Link 
-                href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} 
-                className="text-neutral-500 hover:text-primary text-xs"
-                title={center.district}
-              >
-                {center.district}
-              </Link>
-            </li>
-          </ol>
-        </nav>
-        
-        <div className="bg-light rounded-lg shadow-lg overflow-hidden mb-8 border border-neutral-200">
-          <div className="p-6">
-            <h1 className="text-3xl font-bold spiritual-text-gradient">{center.name}</h1>
-            <p className="text-sm text-neutral-600">
-              Brahma Kumaris Meditation Center
-            </p>
-            
-            <div className="mt-6 grid md:grid-cols-2 gap-8">
-              <div>
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-1 text-spirit-blue-700">Address</h2>
-                  <p className="text-neutral-700">{formattedAddress}</p>
-                </div>
-                
-                {hasMobileOrContact && (
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2 text-spirit-blue-700">Contact</h2>
-                    
-                    {center.contact && (
-                      <div className="flex items-center mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        <div>
-                          {center.contact.split(',').map((number, index) => {
-                            const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
-                            return (
-                              <span key={index}>
-                                <ContactLink 
-                                   href={`tel:${cleanNumber}`} 
-                                   className="text-primary hover:underline"
-                                   center={center}
-                                 >
-                                  {number.trim()}
-                                </ContactLink>
-                                {index < center.contact.split(',').length - 1 && <span className="mx-1">,</span>}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {center.mobile && (
-                      <div className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        <div>
-                          {center.mobile.split(',').map((number, index) => {
-                            const cleanNumber = number.trim();
-                            return (
-                              <span key={index}>
-                                <a href={`tel:${cleanNumber}`} className="text-primary hover:underline">
-                                  {number.trim()}
-                                </a>
-                                {index < center.mobile.split(',').length - 1 && <span className="mx-1">,</span>}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {center.email && (
-                  <div className="mb-6">
-                    <h2 className="text-xl font-semibold mb-2 text-spirit-blue-700">Email</h2>
-                    <div className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <ContactLink 
-                         href={`mailto:${center.email}`} 
-                         className="text-primary hover:underline"
-                         center={center}
-                       >
-                        {center.email}
-                      </ContactLink>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Replace the Get Directions button with our new component */}
-                <div className="mt-8">
-                  <h2 className="text-xl font-semibold mb-3 text-spirit-blue-700">Get Directions</h2>
-                  <DirectionsButton center={center} address={formattedAddress} />
-                </div>
+        {/* ===== HERO SECTION ===== */}
+        <div className="relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
+            <div className="absolute bottom-10 right-10 w-96 h-96 bg-spirit-gold-400 rounded-full blur-3xl" />
+          </div>
 
-                {/* Share and QR Code Section */}
-                <ShareCenter center={center} pageUrl={absoluteUrl} />
+          <div className="container mx-auto px-4 pt-6 pb-10 md:pb-14 relative z-10">
+            {/* Breadcrumb */}
+            <nav className="mb-6">
+              <ol className="flex items-center text-sm flex-wrap gap-1">
+                <li className="flex items-center">
+                  <Link href="/" className="text-white/60 hover:text-white text-xs transition-colors">Home</Link>
+                  <ChevronRight className="w-3 h-3 mx-1.5 text-white/40" />
+                </li>
+                <li className="flex items-center">
+                  <Link href={formatCenterUrl(center.region || actualRegion, "", "", "")} className="text-white/60 hover:text-white text-xs transition-colors">{center.region || actualRegion}</Link>
+                  <ChevronRight className="w-3 h-3 mx-1.5 text-white/40" />
+                </li>
+                <li className="flex items-center">
+                  <Link href={formatCenterUrl(center.region || actualRegion, center.state, "", "")} className="text-white/60 hover:text-white text-xs transition-colors">{center.state}</Link>
+                  <ChevronRight className="w-3 h-3 mx-1.5 text-white/40" />
+                </li>
+                <li>
+                  <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-white/80 text-xs">{center.district}</Link>
+                </li>
+              </ol>
+            </nav>
+
+            {/* Center Name & Badge */}
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white/90 px-3 py-1 rounded-full text-xs font-medium mb-3">
+                <Sparkles className="w-3.5 h-3.5" />
+                Brahma Kumaris Rajyoga Meditation Center
               </div>
-              
-              <div>
-                <div className="h-[400px] md:h-[450px] lg:h-[500px] border border-neutral-200 rounded-lg overflow-hidden">
-                  <CenterMap 
-                    centers={mapCenters} 
-                    height="100%" 
-                    autoZoom={true}
-                    defaultZoom={13}
-                    highlightCenter={true}
-                    showInfoWindowOnLoad={true}
-                  />
-                </div>
-                <p className="text-xs italic text-neutral-500 mt-2">
-                  <span className="font-bold text-spirit-purple-600">Purple</span>: Your Center • 
-                  <span className="font-bold text-green-600">Green</span>: Nearby Centers — 
-                  Click green markers to highlight Nearby Center. Use icon in top right corner to measure distance between centers.
-                </p>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">{center.name}</h1>
+              <div className="flex items-start gap-2 text-white/80 text-sm max-w-2xl">
+                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <p>{formattedAddress}</p>
               </div>
             </div>
-            
-            {/* Services and Timings Section - Only show if content is available */}
-            {((center.services && center.services.length > 0) || center.timings) && (
-              <div className="mt-10 pt-10">
-                {/* Modern Section Divider */}
-                <div className="flex items-center mb-8">
-                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
-                  <div className="px-4">
-                    <h2 className="text-2xl font-bold text-spirit-purple-700 bg-white px-2">Center Information</h2>
-                  </div>
-                  <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 to-transparent"></div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {center.services && center.services.length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">Services</h3>
-                      <ul className="list-disc list-inside text-neutral-700 space-y-1">
-                        {center.services.map((service: string, idx: number) => (
-                          <li key={idx}>{service}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {center.timings && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">Timings</h3>
-                      <div className="text-neutral-700 space-y-1">
-                        <p>{center.timings}</p>
+
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap gap-3">
+              {hasMobileOrContact && (
+                <a
+                  href={`tel:${(center.mobile || center.contact || '').split(',')[0].trim().replace(/[^0-9+]/g, '')}`}
+                  className="inline-flex items-center gap-2 bg-white text-spirit-purple-700 px-5 py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                >
+                  <Phone className="w-4 h-4" />
+                  Call Now
+                </a>
+              )}
+              <a
+                href={getGoogleMapsUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white border border-white/25 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/25 transition-all duration-200"
+              >
+                <Navigation className="w-4 h-4" />
+                Get Directions
+              </a>
+              <a
+                href="#seven-day-course"
+                className="inline-flex items-center gap-2 bg-spirit-gold-400/90 text-spirit-purple-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-400 transition-all duration-200"
+              >
+                <BookOpen className="w-4 h-4" />
+                Free 7-Day Course
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== SECTION NAVIGATION (Sticky) ===== */}
+        <div className="sticky top-0 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <div className="container mx-auto px-4">
+            <div className="flex overflow-x-auto scrollbar-hide -mb-px">
+              {[
+                { id: 'info', label: 'Info', icon: MapPin },
+                { id: 'seven-day-course', label: '7-Day Course', icon: BookOpen },
+                ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', icon: Newspaper }] : []),
+                ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', icon: Map }] : []),
+                { id: 'faq', label: 'FAQ', icon: HelpCircle },
+                ...(center.email && center.email.includes('@') ? [{ id: 'contact', label: 'Contact', icon: MessageCircle }] : []),
+              ].map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="flex items-center gap-1.5 px-4 py-3 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-400 border-b-2 border-transparent hover:border-spirit-purple-500 transition-all duration-200 whitespace-nowrap flex-shrink-0"
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ===== MAIN CONTENT ===== */}
+        <div className="container mx-auto px-4 py-8 space-y-12 md:space-y-16">
+
+          {/* ===== CENTER INFO + MAP SECTION ===== */}
+          <section id="info" className="scroll-mt-20">
+            <div className="grid lg:grid-cols-5 gap-8">
+              {/* Left: Contact Details Card */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Contact Card */}
+                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+                  <div className="p-6">
+                    <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-5 flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
+                        <MapPin className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
                       </div>
+                      Center Details
+                    </h2>
+
+                    {/* Address */}
+                    <div className="mb-5">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1.5">Address</p>
+                      <p className="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed">{formattedAddress}</p>
                     </div>
-                  )}
+
+                    {/* Contact Numbers */}
+                    {hasMobileOrContact && (
+                      <div className="mb-5">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2">Phone</p>
+                        <div className="space-y-2">
+                          {center.contact && center.contact.split(',').map((number, index) => {
+                            const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
+                            return (
+                              <div key={`contact-${index}`} className="flex items-center gap-2">
+                                <Phone className="w-4 h-4 text-neutral-400" />
+                                <ContactLink href={`tel:${cleanNumber}`} className="text-sm text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors" center={center}>
+                                  {number.trim()}
+                                </ContactLink>
+                              </div>
+                            );
+                          })}
+                          {center.mobile && center.mobile.split(',').map((number, index) => {
+                            const cleanNumber = number.trim();
+                            return (
+                              <div key={`mobile-${index}`} className="flex items-center gap-2">
+                                <Smartphone className="w-4 h-4 text-neutral-400" />
+                                <a href={`tel:${cleanNumber}`} className="text-sm text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors">
+                                  {number.trim()}
+                                </a>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Email */}
+                    {center.email && (
+                      <div className="mb-5">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1.5">Email</p>
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+                          <ContactLink href={`mailto:${center.email}`} className="text-sm text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors" center={center}>
+                            {center.email}
+                          </ContactLink>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Timings */}
+                    {center.timings && (
+                      <div className="mb-5">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1.5">Timings</p>
+                        <div className="flex items-start gap-2">
+                          <Clock className="w-4 h-4 text-neutral-400 dark:text-neutral-500 mt-0.5" />
+                          <p className="text-sm text-neutral-700 dark:text-neutral-300">{center.timings}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Services */}
+                    {center.services && center.services.length > 0 && (
+                      <div className="mb-5">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2">Services</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {center.services.map((service: string, idx: number) => (
+                            <span key={idx} className="inline-flex items-center text-xs bg-spirit-purple-50 dark:bg-spirit-purple-900/30 text-spirit-purple-700 dark:text-spirit-purple-300 px-2.5 py-1 rounded-full font-medium">
+                              {service}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Directions Button */}
+                  <div className="border-t border-neutral-100 dark:border-neutral-700 p-4">
+                    <DirectionsButton center={center} address={formattedAddress} />
+                  </div>
+                </div>
+
+                {/* Share Card */}
+                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+                  <div className="p-6">
+                    <ShareCenter center={center} pageUrl={absoluteUrl} />
+                  </div>
                 </div>
               </div>
-            )}
-            
-            {/* News & Updates Section */}
-            <NewsSection
-              initialPosts={newsPosts}
-              totalCount={newsTotalCount}
-              email={center.email}
-            />
 
-            {/* Collapsible Nearby Centers Section */}
-            {nearbyCenters.length > 0 && (
+              {/* Right: Map */}
+              <div className="lg:col-span-3">
+                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden sticky top-20">
+                  <div className="h-[400px] md:h-[500px] lg:h-[550px]">
+                    <CenterMap 
+                      centers={mapCenters} 
+                      height="100%" 
+                      autoZoom={true}
+                      defaultZoom={13}
+                      highlightCenter={true}
+                      showInfoWindowOnLoad={true}
+                    />
+                  </div>
+                  <div className="px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-700">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      <span className="font-semibold text-spirit-purple-600">Purple</span>: This Center
+                      <span className="mx-2">•</span>
+                      <span className="font-semibold text-green-600">Green</span>: Nearby Centers — Click markers for details
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ===== 7-DAY COURSE SECTION ===== */}
+          <SevenDayCourseSection 
+            centerName={center.name}
+            contact={center.contact}
+            mobile={center.mobile}
+          />
+
+          {/* ===== NEWS SECTION ===== */}
+          {newsPosts.length > 0 && (
+            <div id="news" className="scroll-mt-20">
+              <NewsSection
+                initialPosts={newsPosts}
+                totalCount={newsTotalCount}
+                email={center.email}
+              />
+            </div>
+          )}
+
+          {/* ===== NEARBY CENTERS SECTION ===== */}
+          {nearbyCenters.length > 0 && (
+            <section id="nearby" className="scroll-mt-20">
               <CollapsibleSection 
                 title="Nearby Centers" 
                 defaultExpanded={false}
@@ -568,7 +614,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     <div 
                       key={nearbyCenter.branch_code} 
                       id={`center-card-${nearbyCenter.branch_code}`}
-                      className="block h-full transition-all duration-200 rounded-lg border border-neutral-200 hover:shadow-md"
+                      className="block h-full transition-all duration-200 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:shadow-md"
                     >
                       <CenterCard 
                         center={nearbyCenter} 
@@ -579,11 +625,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   ))}
                 </div>
               </CollapsibleSection>
-            )}
-            
-            {/* Collapsible FAQ Section */}
+            </section>
+          )}
+
+          {/* ===== FAQ SECTION ===== */}
+          <section id="faq" className="scroll-mt-20">
             <CollapsibleSection 
-              title="FAQ" 
+              title="Frequently Asked Questions" 
               defaultExpanded={false}
               sectionId="faq"
               faqPreviewData={[
@@ -601,7 +649,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                 },
                 {
                   question: "What do you teach in the meditation course?",
-                  answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul (Shiv Baba), the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
+                  answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul, the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
                 },
                 {
                   question: "Do I need to wear any special dress when I come?",
@@ -639,52 +687,64 @@ export default async function CenterPage({ params }: CenterPageProps) {
             >
               <FAQSection center={center} />
             </CollapsibleSection>
-            
-            {/* Collapsible Contact Form Section */}
-            {center.email && center.email.includes('@') && (
+          </section>
+
+          {/* ===== CONTACT SECTION ===== */}
+          {center.email && center.email.includes('@') && (
+            <section id="contact" className="scroll-mt-20">
               <CollapsibleSection 
                 title="Contact Us" 
                 defaultExpanded={true}
                 sectionId="contact"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="lg:order-2">
-                    <div className="bg-light rounded-lg shadow-md p-6 border border-neutral-200">
-                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">About Contacting Us</h3>
-                      <p className="text-neutral-700 mb-4">
-                        You can use this form to send a message directly to the {center.name} Rajyog Meditation center. 
-                        Whether you want to provide feedback, have a query, or are interested in learning Rajyog Meditation, 
-                        we're here to help, but we would request you to reachout to center by calling first.
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                  {/* Contact Info Card */}
+                  <div className="lg:col-span-2 lg:order-2">
+                    <div className="bg-gradient-to-br from-spirit-purple-50 to-spirit-blue-50 dark:from-spirit-purple-900/20 dark:to-spirit-blue-900/20 rounded-2xl p-6 border border-spirit-purple-100 dark:border-spirit-purple-800">
+                      <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-4 flex items-center gap-2">
+                        <MessageCircle className="w-5 h-5 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                        Get in Touch
+                      </h3>
+                      <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-5 leading-relaxed">
+                        Send a message to {center.name}. Whether you have a query, want to provide feedback, or are interested in learning Rajyoga Meditation — we are here to help.
                       </p>
                       
-                      <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">What to Expect</h3>
-                      <ul className="list-disc list-inside text-neutral-700 space-y-2 mb-4">
-                        <li>Free meditation sessions are available for beginners</li>
-                        <li>All our programs are offered free of charge</li>
-                      </ul>
-                      
-                      {(center.services || center.timings) && (
-                        <>
-                          <h3 className="text-xl font-semibold mb-3 text-spirit-blue-700">Available Services</h3>
-                          {center.services && (
-                            <ul className="list-disc list-inside text-neutral-700 space-y-1 mb-4">
-                              {center.services.map((service: string, idx: number) => (
-                                <li key={idx}>{service}</li>
-                              ))}
-                            </ul>
-                          )}
-                          
-                          {center.timings && (
-                            <div className="text-neutral-700 mb-4">
-                              <p><strong>Timings:</strong> {center.timings}</p>
+                      <div className="space-y-4">
+                        <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                              <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
                             </div>
-                          )}
-                        </>
-                      )}
+                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Free for Everyone</p>
+                          </div>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">All meditation sessions and courses are completely free of charge.</p>
+                        </div>
+                        
+                        <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 rounded-lg bg-spirit-blue-100 dark:bg-spirit-blue-900/30 flex items-center justify-center">
+                              <Users className="w-4 h-4 text-spirit-blue-600 dark:text-spirit-blue-400" />
+                            </div>
+                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Open to All</p>
+                          </div>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">No prior experience needed. Everyone is welcome, regardless of background.</p>
+                        </div>
+
+                        <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
+                              <Phone className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                            </div>
+                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Prefer Calling?</p>
+                          </div>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">We recommend calling the center first for the quickest response.</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="lg:order-1">
+
+                  {/* Contact Form */}
+                  <div className="lg:col-span-3 lg:order-1">
                     <ContactForm 
                       center={center} 
                       pageUrl={absoluteUrl} 
@@ -692,17 +752,19 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   </div>
                 </div>
               </CollapsibleSection>
-            )}
+            </section>
+          )}
+
+          {/* ===== SOUL SUSTENANCE ===== */}
+          <SoulSustenance />
+
+          {/* ===== BACK LINK ===== */}
+          <div className="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+            <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="inline-flex items-center gap-2 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium text-sm transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              Back to {center.district} District
+            </Link>
           </div>
-        </div>
-        
-        <div className="mt-8 pt-6 border-t border-neutral-200">
-          <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-primary hover:underline inline-flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to {center.district} District
-          </Link>
         </div>
         
         {/* Sticky Bottom Navigation for Mobile */}

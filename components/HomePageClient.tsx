@@ -4,12 +4,13 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
-// getNearestCenters removed — now handled server-side via /api/centers/nearby
 import SearchBar from "@/components/SearchBar";
 import CenterCard from "@/components/CenterCard";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
+import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, Navigation, Compass, ArrowRight, SlidersHorizontal } from 'lucide-react';
+import SoulSustenance from '@/components/SoulSustenance';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   ssr: false,
@@ -101,6 +102,7 @@ export default function HomePageClient({
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [regionViewMode, setRegionViewMode] = useState<ViewMode>("list");
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [showAllRegions, setShowAllRegions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [maxDistance, setMaxDistance] = useState<number>(50);
   const [displayLimit, setDisplayLimit] = useState<number>(10);
@@ -488,7 +490,7 @@ export default function HomePageClient({
           </div>
           <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
             <div className="stat-value text-accent text-lg sm:text-xl font-bold">
-              {totalStates}
+              36
             </div>
             <div className="stat-label text-neutral-600 text-xs sm:text-sm">
               In States & UTs
@@ -535,201 +537,235 @@ export default function HomePageClient({
   };
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      {/* H1 Header for SEO */}
-      <h1 className="text-3xl sm:text-4xl font-bold text-center spiritual-text-gradient mb-3">
-        Brahma Kumaris Rajyoga Meditation Centers
-      </h1>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
 
-      {/* AI-citable prose summary — kept visible for crawlers and AI Overview citations */}
-      <p className="text-center text-neutral-600 text-sm sm:text-base max-w-2xl mx-auto mb-6">
-        Offers spiritual learning to all across India and in 110+ countries worldwide. In India, its presence spans 36 states and union territories, and <strong>{totalCenters.toLocaleString()} centers</strong>. Find your nearest center for free meditation classes and 7-day Rajyoga courses.
-      </p>
-
-      {/* Search Bar - First on the page */}
-      <div className="bg-light rounded-lg shadow-md p-4 sm:p-8 border border-neutral-200 mb-8">
-        <div className="flex flex-col sm:flex-row gap-2">
-          <div className="flex-1">
-            <SearchBar
-              onSearchResult={handleSearchResult}
-              value={address}
-              onClear={handleClearSearch}
-              showClearButton={!!lat && !!lng}
-            />
-          </div>
-          <button
-            onClick={handleCurrentLocationClick}
-            className="bg-primary hover:bg-primary-focus text-white font-medium px-4 py-2 rounded-md text-sm sm:text-base flex items-center justify-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            Current Location
-          </button>
-        </div>
-      </div>
-
-      {/* Statistics Summary - Only show when not searching */}
-      {!lat && !lng && <StatsSummary />}
-
-      {lat && lng ? (
-        <div ref={searchResultsRef} className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-            <div className="flex items-center">
-              <h2 className="text-sm font-medium mb-4 text-spirit-blue-700">
-                Centers Near {address}
-              </h2>
+      {/* ===== HERO SECTION ===== */}
+      {!lat && !lng && (
+        <section className="relative overflow-hidden bg-gradient-to-b from-neutral-50 via-spirit-purple-50/20 to-neutral-50 dark:from-neutral-900 dark:via-spirit-purple-950/10 dark:to-neutral-900 py-8 md:py-14">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(184,134,11,0.05),transparent_50%)]" />
+          <div className="container mx-auto max-w-3xl px-4 relative">
+            <div className="text-center mb-6 md:mb-8">
+              <h1 className="text-3xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100 mb-2 md:mb-3 leading-tight">
+                Rajyoga{" "}
+                <span className="bg-gradient-to-r from-spirit-purple-700 via-spirit-purple-500 to-spirit-gold-500 dark:from-spirit-purple-300 dark:via-spirit-purple-200 dark:to-spirit-gold-300 bg-clip-text text-transparent">
+                  Meditation
+                </span>{" "}
+                Centers
+              </h1>
             </div>
-            <div className="flex items-center space-x-2 w-full sm:w-auto">
-              <div className="flex items-center flex-1 sm:flex-auto">
-                <label
-                  htmlFor="distance-filter"
-                  className="text-sm text-neutral-600 mr-2"
-                >
-                  Distance:
-                </label>
-                <input
-                  id="distance-filter"
-                  type="range"
-                  min="5"
-                  max="100"
-                  step="5"
-                  value={maxDistance}
-                  onChange={handleDistanceChange}
-                  className="w-full sm:w-32"
+
+            {/* Search — no extra wrapper, SearchBar has its own styling */}
+            <div className="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto mb-6">
+              <div className="flex-1">
+                <SearchBar
+                  onSearchResult={handleSearchResult}
+                  value={address}
+                  onClear={handleClearSearch}
+                  showClearButton={!!lat && !!lng}
                 />
-                <span className="text-sm text-neutral-600 ml-2 whitespace-nowrap">
-                  {maxDistance} km
+              </div>
+              <button
+                onClick={handleCurrentLocationClick}
+                className="flex items-center justify-center gap-2 bg-spirit-purple-600 hover:bg-spirit-purple-700 text-white font-semibold px-5 py-3 rounded-lg text-sm transition-colors shrink-0"
+              >
+                <Navigation className="w-4 h-4" />
+                Near Me
+              </button>
+            </div>
+
+            {/* Stats + Description */}
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-4 sm:gap-6 mb-2 text-xs text-neutral-500 dark:text-neutral-400">
+                <span className="flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-spirit-purple-500 dark:text-spirit-purple-400" />
+                  <strong className="text-neutral-700 dark:text-neutral-200">{totalCenters.toLocaleString()}</strong> Centers
+                </span>
+                <span className="w-px h-3.5 bg-neutral-300 dark:bg-neutral-600" />
+                <span className="flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-spirit-purple-500 dark:text-spirit-purple-400" />
+                  <strong className="text-neutral-700 dark:text-neutral-200">36</strong> States &amp; UTs
                 </span>
               </div>
+              <p className="text-[11px] sm:text-xs text-neutral-400 dark:text-neutral-500 max-w-md mx-auto leading-relaxed">
+                Find your nearest center for free meditation classes and 7-day Rajyoga courses
+              </p>
             </div>
           </div>
+        </section>
+      )}
 
-          {/* Modified layout - Map first on both mobile and desktop */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 mb-6">
-            {/* Map container - full width on mobile with 40% height, sticky on desktop */}
-            <div className="order-1 md:col-span-6 md:sticky md:top-4 md:self-start h-[40vh] sm:h-[45vh] md:h-[calc(100vh-32px)]">
-              <div
-                ref={mapRef}
-                className="bg-light rounded-lg shadow-md border border-neutral-200 overflow-hidden h-full"
-              >
-                <div className="h-full w-full">
-                  <CenterMap
-                    centers={nearestCenters}
-                    autoZoom={nearestCenters.length > 0}
-                    onCenterSelect={handleCenterSelect}
-                    highlightCenter={true}
-                    showInfoWindowOnLoad={false}
-                    height="100%"
-                    selectedCenter={selectedCenter}
-                    userLocation={userLocation}
-                  />
+      {/* ===== SEARCH RESULTS VIEW ===== */}
+      {lat && lng ? (
+        <div className="min-h-screen">
+          {/* Golden gradient search header */}
+          <div className="bg-gradient-to-b from-spirit-purple-700 via-spirit-purple-600 to-transparent dark:from-spirit-purple-900 dark:via-spirit-purple-900/50 dark:to-transparent pb-20 pt-6">
+            <div className="container mx-auto px-4">
+              <div className="max-w-2xl mx-auto">
+                <p className="text-center text-white/70 text-xs font-medium uppercase tracking-wider mb-3">Find Your Center</p>
+                <div className="bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-4">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1">
+                      <SearchBar
+                        onSearchResult={handleSearchResult}
+                        value={address}
+                        onClear={handleClearSearch}
+                        showClearButton={!!lat && !!lng}
+                      />
+                    </div>
+                    <button
+                      onClick={handleCurrentLocationClick}
+                      className="flex items-center justify-center gap-2 bg-white text-spirit-purple-700 dark:bg-spirit-purple-400 dark:text-white font-semibold px-5 py-3 rounded-xl text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                    >
+                      <Navigation className="w-4 h-4" />
+                      Near Me
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Centers list - full width on mobile, 6 columns on desktop */}
-            <div className="order-2 md:col-span-6 bg-light rounded-lg shadow-md border border-neutral-200 p-4 centers-list-container">
-              <div
-                ref={resultsContainerRef}
-                className="h-[50vh] sm:h-[55vh] md:h-[calc(100vh-64px)] overflow-y-auto pr-2"
-              >
-                {nearestCenters.length > 0 ? (
-                  <>
-                    <h3 className="text-xl font-medium mb-4 text-spirit-blue-700">
-                      Found {nearestCenters.length} centers near you
-                    </h3>
-                    <div className="space-y-3">
-                      {nearestCenters.map((center) => (
-                        <div
-                          key={center.branch_code}
-                          id={`center-card-${center.branch_code}`}
-                          onClick={() => handleCardClick(center)}
-                          className={`cursor-pointer rounded-lg transition-all duration-200 ${
-                            selectedCenter?.branch_code === center.branch_code
-                              ? "shadow-md bg-spirit-blue-50"
-                              : "hover:shadow-sm hover:bg-neutral-50"
-                          }`}
+          <div className="container mx-auto px-4 -mt-14">
+            <div ref={searchResultsRef}>
+              {/* Results header with distance slider */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm px-5 py-4">
+                <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
+                    <MapPin className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                  </div>
+                  Centers Near You
+                  {nearestCenters.length > 0 && (
+                    <span className="text-sm font-normal text-neutral-400 dark:text-neutral-500">({nearestCenters.length})</span>
+                  )}
+                </h2>
+                <div className="flex items-center gap-2 bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-200 dark:border-neutral-600 rounded-xl px-3 py-2">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
+                  <input
+                    id="distance-filter"
+                    type="range"
+                    min="5"
+                    max="100"
+                    step="5"
+                    value={maxDistance}
+                    onChange={handleDistanceChange}
+                    className="w-24 sm:w-32 accent-spirit-purple-600"
+                  />
+                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400 whitespace-nowrap">{maxDistance} km</span>
+                </div>
+              </div>
+
+              {/* Map + List Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5 mb-8">
+                {/* Map */}
+                <div className="order-1 md:col-span-6 md:sticky md:top-16 md:self-start h-[40vh] sm:h-[45vh] md:h-[calc(100vh-80px)]">
+                  <div ref={mapRef} className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden h-full">
+                    <CenterMap
+                      centers={nearestCenters}
+                      autoZoom={nearestCenters.length > 0}
+                      onCenterSelect={handleCenterSelect}
+                      highlightCenter={true}
+                      showInfoWindowOnLoad={false}
+                      height="100%"
+                      selectedCenter={selectedCenter}
+                      userLocation={userLocation}
+                    />
+                  </div>
+                </div>
+
+                {/* Centers list */}
+                <div className="order-2 md:col-span-6 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm centers-list-container">
+                  <div
+                    ref={resultsContainerRef}
+                    className="h-[50vh] sm:h-[55vh] md:h-[calc(100vh-80px)] overflow-y-auto p-4"
+                  >
+                    {loading ? (
+                      <div className="flex flex-col items-center justify-center py-16 px-6">
+                        {/* Peaceful loading animation */}
+                        <div className="relative w-20 h-20 mb-6">
+                          <div className="absolute inset-0 rounded-full border-2 border-spirit-purple-100 dark:border-spirit-purple-800" />
+                          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-spirit-purple-500 dark:border-t-spirit-purple-400 animate-spin" />
+                          <div className="absolute inset-3 rounded-full border-2 border-transparent border-b-spirit-gold-400 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Sparkles className="w-5 h-5 text-spirit-purple-500 dark:text-spirit-purple-400 animate-pulse" />
+                          </div>
+                        </div>
+                        <h3 className="text-base font-semibold text-neutral-700 dark:text-neutral-200 mb-2">Finding Centers Near You</h3>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400 text-center max-w-xs leading-relaxed">
+                          &ldquo;Patience is the companion of wisdom.&rdquo;
+                        </p>
+                        <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-3 italic">
+                          Searching within {maxDistance} km of your location...
+                        </p>
+                      </div>
+                    ) : nearestCenters.length > 0 ? (
+                      <>
+                        <div className="flex items-center justify-between mb-4 pb-3 border-b border-neutral-100 dark:border-neutral-700">
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                            Found <strong className="text-neutral-700 dark:text-neutral-200">{nearestCenters.length}</strong> centers within {maxDistance} km
+                          </p>
+                          <div className="text-[10px] text-spirit-purple-600 dark:text-spirit-purple-400 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 px-2 py-0.5 rounded-full font-medium">
+                            Sorted by distance
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          {nearestCenters.map((center) => (
+                            <div
+                              key={center.branch_code}
+                              id={`center-card-${center.branch_code}`}
+                              onClick={() => handleCardClick(center)}
+                              className={`cursor-pointer rounded-xl border transition-all duration-200 p-1 ${
+                                selectedCenter?.branch_code === center.branch_code
+                                  ? "border-spirit-purple-300 dark:border-spirit-purple-600 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 shadow-md ring-1 ring-spirit-purple-200 dark:ring-spirit-purple-700"
+                                  : "border-neutral-100 dark:border-neutral-700 hover:border-spirit-purple-200 dark:hover:border-spirit-purple-700 hover:shadow-sm"
+                              }`}
+                            >
+                              <CenterCard
+                                center={center}
+                                distance={center.distance}
+                                showDistance={true}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <div id="lazy-load-sentinel" className="h-4"></div>
+                        {loadingMore && (
+                          <div className="flex items-center justify-center gap-2 py-4">
+                            <div className="w-4 h-4 border-2 border-spirit-purple-200 border-t-spirit-purple-500 rounded-full animate-spin" />
+                            <span className="text-neutral-400 dark:text-neutral-500 text-sm">Loading more centers...</span>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center py-16 px-6">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
+                          <Search className="w-7 h-7 text-neutral-400 dark:text-neutral-500" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 mb-2">No Centers Found Nearby</h3>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6 max-w-xs mx-auto">
+                          No meditation centers within {maxDistance} km of your location. Try expanding the search radius.
+                        </p>
+                        <button
+                          onClick={() => setMaxDistance((prev) => Math.min(prev + 20, 100))}
+                          className="inline-flex items-center gap-2 text-sm bg-spirit-purple-50 dark:bg-spirit-purple-900/20 text-spirit-purple-700 dark:text-spirit-purple-400 hover:bg-spirit-purple-100 dark:hover:bg-spirit-purple-900/30 px-5 py-2.5 rounded-xl font-medium transition-colors"
                         >
-                          <CenterCard
-                            center={center}
-                            distance={center.distance}
-                            showDistance={true}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    {/* Sentinel element for intersection observer */}
-                    <div id="lazy-load-sentinel" className="h-4"></div>
-                    {/* Loading indicator */}
-                    {loadingMore && (
-                      <div className="text-center py-4">
-                        <div className="animate-pulse text-neutral-400">
-                          Loading more centers...
-                        </div>
+                          Expand to {Math.min(maxDistance + 20, 100)} km
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     )}
-                  </>
-                ) : (
-                  <div className="text-center py-8">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-neutral-300 mb-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <h3 className="text-lg sm:text-xl font-semibold mb-2 text-neutral-600">
-                      No Centers Found
-                    </h3>
-                    <p className="text-sm sm:text-base text-neutral-500">
-                      We couldn't find any meditation centers within{" "}
-                      {maxDistance} km of your location.
-                    </p>
-                    <button
-                      onClick={() =>
-                        setMaxDistance((prev) => Math.min(prev + 20, 100))
-                      }
-                      className="mt-4 text-primary hover:underline"
-                    >
-                      Try increasing the distance filter
-                    </button>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       ) : (
-        /* Regions and States Section - Only shown when not searching */
-        <>
-          {/* India map for regions */}
-          <div className="bg-light rounded-lg shadow-md border border-neutral-200 overflow-hidden mb-8">
-            <div ref={regionMapRef} className="h-[500px] sm:h-[600px]">
+        /* ===== EXPLORE VIEW (no search active) ===== */
+        <div className="container mx-auto px-4 py-8 space-y-10">
+
+          {/* ===== INDIA MAP ===== */}
+          <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+            <div ref={regionMapRef} className="h-[400px] sm:h-[500px] md:h-[550px]">
               <CenterMap
                 centers={stateMapMarkersForMap}
                 autoZoom={true}
@@ -738,136 +774,215 @@ export default function HomePageClient({
                 defaultZoom={5}
               />
             </div>
-          </div>
-
-          {/* By Count/Alphabetical switcher */}
-          <div className="flex justify-center mb-6">
-            <div className="flex space-x-1 bg-light rounded-md border border-neutral-200">
-              <button
-                onClick={() => handleSortChange("centers")}
-                className={`px-4 py-2 text-sm ${
-                  sortBy === "centers"
-                    ? "bg-primary text-white rounded-md"
-                    : "text-neutral-600"
-                }`}
-              >
-                By Count
-              </button>
-              <button
-                onClick={() => handleSortChange("alpha")}
-                className={`px-4 py-2 text-sm ${
-                  sortBy === "alpha"
-                    ? "bg-primary text-white rounded-md"
-                    : "text-neutral-600"
-                }`}
-              >
-                In Alphabetical
-              </button>
+            <div className="px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-700">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">Click any state marker to explore its meditation centers.</p>
             </div>
           </div>
 
-          {/* Region and state cards */}
-          {getSortedRegions().map((region) => (
-            <div key={region.name} className="mb-8">
-              <div className="flex items-center mb-4">
-                <h3 className="text-xl font-bold text-spirit-blue-700">
-                  {region.name}
-                </h3>
-                <div className="ml-3 bg-spirit-blue-100 text-spirit-blue-800 text-xs font-medium rounded-full px-2.5 py-0.5">
-                  {region.stateCount} States/UT
-                </div>
-                <div className="ml-2 bg-primary text-white text-xs font-medium rounded-full px-2.5 py-0.5">
-                  {region.centerCount} Centers
-                </div>
-              </div>
+          {/* Decorative Divider */}
+          <div className="flex items-center my-12">
+            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
+            <div className="px-4">
+              <div className="w-2 h-2 rounded-full bg-spirit-purple-400 dark:bg-spirit-purple-600"></div>
+            </div>
+            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
+          </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                {regionToStates[region.name] &&
-                  Object.keys(regionToStates[region.name].states)
-                    .sort((a, b) => {
-                      if (sortBy === "alpha") {
-                        return a.localeCompare(b);
-                      } else {
-                        const stateA = statesSummary.find(
-                          (s) => s.state === a
-                        );
-                        const stateB = statesSummary.find(
-                          (s) => s.state === b
-                        );
-                        return (
-                          (stateB?.centerCount || 0) -
-                          (stateA?.centerCount || 0)
-                        );
-                      }
-                    })
-                    .map((stateName) => {
-                      const stateData = statesSummary.find(
-                        (s) => s.state === stateName
-                      );
-                      return (
-                        <Link
-                          key={stateName}
-                          href={formatCenterUrl(region.name, stateName)}
-                          className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-neutral-200 p-3 sm:p-4 block"
-                        >
-                          <h4 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3 text-neutral-800 line-clamp-2">
-                            {stateName}
-                          </h4>
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                            <div className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-spirit-blue-600 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                />
-                              </svg>
-                              <span className="text-neutral-700">
-                                {stateData?.districtCount || 0} Districts
+          {/* ===== EXPLORE BY REGION ===== */}
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                Explore by Region
+              </h2>
+              <div className="flex bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1 border border-neutral-200 dark:border-neutral-700">
+                <button
+                  onClick={() => handleSortChange("centers")}
+                  className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                    sortBy === "centers"
+                      ? "bg-white dark:bg-neutral-700 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
+                      : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300"
+                  }`}
+                >
+                  By Count
+                </button>
+                <button
+                  onClick={() => handleSortChange("alpha")}
+                  className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                    sortBy === "alpha"
+                      ? "bg-white dark:bg-neutral-700 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
+                      : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300"
+                  }`}
+                >
+                  A–Z
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              {getSortedRegions().map((region, regionIdx) => {
+                const regionColors = [
+                  { accent: 'from-spirit-purple-500 to-spirit-blue-500', bg: 'bg-spirit-purple-50/60 dark:bg-spirit-purple-900/10', text: 'text-spirit-purple-700 dark:text-spirit-purple-300', bar: 'bg-spirit-purple-500', hoverBg: 'hover:bg-spirit-purple-50 dark:hover:bg-spirit-purple-900/20' },
+                  { accent: 'from-spirit-blue-500 to-spirit-teal-500', bg: 'bg-spirit-blue-50/60 dark:bg-spirit-blue-900/10', text: 'text-spirit-blue-700 dark:text-spirit-blue-300', bar: 'bg-spirit-blue-500', hoverBg: 'hover:bg-spirit-blue-50 dark:hover:bg-spirit-blue-900/20' },
+                  { accent: 'from-spirit-teal-500 to-spirit-gold-500', bg: 'bg-spirit-teal-50/60 dark:bg-spirit-teal-900/10', text: 'text-spirit-teal-700 dark:text-spirit-teal-300', bar: 'bg-spirit-teal-500', hoverBg: 'hover:bg-spirit-teal-50 dark:hover:bg-spirit-teal-900/20' },
+                  { accent: 'from-spirit-gold-500 to-spirit-purple-500', bg: 'bg-spirit-gold-50/60 dark:bg-spirit-gold-900/10', text: 'text-spirit-gold-700 dark:text-spirit-gold-300', bar: 'bg-spirit-gold-500', hoverBg: 'hover:bg-spirit-gold-50 dark:hover:bg-spirit-gold-900/20' },
+                  { accent: 'from-spirit-rose-500 to-spirit-purple-500', bg: 'bg-spirit-rose-50/60 dark:bg-spirit-rose-900/10', text: 'text-spirit-rose-700 dark:text-spirit-rose-300', bar: 'bg-spirit-rose-500', hoverBg: 'hover:bg-spirit-rose-50 dark:hover:bg-spirit-rose-900/20' },
+                  { accent: 'from-spirit-purple-500 to-spirit-gold-500', bg: 'bg-spirit-purple-50/60 dark:bg-spirit-purple-900/10', text: 'text-spirit-purple-700 dark:text-spirit-purple-300', bar: 'bg-spirit-purple-500', hoverBg: 'hover:bg-spirit-purple-50 dark:hover:bg-spirit-purple-900/20' },
+                ];
+                const color = regionColors[regionIdx % regionColors.length];
+                const regionStates = regionToStates[region.name]
+                  ? Object.keys(regionToStates[region.name].states)
+                      .sort((a, b) => {
+                        if (sortBy === "alpha") return a.localeCompare(b);
+                        const stateA = statesSummary.find((s) => s.state === a);
+                        const stateB = statesSummary.find((s) => s.state === b);
+                        return (stateB?.centerCount || 0) - (stateA?.centerCount || 0);
+                      })
+                  : [];
+                const maxCentersInRegion = Math.max(...regionStates.map(s => statesSummary.find(st => st.state === s)?.centerCount || 0), 1);
+                const isExpanded = showAllRegions || regionIdx < 3;
+
+                return (
+                  <div key={region.name} className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
+                    {/* Region Header */}
+                    <div className="px-5 py-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color.accent} flex items-center justify-center text-white shadow-sm`}>
+                            <Compass className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <Link
+                              href={formatCenterUrl(region.name)}
+                              className="group flex items-center gap-1.5"
+                            >
+                              <h3 className="text-base md:text-lg font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-spirit-purple-600 dark:group-hover:text-spirit-purple-400 transition-colors">
+                                {region.name}
+                              </h3>
+                              <ArrowRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-spirit-purple-500 group-hover:translate-x-0.5 transition-all" />
+                            </Link>
+                            <div className="flex items-center gap-3 mt-0.5">
+                              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                <strong className={color.text}>{region.centerCount.toLocaleString()}</strong> centers
                               </span>
-                            </div>
-                            <div className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-primary mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                />
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                              </svg>
-                              <span className="text-neutral-700">
-                                {stateData?.centerCount || 0} Centers
+                              <span className="w-px h-3 bg-neutral-200 dark:bg-neutral-600" />
+                              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                <strong className={color.text}>{region.stateCount}</strong> states
                               </span>
                             </div>
                           </div>
-                        </Link>
-                      );
-                    })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* State Grid */}
+                    {isExpanded && (
+                      <div className="px-4 pb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                          {regionStates.map((stateName) => {
+                            const stateData = statesSummary.find((s) => s.state === stateName);
+                            const count = stateData?.centerCount || 0;
+                            const pct = Math.round((count / maxCentersInRegion) * 100);
+
+                            return (
+                              <Link
+                                key={stateName}
+                                href={formatCenterUrl(region.name, stateName)}
+                                className={`group flex items-center gap-3 px-3.5 py-3 rounded-xl border border-transparent hover:border-neutral-200 dark:hover:border-neutral-600 ${color.hoverBg} transition-all duration-200`}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between mb-1.5">
+                                    <h4 className="text-sm font-medium text-neutral-800 dark:text-neutral-200 group-hover:text-spirit-purple-600 dark:group-hover:text-spirit-purple-400 truncate transition-colors">
+                                      {stateName}
+                                    </h4>
+                                    <span className="text-xs font-bold text-neutral-700 dark:text-neutral-200 ml-2 tabular-nums shrink-0">
+                                      {count}
+                                    </span>
+                                  </div>
+                                  <div className="w-full h-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full rounded-full ${color.bar} opacity-70 group-hover:opacity-100 transition-all duration-500`}
+                                      style={{ width: `${Math.max(pct, 4)}%` }}
+                                    />
+                                  </div>
+                                  <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">
+                                    {stateData?.districtCount || 0} districts
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-spirit-purple-500 shrink-0 group-hover:translate-x-0.5 transition-all" />
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Show more regions toggle */}
+            {getSortedRegions().length > 3 && !showAllRegions && (
+              <div className="text-center mt-6">
+                <button
+                  onClick={() => setShowAllRegions(true)}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 hover:bg-spirit-purple-100 dark:hover:bg-spirit-purple-900/30 px-5 py-2.5 rounded-xl transition-colors"
+                >
+                  Show All {getSortedRegions().length} Regions
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Decorative Divider */}
+          <div className="flex items-center my-12">
+            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
+            <div className="px-4">
+              <div className="w-2 h-2 rounded-full bg-spirit-purple-400 dark:bg-spirit-purple-600"></div>
+            </div>
+            <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
+          </div>
+
+          {/* ===== INFO ROW ===== */}
+          <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+            <div className="p-6 md:p-8">
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="flex gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-spirit-purple-100 to-spirit-blue-100 dark:from-spirit-purple-900/30 dark:to-spirit-blue-900/30 flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-5 h-5 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Free 7-Day Course</h3>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Every center offers a free introductory Rajyoga meditation course. Walk in any day — no registration needed.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-spirit-blue-100 to-spirit-purple-100 dark:from-spirit-blue-900/30 dark:to-spirit-purple-900/30 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-spirit-blue-600 dark:text-spirit-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Open to Everyone</h3>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">All classes are open to people of every age, background, and faith.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-spirit-gold-100 to-spirit-purple-100 dark:from-spirit-gold-900/30 dark:to-spirit-purple-900/30 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-5 h-5 text-spirit-gold-600 dark:text-spirit-gold-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Always Free</h3>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">All programs, classes, and courses at Brahma Kumaris are offered completely free of charge.</p>
+                  </div>
+                </div>
               </div>
             </div>
-          ))}
-        </>
+          </div>
+
+          {/* ===== SOUL SUSTENANCE ===== */}
+          <SoulSustenance />
+        </div>
       )}
-    </main>
+    </div>
   );
 }
 

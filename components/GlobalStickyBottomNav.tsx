@@ -46,7 +46,7 @@ export default function GlobalStickyBottomNav({}: GlobalStickyBottomNavProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
       {/* Background with blur effect */}
-      <div className="bg-white/95 backdrop-blur-sm border-t border-spirit-purple-200 shadow-lg">
+      <div className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-t border-spirit-purple-200 dark:border-spirit-purple-800 shadow-lg">
         <div className="flex">
           {/* Nearby Centers Button */}
           <button

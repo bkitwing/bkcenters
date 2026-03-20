@@ -6,7 +6,8 @@ import {
   getStateCentersLightweight, 
   getRegionForState, 
   getRegionBySlug,
-  getStateBySlug
+  getStateBySlug,
+  getStatesByRegionFast
 } from '@/lib/serverCenterData';
 import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
@@ -101,10 +102,17 @@ export default async function StatePage({ params }: StatePageProps) {
   // Get the actual region for this state from our data
   const stateRegion = await getRegionForState(actualState);
   
-  const [districts, lightCenters] = await Promise.all([
+  const [districts, lightCenters, allStatesInRegion] = await Promise.all([
     getDistrictsByState(actualState),
     getStateCentersLightweight(actualState),
+    getStatesByRegionFast(stateRegion || actualRegion),
   ]);
+
+  // Other states in the same region (exclude current state)
+  const otherStates = allStatesInRegion
+    .filter(s => s.name !== actualState)
+    .sort((a, b) => b.centerCount - a.centerCount)
+    .slice(0, 12);
   
   // Check if the URL region matches the actual region
   if (actualRegion !== stateRegion && stateRegion !== 'INDIA') {
@@ -179,6 +187,7 @@ export default async function StatePage({ params }: StatePageProps) {
         districts={districts}
         totalCenters={lightCenters.length}
         districtSummary={districtSummary}
+        otherStates={otherStates}
       />
     </>
   );

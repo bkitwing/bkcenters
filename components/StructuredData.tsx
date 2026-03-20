@@ -395,14 +395,50 @@ export function EventSchema({ center, centerUrl }: EventSchemaProps) {
     addressCountry: center.country || 'IN',
   };
 
+  // Calculate next Monday as the startDate for the recurring event
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ...
+  const daysUntilNextMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek;
+  const nextMonday = new Date(now);
+  nextMonday.setDate(now.getDate() + daysUntilNextMonday);
+  const startDateStr = nextMonday.toISOString().split('T')[0] + 'T06:00:00+05:30';
+
+  // End date is 1 year from start for recurring schedule visibility
+  const endDate = new Date(nextMonday);
+  endDate.setFullYear(endDate.getFullYear() + 1);
+  const endDateStr = endDate.toISOString().split('T')[0] + 'T20:00:00+05:30';
+
   const schema: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: `Rajyoga Meditation Class at ${center.name}`,
-    description: `Free Rajyoga meditation class at ${center.name}, a Brahma Kumaris center in ${center.district}, ${center.state}. Open to all, no prior experience required.`,
+    description: `Free Rajyoga meditation class at ${center.name}, a Brahma Kumaris center in ${center.district}, ${center.state}. Open to all, no prior experience required. Classes held daily — morning and evening sessions.`,
+    startDate: startDateStr,
+    endDate: endDateStr,
+    eventSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1D',
+      byDay: [
+        'https://schema.org/Monday',
+        'https://schema.org/Tuesday',
+        'https://schema.org/Wednesday',
+        'https://schema.org/Thursday',
+        'https://schema.org/Friday',
+        'https://schema.org/Saturday',
+        'https://schema.org/Sunday',
+      ],
+      startTime: '06:00:00+05:30',
+      endTime: '20:00:00+05:30',
+      scheduleTimezone: 'Asia/Kolkata',
+    },
     organizer: {
       '@type': 'Organization',
       '@id': 'https://www.brahmakumaris.com/#organization',
+      name: 'Brahma Kumaris',
+      url: 'https://www.brahmakumaris.com',
+    },
+    performer: {
+      '@type': 'Organization',
       name: 'Brahma Kumaris',
       url: 'https://www.brahmakumaris.com',
     },
@@ -421,11 +457,20 @@ export function EventSchema({ center, centerUrl }: EventSchemaProps) {
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     eventStatus: 'https://schema.org/EventScheduled',
     isAccessibleForFree: true,
-    url: 'https://www.brahmakumaris.com/events',
+    url: centerUrl,
+    image: 'https://www.brahmakumaris.com/centers/brahma-kumaris-logo.webp',
     inLanguage: 'en',
     audience: {
       '@type': 'Audience',
       audienceType: 'General Public',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'INR',
+      availability: 'https://schema.org/InStock',
+      url: centerUrl,
+      validFrom: startDateStr,
     },
   };
 

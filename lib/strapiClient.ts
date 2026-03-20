@@ -314,7 +314,7 @@ const POPULATE_NEARBY = [
 /**
  * Load all centers with CenterCard-essential fields only.
  * ~5x smaller payload than full populate, uses page size 2000 (~3 API calls instead of 12).
- * Used by the /api/centers/nearby endpoint.
+ * Used by the /api/centers/nearby endpoint as fallback.
  */
 export async function loadCentersForNearby(): Promise<Center[]> {
   let all: StrapiCenterEntry[] = [];
@@ -328,6 +328,51 @@ export async function loadCentersForNearby(): Promise<Center[]> {
     if (page >= res.meta.pagination.pageCount) break;
     page++;
   }
+  return all.map(transformStrapiCenter);
+}
+
+/**
+ * Fast nearby search using bounding box pre-filter.
+ * Instead of fetching all 5600+ centers, uses Strapi latitude/longitude
+ * filters to only fetch centers within a geographic bounding box.
+ * Reduces API calls from 3 pages to typically 1 page (~50-300 records).
+ * 
+ * 1° latitude ≈ 111 km, so for a 150km radius use ~1.5° padding.
+ * Longitude varies by latitude; at India's range (8-35°N) use ~2° padding.
+ */
+export async function loadCentersNearbyBBox(
+  lat: number,
+  lng: number,
+  radiusKm: number = 150
+): Promise<Center[]> {
+  // Convert radius to degree padding (with generous margin)
+  const latPad = (radiusKm / 111) * 1.2; // ~1.2x safety margin
+  const lngPad = (radiusKm / (111 * Math.cos((lat * Math.PI) / 180))) * 1.2;
+
+  const minLat = lat - latPad;
+  const maxLat = lat + latPad;
+  const minLng = lng - lngPad;
+  const maxLng = lng + lngPad;
+
+  const bboxFilters = [
+    `filters[latitude][$gte]=${minLat.toFixed(4)}`,
+    `filters[latitude][$lte]=${maxLat.toFixed(4)}`,
+    `filters[longitude][$gte]=${minLng.toFixed(4)}`,
+    `filters[longitude][$lte]=${maxLng.toFixed(4)}`,
+  ].join('&');
+
+  let all: StrapiCenterEntry[] = [];
+  let page = 1;
+  while (true) {
+    const res = await strapiGet<StrapiCenterEntry[]>(
+      `centers?${POPULATE_NEARBY}&${bboxFilters}&pagination[page]=${page}&pagination[pageSize]=500`,
+      { revalidate: 3600, tags: ['centers-nearby-bbox'] }
+    );
+    all = all.concat(res.data || []);
+    if (page >= res.meta.pagination.pageCount) break;
+    page++;
+  }
+  logger.info(`BBox nearby: fetched ${all.length} centers for (${lat.toFixed(2)}, ${lng.toFixed(2)}) r=${radiusKm}km`);
   return all.map(transformStrapiCenter);
 }
 

@@ -199,10 +199,10 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
   };
 
   const primaryButtonClass = "bg-spirit-purple-600 text-white px-3 py-2 rounded-md text-sm hover:bg-spirit-purple-700 transition-colors flex items-center";
-  const secondaryButtonClass = "bg-spirit-blue-50 text-spirit-blue-700 border border-spirit-blue-200 px-3 py-2 rounded-md text-sm hover:bg-spirit-blue-100 transition-colors flex items-center";
+  const secondaryButtonClass = "bg-spirit-blue-50 dark:bg-spirit-blue-900/20 text-spirit-blue-700 dark:text-spirit-blue-400 border border-spirit-blue-200 dark:border-spirit-blue-800 px-3 py-2 rounded-md text-sm hover:bg-spirit-blue-100 dark:hover:bg-spirit-blue-900/30 transition-colors flex items-center";
   
   const cardPrimaryButtonClass = "bg-spirit-purple-600 text-white px-2 py-1.5 rounded-md text-sm hover:bg-spirit-purple-700 transition-colors flex items-center";
-  const cardSecondaryButtonClass = "bg-spirit-blue-50 text-spirit-blue-700 border border-spirit-blue-200 px-2 py-1.5 rounded-md text-sm hover:bg-spirit-blue-100 transition-colors flex items-center";
+  const cardSecondaryButtonClass = "bg-spirit-blue-50 dark:bg-spirit-blue-900/20 text-spirit-blue-700 dark:text-spirit-blue-400 border border-spirit-blue-200 dark:border-spirit-blue-800 px-2 py-1.5 rounded-md text-sm hover:bg-spirit-blue-100 dark:hover:bg-spirit-blue-900/30 transition-colors flex items-center";
   
   // Select appropriate button classes based on style
   const primaryClass = buttonStyle === 'card' ? cardPrimaryButtonClass : primaryButtonClass;
@@ -247,7 +247,7 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
             onChange={(e) => setStartLocation(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Enter starting location"
-            className="flex-grow p-2 border border-neutral-300 rounded text-sm"
+            className="flex-grow p-2 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded text-sm"
           />
           <button
             ref={goButtonRef}

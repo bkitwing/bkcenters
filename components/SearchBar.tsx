@@ -360,7 +360,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           value={displayValue}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          className={`w-full p-4 ${(!disableVoiceInput && voiceSupported) ? 'pr-24' : 'pr-10'} rounded-lg border ${locationError || voiceError ? 'border-red-300' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent ${isListening ? 'animate-pulse-light' : ''}`}
+          className={`w-full p-4 ${(!disableVoiceInput && voiceSupported) ? 'pr-24' : 'pr-10'} rounded-lg border ${locationError || voiceError ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-neutral-600'} bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#FF7F50] focus:border-transparent ${isListening ? 'animate-pulse-light' : ''}`}
           placeholder={
             voiceError 
               ? "Error recognizing speech" 
@@ -416,14 +416,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
               className="focus:outline-none"
               aria-label="Clear search"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 hover:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           ) : (
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              className="h-6 w-6 text-gray-500" 
+              className="h-6 w-6 text-gray-500 dark:text-neutral-400" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"

@@ -9,6 +9,8 @@ import { Metadata } from 'next';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
+import SoulSustenance from '@/components/SoulSustenance';
+import { MapPin, ChevronRight, ArrowLeft, Building2, Map, Sparkles, BookOpen, Users, Globe } from 'lucide-react';
 
 // Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
 export const revalidate = 86400;
@@ -127,8 +129,11 @@ export default async function RegionPage({ params }: RegionPageProps) {
     position: idx + 1,
   }));
 
+  // Find the max center count for bar scaling
+  const maxCenters = states.length > 0 ? Math.max(...states.map(s => s.centerCount)) : 1;
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
       {/* Structured Data for SEO */}
       <BreadcrumbSchema items={breadcrumbItems} />
       <PlaceSchema 
@@ -144,126 +149,193 @@ export default async function RegionPage({ params }: RegionPageProps) {
         items={itemListItems}
       />
 
-      {/* Breadcrumb Navigation */}
-      <nav className="flex mb-6 text-sm">
-        <ol className="flex items-center space-x-2">
-          <li>
-            <Link href="/" className="text-neutral-500 hover:text-primary">
-              Home
-            </Link>
-          </li>
-          <li className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </li>
-          <li>
-            <span className="font-medium text-primary">
-              {region}
-            </span>
-          </li>
-        </ol>
-      </nav>
-      
-      <h1 className="text-3xl font-bold mb-4 spiritual-text-gradient">{region} Centers</h1>
-      
-      {/* Statistics summary for the region */}
-      <div className="bg-light rounded-lg shadow-md p-4 mb-6 border border-neutral-200">
-        <h3 className="text-xl mb-3 font-bold spiritual-text-gradient">Centers Overview</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="bg-spirit-purple-50 p-3 rounded-lg border border-spirit-purple-100">
-            <div className="text-primary text-2xl font-bold">{totalCenters}</div>
-            <div className="text-neutral-600 text-sm">Total Centers</div>
-          </div>
-          <div className="bg-spirit-blue-50 p-3 rounded-lg border border-spirit-blue-100">
-            <div className="text-secondary text-2xl font-bold">
-              {states.length}
+      {/* ===== HERO SECTION ===== */}
+      <div className="relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-spirit-gold-400 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-spirit-blue-400 rounded-full blur-3xl" />
+        </div>
+
+        <div className="container mx-auto px-4 pt-6 pb-10 md:pb-14 relative z-10">
+          {/* Breadcrumb */}
+          <nav className="mb-6">
+            <ol className="flex items-center text-sm flex-wrap gap-1">
+              <li className="flex items-center">
+                <Link href="/" className="text-white/60 hover:text-white text-xs transition-colors">Home</Link>
+              </li>
+            </ol>
+          </nav>
+
+          {/* Title & Badge */}
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white/90 px-3 py-1 rounded-full text-xs font-medium mb-3">
+              <Globe className="w-3.5 h-3.5" />
+              Brahma Kumaris Meditation Centers
             </div>
-            <div className="text-neutral-600 text-sm">States & UT</div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">{region}</h1>
+            <p className="text-white/70 text-sm max-w-2xl">
+              Explore {totalCenters} Brahma Kumaris Rajyoga meditation centers across {states.length} {states.length === 1 ? 'state' : 'states'} and {totalDistricts} districts in {region}
+            </p>
           </div>
-          <div className="bg-spirit-gold-50 p-3 rounded-lg border border-spirit-gold-100">
-            <div className="text-accent text-2xl font-bold">{totalDistricts}</div>
-            <div className="text-neutral-600 text-sm">Districts</div>
+
+          {/* Stats Row */}
+          <div className="flex flex-wrap gap-4">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-5 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white leading-none">{totalCenters}</p>
+                <p className="text-xs text-white/60">Meditation Centers</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-5 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
+                <Map className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white leading-none">{states.length}</p>
+                <p className="text-xs text-white/60">States &amp; UTs</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-5 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white leading-none">{totalDistricts}</p>
+                <p className="text-xs text-white/60">Districts</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-5 py-3 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white leading-none">Free</p>
+                <p className="text-xs text-white/60">All Classes &amp; Courses</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Show states grouped by region if region is INDIA */}
-      {region === 'INDIA' ? (
-        // Display regions with their states
-        Object.keys(statesByRegion)
-          .filter(regionName => statesByRegion[regionName].length > 0)
-          .sort()
-          .map(regionName => (
-            <div key={regionName} className="mb-10">
-              <h2 className="text-2xl font-semibold mb-4 text-spirit-blue-700">
-                <Link href={formatCenterUrl(regionName)} className="hover:underline">
-                  {regionName}
-                </Link>
+
+      {/* ===== MAIN CONTENT ===== */}
+      <div className="container mx-auto px-4 py-8 space-y-10">
+
+        {/* ===== STATES GRID ===== */}
+        {states.length > 0 ? (
+          <div>
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+                {region === 'INDIA' ? 'Explore States & Union Territories' : `States in ${region}`}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                {statesByRegion[regionName].map(state => (
-                  <Link
-                    key={state.name}
-                    href={formatCenterUrl(regionName, state.name)}
-                    className="bg-light p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 block"
-                  >
-                    <h3 className="text-xl font-semibold mb-2 text-spirit-purple-700">{state.name}</h3>
-                    <div className="flex justify-between items-center">
-                      <span className="text-neutral-600">
-                        {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'}
-                      </span>
-                      <span className="text-primary font-medium">View →</span>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm">Select a state to find meditation centers near you</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {states
+                .sort((a, b) => b.centerCount - a.centerCount)
+                .map((state, idx) => (
+                <Link
+                  key={state.name}
+                  href={formatCenterUrl(region, state.name)}
+                  className="group bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-5 hover:shadow-lg hover:border-spirit-purple-200 dark:hover:border-spirit-purple-700 hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Rank / Icon */}
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${
+                      idx % 5 === 0 ? 'bg-gradient-to-br from-spirit-purple-500 to-spirit-blue-500' :
+                      idx % 5 === 1 ? 'bg-gradient-to-br from-spirit-blue-500 to-spirit-teal-500' :
+                      idx % 5 === 2 ? 'bg-gradient-to-br from-spirit-teal-500 to-spirit-purple-500' :
+                      idx % 5 === 3 ? 'bg-gradient-to-br from-spirit-gold-500 to-spirit-purple-500' :
+                      'bg-gradient-to-br from-spirit-rose-500 to-spirit-purple-500'
+                    }`}>
+                      {state.centerCount}
                     </div>
-                  </Link>
-                ))}
-              </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-spirit-purple-700 dark:group-hover:text-spirit-purple-400 transition-colors truncate">{state.name}</h3>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                        {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'} &middot; {state.districtCount} {state.districtCount === 1 ? 'district' : 'districts'}
+                      </p>
+                      {/* Progress bar */}
+                      <div className="w-full h-1 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden mt-2.5">
+                        <div 
+                          className="h-full bg-gradient-to-r from-spirit-purple-400 to-spirit-blue-400 rounded-full transition-all duration-700"
+                          style={{ width: `${Math.max((state.centerCount / maxCenters) * 100, 5)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Arrow */}
+                    <ChevronRight className="w-4 h-4 text-neutral-300 dark:text-neutral-600 group-hover:text-spirit-purple-500 group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" />
+                  </div>
+                </Link>
+              ))}
             </div>
-          ))
-      ) : (
-        // For specific regions, show the states directly
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          {states.map(state => (
-            <Link
-              key={state.name}
-              href={formatCenterUrl(region, state.name)}
-              className="bg-light p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-neutral-200 block"
-            >
-              <h2 className="text-xl font-semibold mb-2 text-spirit-purple-700">{state.name}</h2>
-              <div className="flex justify-between items-center">
-                <span className="text-neutral-600">
-                  {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'}
-                </span>
-                <span className="text-primary font-medium">View →</span>
-              </div>
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm p-10 text-center">
+            <Globe className="w-14 h-14 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-3 text-neutral-700 dark:text-neutral-300">No States Found</h2>
+            <p className="text-neutral-500 dark:text-neutral-400 mb-6 text-sm max-w-md mx-auto">
+              We couldn&apos;t find any states in {region}.
+            </p>
+            <Link href="/" className="inline-flex items-center gap-2 bg-gradient-to-r from-spirit-purple-600 to-spirit-blue-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:shadow-lg transition-all">
+              Explore All Centers
             </Link>
-          ))}
-          
-          {states.length === 0 && (
-            <div className="col-span-full bg-light p-8 rounded-lg shadow-md text-center border border-neutral-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-neutral-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <h2 className="text-2xl font-bold mb-4 text-neutral-700">No States Found</h2>
-              <p className="text-neutral-600 mb-6">
-                We couldn't find any states in {region}.
-              </p>
-              
-              <Link href="/" className="btn-primary">
-                Explore All Centers
-              </Link>
+          </div>
+        )}
+
+        {/* ===== INFO ROW ===== */}
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+          <div className="p-6 md:p-8">
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-spirit-purple-100 to-spirit-blue-100 dark:from-spirit-purple-900/30 dark:to-spirit-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-5 h-5 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Free 7-Day Course</h3>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Every center offers a free introductory Rajyoga meditation course. Walk in any day — no registration needed.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-spirit-blue-100 to-spirit-purple-100 dark:from-spirit-blue-900/30 dark:to-spirit-purple-900/30 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-spirit-blue-600 dark:text-spirit-blue-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Open to Everyone</h3>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">All classes are open to people of every age, background, and faith.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-spirit-gold-100 to-spirit-purple-100 dark:from-spirit-gold-900/30 dark:to-spirit-purple-900/30 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-spirit-gold-600 dark:text-spirit-gold-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-sm mb-1">Always Free</h3>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">All programs, classes, and courses at Brahma Kumaris are offered completely free of charge.</p>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
-      )}
-      
-      <div className="mt-8 pt-6 border-t border-neutral-200">
-        <Link href="/" className="text-primary hover:underline inline-flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Home
-        </Link>
+
+        {/* ===== SOUL SUSTENANCE ===== */}
+        <SoulSustenance />
+
+        {/* ===== BACK LINK ===== */}
+        <div className="pt-6 border-t border-neutral-200 dark:border-neutral-700">
+          <Link href="/" className="inline-flex items-center gap-2 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium text-sm transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );

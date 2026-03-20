@@ -9,6 +9,26 @@ import { calculateCenterDistance, formatDistance } from '@/lib/distanceUtils';
 import { logger } from '@/lib/logger';
 import { CenterLocatorAnalytics } from './GoogleAnalytics';
 
+// Dark mode map styles for Google Maps
+const darkMapStyles: any[] = [
+  { elementType: 'geometry', stylers: [{ color: '#2D2A26' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#1A1815' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#A09890' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#C0BCB4' }] },
+  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#A09890' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#3D3835' }] },
+  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#6B6560' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#3D3835' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#504840' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#504840' }] },
+  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#6B6050' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#C0BCB4' }] },
+  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#2D2A26' }] },
+  { featureType: 'transit.station', elementType: 'labels.text.fill', stylers: [{ color: '#A09890' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#1A1815' }] },
+  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#6B6050' }] },
+];
+
 interface CenterMapProps {
   centers: Center[];
   initialLat?: number;
@@ -44,6 +64,27 @@ const CenterMap: React.FC<CenterMapProps> = ({
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [markersReady, setMarkersReady] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  // Watch for theme changes via MutationObserver on <html> classList
+  useEffect(() => {
+    const html = document.documentElement;
+    setIsDark(html.classList.contains('dark'));
+
+    const observer = new MutationObserver(() => {
+      const dark = html.classList.contains('dark');
+      setIsDark(dark);
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  // Update map styles when theme changes
+  useEffect(() => {
+    if (mapRef) {
+      mapRef.setOptions({ styles: isDark ? darkMapStyles : [] });
+    }
+  }, [isDark, mapRef]);
   
   // Create a reference to store all markers for later access
   const [markers, setMarkers] = useState<Map<string, google.maps.Marker>>(new Map());
@@ -482,7 +523,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
     if (selectedCenter?.branch_code === center.branch_code) {
       return {
         path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-        fillColor: '#7E57C2', // Primary purple
+        fillColor: '#B8860B', // Primary golden
         fillOpacity: 1,
         strokeColor: '#FFFFFF',
         strokeWeight: 2.5,
@@ -495,35 +536,28 @@ const CenterMap: React.FC<CenterMapProps> = ({
       const count = center.district_total || 0;
       
       // Calculate color intensity based on center count
-      // Higher count = more intense color (darker orange)
-      // Lower count = lighter color
-      const baseColor = '#7E57C2'; // Primary purple
-      let opacity = 0.5 + Math.min(count / 50, 0.5); // Scale opacity between 0.5 and 1.0
-      
-      // For very small numbers, ensure they're still visible
-      if (count <= 5) opacity = 0.5;
+      const baseColor = '#8B6914'; // Dark golden for better contrast
+      let opacity = 0.6 + Math.min(count / 50, 0.4);
+      if (count <= 5) opacity = 0.6;
       
       return {
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: baseColor,
         fillOpacity: opacity,
-        scale: 15, // Fixed size for all markers
+        scale: 15,
         strokeColor: '#FFFFFF',
         strokeWeight: 2,
         labelOrigin: new google.maps.Point(0, 0)
       };
     }
     
-    // For state summary on homepage
+    // Add labels for state summary markers on homepage
     if (center.is_state_summary) {
-      const count = center.district_total || 0;
-      
-      // Use fixed size for state markers
       return {
         path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#7E57C2', // Primary purple
-        fillOpacity: 0.7, // Fixed opacity
-        scale: 15, // Fixed size for all state markers
+        fillColor: '#8B6914', // Dark golden for better contrast
+        fillOpacity: 0.85,
+        scale: 15,
         strokeColor: '#FFFFFF',
         strokeWeight: 2,
         labelOrigin: new google.maps.Point(0, 0)
@@ -534,7 +568,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
     if (highlightCenter && center.is_highlighted) {
       return {
         path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-        fillColor: '#7E57C2', // Primary purple
+        fillColor: '#B8860B', // Primary golden
         fillOpacity: 1,
         strokeColor: '#FFFFFF',
         strokeWeight: 2,
@@ -557,7 +591,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
     // Default marker
     return {
       path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
-      fillColor: center.is_district_summary ? '#4FC3F7' : '#7E57C2', // Secondary blue for districts, primary purple for centers
+      fillColor: center.is_district_summary ? '#8B6914' : '#B8860B', // Dark gold for districts, primary golden for centers
       fillOpacity: 0.9,
       strokeColor: '#FFFFFF',
       strokeWeight: 2,
@@ -627,10 +661,10 @@ const CenterMap: React.FC<CenterMapProps> = ({
       {isLoaded && centerPosition && GoogleMap && Marker && InfoWindow ? (
         <div className="relative h-full">
           {/* Distance measurement controls */}
-          <div className="absolute top-2 right-2 z-10 bg-white rounded-lg shadow-md p-2">
+          <div className="absolute top-2 right-2 z-10 bg-white dark:bg-neutral-800 rounded-lg shadow-md p-2">
             <button 
               onClick={toggleDistanceMeasurementMode}
-              className={`flex items-center justify-center w-8 h-8 rounded-full ${distanceMeasurementMode ? 'bg-spirit-purple-700 text-white' : 'bg-white text-neutral-700 border border-neutral-300'}`}
+              className={`flex items-center justify-center w-8 h-8 rounded-full ${distanceMeasurementMode ? 'bg-spirit-purple-700 text-white' : 'bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-600'}`}
               title={distanceMeasurementMode ? 'Exit Measure Mode' : 'Measure Distance'}
             >
               {distanceMeasurementMode ? (
@@ -647,20 +681,20 @@ const CenterMap: React.FC<CenterMapProps> = ({
             {distanceMeasurementMode && (
               <div className="mt-2 w-48">
                 {!startPoint && (
-                  <p className="text-sm text-neutral-700">Click on any center</p>
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300">Click on any center</p>
                 )}
                 {startPoint && !endPoint && (
-                  <p className="text-sm text-neutral-700">Click on another center</p>
+                  <p className="text-sm text-neutral-700 dark:text-neutral-300">Click on another center</p>
                 )}
                 {startPoint && endPoint && measuredDistance !== null && (
-                  <div className="p-2 bg-neutral-100 rounded text-sm">
+                  <div className="p-2 bg-neutral-100 dark:bg-neutral-700 rounded text-sm">
                     <p className="font-bold">Distance:</p>
                     <p>{formatDistance(measuredDistance)}</p>
                     <p className="text-xs mt-1">From: {startPoint.name}</p>
                     <p className="text-xs">To: {endPoint.name}</p>
                     <button 
                       onClick={resetDistanceMeasurement}
-                      className="mt-2 px-2 py-1 bg-neutral-200 text-neutral-700 rounded text-xs"
+                      className="mt-2 px-2 py-1 bg-neutral-200 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 rounded text-xs"
                     >
                       Reset
                     </button>
@@ -681,6 +715,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
               zoomControl: true,
               maxZoom: 18,
               minZoom: 5,
+              styles: isDark ? darkMapStyles : [],
             }}
             onLoad={onMapLoad}
           >
@@ -732,21 +767,21 @@ const CenterMap: React.FC<CenterMapProps> = ({
           </GoogleMap>
         </div>
       ) : (
-        <div className="h-full w-full flex items-center justify-center bg-gray-100">
+        <div className="h-full w-full flex items-center justify-center bg-gray-100 dark:bg-neutral-800">
           {loadError ? (
             <div className="text-center p-4">
               <p className="text-red-500 font-medium">Error loading Google Maps</p>
-              <p className="text-sm text-gray-600 mt-2">Failed to load Google Maps</p>
+              <p className="text-sm text-gray-600 dark:text-neutral-400 mt-2">Failed to load Google Maps</p>
             </div>
           ) : !hasValidKey ? (
             <div className="text-center p-4">
               <p className="text-yellow-600 font-medium">Google Maps API key not configured</p>
-              <p className="text-sm text-gray-600 mt-2">Please add your API key in .env.local file</p>
+              <p className="text-sm text-gray-600 dark:text-neutral-400 mt-2">Please add your API key in .env.local file</p>
             </div>
           ) : (
             <div className="animate-pulse flex flex-col items-center">
               <div className="h-12 w-12 bg-blue-200 rounded-full mb-2"></div>
-              <p className="text-gray-500">Loading map...</p>
+              <p className="text-gray-500 dark:text-neutral-400">Loading map...</p>
             </div>
           )}
         </div>

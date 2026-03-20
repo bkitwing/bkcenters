@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaHome, FaBars, FaTimes, FaSearch } from "react-icons/fa";
-import { MdMyLocation } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { CenterLocatorAnalytics } from './GoogleAnalytics';
+import { ThemeToggle } from './ThemeToggle';
+import { Home, MapPin, Search, Menu, X, Building2, Compass } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,11 +27,9 @@ const Header = () => {
         try {
           const { latitude, longitude } = position.coords;
           
-          // Track successful location usage
           CenterLocatorAnalytics.locationPermission(true);
           CenterLocatorAnalytics.searchCenters('Current Location', 0, 'location');
 
-          // Navigate to results page with query params
           router.push(
             `/?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent(
               "Current Location"
@@ -46,7 +44,6 @@ const Header = () => {
         console.error("Error getting location:", error);
         let errorMessage = "Failed to get your location";
         
-        // Track location permission denial
         if (error.code === error.PERMISSION_DENIED) {
           CenterLocatorAnalytics.locationPermission(false);
         }
@@ -67,172 +64,145 @@ const Header = () => {
         alert(errorMessage);
       },
       {
-        enableHighAccuracy: false, // Use network location for faster response
+        enableHighAccuracy: false,
         timeout: 15000,
-        maximumAge: 60000, // Allow cached position up to 1 minute old
+        maximumAge: 60000,
       }
     );
   };
 
   return (
-    <header className="bg-white border-b border-neutral-200 sticky top-0 z-50">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+    <header className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60 sticky top-0 z-50 transition-colors duration-300">
+      <div className="container mx-auto px-4 sm:px-6 h-14 flex justify-between items-center">
         {/* Logo */}
         <Link
-          href="https://www.brahmakumaris.com/"
-          className="flex items-center"
+          href="/"
+          className="flex items-center shrink-0"
         >
           <Image
             src="/centers/brahma-kumaris-logo.webp"
             alt="Brahma Kumaris"
             width={80}
             height={80}
-            className="h-10 w-auto"
+            className="h-9 w-auto"
             unoptimized
           />
         </Link>
 
-        {/* Desktop Menu */}
-        <nav className="hidden md:block">
-          <ul className="flex space-x-8 items-center">
-            <li>
-              <Link
-                href="/"
-                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
-                aria-label="Home"
-              >
-                <FaHome size={20} className="text-gray-600" />
-              </Link>
-            </li>
-            <li>
-              <button
-                onClick={handleUseMyLocation}
-                className="flex items-center transition-colors focus:outline-none nearby-button"
-              >
-                <div className="flex items-center text-[#CF3891] font-bold">
-                  <span>Nearby Me</span>
-                </div>
-              </button>
-            </li>
-            <li>
-              <Link
-                href="/india"
-                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
-              >
-                <span className="text-gray-600 font-medium">
-                  All States
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/retreat"
-                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
-              >
-                <span className="text-gray-600 font-medium">
-                  HQ Campuses
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/"
-                className="flex items-center text-neutral-700 hover:text-primary transition-colors"
-                aria-label="Search Centers" 
-              >
-                <FaSearch size={20} className="text-gray-600" />
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        {/* Mobile Menu and Search Button */}
-        <div className="md:hidden flex items-center space-x-4">
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-0.5">
           <Link
             href="/"
-            className="text-neutral-700 hover:text-primary transition-colors"
-            aria-label="Home"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-neutral-600 dark:text-neutral-400 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm font-medium"
           >
-            <FaHome size={20} className="text-gray-600" />
-          </Link>
-          <Link
-            href="/"
-            className="text-neutral-700 hover:text-primary transition-colors"
-            aria-label="Search Centers"
-          >
-            <FaSearch size={20} className="text-gray-600" />
+            <Home className="w-3.5 h-3.5" />
+            Home
           </Link>
           <button
-            className="text-neutral-700 focus:outline-none"
-            onClick={toggleMenu}
+            onClick={handleUseMyLocation}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-spirit-purple-600 dark:text-spirit-purple-400 hover:bg-spirit-purple-50 dark:hover:bg-spirit-purple-900/20 transition-colors text-sm font-semibold"
           >
-            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            <MapPin className="w-3.5 h-3.5" />
+            Nearby
+          </button>
+          <Link
+            href="/india"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-neutral-600 dark:text-neutral-400 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm font-medium"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            All States
+          </Link>
+          <Link
+            href="/retreat"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-neutral-600 dark:text-neutral-400 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm font-medium"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            HQ Campuses
+          </Link>
+          <div className="w-px h-5 bg-neutral-200 dark:bg-neutral-700 mx-1" />
+          <Link
+            href="/"
+            className="p-2 rounded-lg text-neutral-500 dark:text-neutral-400 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            aria-label="Search centers"
+          >
+            <Search className="w-4 h-4" />
+          </Link>
+          <ThemeToggle />
+        </nav>
+
+        {/* Mobile: Home + Search outside menu, then hamburger */}
+        <div className="md:hidden flex items-center gap-0.5">
+          <Link
+            href="/"
+            className="p-2 rounded-lg text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            aria-label="Home"
+          >
+            <Home className="w-5 h-5" />
+          </Link>
+          <Link
+            href="/"
+            className="p-2 rounded-lg text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            aria-label="Search"
+          >
+            <Search className="w-5 h-5" />
+          </Link>
+          <button
+            className="p-2 rounded-lg text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Dropdown */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg">
-          <nav className="container mx-auto px-4 py-3">
-            <ul className="space-y-4">
+        <div className="md:hidden bg-white dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-800 shadow-lg animate-in slide-in-from-top-2 duration-200">
+          <nav className="container mx-auto px-4 py-2">
+            <ul className="space-y-0.5">
               <li>
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);
                     handleUseMyLocation();
                   }}
-                  className="flex items-center transition-colors focus:outline-none"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-spirit-purple-600 dark:text-spirit-purple-400 hover:bg-spirit-purple-50 dark:hover:bg-spirit-purple-900/20 transition-colors"
                 >
-                  <div className="flex items-center text-[#CF3891] font-medium">
-                    <span>Nearby Me</span>
-                  </div>
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm font-semibold">Nearby Centers</span>
                 </button>
               </li>
               <li>
                 <Link
                   href="/india"
-                  className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                   onClick={toggleMenu}
                 >
-                  <span className="text-gray-600 font-medium">
-                    All States
-                  </span>
+                  <Compass className="w-4 h-4" />
+                  <span className="text-sm font-medium">All States</span>
                 </Link>
               </li>
               <li>
                 <Link
                   href="/retreat"
-                  className="flex items-center text-neutral-700 hover:text-primary transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                   onClick={toggleMenu}
                 >
-                  <span className="text-gray-600 font-medium">
-                    HQ Campuses
-                  </span>
+                  <Building2 className="w-4 h-4" />
+                  <span className="text-sm font-medium">HQ Campuses</span>
                 </Link>
+              </li>
+              <li className="pt-2 mt-1 border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex items-center justify-between px-3 py-2">
+                  <span className="text-sm text-neutral-500 dark:text-neutral-400">Dark Mode</span>
+                  <ThemeToggle />
+                </div>
               </li>
             </ul>
           </nav>
         </div>
       )}
-
-      <style jsx global>{`
-        .nearby-button {
-          animation: subtle-pulse 3s ease-in-out infinite;
-        }
-
-        @keyframes subtle-pulse {
-          0% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.85;
-          }
-          100% {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </header>
   );
 };

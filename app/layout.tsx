@@ -10,6 +10,8 @@ import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
 // Lightweight Strapi queries — only fetch counts, not all 5612 centers
 import { fetchCenterCount, fetchStatAndDistrictCounts } from "@/lib/strapiClient";
 import Link from "next/link";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Footer } from "@/components/Footer";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -92,7 +94,7 @@ export default async function RootLayout({
 }) {
   const { totalCenters } = await getHomeMetadata();
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://maps.googleapis.com" />
         <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
@@ -100,32 +102,16 @@ export default async function RootLayout({
         <WebSiteSchema />
         <DatasetSchema totalCenters={totalCenters} />
       </head>
-      <body className={`${inter.className} bg-neutral-50`}>
-        <Suspense fallback={null}>
-          <GoogleAnalytics />
-        </Suspense>
-        <Header />
-        <main>{children}</main>
-        <GlobalStickyBottomNav />
-        <footer className="bg-spirit-purple-50 mt-8 border-t border-spirit-purple-100">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-4">
-              <Link href="/privacy-policy" className="text-spirit-purple-700 hover:text-spirit-purple-900 hover:underline">
-                Privacy Policy
-              </Link>
-              <span className="hidden md:inline text-neutral-400">|</span>
-              <Link href="/terms-and-conditions" className="text-spirit-purple-700 hover:text-spirit-purple-900 hover:underline">
-                Terms and Conditions
-              </Link>
-            </div>
-            <div className="text-center text-neutral-600">
-              <p>
-                © {new Date().getFullYear()} Brahma Kumaris. All rights
-                reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+      <body className={`${inter.className} bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+          <Suspense fallback={null}>
+            <GoogleAnalytics />
+          </Suspense>
+          <Header />
+          <main>{children}</main>
+          <GlobalStickyBottomNav />
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
