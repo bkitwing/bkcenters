@@ -72,7 +72,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60 sticky top-0 z-50 transition-colors duration-300">
+    <header className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60 sticky top-0 z-50 transition-colors duration-300" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <div className="container mx-auto px-4 sm:px-6 h-14 flex justify-between items-center">
         {/* Logo */}
         <Link

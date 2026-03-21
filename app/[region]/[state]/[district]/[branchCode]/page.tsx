@@ -12,6 +12,7 @@ import ContactLink from '@/components/ContactLink';
 import FAQSection from '@/components/FAQSection';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
+import SectionNav from '@/components/SectionNav';
 import SevenDayCourseSection from '@/components/SevenDayCourseSection';
 import SoulSustenance from '@/components/SoulSustenance';
 import CallNowButton from '@/components/CallNowButton';
@@ -429,31 +430,18 @@ export default async function CenterPage({ params }: CenterPageProps) {
         </div>
 
         {/* ===== SECTION NAVIGATION (Sticky) ===== */}
-        <div className="sticky top-14 z-40 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 shadow-sm">
-          <div className="container mx-auto px-4">
-            <div className="flex overflow-x-auto scrollbar-hide -mb-px">
-              {[
-                { id: 'info', label: 'Info', icon: MapPin },
-                { id: 'seven-day-course', label: '7-Day Course', icon: BookOpen },
-                { id: 'guided-meditation', label: 'Meditation', icon: Headphones },
-                ...(eventPosts.length > 0 ? [{ id: 'events', label: 'Events', icon: CalendarDays }] : []),
-                ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', icon: Newspaper }] : []),
-                ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', icon: Map }] : []),
-                { id: 'faq', label: 'FAQ', icon: HelpCircle },
-                ...(center.email && center.email.includes('@') ? [{ id: 'contact', label: 'Contact', icon: MessageCircle }] : []),
-              ].map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="flex items-center gap-1.5 px-4 py-3 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-400 border-b-2 border-transparent hover:border-spirit-purple-500 transition-all duration-200 whitespace-nowrap flex-shrink-0"
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
+        <SectionNav
+          items={[
+            { id: 'info', label: 'Info', iconName: 'MapPin' },
+            { id: 'seven-day-course', label: '7-Day Course', iconName: 'BookOpen' },
+            { id: 'guided-meditation', label: 'Meditation', iconName: 'Headphones' },
+            ...(eventPosts.length > 0 ? [{ id: 'events', label: 'Events', iconName: 'CalendarDays' }] : []),
+            ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', iconName: 'Newspaper' }] : []),
+            ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', iconName: 'Map' }] : []),
+            { id: 'faq', label: 'FAQ', iconName: 'HelpCircle' },
+            ...(center.email && center.email.includes('@') ? [{ id: 'contact', label: 'Contact', iconName: 'MessageCircle' }] : []),
+          ]}
+        />
 
         {/* ===== MAIN CONTENT ===== */}
         <div className="container mx-auto px-4 py-8 space-y-12 md:space-y-16">

@@ -146,7 +146,7 @@ export default function CallNowButton({ mobile, contact, className, children }: 
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-neutral-200 dark:border-neutral-700">
+            <div className="p-4 border-t border-neutral-200 dark:border-neutral-700" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
               <button
                 onClick={() => setShowModal(false)}
                 className="w-full py-3 text-center text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-colors"

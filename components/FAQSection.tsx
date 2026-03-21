@@ -21,6 +21,14 @@ export default function FAQSection({ center }: FAQSectionProps) {
     setExpandedItem(prev => prev === index ? null : index);
   };
 
+  // Parse multiple phone numbers (same logic as email templates)
+  const parsePhoneNumbers = (raw: string | undefined) => {
+    if (!raw) return [];
+    return raw.split(/[,\/|;]/)
+      .map(num => num.trim())
+      .filter(num => num.length > 0);
+  };
+
   // Format address like the main page
   const formatAddress = () => {
     const { line1, line2, line3, city, pincode } = center.address || {};
@@ -48,17 +56,31 @@ export default function FAQSection({ center }: FAQSectionProps) {
         <div className="bg-gray-50 dark:bg-neutral-700/50 p-3 rounded-lg border-l-4 border-spirit-purple-400">
            <p className="font-medium text-gray-800 dark:text-neutral-200 mb-2">{formatAddress()}</p>
            <div className="flex flex-wrap gap-3 text-sm">
-             {(center.mobile || center.contact) && (
+             {/* Render multiple phone numbers as individual links */}
+             {parsePhoneNumbers(center.mobile).map((phone, index) => (
                <a 
-                 href={`tel:${center.mobile || center.contact}`}
+                 key={`mobile-${index}`}
+                 href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
                  className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
                >
                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                  </svg>
-                 {center.mobile || center.contact}
+                 {phone}
                </a>
-             )}
+             ))}
+             {parsePhoneNumbers(center.contact).map((phone, index) => (
+               <a 
+                 key={`contact-${index}`}
+                 href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
+                 className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
+               >
+                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                 </svg>
+                 {phone}
+               </a>
+             ))}
              {center.email && center.email.includes('@') && (
                <a 
                  href={`mailto:${center.email}`}
@@ -113,9 +135,38 @@ export default function FAQSection({ center }: FAQSectionProps) {
     {
       question: "What do you teach in the meditation course?",
       answer: (
-        <span>
-          In the introductory <a href="https://www.brahmakumaris.com/spiritual-knowledge/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">7-day Rajyoga course</a>, you learn about the soul, the Supreme Soul, the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength.
-        </span>
+        <div className="space-y-2">
+          <p>
+            In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul, the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength.
+          </p>
+          <p className="text-sm">
+            You can also start learning online:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a 
+              href="https://courses.brahmakumaris.com/a-personal-journey-for-transformation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 text-spirit-purple-700 dark:text-spirit-purple-300 rounded-lg text-sm font-medium hover:bg-spirit-purple-100 dark:hover:bg-spirit-purple-900/30 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Online Course (English)
+            </a>
+            <a 
+              href="https://courses.brahmakumaris.com/sahaj-rajyog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 text-spirit-purple-700 dark:text-spirit-purple-300 rounded-lg text-sm font-medium hover:bg-spirit-purple-100 dark:hover:bg-spirit-purple-900/30 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              ऑनलाइन कोर्स (हिन्दी)
+            </a>
+          </div>
+        </div>
       )
     },
     {
@@ -150,7 +201,7 @@ export default function FAQSection({ center }: FAQSectionProps) {
       question: "If I visit the center, do I have to change my life?",
       answer: (
         <span>
-          There is no compulsion. You can practice at your own pace. Many souls naturally feel inspired to live peacefully, wake up early, speak sweetly, or adopt <a href="https://www.brahmakumaris.com/blog/environment/the-silent-impact-of-food-nourishing-the-self-nurturing-the-earth/" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">pure vegetarian</a> food.
+          There is no compulsion. You can practice at your own pace. Many souls naturally feel inspired to live peacefully, wake up early, speak sweetly, or adopt <a href="https://www.brahmakumaris.com/wisdom/blog/hin/bhojan-ka-maun-prabhav-atma-ka-poshan-prakriti-ki-seva" target="_blank" rel="noopener noreferrer" className="text-spirit-purple-600 hover:text-spirit-purple-800 underline font-medium">pure vegetarian</a> food.
         </span>
       )
     },
