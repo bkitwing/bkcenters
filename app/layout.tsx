@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
-import Header from "../components/Header";
+import { UnifiedHeader } from "../components/unified-header";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
 import { OrganizationSchema, WebSiteSchema, DatasetSchema } from "../components/StructuredData";
@@ -108,7 +108,7 @@ export default async function RootLayout({
           <Suspense fallback={null}>
             <GoogleAnalytics />
           </Suspense>
-          <Header />
+          <UnifiedHeader />
           <main>{children}</main>
           <GlobalStickyBottomNav />
           <Footer />

@@ -94,9 +94,9 @@ export default function SectionNav({ items }: SectionNavProps) {
   };
 
   return (
-    <div className="sticky z-40 backdrop-blur-md border-b border-spirit-purple-200/60 dark:border-spirit-purple-800/30 shadow-[0_1px_8px_rgba(107,70,193,0.06)]" style={{ top: 'var(--header-h, 3.5rem)' }}>
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-spirit-purple-50/70 via-white to-spirit-purple-50/70 dark:from-spirit-purple-950/40 dark:via-neutral-900/95 dark:to-spirit-purple-950/40" />
+    <div className="sticky z-40 backdrop-blur-md border-b border-neutral-200/40 dark:border-neutral-800/40 shadow-sm" style={{ top: 'var(--header-h, 3.5rem)' }}>
+      {/* Subtle gradient background — matches the golden spiritual theme */}
+      <div className="absolute inset-0 bg-neutral-50/95 dark:bg-neutral-900/95" />
 
       <div className="container mx-auto px-4 relative">
         <div className="relative">
@@ -133,7 +133,7 @@ export default function SectionNav({ items }: SectionNavProps) {
               aria-label="Scroll for more"
               className="absolute right-0 top-0 bottom-0 flex items-center md:hidden z-10"
             >
-              <div className="w-9 h-full bg-gradient-to-l from-spirit-purple-50 dark:from-neutral-900 via-spirit-purple-50/80 dark:via-neutral-900/80 to-transparent flex items-center justify-end pr-1">
+              <div className="w-9 h-full bg-gradient-to-l from-neutral-50 dark:from-neutral-900 via-neutral-50/80 dark:via-neutral-900/80 to-transparent flex items-center justify-end pr-1">
                 <ChevronRight className="w-4 h-4 text-spirit-purple-500 dark:text-spirit-purple-400 animate-pulse" />
               </div>
             </button>

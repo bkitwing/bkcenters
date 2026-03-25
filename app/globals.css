@@ -168,7 +168,7 @@ body {
 
 /* Header height including safe area — used for sticky nav offset */
 :root {
-  --header-h: calc(3.5rem + env(safe-area-inset-top, 0px));
+  --header-h: calc(4rem + env(safe-area-inset-top, 0px));
 }
 
 /* Smooth scroll for anchor links */

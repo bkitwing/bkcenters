@@ -145,6 +145,38 @@ export default function HomePageClient({
     }
   }, [searchParams]);
 
+  // Auto-prompt for location on first visit (only when no search params present)
+  useEffect(() => {
+    const hasParams = searchParams.get("lat") || searchParams.get("lng") || searchParams.get("address");
+    if (hasParams) return; // User already has a search — don't interrupt
+
+    // Check if we've already prompted this session
+    const alreadyPrompted = sessionStorage.getItem("location-prompted");
+    if (alreadyPrompted) return;
+
+    // Small delay so the page renders first, then ask for location
+    const timer = setTimeout(() => {
+      if (!navigator.geolocation) return;
+      sessionStorage.setItem("location-prompted", "1");
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          router.push(
+            `/?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent("Current Location")}`
+          );
+        },
+        () => {
+          // User denied or error — silently ignore, they can search manually
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+      );
+    }, 800);
+
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Fetch nearest centers from server-side API (no client-side distance calc)
   useEffect(() => {
     if (!lat || !lng) return;
