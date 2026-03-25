@@ -104,7 +104,7 @@ export default async function RootLayout({
         <DatasetSchema totalCenters={totalCenters} />
       </head>
       <body className={`${inter.className} bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true} storageKey="bk-centers-theme">
           <Suspense fallback={null}>
             <GoogleAnalytics />
           </Suspense>
