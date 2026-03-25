@@ -23,7 +23,6 @@ import {
   Compass,
   Building,
   Flower2,
-  Trophy,
   Baby,
   User,
   UserRound,
@@ -83,7 +82,7 @@ export const NAVIGATION: NavSection[] = [
     id: "courses",
     label: "Courses",
     href: "https://courses.brahmakumaris.com/",
-    icon: Trophy,
+    icon: GraduationCap,
     description: "Rajyoga meditation courses",
     accentColor: "indigo",
     subItems: [

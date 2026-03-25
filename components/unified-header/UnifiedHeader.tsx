@@ -429,7 +429,7 @@ function MobileEcosystemSection({
     <div className="px-4 py-3">
       <div className="flex items-center justify-between mb-3">
         <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
-          Explore the Ecosystem
+          Explore More
         </p>
         <div className="h-px flex-1 ml-3 bg-neutral-100 dark:bg-neutral-800" />
       </div>
@@ -578,7 +578,8 @@ export function UnifiedHeader() {
   const router = useRouter();
   const navRef = useRef<HTMLElement>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const whatsappRef = useRef<HTMLDivElement>(null);
+  const whatsappDesktopRef = useRef<HTMLDivElement>(null);
+  const whatsappMobileRef = useRef<HTMLDivElement>(null);
 
   // Close everything on route change
   useEffect(() => {
@@ -602,7 +603,7 @@ export function UnifiedHeader() {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setActiveDropdown(null);
       }
-      if (whatsappRef.current && !whatsappRef.current.contains(e.target as Node)) {
+      if (whatsappDesktopRef.current && !whatsappDesktopRef.current.contains(e.target as Node) && whatsappMobileRef.current && !whatsappMobileRef.current.contains(e.target as Node)) {
         setIsWhatsAppOpen(false);
       }
     };
@@ -751,7 +752,7 @@ export function UnifiedHeader() {
 
               <div className="flex items-center gap-0.5 ml-1">
                 {/* WhatsApp button */}
-                <div className="relative" ref={whatsappRef}>
+                <div className="relative" ref={whatsappDesktopRef}>
                   <button
                     onClick={() => setIsWhatsAppOpen(!isWhatsAppOpen)}
                     className={`flex items-center justify-center h-8 w-8 rounded-lg transition-all duration-200 ${
@@ -834,7 +835,7 @@ export function UnifiedHeader() {
                 <Search className="w-5 h-5" />
               </Link>
               {/* WhatsApp — mobile */}
-              <div className="relative" ref={whatsappRef}>
+              <div className="relative" ref={whatsappMobileRef}>
                 <button
                   onClick={() => setIsWhatsAppOpen(!isWhatsAppOpen)}
                   className={`flex items-center justify-center h-10 w-10 rounded-xl transition-all duration-200 ${
