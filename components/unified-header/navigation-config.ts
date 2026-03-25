@@ -73,6 +73,7 @@ export const NAVIGATION: NavSection[] = [
     subItems: [
       { label: "Children", href: "/meditation/age/children", icon: Baby },
       { label: "Youth", href: "/meditation/age/youth", icon: GraduationCap },
+      { label: "Young Adults", href: "/meditation/age/young-adults", icon: User },
       { label: "Middle Age", href: "/meditation/age/middle-age", icon: User },
       { label: "Elderly", href: "/meditation/age/elderly", icon: UserRound },
       { label: "Topics", href: "/meditation/topics", icon: LayoutGrid },

@@ -393,7 +393,7 @@ export function UnifiedHeader() {
   return (
     <>
       <header
-        className="sticky top-0 z-50 w-full bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl backdrop-saturate-150 border-b border-neutral-200/60 dark:border-neutral-800/50 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+        className="sticky top-0 z-[70] w-full bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl backdrop-saturate-150 border-b border-neutral-200/60 dark:border-neutral-800/50 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="container mx-auto max-w-7xl px-4">
@@ -524,12 +524,13 @@ export function UnifiedHeader() {
       {/* ================================================================ */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden"
+          className="fixed inset-0 z-[60] lg:hidden"
           style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
         >
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200"
+            className="absolute top-16 inset-x-0 bottom-0 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200"
+            style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
             onClick={closeMobileMenu}
           />
 
