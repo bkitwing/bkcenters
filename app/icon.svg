@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="centerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+  </defs>
+  <!-- Pin body -->
+  <path d="M16 2C10.5 2 6 6.5 6 12c0 7 10 18 10 18s10-11 10-18c0-5.5-4.5-10-10-10z" fill="url(#centerGrad)"/>
+  <!-- Inner circle -->
+  <circle cx="16" cy="12" r="5" fill="white" opacity="0.9"/>
+  <!-- Lotus dot in center -->
+  <circle cx="16" cy="12" r="2.5" fill="url(#centerGrad)" opacity="0.8"/>
+</svg>
