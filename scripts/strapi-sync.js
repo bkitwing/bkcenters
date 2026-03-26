@@ -31,13 +31,11 @@ const RAW_FILE = path.join(__dirname, '..', 'Centers_Raw.json');
 const BATCH_SIZE = 20;
 const DELAY_MS = 200;
 const RETREAT_BRANCH_CODES = ['90001', '90007', '90006'];
+const EXCLUDED_REGIONS = ['NEPAL']; // Only sync India data
 const REPORT_FILE = path.join(__dirname, 'sync-report.json');
 const DETAILED = process.argv.includes('--detailed') || process.argv.includes('-d');
 const AUTO_YES = process.argv.includes('--yes') || process.argv.includes('-y');
 const DRY_RUN = process.argv.includes('--dry-run');
-const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET;
-// Default to local; override with NEXT_APP_URL env var for production
-const NEXT_APP_URL = process.env.NEXT_APP_URL || 'http://localhost:5400';
 
 // --- Helpers ---
 
@@ -222,8 +220,19 @@ async function sync() {
   // Step 1: Read raw data
   console.log('Reading Centers_Raw.json...');
   const rawData = JSON.parse(fs.readFileSync(RAW_FILE, 'utf8'));
-  const rawEntries = rawData.data;
-  console.log(`  Raw file: ${rawEntries.length} entries\n`);
+  const allRawEntries = rawData.data;
+  console.log(`  Raw file: ${allRawEntries.length} entries`);
+
+  // Filter out excluded regions (e.g. Nepal) — only sync India data
+  const rawEntries = allRawEntries.filter(e => {
+    const region = (e.region || '').toUpperCase().trim();
+    return !EXCLUDED_REGIONS.includes(region);
+  });
+  const excludedCount = allRawEntries.length - rawEntries.length;
+  if (excludedCount > 0) {
+    console.log(`  Excluded ${excludedCount} entries from regions: ${EXCLUDED_REGIONS.join(', ')}`);
+  }
+  console.log(`  Entries to sync: ${rawEntries.length}\n`);
 
   // Step 2: Fetch existing data from Strapi
   console.log('Fetching existing Strapi data...');
@@ -370,12 +379,13 @@ async function sync() {
   }
 
   if (toCreate.length === 0 && toUpdate.length === 0 && toDelete.length === 0) {
-    console.log('✓ Everything is already in sync! No changes needed.\n');
-    return;
+    console.log('✓ Centers are already in sync! Checking for orphaned hierarchy entries...\n');
   }
 
+  const hasCenterChanges = toCreate.length > 0 || toUpdate.length > 0 || toDelete.length > 0;
+
   // --- Dry run mode ---
-  if (DRY_RUN) {
+  if (hasCenterChanges && DRY_RUN) {
     console.log('🔍 DRY RUN — No changes were made. Review the plan above.\n');
     const report = buildReport(toCreate, toUpdate, toDelete);
     fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2), 'utf8');
@@ -384,7 +394,7 @@ async function sync() {
   }
 
   // --- Confirmation Prompt ---
-  if (!AUTO_YES) {
+  if (hasCenterChanges && !AUTO_YES) {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║                    ⚠️  CONFIRMATION REQUIRED                 ║');
     console.log('╠══════════════════════════════════════════════════════════════╣');
@@ -509,6 +519,145 @@ async function sync() {
     console.log(`  ✓ Deleted ${deleted}, Failed ${errors}\n`);
   }
 
+  // Step 8: Clean up orphaned hierarchy entries (districts, states, regions with no centers)
+  {
+    console.log('Checking for orphaned hierarchy entries...');
+
+    // Re-fetch current state of all collections after center deletions
+    const [currentCenters, currentDistricts, currentStates, currentRegions] = await Promise.all([
+      fetchAll('centers', 'district_center'),
+      fetchAll('district-centers', 'state_center'),
+      fetchAll('state-centers', 'region_center'),
+      fetchAll('region-centers'),
+    ]);
+
+    // Build sets of district/state/region IDs that are still referenced by centers
+    const usedDistrictIds = new Set();
+    for (const c of currentCenters) {
+      const distId = c.attributes.district_center?.data?.id;
+      if (distId) usedDistrictIds.add(distId);
+    }
+
+    const orphanedDistricts = currentDistricts.filter(d => !usedDistrictIds.has(d.id));
+
+    // Build set of state IDs still referenced by remaining districts
+    const remainingDistricts = currentDistricts.filter(d => usedDistrictIds.has(d.id));
+    const usedStateIds = new Set();
+    for (const d of remainingDistricts) {
+      const stateId = d.attributes.state_center?.data?.id;
+      if (stateId) usedStateIds.add(stateId);
+    }
+
+    const orphanedStates = currentStates.filter(s => !usedStateIds.has(s.id));
+
+    // Build set of region IDs still referenced by remaining states
+    const remainingStates = currentStates.filter(s => usedStateIds.has(s.id));
+    const usedRegionIds = new Set();
+    for (const s of remainingStates) {
+      const regionId = s.attributes.region_center?.data?.id;
+      if (regionId) usedRegionIds.add(regionId);
+    }
+
+    const orphanedRegions = currentRegions.filter(r => !usedRegionIds.has(r.id));
+
+    const totalOrphans = orphanedDistricts.length + orphanedStates.length + orphanedRegions.length;
+
+    if (totalOrphans === 0) {
+      console.log('  No orphaned hierarchy entries found.\n');
+    } else {
+      // Show what will be removed
+      console.log('');
+      if (orphanedDistricts.length > 0) {
+        console.log('┌─── ORPHANED DISTRICTS ───');
+        for (const d of orphanedDistricts) {
+          console.log(`│  - ${d.attributes.name}`);
+        }
+        console.log('└──────────────────────────\n');
+      }
+      if (orphanedStates.length > 0) {
+        console.log('┌─── ORPHANED STATES ───');
+        for (const s of orphanedStates) {
+          console.log(`│  - ${s.attributes.name}`);
+        }
+        console.log('└───────────────────────\n');
+      }
+      if (orphanedRegions.length > 0) {
+        console.log('┌─── ORPHANED REGIONS ───');
+        for (const r of orphanedRegions) {
+          console.log(`│  - ${r.attributes.name}`);
+        }
+        console.log('└────────────────────────\n');
+      }
+
+      // Ask for confirmation
+      let proceedOrphan = AUTO_YES;
+      if (!AUTO_YES) {
+        console.log('╔══════════════════════════════════════════════════════════════╗');
+        console.log('║              ⚠️  ORPHAN CLEANUP CONFIRMATION                 ║');
+        console.log('╠══════════════════════════════════════════════════════════════╣');
+        console.log(`║  Districts : ${String(orphanedDistricts.length).padStart(4)} orphaned                                    ║`);
+        console.log(`║  States    : ${String(orphanedStates.length).padStart(4)} orphaned                                    ║`);
+        console.log(`║  Regions   : ${String(orphanedRegions.length).padStart(4)} orphaned                                    ║`);
+        console.log('╠══════════════════════════════════════════════════════════════╣');
+        console.log('║  [y] Yes, delete orphaned entries                           ║');
+        console.log('║  [n] No, keep them                                          ║');
+        console.log('╚══════════════════════════════════════════════════════════════╝');
+        console.log('');
+
+        const answer = await askUser('Delete orphaned entries? (y/n): ');
+        const choice = answer.trim().toLowerCase();
+        proceedOrphan = (choice === 'y' || choice === 'yes');
+
+        if (!proceedOrphan) {
+          console.log('\n⏭️  Skipping orphan cleanup.\n');
+        }
+      }
+
+      if (proceedOrphan) {
+        // Delete orphaned districts
+        if (orphanedDistricts.length > 0) {
+          console.log(`  Removing ${orphanedDistricts.length} orphaned district(s)...`);
+          for (const d of orphanedDistricts) {
+            try {
+              await strapiRequest('DELETE', `district-centers/${d.id}`);
+              console.log(`    - District: ${d.attributes.name}`);
+            } catch (err) {
+              console.error(`    ✗ Failed to delete district ${d.attributes.name}: ${err.message}`);
+            }
+          }
+        }
+
+        // Delete orphaned states
+        if (orphanedStates.length > 0) {
+          console.log(`  Removing ${orphanedStates.length} orphaned state(s)...`);
+          for (const s of orphanedStates) {
+            try {
+              await strapiRequest('DELETE', `state-centers/${s.id}`);
+              console.log(`    - State: ${s.attributes.name}`);
+            } catch (err) {
+              console.error(`    ✗ Failed to delete state ${s.attributes.name}: ${err.message}`);
+            }
+          }
+        }
+
+        // Delete orphaned regions
+        if (orphanedRegions.length > 0) {
+          console.log(`  Removing ${orphanedRegions.length} orphaned region(s)...`);
+          for (const r of orphanedRegions) {
+            try {
+              await strapiRequest('DELETE', `region-centers/${r.id}`);
+              console.log(`    - Region: ${r.attributes.name}`);
+            } catch (err) {
+              console.error(`    ✗ Failed to delete region ${r.attributes.name}: ${err.message}`);
+            }
+          }
+        }
+
+        console.log(`  ✓ Cleaned up ${totalOrphans} orphaned entries.\n`);
+      }
+    }
+  }
+
   // Summary & Report
   const report = buildReport(toCreate, toUpdate, toDelete);
   fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2), 'utf8');
@@ -519,66 +668,6 @@ async function sync() {
   console.log(`  Deleted: ${report.summary.deleted}`);
   console.log(`  Report saved to: scripts/sync-report.json`);
   console.log('=====================\n');
-
-  // Trigger on-demand revalidation so Next.js pages show updated data immediately
-  await revalidateNextJs();
-}
-
-/**
- * Call the Next.js /api/revalidate endpoint to purge cached pages.
- * Only runs if REVALIDATE_SECRET is set and changes were made.
- */
-async function revalidateNextJs() {
-  if (!REVALIDATE_SECRET) {
-    console.log('ℹ️  REVALIDATE_SECRET not set — skipping cache revalidation.');
-    console.log('   Set REVALIDATE_SECRET in .env and ensure the Next.js server is running.\n');
-    return;
-  }
-
-  const url = `${NEXT_APP_URL}/api/revalidate`;
-  console.log(`Triggering cache revalidation at ${url}...`);
-
-  try {
-    const http = url.startsWith('https') ? https : require('http');
-    const parsedUrl = new URL(url);
-    const postData = JSON.stringify({ secret: REVALIDATE_SECRET });
-
-    const result = await new Promise((resolve, reject) => {
-      const req = http.request({
-        hostname: parsedUrl.hostname,
-        port: parsedUrl.port || (url.startsWith('https') ? 443 : 80),
-        path: parsedUrl.pathname,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData)
-        },
-        timeout: 10000
-      }, res => {
-        let d = '';
-        res.on('data', c => d += c);
-        res.on('end', () => {
-          try { resolve({ status: res.statusCode, body: JSON.parse(d) }); }
-          catch (e) { resolve({ status: res.statusCode, body: d }); }
-        });
-      });
-      req.on('error', reject);
-      req.on('timeout', () => { req.destroy(); reject(new Error('Revalidation request timed out')); });
-      req.write(postData);
-      req.end();
-    });
-
-    if (result.status === 200 && result.body.revalidated) {
-      console.log(`  ✓ Cache revalidated! Paths: ${result.body.paths.join(', ')}`);
-      console.log(`    Pages will show updated data on next visit.\n`);
-    } else {
-      console.log(`  ⚠ Revalidation response: ${result.status}`, result.body);
-    }
-  } catch (err) {
-    console.log(`  ⚠ Could not reach Next.js server at ${url}: ${err.message}`);
-    console.log('    This is normal if the server is not running locally.');
-    console.log('    Pages will auto-refresh within 24 hours (fallback).\n');
-  }
 }
 
 sync().catch(err => {

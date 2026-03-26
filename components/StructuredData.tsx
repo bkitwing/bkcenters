@@ -557,7 +557,7 @@ export function DatasetSchema({ totalCenters }: DatasetSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'Brahma Kumaris Meditation Centers \u2014 India & Nepal',
+    name: 'Brahma Kumaris Meditation Centers \u2014 India',
     description: `A comprehensive directory of ${totalCenters ? totalCenters + ' ' : ''}Brahma Kumaris Rajyoga meditation centers across India and Nepal, including address, contact information, and geographic coordinates.`,
     url: 'https://www.brahmakumaris.com/centers',
     creator: {

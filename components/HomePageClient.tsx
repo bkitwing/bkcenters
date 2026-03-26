@@ -896,10 +896,6 @@ export default function HomePageClient({
                               <span className="text-xs text-neutral-500 dark:text-neutral-400">
                                 <strong className={color.text}>{region.centerCount.toLocaleString()}</strong> centers
                               </span>
-                              <span className="w-px h-3 bg-neutral-200 dark:bg-neutral-600" />
-                              <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                                <strong className={color.text}>{region.stateCount}</strong> states
-                              </span>
                             </div>
                           </div>
                         </div>
