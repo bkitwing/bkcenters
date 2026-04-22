@@ -1,11 +1,2497 @@
 {
-  "timestamp": "2026-03-26T07:53:46.579Z",
+  "timestamp": "2026-04-22T10:17:37.824Z",
   "summary": {
-    "created": 0,
-    "updated": 0,
-    "deleted": 0
+    "created": 57,
+    "updated": 116,
+    "deleted": 2
   },
-  "created": [],
-  "updated": [],
-  "deleted": []
+  "created": [
+    {
+      "branch_code": "05757",
+      "name": "Ghaziabad Vaishali",
+      "district": "Ghaziabad",
+      "state": "Uttar Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05758",
+      "name": "Prayagraj Jhalwa",
+      "district": "Prayagraj",
+      "state": "Uttar Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05759",
+      "name": "Komna (nuapada)",
+      "district": "Nuapada",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05760",
+      "name": "Chhatiguda",
+      "district": "Kalahandi",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05761",
+      "name": "Hyderabad Attapur",
+      "district": "Rangareddy",
+      "state": "Telangana",
+      "region": "India"
+    },
+    {
+      "branch_code": "05762",
+      "name": "Jodhpur Aiims Road",
+      "district": "Jodhpur",
+      "state": "Rajasthan",
+      "region": "India"
+    },
+    {
+      "branch_code": "05763",
+      "name": "Taiyabpur",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05764",
+      "name": "Khairthal Jasoriya Colony",
+      "district": "Khairthal Tijara",
+      "state": "Rajasthan",
+      "region": "India"
+    },
+    {
+      "branch_code": "05765",
+      "name": "Jaipatna",
+      "district": "Kalahandi",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05766",
+      "name": "Udaipurwati",
+      "district": "Jhunjhunu",
+      "state": "Rajasthan",
+      "region": "India"
+    },
+    {
+      "branch_code": "05767",
+      "name": "Mahalung",
+      "district": "Solapur",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05768",
+      "name": "Gangadhara Nellore",
+      "district": "Chittoor",
+      "state": "Andhra Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05769",
+      "name": "Sanderao",
+      "district": "Pali",
+      "state": "Rajasthan",
+      "region": "India"
+    },
+    {
+      "branch_code": "05770",
+      "name": "Karlamunda",
+      "district": "Kalahandi",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05771",
+      "name": "Kusurla",
+      "district": "Kalahandi",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05772",
+      "name": "Pangam (malkangiri)",
+      "district": "Malkangiri",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05773",
+      "name": "Dabugaon",
+      "district": "Nabarangapur",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05774",
+      "name": "Dhanpur (dahod)",
+      "district": "Dahod",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05775",
+      "name": "Garbada",
+      "district": "Dahod",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05776",
+      "name": "Silli (ranchi)",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "region": "India"
+    },
+    {
+      "branch_code": "05777",
+      "name": "Patna Rajeev Nagar",
+      "district": "Patna",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05778",
+      "name": "Bishunpura",
+      "district": "Saran",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05779",
+      "name": "Marhowrah",
+      "district": "Saran",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05780",
+      "name": "Patna Malsalami",
+      "district": "Patna",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05781",
+      "name": "Jandaha",
+      "district": "Vaishali",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05782",
+      "name": "Patna New Patliputra Colony",
+      "district": "Patna",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05783",
+      "name": "Fariyadka",
+      "district": "Bhavnagar",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05784",
+      "name": "Kunda (kabirdham)",
+      "district": "Kabirdham",
+      "state": "Chhattisgarh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05785",
+      "name": "Sahaspur Lohara",
+      "district": "Kabirdham",
+      "state": "Chhattisgarh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05786",
+      "name": "Ranipool",
+      "district": "East Sikkim",
+      "state": "Sikkim",
+      "region": "India"
+    },
+    {
+      "branch_code": "05787",
+      "name": "Ram Nagar (barabanki)",
+      "district": "Barabanki",
+      "state": "Uttar Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05788",
+      "name": "Khanvel",
+      "district": "Dadra & Nagar Haveli",
+      "state": "Dadra & Nagar Havelli",
+      "region": "India"
+    },
+    {
+      "branch_code": "05789",
+      "name": "Ambad Aher Nagar",
+      "district": "Jalna",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05790",
+      "name": "Dhusuri",
+      "district": "Bhadrak",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05791",
+      "name": "Arnapal ",
+      "district": "Bhadrak",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05792",
+      "name": "Nedumangad",
+      "district": "Thiruvananthapuram",
+      "state": "Kerala",
+      "region": "India"
+    },
+    {
+      "branch_code": "05793",
+      "name": "Panchkula Amravati Dlf",
+      "district": "Panchkula",
+      "state": "Haryana",
+      "region": "India"
+    },
+    {
+      "branch_code": "05794",
+      "name": "Sirsa Premnagar",
+      "district": "Sirsa",
+      "state": "Haryana",
+      "region": "India"
+    },
+    {
+      "branch_code": "05795",
+      "name": "Peth (latur)",
+      "district": "Latur",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05796",
+      "name": "Delhi Qutabgarh",
+      "district": "North West Delhi",
+      "state": "Delhi",
+      "region": "India"
+    },
+    {
+      "branch_code": "05797",
+      "name": "Khantapada",
+      "district": "Balasore",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05798",
+      "name": "Ghanteswar",
+      "district": "Bhadrak",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05799",
+      "name": "Barhi (katni)",
+      "district": "Katni",
+      "state": "Madhya Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05800",
+      "name": "Pithoragarh",
+      "district": "Pithoragarh",
+      "state": "Uttarakhand",
+      "region": "India"
+    },
+    {
+      "branch_code": "05801",
+      "name": "Chikka Tirupati",
+      "district": "Kolar",
+      "state": "Karnataka",
+      "region": "India"
+    },
+    {
+      "branch_code": "05802",
+      "name": "Pusesavali",
+      "district": "Satara",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05803",
+      "name": "Taradgaon",
+      "district": "Satara",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05804",
+      "name": "Surat Niyol",
+      "district": "Surat",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05805",
+      "name": "Surat Godadara",
+      "district": "Surat",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05806",
+      "name": "Surat Kareli",
+      "district": "Surat",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05807",
+      "name": "Medchal",
+      "district": "Medchal-malkajgiri",
+      "state": "Telangana",
+      "region": "India"
+    },
+    {
+      "branch_code": "05808",
+      "name": "Indore Shiv Sagar Colony",
+      "district": "Indore",
+      "state": "Madhya Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05809",
+      "name": "Malhar",
+      "district": "Bilaspur",
+      "state": "Chhattisgarh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05810",
+      "name": "Bilaspur Basant Vihar Chowk",
+      "district": "Bilaspur",
+      "state": "Chhattisgarh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05811",
+      "name": "Junagadh Madhuram",
+      "district": "Junagadh",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05812",
+      "name": "Bilaspur Torwa",
+      "district": "Bilaspur",
+      "state": "Chhattisgarh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05813",
+      "name": "Nimdha",
+      "district": "Bilaspur",
+      "state": "Chhattisgarh",
+      "region": "India"
+    }
+  ],
+  "updated": [
+    {
+      "branch_code": "00133",
+      "name": "Kolkata Ashutosh Mukherjee Road",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9831142250",
+          "to": "9123329027, 8617222216"
+        }
+      ]
+    },
+    {
+      "branch_code": "00170",
+      "name": "Madhubani",
+      "changes": [
+        {
+          "field": "email",
+          "from": null,
+          "to": "madhubani@bkivv.org"
+        },
+        {
+          "field": "contact",
+          "from": "06276-223454",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00196",
+      "name": "Tinsukia",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "0374- 2339113",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00270",
+      "name": "Mahuva (bhavnagar)",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "'param Jyoti Bhavan' , H.no: 305-b",
+          "to": "Param Jyoti Bhavan , H.no: 305-b"
+        },
+        {
+          "field": "contact",
+          "from": "02844-223000",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00275",
+      "name": "Mehsana Gurukrupa Society",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "No: 7, 'peace Palace'",
+          "to": "No: 7, Peace Palace"
+        },
+        {
+          "field": "email",
+          "from": "mehsana@bkivv.org",
+          "to": "gurukrupasociety.msh@bkivv.org"
+        },
+        {
+          "field": "contact",
+          "from": "02762-253746",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00359",
+      "name": "Banahatti",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8762245492, 6363365072",
+          "to": "6363365072, 9740271926"
+        }
+      ]
+    },
+    {
+      "branch_code": "00425",
+      "name": "Vikarabad",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9581612304, 9449718709",
+          "to": "9581612304, 9440886064"
+        }
+      ]
+    },
+    {
+      "branch_code": "00510",
+      "name": "Bengaluru Gottigere",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "080- 25780945",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00511",
+      "name": "Bengaluru Indiranagar New Thippasandra",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 653, Ground Floor, 6th Cross, 6 Main",
+          "to": "H No: 1882, 7th Cross, 4th Main Road"
+        },
+        {
+          "field": "latitude",
+          "from": 12.970714,
+          "to": 12.971811
+        },
+        {
+          "field": "longitude",
+          "from": 77.651391,
+          "to": 77.651903
+        }
+      ]
+    },
+    {
+      "branch_code": "00517",
+      "name": "Bengaluru V.v.puram",
+      "changes": [
+        {
+          "field": "address_line2",
+          "from": "Surveyor Street ",
+          "to": "Surveyor Street"
+        },
+        {
+          "field": "contact",
+          "from": "080- 26679440",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00518",
+      "name": "Bengaluru Vijay Nagar",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Bengaluru  Vijay Nagar",
+          "to": "Bengaluru Vijay Nagar"
+        },
+        {
+          "field": "mobile",
+          "from": "9205495747",
+          "to": "9916758137"
+        }
+      ]
+    },
+    {
+      "branch_code": "00519",
+      "name": "Bengaluru Vyali Kaval",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "",
+          "to": "7337796573"
+        }
+      ]
+    },
+    {
+      "branch_code": "00523",
+      "name": "Chikkamagaluru Basavanahalli",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "08262-232432",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00525",
+      "name": "Dharmavaram State Bank Colony",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "08559- 220020",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00535",
+      "name": "Madhugiri",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7019455510, 9481553673",
+          "to": "7019455510"
+        }
+      ]
+    },
+    {
+      "branch_code": "00544",
+      "name": "Sira (kar)",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 144, Near Gramina Bank",
+          "to": "H.no: 144"
+        },
+        {
+          "field": "address_line2",
+          "from": "Main Road",
+          "to": "Near Gramina Bank"
+        },
+        {
+          "field": "address_line3",
+          "from": "",
+          "to": "Main Road"
+        },
+        {
+          "field": "contact",
+          "from": "08135- 275528",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00623",
+      "name": "Mumbai Andheri (west) Lokhandwala",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9930366512",
+          "to": "7506007910, 9930366512"
+        }
+      ]
+    },
+    {
+      "branch_code": "00650",
+      "name": "Nanded Kailash Nagar",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "02462- 251649",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00666",
+      "name": "Pune Chandan Nagar",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9975281468, 6372711464",
+          "to": "9325157056"
+        }
+      ]
+    },
+    {
+      "branch_code": "00674",
+      "name": "Ramachandrapuram (bhel)",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "040- 23027935",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "9391304556, 9491392262",
+          "to": "9391304556, 7675911676"
+        }
+      ]
+    },
+    {
+      "branch_code": "00681",
+      "name": "Secunderabad Alwal",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "040- 27960384",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00726",
+      "name": "Mandi Dabwali",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7814377469, 8168247975",
+          "to": "7495077469, 9815605511"
+        },
+        {
+          "field": "section",
+          "from": "00788",
+          "to": "00721"
+        }
+      ]
+    },
+    {
+      "branch_code": "00739",
+      "name": "Gurdaspur",
+      "changes": [
+        {
+          "field": "email",
+          "from": null,
+          "to": "gurdaspur@bkivv.org"
+        }
+      ]
+    },
+    {
+      "branch_code": "00748",
+      "name": "Jammu Tawi",
+      "changes": [
+        {
+          "field": "address_line2",
+          "from": "B.c. Road",
+          "to": "B.k. Road"
+        },
+        {
+          "field": "contact",
+          "from": "0191-2573141",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "00757",
+      "name": "Kullu (hp)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9418270055, 7018389827",
+          "to": "9418270055"
+        }
+      ]
+    },
+    {
+      "branch_code": "00813",
+      "name": "Jaipur Malviya Nagar Block A",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9461042429",
+          "to": "7568200142, 7976374804"
+        }
+      ]
+    },
+    {
+      "branch_code": "00837",
+      "name": "Chennai Broadway",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9941084545, 8825904330",
+          "to": "8825904330, 9941084545"
+        },
+        {
+          "field": "section",
+          "from": "00837",
+          "to": "05059"
+        }
+      ]
+    },
+    {
+      "branch_code": "00971",
+      "name": "Meerut Shastri Nagar",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9259257078, 8826599306",
+          "to": "9650692110"
+        }
+      ]
+    },
+    {
+      "branch_code": "01038",
+      "name": "Lumding",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "03674- 263844",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "9435366321",
+          "to": "9435366321, 7002528233"
+        }
+      ]
+    },
+    {
+      "branch_code": "01056",
+      "name": "Chapakhowa",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "03756- 244178",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "01270",
+      "name": "Bagepalli",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "House Of Nanjamma",
+          "to": "Door No: 365, C/o G Balaji"
+        },
+        {
+          "field": "address_line2",
+          "from": "Municipal Office Road",
+          "to": "Near Aradhya School Road, Opp Raghavendra Mutt"
+        },
+        {
+          "field": "latitude",
+          "from": 13.785769,
+          "to": 13.78523
+        },
+        {
+          "field": "longitude",
+          "from": 77.791178,
+          "to": 77.78856
+        }
+      ]
+    },
+    {
+      "branch_code": "01271",
+      "name": "Balehonnur",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "08266- 250496",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "01273",
+      "name": "Bengaluru Basaveshwaranagar",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 820, 8th Main",
+          "to": "H.no: 893, 8th A Main Road"
+        },
+        {
+          "field": "contact",
+          "from": "080- 23226959",
+          "to": "080- 35911736"
+        },
+        {
+          "field": "latitude",
+          "from": 12.992128,
+          "to": 12.99142
+        },
+        {
+          "field": "longitude",
+          "from": 77.5416055,
+          "to": 77.5418
+        }
+      ]
+    },
+    {
+      "branch_code": "01275",
+      "name": "Bengaluru Geleyara Balaga",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 132, Ranganatha Nilaya, Muneshwara Block",
+          "to": "H No: 4, 15th Cross, 1st Main Road"
+        },
+        {
+          "field": "address_line2",
+          "from": "Mahalakshmi Layout, Main Road",
+          "to": "Mahalakshmi Layout, Muneshwara Block"
+        },
+        {
+          "field": "address_line3",
+          "from": "Athmiya Geleyara Balaga",
+          "to": "Geleyara Balaga"
+        },
+        {
+          "field": "contact",
+          "from": "080- 23496109",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "9353835578",
+          "to": "9353835578, 9481554088"
+        },
+        {
+          "field": "latitude",
+          "from": 13.0063277,
+          "to": 13.007289
+        },
+        {
+          "field": "longitude",
+          "from": 77.5413173,
+          "to": 77.542773
+        }
+      ]
+    },
+    {
+      "branch_code": "01294",
+      "name": "Dommasandra",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "080-27822910",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "01295",
+      "name": "Gersoppa",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9481382534, 9449236846",
+          "to": "8088594654, 9449236846"
+        }
+      ]
+    },
+    {
+      "branch_code": "01309",
+      "name": "Sorab Chamrajpet",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9449570576, 9480719018",
+          "to": "8073526862, 9483491370"
+        }
+      ]
+    },
+    {
+      "branch_code": "01317",
+      "name": "Adilabad",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "08732- 231028",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "01328",
+      "name": "Bhadgaon",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9404492671, 7666704029",
+          "to": "9137215959"
+        }
+      ]
+    },
+    {
+      "branch_code": "01353",
+      "name": "Hingoli Jijamata Nagar",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9881944111, 9421768780, 9146025430",
+          "to": "9881944111"
+        }
+      ]
+    },
+    {
+      "branch_code": "01494",
+      "name": "Bahel (bhiwani)",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "01255- 265274",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "01495",
+      "name": "Banikhet",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "01899- 254922",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "9418362231",
+          "to": "9418362231, 9816401683"
+        }
+      ]
+    },
+    {
+      "branch_code": "01508",
+      "name": "Dhuri (sangrur)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7973267207",
+          "to": "8146249287, 7973267207"
+        }
+      ]
+    },
+    {
+      "branch_code": "01730",
+      "name": "Pune Vinode Nagar",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Pune Thergaon",
+          "to": "Pune Vinode Nagar"
+        },
+        {
+          "field": "slug",
+          "from": "pune-thergaon",
+          "to": "pune-vinode-nagar"
+        },
+        {
+          "field": "address_line1",
+          "from": "Flat No: 8, Shinde Residency, Hanuman Nagar",
+          "to": "Flat No: 102, 1st Floor, Royal Castle, A Building"
+        },
+        {
+          "field": "address_line2",
+          "from": "Behind Ganesh Temple, Ashoka Society Road",
+          "to": "Vinode Nagar, Hinjewadi Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "Kalewadi Fata, Thergaon",
+          "to": "Wakad"
+        },
+        {
+          "field": "mobile",
+          "from": "9665216713",
+          "to": "9665216713, 9588441025"
+        },
+        {
+          "field": "latitude",
+          "from": 18.6065367,
+          "to": 18.599262
+        },
+        {
+          "field": "longitude",
+          "from": 73.7773067,
+          "to": 73.74075
+        }
+      ]
+    },
+    {
+      "branch_code": "01843",
+      "name": "Anantapur K V S Nagar",
+      "changes": [
+        {
+          "field": "address_line2",
+          "from": "Behind Saibaba Kalyana Mantap",
+          "to": "Behind Saibaba Kalyana Mantap, Om Shanti Nagar"
+        },
+        {
+          "field": "address_line3",
+          "from": "K.v.s. Nagar, Anantapur",
+          "to": "Ntr Marg, K.v.s. Nagar, Anantapur"
+        },
+        {
+          "field": "contact",
+          "from": "08554- 237314",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "01848",
+      "name": "Velugodu",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "08517- 235523",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "01867",
+      "name": "Baldwara",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9418663889, 9418994103",
+          "to": "9418663889, 9418270055"
+        }
+      ]
+    },
+    {
+      "branch_code": "01984",
+      "name": "Koilakuntla",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "State Bank Road",
+          "to": "H.no: 10-96"
+        },
+        {
+          "field": "address_line2",
+          "from": "Main Bazar",
+          "to": "State Bank Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "",
+          "to": "Main Bazar"
+        }
+      ]
+    },
+    {
+      "branch_code": "02008",
+      "name": "Bhairi Singupuram",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9491932287, 9490042255",
+          "to": "8500895175, 9490042255"
+        }
+      ]
+    },
+    {
+      "branch_code": "02091",
+      "name": "Narpala",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "D No: 1-220",
+          "to": "H No: 1/141"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Dhyan Mandir",
+          "to": "Peddamma Katta, Akula Ramappa Veedhi"
+        },
+        {
+          "field": "address_line3",
+          "from": "Ammavarisala Street, Tal: Mandal",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "8985932562",
+          "to": "8297917745"
+        },
+        {
+          "field": "latitude",
+          "from": 14.713379,
+          "to": 14.7137782
+        },
+        {
+          "field": "longitude",
+          "from": 77.808994,
+          "to": 77.808623
+        }
+      ]
+    },
+    {
+      "branch_code": "02130",
+      "name": "Atmakur (nellore)",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 2-214-9",
+          "to": "Atma Darshan Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "J.r. Peta, 4th Line, Sundar Nagar",
+          "to": "J.r. Peta, Bsr Line"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Svs Super Market",
+          "to": "Near Medha School"
+        },
+        {
+          "field": "mobile",
+          "from": "7013857966",
+          "to": "7013857966, 9160857319"
+        },
+        {
+          "field": "latitude",
+          "from": 14.6204513,
+          "to": 14.621422
+        },
+        {
+          "field": "longitude",
+          "from": 79.6252988,
+          "to": 79.624807
+        }
+      ]
+    },
+    {
+      "branch_code": "02132",
+      "name": "Bengaluru Banashankari Katriguppe",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "House No: 81, Padmalaya",
+          "to": "House No: 57, 2nd Main"
+        },
+        {
+          "field": "address_line2",
+          "from": "3rd Main, Poorna Pragna Layout",
+          "to": "Siddhartha Extension, Near 43a Bus Stop"
+        },
+        {
+          "field": "address_line3",
+          "from": "Katriguppe, 3rd Stage, Banashankari",
+          "to": "Katreguppe, 3rd Stage, Banashankari"
+        },
+        {
+          "field": "mobile",
+          "from": "9347674933, 9241653033",
+          "to": "8919363674"
+        },
+        {
+          "field": "latitude",
+          "from": 12.9327489,
+          "to": 12.93036
+        },
+        {
+          "field": "longitude",
+          "from": 77.5502144,
+          "to": 77.55458
+        }
+      ]
+    },
+    {
+      "branch_code": "02197",
+      "name": "Vijaypur Jammu",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 74",
+          "to": "Vishwa Anand Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Jasrota Right Canal Road",
+          "to": "Canal Road, Near Shiv Mandir"
+        },
+        {
+          "field": "address_line3",
+          "from": "Ward No:13",
+          "to": "Ward No:3"
+        },
+        {
+          "field": "latitude",
+          "from": 32.5635765,
+          "to": 32.57016
+        },
+        {
+          "field": "longitude",
+          "from": 75.0157817,
+          "to": 75.028185
+        }
+      ]
+    },
+    {
+      "branch_code": "02201",
+      "name": "Kalayat",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Shiv Gyan Jyoti Bhawan",
+          "to": "Shiv Gyan Jyoti Bhawan, H No: 9"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Kapil Muni Mandir Road",
+          "to": "Near Kapil Muni Mandir Road, Main Bazar"
+        },
+        {
+          "field": "mobile",
+          "from": "9416134279",
+          "to": "9350011042"
+        }
+      ]
+    },
+    {
+      "branch_code": "02388",
+      "name": "Ramachandrapuram New Mig",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "040-23020230",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "7675911676, 9704155297",
+          "to": "8839794100"
+        }
+      ]
+    },
+    {
+      "branch_code": "02434",
+      "name": "Bengaluru Kumaraswamy Layout",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9481678205",
+          "to": "9611598369"
+        }
+      ]
+    },
+    {
+      "branch_code": "02451",
+      "name": "Hadgaon",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "1st Floor, B.k. Deshmukh Niwas",
+          "to": "Kalpvraksh, Plot No: 30"
+        },
+        {
+          "field": "address_line2",
+          "from": "Swatrant Sainik Chowk, Deshmukh Galli",
+          "to": "Near Maheshwari Bhawan, Bapunagar"
+        },
+        {
+          "field": "address_line3",
+          "from": "Shri Krishna Mandir Road",
+          "to": "Hadgaon"
+        },
+        {
+          "field": "mobile",
+          "from": "7083678316",
+          "to": "7083678316, 8390066584"
+        },
+        {
+          "field": "latitude",
+          "from": 19.4998356,
+          "to": 19.5003525
+        },
+        {
+          "field": "longitude",
+          "from": 77.6583116,
+          "to": 77.6572217
+        }
+      ]
+    },
+    {
+      "branch_code": "02453",
+      "name": "Kandhar",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Papinwar Nivas",
+          "to": "Papinwar Nivas, H No: 1/529/1"
+        }
+      ]
+    },
+    {
+      "branch_code": "02454",
+      "name": "Hingoli Govind Nagar",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Tapasya Bhawan",
+          "to": "Survey No: 13, Tapasya Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Akola By-pass Road",
+          "to": "Ganesh Wadi, Akola By-pass Road"
+        },
+        {
+          "field": "contact",
+          "from": "02456- 222890",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "",
+          "to": "9421768780, 9146025430"
+        }
+      ]
+    },
+    {
+      "branch_code": "02562",
+      "name": "Naigaon",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "House Of Bapmao Bomnale",
+          "to": "C/o: Nakate Nivas"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Janta High School",
+          "to": "Sarafa Market"
+        },
+        {
+          "field": "address_line3",
+          "from": "Gandhi Nagar",
+          "to": "Shelgaon Road"
+        },
+        {
+          "field": "latitude",
+          "from": 18.8498601,
+          "to": 18.8483376
+        },
+        {
+          "field": "longitude",
+          "from": 77.5353191,
+          "to": 77.533716
+        }
+      ]
+    },
+    {
+      "branch_code": "02615",
+      "name": "Dahanu Road",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7506007910, 8329906253",
+          "to": "8329906253, 9673223280"
+        }
+      ]
+    },
+    {
+      "branch_code": "02649",
+      "name": "Noida Sector 71 Block C",
+      "changes": [
+        {
+          "field": "email",
+          "from": "noidasector33@bkivv.org",
+          "to": "noidasector71c@bkivv.org"
+        },
+        {
+          "field": "mobile",
+          "from": "9650692084, 9999183180",
+          "to": "9650692084, 8742978110"
+        }
+      ]
+    },
+    {
+      "branch_code": "02698",
+      "name": "Kolkata Lake Gardens",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9433295967",
+          "to": "9732769181, 9831142250"
+        }
+      ]
+    },
+    {
+      "branch_code": "02793",
+      "name": "Bengaluru Lakkasandra",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "6/1, Tukaram Nilaya",
+          "to": "H.no: 05, 1st Cross"
+        },
+        {
+          "field": "address_line2",
+          "from": "8th Cross, 16th Main",
+          "to": "Bannerghatta Road, Gupta Layout"
+        },
+        {
+          "field": "address_line3",
+          "from": "Lakkasandra",
+          "to": "Lakkasandra, Adugodi"
+        },
+        {
+          "field": "latitude",
+          "from": 12.9419096,
+          "to": 12.94267
+        },
+        {
+          "field": "longitude",
+          "from": 77.6007058,
+          "to": 77.60268
+        }
+      ]
+    },
+    {
+      "branch_code": "02799",
+      "name": "Bengaluru Byatarayanapura",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 5/a, Beside Sharada",
+          "to": "H.no: 5/37, Nanjahanuma Nilaya"
+        },
+        {
+          "field": "address_line2",
+          "from": "Vidya Peeta School",
+          "to": "1st Cross, 2nd Main Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "Mysuru Road, Byatarayanpur",
+          "to": "Byatarayanpura"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "byatarayanapura.blr@bkivv.org"
+        },
+        {
+          "field": "latitude",
+          "from": 12.9515576,
+          "to": 12.95023
+        },
+        {
+          "field": "longitude",
+          "from": 77.5420982,
+          "to": 77.54215
+        }
+      ]
+    },
+    {
+      "branch_code": "02802",
+      "name": "Bengaluru Bannerghatta",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 27, Post Office Road,  2nd",
+          "to": "H.no: 27, 1st Floor, Post Office Road"
+        }
+      ]
+    },
+    {
+      "branch_code": "02829",
+      "name": "Bengaluru Girinagar",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8762005971, 9343992322",
+          "to": "8762005971, 9343992322, 7349528071"
+        }
+      ]
+    },
+    {
+      "branch_code": "02965",
+      "name": "Fatehgarh Panjtoor (pb)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9464412789",
+          "to": "6239531162, 9464412789"
+        }
+      ]
+    },
+    {
+      "branch_code": "02968",
+      "name": "Chittoor Sambaiah Kandiga",
+      "changes": [
+        {
+          "field": "section",
+          "from": "00389",
+          "to": "02968"
+        }
+      ]
+    },
+    {
+      "branch_code": "03004",
+      "name": "Veldurthi",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "House No: 8/103",
+          "to": "House No: 10-33"
+        },
+        {
+          "field": "address_line2",
+          "from": "Main Bazar",
+          "to": "Reddy Street"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Old Water Tank",
+          "to": "Veldurthi"
+        },
+        {
+          "field": "mobile",
+          "from": "8639275773",
+          "to": "9448277454"
+        },
+        {
+          "field": "latitude",
+          "from": 15.550323,
+          "to": 15.551237
+        },
+        {
+          "field": "longitude",
+          "from": 77.930487,
+          "to": 77.931127
+        }
+      ]
+    },
+    {
+      "branch_code": "03074",
+      "name": "Kadra (kar)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9449236846",
+          "to": "9449236846, 9019294758"
+        }
+      ]
+    },
+    {
+      "branch_code": "03076",
+      "name": "Gurram Konda",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "08586- 260024",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "",
+          "to": "9100873289"
+        }
+      ]
+    },
+    {
+      "branch_code": "03137",
+      "name": "Tuljapur",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 71/1, Vimal",
+          "to": "H.no: 203/2, Rhn No 1"
+        },
+        {
+          "field": "address_line2",
+          "from": "Chhatrapati Nagar",
+          "to": "Pujari Nagar"
+        },
+        {
+          "field": "address_line3",
+          "from": "Osmanabad Road",
+          "to": "Naldurga Road"
+        },
+        {
+          "field": "latitude",
+          "from": 18.0271742,
+          "to": 17.996596
+        },
+        {
+          "field": "longitude",
+          "from": 76.0761495,
+          "to": 76.082135
+        }
+      ]
+    },
+    {
+      "branch_code": "03230",
+      "name": "Mumbai Dharavi",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 203, Gold Field Girnar Tower",
+          "to": "H.no: 203, Gold Field Girnar Tower, 2nd Floor"
+        },
+        {
+          "field": "contact",
+          "from": "022- 24044111",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "03267",
+      "name": "Bengaluru J.p.nagar 6th Phase",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "080-26535175",
+          "to": ""
+        }
+      ]
+    },
+    {
+      "branch_code": "03343",
+      "name": "Bengaluru Halasuru",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8553276672, 8050001910",
+          "to": "9113865331"
+        }
+      ]
+    },
+    {
+      "branch_code": "03356",
+      "name": "Ulga (kar)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8762099936, 8088594654",
+          "to": "9019294758, 8088594654"
+        }
+      ]
+    },
+    {
+      "branch_code": "03357",
+      "name": "Patadi",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "5, Hatdi",
+          "to": "5 Hatdi"
+        }
+      ]
+    },
+    {
+      "branch_code": "03359",
+      "name": "Araria R.s",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 90, Near Mohini Devi Hospital",
+          "to": "H.no: 90, Om Shanti Road"
+        },
+        {
+          "field": "address_line2",
+          "from": "Om Shanti Road, Ward No: 4",
+          "to": "Ward No: 4, Near Mohini Devi School"
+        },
+        {
+          "field": "address_line3",
+          "from": "Teh: Kedia Tola",
+          "to": "Araria R.s"
+        },
+        {
+          "field": "city",
+          "from": "Araria",
+          "to": "Araria R.s"
+        },
+        {
+          "field": "email",
+          "from": "araria@bkivv.org",
+          "to": "arariars@bkivv.org"
+        }
+      ]
+    },
+    {
+      "branch_code": "03365",
+      "name": "Lehragaga",
+      "changes": [
+        {
+          "field": "email",
+          "from": null,
+          "to": "lehragaga@bkivv.org"
+        },
+        {
+          "field": "mobile",
+          "from": "9876443406",
+          "to": "9876443406, 7986892008"
+        }
+      ]
+    },
+    {
+      "branch_code": "03388",
+      "name": "Kolkata Metropolitan",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9732947327, 7679038228",
+          "to": "9732947327, 8420263255"
+        }
+      ]
+    },
+    {
+      "branch_code": "03631",
+      "name": "Mahanpur",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7006143823",
+          "to": "7006143823, 7889571590"
+        }
+      ]
+    },
+    {
+      "branch_code": "03659",
+      "name": "Perne Phata",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "6372711464, 9975281468",
+          "to": "9975281468"
+        }
+      ]
+    },
+    {
+      "branch_code": "03672",
+      "name": "Kymore",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7509375877, 8959274790",
+          "to": "8319351915, 9685957269"
+        },
+        {
+          "field": "section",
+          "from": "03225",
+          "to": "03672"
+        }
+      ]
+    },
+    {
+      "branch_code": "03762",
+      "name": "Gulbarga Kotnur D Layout",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7337614973, 9542209785",
+          "to": "7337614973, 9449718709"
+        }
+      ]
+    },
+    {
+      "branch_code": "03847",
+      "name": "Chennai Chromepet",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Door No-5",
+          "to": "Old No. 10, New No.21"
+        },
+        {
+          "field": "address_line2",
+          "from": "Shankar Nagar Main Road",
+          "to": "Nallappa Street, Nehru Nagar"
+        },
+        {
+          "field": "address_line3",
+          "from": "Nagappa Nagar",
+          "to": "Chromepet"
+        },
+        {
+          "field": "mobile",
+          "from": "9445287586",
+          "to": "9445287586, 9791006188"
+        },
+        {
+          "field": "latitude",
+          "from": 12.956677,
+          "to": 12.940294
+        },
+        {
+          "field": "longitude",
+          "from": 80.1358538,
+          "to": 80.14186
+        }
+      ]
+    },
+    {
+      "branch_code": "03967",
+      "name": "Patna City Gulzarbagh",
+      "changes": [
+        {
+          "field": "address_line3",
+          "from": "Gulzarbagh, Gai Ghat, Tal: Sampat Chak",
+          "to": "Gulzarbagh, Tal: Sampat Chak"
+        },
+        {
+          "field": "mobile",
+          "from": "9570533069, 9308412830",
+          "to": "9570533069, 9608713060"
+        },
+        {
+          "field": "section",
+          "from": "00180",
+          "to": "03967"
+        }
+      ]
+    },
+    {
+      "branch_code": "03998",
+      "name": "Chabua",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "B.no: 1, Kunjvan",
+          "to": "H.no: 38, Ritayan"
+        },
+        {
+          "field": "address_line2",
+          "from": "College Road",
+          "to": "College Road, Ward B"
+        },
+        {
+          "field": "mobile",
+          "from": "8638379432",
+          "to": "8638379432, 7086819856"
+        },
+        {
+          "field": "latitude",
+          "from": 27.485379,
+          "to": 27.484066
+        },
+        {
+          "field": "longitude",
+          "from": 95.168065,
+          "to": 95.169276
+        }
+      ]
+    },
+    {
+      "branch_code": "04250",
+      "name": "Gaupur",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H-57, Shantidham",
+          "to": "Khasra No:2176, Shantidham"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Yogi Chowk Andhra Bank, Tal: Ujiarpur",
+          "to": "Near Yogi Chowk, Tal: Ujiarpur"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "gaupur@bkivv.org"
+        }
+      ]
+    },
+    {
+      "branch_code": "04269",
+      "name": "Govindgarh (jaipur)",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Plot No:28a, Kalu Ka Bas",
+          "to": "Prabhu Prem Ratna Bhavan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Bajrang Colony, Ward No: 12,  Sikar Road",
+          "to": "Near Deepak School, Aara Stand"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Bus Stand, Tal: Choumu",
+          "to": "Nh-52, Tal: Chomu"
+        },
+        {
+          "field": "mobile",
+          "from": "9413323909",
+          "to": "9413323909, 9413323914"
+        },
+        {
+          "field": "latitude",
+          "from": 27.25046,
+          "to": 27.246106
+        },
+        {
+          "field": "longitude",
+          "from": 75.653073,
+          "to": 75.656779
+        }
+      ]
+    },
+    {
+      "branch_code": "04314",
+      "name": "Hole Honnur",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Plot No: 1/1a, 'shivasankalpa'",
+          "to": "Sri Channaveereswara Complex, Second Floor"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Karumariyamma Temple, Nrupatunga Circle",
+          "to": "Pete Beedi, Nrupathunga Circle"
+        },
+        {
+          "field": "address_line3",
+          "from": "Mallappa Layout, Tal: Bhadravathi",
+          "to": "Tal: Bhadravathi"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "holehonnuru@bkivv.org"
+        },
+        {
+          "field": "mobile",
+          "from": "8197971183, 7026194307",
+          "to": "7026194307"
+        },
+        {
+          "field": "latitude",
+          "from": 13.988015,
+          "to": 13.9874
+        },
+        {
+          "field": "longitude",
+          "from": 75.692005,
+          "to": 75.69187
+        }
+      ]
+    },
+    {
+      "branch_code": "04315",
+      "name": "Anaveri",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 109",
+          "to": "Gowdara Beedi"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Thimmappa Temple",
+          "to": ""
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "anaveri@bkivv.org"
+        },
+        {
+          "field": "latitude",
+          "from": 14.060398,
+          "to": 14.059958
+        },
+        {
+          "field": "longitude",
+          "from": 75.740188,
+          "to": 75.740702
+        }
+      ]
+    },
+    {
+      "branch_code": "04321",
+      "name": "Barti (jagatsinghapur)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9777846141",
+          "to": "6370226806"
+        }
+      ]
+    },
+    {
+      "branch_code": "04446",
+      "name": "Ambala Cantt Defence Colony",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9034369108, 7404514451",
+          "to": "7404514451, 9468338692"
+        }
+      ]
+    },
+    {
+      "branch_code": "04456",
+      "name": "Mudkhed",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7218832243, 9322382487",
+          "to": "8468823030"
+        }
+      ]
+    },
+    {
+      "branch_code": "04513",
+      "name": "Rajpura Dharampura Colony",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "6239637586, 7009400963",
+          "to": "7009400963"
+        }
+      ]
+    },
+    {
+      "branch_code": "04528",
+      "name": "Sasni (hathras)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8755868757",
+          "to": "7253843510"
+        }
+      ]
+    },
+    {
+      "branch_code": "04552",
+      "name": "Hajipur Naya Tola",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9162562583",
+          "to": "9162562583, 9204800953"
+        },
+        {
+          "field": "section",
+          "from": "02004",
+          "to": "04552"
+        }
+      ]
+    },
+    {
+      "branch_code": "04659",
+      "name": "Biloli",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 1160",
+          "to": "C/o: Saiprasad Nivas, H No: 357"
+        },
+        {
+          "field": "address_line2",
+          "from": "Adv. Anil Godhamgaonkar Nivas",
+          "to": "Indira Nagar"
+        },
+        {
+          "field": "address_line3",
+          "from": "Mathsthan Road",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "8432640980",
+          "to": "8698430478, 8432640980"
+        },
+        {
+          "field": "latitude",
+          "from": 18.774865,
+          "to": 18.7823639
+        },
+        {
+          "field": "longitude",
+          "from": 77.723338,
+          "to": 77.7153983
+        }
+      ]
+    },
+    {
+      "branch_code": "04691",
+      "name": "Kolkata Moore Avenue",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9732769181,  9433295967",
+          "to": "7679038228, 9732769181"
+        }
+      ]
+    },
+    {
+      "branch_code": "04747",
+      "name": "Kalasapura",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 130, Swadharshana Bhawan",
+          "to": "Swadharshana Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Behind Govt High School",
+          "to": "Javagal Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "Tal: Chikmagalur",
+          "to": "Tal: Chikkamagaluru"
+        },
+        {
+          "field": "mobile",
+          "from": "9113267554,  9164720995",
+          "to": "9060400918, 9113267554"
+        },
+        {
+          "field": "latitude",
+          "from": 13.2793253,
+          "to": 13.28059
+        },
+        {
+          "field": "longitude",
+          "from": 75.9366662,
+          "to": 75.9391
+        }
+      ]
+    },
+    {
+      "branch_code": "04789",
+      "name": "Kolkata Badu",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9674299379, 9903565329",
+          "to": "8420263255, 9732947327"
+        }
+      ]
+    },
+    {
+      "branch_code": "04819",
+      "name": "Bhirha",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9798661079",
+          "to": "9031156121"
+        }
+      ]
+    },
+    {
+      "branch_code": "04912",
+      "name": "Hazaribag Devangana",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Hazaribag Devangana ",
+          "to": "Hazaribag Devangana"
+        },
+        {
+          "field": "slug",
+          "from": "hazaribag-devangana-",
+          "to": "hazaribag-devangana"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "devangana.haz@bkivv.org"
+        },
+        {
+          "field": "mobile",
+          "from": "8757124757, 7992205628",
+          "to": "7992205628"
+        }
+      ]
+    },
+    {
+      "branch_code": "04960",
+      "name": "Kesariya",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No:632",
+          "to": "Divya Anubhuti Bhawan, Khasra No: 3525"
+        },
+        {
+          "field": "address_line2",
+          "from": "Purani Bazar",
+          "to": "Purani Bazar Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Gyan Ganga Vidya Mandir",
+          "to": "Gayatri Nagar, Chakiya"
+        },
+        {
+          "field": "mobile",
+          "from": "9973127088, 9631078742",
+          "to": "9973127088, 8169907316"
+        },
+        {
+          "field": "latitude",
+          "from": 26.350516,
+          "to": 26.35086
+        },
+        {
+          "field": "longitude",
+          "from": 84.870185,
+          "to": 84.869771
+        }
+      ]
+    },
+    {
+      "branch_code": "05020",
+      "name": "Murliganj",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 49",
+          "to": "Building No: 115"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near H.p. Gas Godown, Kashipur",
+          "to": "Opp. Central Bank"
+        },
+        {
+          "field": "address_line3",
+          "from": "Central Bank Road",
+          "to": "Haridwar Chowk, W.no:7"
+        },
+        {
+          "field": "latitude",
+          "from": 25.900912,
+          "to": 25.89906
+        },
+        {
+          "field": "longitude",
+          "from": 86.993666,
+          "to": 86.99224
+        }
+      ]
+    },
+    {
+      "branch_code": "05059",
+      "name": "Chennai Madhavaram",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "D No: 7, Shiv Darshan Bhawan",
+          "to": "Plot  No: 7 & 8, Shiv Darshan Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "1st Natarajan Nagar",
+          "to": "1st Cross Street,  Natarajan Nagar Extention"
+        },
+        {
+          "field": "mobile",
+          "from": "9941084545",
+          "to": "9941084545, 7092317403"
+        },
+        {
+          "field": "section",
+          "from": "00837",
+          "to": "05059"
+        }
+      ]
+    },
+    {
+      "branch_code": "05246",
+      "name": "Gheer (karnal)",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 338c",
+          "to": "Hanuman Gali"
+        },
+        {
+          "field": "address_line2",
+          "from": "Kunjpura Road, Near Hanuman Mandir",
+          "to": ""
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "gheer@bkivv.org"
+        },
+        {
+          "field": "mobile",
+          "from": "8607267903",
+          "to": "8607267903, 9079796408"
+        },
+        {
+          "field": "latitude",
+          "from": 29.781745,
+          "to": 29.78105226
+        },
+        {
+          "field": "longitude",
+          "from": 77.107269,
+          "to": 77.1073846
+        }
+      ]
+    },
+    {
+      "branch_code": "05267",
+      "name": "Chakrata",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7452871144",
+          "to": "7668149918"
+        }
+      ]
+    },
+    {
+      "branch_code": "05393",
+      "name": "Pune Lonikand",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9325157056, 8421166366",
+          "to": "6372711464"
+        }
+      ]
+    },
+    {
+      "branch_code": "05401",
+      "name": "Boginadi",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8011157822, 8474839291",
+          "to": "8011157822"
+        }
+      ]
+    },
+    {
+      "branch_code": "05438",
+      "name": "Bengaluru Singapura Layout",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9206101820",
+          "to": "8197404066"
+        }
+      ]
+    },
+    {
+      "branch_code": "05482",
+      "name": "Singoli",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9027567962, 7023172717",
+          "to": "9554685539"
+        }
+      ]
+    },
+    {
+      "branch_code": "05612",
+      "name": "Gaya Jhilganj",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9024721199",
+          "to": "6202494650"
+        }
+      ]
+    },
+    {
+      "branch_code": "05693",
+      "name": "Kolkata Lords More",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8617222216, 9831142250",
+          "to": "8617222216, 9831288059"
+        }
+      ]
+    },
+    {
+      "branch_code": "05715",
+      "name": "Hindol Road",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9178879454, 6370288628",
+          "to": "9692931958, 8338916439"
+        }
+      ]
+    }
+  ],
+  "deleted": [
+    {
+      "branch_code": "01727",
+      "name": "Pune Phule Nagar"
+    },
+    {
+      "branch_code": "05593",
+      "name": "Mandi Dabwali Rajiv Nagar"
+    }
+  ]
 }

@@ -72,9 +72,18 @@ Strapi Base URL: `https://webapp.brahmakumaris.com/api`
 
 ## How to Sync (Step by Step)
 
+### Step 0: Fetch latest data from PADT API
+
+```bash
+curl -s -u "bkpad_bkc:merababa" "http://padt.bkivv.app:8080/locations/c/india" -o Centers_Raw.json
+```
+
+> **Note:** This endpoint only works over **HTTP** (not HTTPS) on port 8080.
+> Credentials: username `bkpad_bkc`, password `merababa`
+
 ### When you get new data from the external API:
 
-1. **Paste** the new JSON response into `Centers_Raw.json` (overwrite the file)
+1. **Run the curl command above** to fetch and save into `Centers_Raw.json`
 2. **Run sync**:
    ```bash
    npm run strapi-sync
