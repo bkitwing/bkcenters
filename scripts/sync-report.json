@@ -1,101 +1,525 @@
 {
-  "timestamp": "2026-05-08T08:10:33.986Z",
+  "timestamp": "2026-05-24T13:01:57.746Z",
   "summary": {
-    "created": 10,
-    "updated": 7,
-    "deleted": 0
+    "created": 19,
+    "updated": 77,
+    "deleted": 6
   },
   "created": [
     {
-      "branch_code": "05820",
-      "name": "Khewra (sonipat)",
-      "district": "Sonipat",
-      "state": "Haryana",
+      "branch_code": "03941",
+      "name": "Lalru Pind",
+      "district": "Sahibzada Ajit Singh Nagar",
+      "state": "Punjab",
       "region": "India"
     },
     {
-      "branch_code": "05821",
-      "name": "Manatri",
-      "district": "Mayurbhanj",
+      "branch_code": "05830",
+      "name": "Kumbhoj",
+      "district": "Kolhapur",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05831",
+      "name": "Kale (panhala)",
+      "district": "Kolhapur",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05832",
+      "name": "Surat Umra ",
+      "district": "Surat",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05833",
+      "name": "Ganjam Sanabazar",
+      "district": "Ganjam",
       "state": "Odisha",
       "region": "India"
     },
     {
-      "branch_code": "05822",
-      "name": "Patna Bhagwat Nagar",
-      "district": "Patna",
+      "branch_code": "05834",
+      "name": "Brahmapur Harsha Vihar",
+      "district": "Ganjam",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05835",
+      "name": "Brahmapur Padmanagar",
+      "district": "Ganjam",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05836",
+      "name": "Kokrajhar Bhabanipur",
+      "district": "Kokrajhar",
+      "state": "Assam",
+      "region": "India"
+    },
+    {
+      "branch_code": "05837",
+      "name": "Kanpur  Sazari Farm",
+      "district": "Kanpur Nagar",
+      "state": "Uttar Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05838",
+      "name": "Ratnagiri Kuwarbav",
+      "district": "Ratnagiri",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05839",
+      "name": "Rajache Kurle",
+      "district": "Satara",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05840",
+      "name": "Sakegaon",
+      "district": "Jalgaon",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05841",
+      "name": "Jafrabad",
+      "district": "Jalna",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05842",
+      "name": "Semla (koraput)",
+      "district": "Koraput",
+      "state": "Odisha",
+      "region": "India"
+    },
+    {
+      "branch_code": "05843",
+      "name": "Parpodi",
+      "district": "Bemetara",
+      "state": "Chhattisgarh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05844",
+      "name": "Durg Sindhya Nagar",
+      "district": "Durg",
+      "state": "Chhattisgarh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05845",
+      "name": "Saliwada",
+      "district": "Jabalpur",
+      "state": "Madhya Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05846",
+      "name": "Sahebganj",
+      "district": "Muzaffarpur",
       "state": "Bihar",
       "region": "India"
     },
     {
-      "branch_code": "05823",
-      "name": "Muzaffarnagar Bamanheri ",
-      "district": "Muzaffarnagar",
-      "state": "Uttar Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05824",
-      "name": "Charthawal",
-      "district": "Muzaffarnagar",
-      "state": "Uttar Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05825",
-      "name": "Ajmer Madar",
-      "district": "Ajmer",
-      "state": "Rajasthan",
-      "region": "India"
-    },
-    {
-      "branch_code": "05826",
-      "name": "Bareilly Nakatiya",
-      "district": "Bareilly",
-      "state": "Uttar Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05827",
-      "name": "Dolasahi",
-      "district": "Bhadrak",
-      "state": "Odisha",
-      "region": "India"
-    },
-    {
-      "branch_code": "05828",
-      "name": "Abu Road Manpur",
-      "district": "Sirohi",
-      "state": "Rajasthan",
-      "region": "India"
-    },
-    {
-      "branch_code": "05829",
-      "name": "Rambha (ganjam)",
-      "district": "Ganjam",
-      "state": "Odisha",
+      "branch_code": "05847",
+      "name": "Pandatarai",
+      "district": "Kabirdham",
+      "state": "Chhattisgarh",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "00104",
-      "name": "Muzaffarnagar Keshavpuri",
+      "branch_code": "00072",
+      "name": "Delhi Rajouri Garden",
       "changes": [
         {
-          "field": "address_line1",
-          "from": "Divya Dham",
-          "to": "Divya Dham, H.no: 500/8c"
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "00111",
+      "name": "Rohtak Sheela Bypass Chowk",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "00453",
+      "name": "Hosur (tn)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9667159088",
+          "to": "9886006480"
+        }
+      ]
+    },
+    {
+      "branch_code": "00600",
+      "name": "Ishwarpur (ms)",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Islampur (ms)",
+          "to": "Ishwarpur (ms)"
         },
         {
-          "field": "address_line2",
-          "from": "H.no: 500/8c, Meerut Road, Keshavpuri",
-          "to": "Meerut Road"
+          "field": "slug",
+          "from": "islampur-(ms)",
+          "to": "ishwarpur-(ms)"
+        },
+        {
+          "field": "city",
+          "from": "Islampur (ms)",
+          "to": "Ishwarpur (ms)"
+        }
+      ]
+    },
+    {
+      "branch_code": "00615",
+      "name": "Khammam Ramalayam Street",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8639162545, 9515734665",
+          "to": "9052911331, 9515734665"
+        }
+      ]
+    },
+    {
+      "branch_code": "00675",
+      "name": "Ratnagiri Nachane",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Ratnagiri",
+          "to": "Ratnagiri Nachane"
+        },
+        {
+          "field": "slug",
+          "from": "ratnagiri",
+          "to": "ratnagiri-nachane"
         },
         {
           "field": "address_line3",
-          "from": "",
-          "to": "Keshavpuri"
+          "from": "Near J.k.files Company, Nachne",
+          "to": "Near J.k.files Company, Nachane"
+        }
+      ]
+    },
+    {
+      "branch_code": "00946",
+      "name": "Delhi Narela Pana Udyan",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "00952",
+      "name": "New Delhi Swarna Park",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "00968",
+      "name": "Kosli (rewari)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "00976",
+      "name": "Rewari Sector 1",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "00981",
+      "name": "Sonipat Sector 15",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "01210",
+      "name": "Annigeri",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9535260829",
+          "to": "7483259330"
+        }
+      ]
+    },
+    {
+      "branch_code": "01587",
+      "name": "Sambhar Lake",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9829184920",
+          "to": "9829184920, 9468594095"
+        }
+      ]
+    },
+    {
+      "branch_code": "01653",
+      "name": "Rewari Shiv Nagar",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "01669",
+      "name": "New Delhi Janakpuri B3a",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI ORC"
+        }
+      ]
+    },
+    {
+      "branch_code": "01675",
+      "name": "Mawana",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI RAJOURI",
+          "to": "DELHI ORC"
+        }
+      ]
+    },
+    {
+      "branch_code": "01810",
+      "name": "Basrur",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9483855655",
+          "to": "9448279838"
+        }
+      ]
+    },
+    {
+      "branch_code": "01954",
+      "name": "New Delhi Punjabi Bagh",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "01955",
+      "name": "New Delhi Parampuri",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02098",
+      "name": "Aligarh Raghuvir Puri",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02147",
+      "name": "Dapoli (ratnagiri)",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Dapoli",
+          "to": "Dapoli (ratnagiri)"
+        },
+        {
+          "field": "slug",
+          "from": "dapoli",
+          "to": "dapoli-(ratnagiri)"
+        }
+      ]
+    },
+    {
+      "branch_code": "02234",
+      "name": "Delhi Bakhtawarpur",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02256",
+      "name": "Baramati M.i.d.c",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9665332295",
+          "to": "7887930492"
+        }
+      ]
+    },
+    {
+      "branch_code": "02353",
+      "name": "Aterna",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02424",
+      "name": "Tatiri (baghpat)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI ORC"
+        }
+      ]
+    },
+    {
+      "branch_code": "02465",
+      "name": "Yelburga",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9448279838",
+          "to": "8147647245"
+        }
+      ]
+    },
+    {
+      "branch_code": "02472",
+      "name": "Sonkh (mathura)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02625",
+      "name": "Khurja Dhakar Road",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02766",
+      "name": "New Delhi Tilangpur Kotla Vihar",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02767",
+      "name": "Meham (rohtak)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "02830",
+      "name": "Roddam",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9908479666",
+          "to": "9908479666, 9182749298"
+        }
+      ]
+    },
+    {
+      "branch_code": "02876",
+      "name": "Kokrajhar Boro Bazar",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Kokrajhar",
+          "to": "Kokrajhar Boro Bazar"
+        },
+        {
+          "field": "slug",
+          "from": "kokrajhar",
+          "to": "kokrajhar-boro-bazar"
         }
       ]
     },
@@ -104,72 +528,736 @@
       "name": "Lalru Mandi",
       "changes": [
         {
-          "field": "address_line1",
-          "from": "Om Shanti Bhawan",
-          "to": "Khasra No: 184, Khata No: 336/674, Om Shanti Bhawan"
-        }
-      ]
-    },
-    {
-      "branch_code": "03697",
-      "name": "Mohammadpur Devmal",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "7690827743,  8791267505",
-          "to": "8196919851, 7505816886"
-        }
-      ]
-    },
-    {
-      "branch_code": "04188",
-      "name": "Gohana Punjabi Colony",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "8053288765",
-          "to": "8053288765, 7015805060"
-        }
-      ]
-    },
-    {
-      "branch_code": "04432",
-      "name": "Patna Bahadurpur",
-      "changes": [
-        {
           "field": "section",
-          "from": "00180",
-          "to": "04432"
+          "from": "00724",
+          "to": "02894"
         }
       ]
     },
     {
-      "branch_code": "04526",
-      "name": "Gorakhpur Miya Bazar",
+      "branch_code": "02980",
+      "name": "Pune Marunji",
       "changes": [
         {
-          "field": "address_line2",
-          "from": "2nd Floor,, Super Electronic Market",
-          "to": "2nd Floor, Super Electronic Market"
+          "field": "mobile",
+          "from": "7887930492",
+          "to": "9561631814"
+        }
+      ]
+    },
+    {
+      "branch_code": "02984",
+      "name": "Shikrapur",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9545489725, 9960979190",
+          "to": "8788622248"
+        }
+      ]
+    },
+    {
+      "branch_code": "03117",
+      "name": "Phusro",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7488364691",
+          "to": "7014265060, 7654970088"
+        }
+      ]
+    },
+    {
+      "branch_code": "03316",
+      "name": "Masur (satara)",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "No: 691, Shivalaya",
+          "to": "Milkat No: 691, Shivalaya"
+        },
+        {
+          "field": "address_line3",
+          "from": "Yuvraj Patil Chowk, Tal: Karad",
+          "to": "Ashtavinayak Peth, Yuvraj Patil Chowk, Tal: Karad"
         },
         {
           "field": "mobile",
-          "from": "9451471834, 8299325259",
-          "to": "7052931315, 9517131507"
+          "from": "9623278176",
+          "to": "9623278176, 8308906491"
+        },
+        {
+          "field": "section",
+          "from": "00611",
+          "to": "03316"
         }
       ]
     },
     {
-      "branch_code": "05614",
-      "name": "Shukratal",
+      "branch_code": "03486",
+      "name": "New Delhi Mundka Village",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "03699",
+      "name": "Kund (rewari)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "03883",
+      "name": "Nuh (har)",
       "changes": [
         {
           "field": "mobile",
-          "from": "8445679111, 8196919851",
-          "to": "8445679111, 9627054205"
+          "from": "8708103450, 8368628876",
+          "to": "8708103450, 8295618375"
+        }
+      ]
+    },
+    {
+      "branch_code": "03937",
+      "name": "Aligarh Sasni Gate",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "03964",
+      "name": "Utnoor",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: C-115, House Of Jadi Shivaji",
+          "to": "H.no: 4-36/1"
+        },
+        {
+          "field": "address_line2",
+          "from": "Ntr Chowk, Near Bus Depot",
+          "to": "Beside Durga Devi Temple"
+        },
+        {
+          "field": "address_line3",
+          "from": "Lakkaram",
+          "to": "Govt. Hospital Road, Sevadas Nagar"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "adilabad@bkivv.org"
+        },
+        {
+          "field": "mobile",
+          "from": "8332086033",
+          "to": "6300817163"
+        },
+        {
+          "field": "latitude",
+          "from": 19.3703899,
+          "to": 19.370262
+        },
+        {
+          "field": "longitude",
+          "from": 78.7813851,
+          "to": 78.7733768
+        }
+      ]
+    },
+    {
+      "branch_code": "04009",
+      "name": "Duliajan",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.no: 211, Opp: Rituraj Gas Agency",
+          "to": "No:16"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Shanti Petrol Pump",
+          "to": "Near Rahaman's Dental Clinic"
+        },
+        {
+          "field": "address_line3",
+          "from": "Jaya Nagar Road",
+          "to": "Kamalabari Road"
+        },
+        {
+          "field": "mobile",
+          "from": "9706188974, 8787570109",
+          "to": "8787570109"
+        },
+        {
+          "field": "latitude",
+          "from": 27.348228,
+          "to": 27.347058
+        },
+        {
+          "field": "longitude",
+          "from": 95.317975,
+          "to": 95.323096
+        }
+      ]
+    },
+    {
+      "branch_code": "04046",
+      "name": "New Delhi Shahdara Ashok Nagar",
+      "changes": [
+        {
+          "field": "email",
+          "from": "ashoknagar.del@bkivv.org",
+          "to": "ashoknagar.shahdara.del@bkivv.org"
+        },
+        {
+          "field": "sub_zone",
+          "from": "DELHI RAJOURI",
+          "to": "DELHI ORC"
+        }
+      ]
+    },
+    {
+      "branch_code": "04163",
+      "name": "Dhamdha",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7000714495",
+          "to": "9179328883"
+        }
+      ]
+    },
+    {
+      "branch_code": "04171",
+      "name": "Kaptipada",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Plot No: 975/26/82, Mallik Niwas, 2nd Floor",
+          "to": "House No: 105"
+        },
+        {
+          "field": "address_line2",
+          "from": "Above Laxmi Narayan Shopping",
+          "to": "Near B.e.o Office"
+        },
+        {
+          "field": "address_line3",
+          "from": "Kala Dam Road, Ward No-3",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "8763685044",
+          "to": "8908603715, 9861814221"
+        },
+        {
+          "field": "latitude",
+          "from": 21.517194,
+          "to": 21.513616
+        },
+        {
+          "field": "longitude",
+          "from": 86.525705,
+          "to": 86.530485
+        }
+      ]
+    },
+    {
+      "branch_code": "04244",
+      "name": "Noida Sector 110",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Noida Sector 108",
+          "to": "Noida Sector 110"
+        },
+        {
+          "field": "slug",
+          "from": "noida-sector-108",
+          "to": "noida-sector-110"
+        },
+        {
+          "field": "address_line1",
+          "from": "H.no:104, Alpine Building",
+          "to": "Flat No:103, Tower 25, Lotus Panache"
+        },
+        {
+          "field": "address_line2",
+          "from": "Divine Meadows Road",
+          "to": "Near Yatharth Hospital"
+        },
+        {
+          "field": "address_line3",
+          "from": "Sector 108",
+          "to": "Sector 110"
+        },
+        {
+          "field": "mobile",
+          "from": "8826599306, 9650692051",
+          "to": "8826599306"
+        },
+        {
+          "field": "latitude",
+          "from": 28.525057,
+          "to": 28.531445
+        },
+        {
+          "field": "longitude",
+          "from": 77.375037,
+          "to": 77.384059
+        }
+      ]
+    },
+    {
+      "branch_code": "04309",
+      "name": "Rewari Sector 4",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04520",
+      "name": "Rohtak Anantpuram Society",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04637",
+      "name": "New Delhi M. P. Chowk",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI RAJOURI",
+          "to": "DELHI ORC"
+        }
+      ]
+    },
+    {
+      "branch_code": "04759",
+      "name": "Dahina",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04802",
+      "name": "Delhi Nandram Park",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04856",
+      "name": "Chang (bhiwani)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04864",
+      "name": "Rohtak Arya Nagar",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04876",
+      "name": "Rohtak Dlf Colony",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04878",
+      "name": "Kalanaur",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "04880",
+      "name": "Delhi Nangloi Friends Enclave",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05042",
+      "name": "Dharpally",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 6-20",
+          "to": "Survey No: 1155, Vaishnavi Ventures"
+        },
+        {
+          "field": "address_line2",
+          "from": "Nehru Road",
+          "to": "Near Peddamma Temple"
+        },
+        {
+          "field": "latitude",
+          "from": 18.575597,
+          "to": 18.571994
+        },
+        {
+          "field": "longitude",
+          "from": 78.369989,
+          "to": 78.357826
+        }
+      ]
+    },
+    {
+      "branch_code": "05046",
+      "name": "New Delhi Naraina",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05081",
+      "name": "Rohtak Janta Colony",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05171",
+      "name": "Rohtak Jagdish Colony",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05309",
+      "name": "New Delhi Tagore Garden",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05310",
+      "name": "New Delhi Ashok Nagar",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05403",
+      "name": "Dalsingsarai",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Khasra No-25, Manju Niwas",
+          "to": "Khasra No-1298, Kalyankari Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Railway Crossing Gate-32",
+          "to": "Opp: Celebration Resort, Daini Chowk"
+        },
+        {
+          "field": "address_line3",
+          "from": "Vip Colony",
+          "to": "Pagra"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "dalsingsarai@bkivv.org"
+        },
+        {
+          "field": "latitude",
+          "from": 25.670149,
+          "to": 25.671264
+        },
+        {
+          "field": "longitude",
+          "from": 85.838063,
+          "to": 85.820678
+        }
+      ]
+    },
+    {
+      "branch_code": "05419",
+      "name": "Rohtak Sector 3",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05443",
+      "name": "Bangana",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8894381638",
+          "to": "9817037668"
+        }
+      ]
+    },
+    {
+      "branch_code": "05455",
+      "name": "Bakhri Bazar",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7870936606",
+          "to": "8409358752"
+        }
+      ]
+    },
+    {
+      "branch_code": "05547",
+      "name": "New Delhi Tilak Nagar Block 23",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI ORC"
+        }
+      ]
+    },
+    {
+      "branch_code": "05572",
+      "name": "Bokaro Thermal",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7654970088, 9934422931",
+          "to": "7654970088, 7014265060"
+        }
+      ]
+    },
+    {
+      "branch_code": "05581",
+      "name": "Bengaluru Kammagondanahalli",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Plot No: 5, 1st Floor",
+          "to": "Plot No: 4138, Prestige Kensington Gardens"
+        },
+        {
+          "field": "address_line2",
+          "from": "17th Main Muniappa Coconut Garden",
+          "to": "Hmt Main Road, Jalahalli"
+        },
+        {
+          "field": "address_line3",
+          "from": "Kammagondanahalli",
+          "to": "Near Kammagondanahalli"
+        },
+        {
+          "field": "pincode",
+          "from": "560015",
+          "to": "560013"
+        },
+        {
+          "field": "mobile",
+          "from": "9381052460",
+          "to": "7795865781, 9971739168"
+        },
+        {
+          "field": "latitude",
+          "from": 13.0640463,
+          "to": 13.051714
+        },
+        {
+          "field": "longitude",
+          "from": 77.5328146,
+          "to": 77.536
+        }
+      ]
+    },
+    {
+      "branch_code": "05675",
+      "name": "Khair (aligarh)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05679",
+      "name": "Pydeti",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8520834177",
+          "to": "9490947803, 9492292768"
+        }
+      ]
+    },
+    {
+      "branch_code": "05740",
+      "name": "Surat Kholvad",
+      "changes": [
+        {
+          "field": "address_line2",
+          "from": "Laskana-kolvad Road",
+          "to": "Laskana-kholvad Road"
+        }
+      ]
+    },
+    {
+      "branch_code": "05794",
+      "name": "Sirsa Premnagar",
+      "changes": [
+        {
+          "field": "address_line2",
+          "from": "Agarsen Colony",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "9050382455, 9477745611",
+          "to": "9050382455, 9467745611"
+        }
+      ]
+    },
+    {
+      "branch_code": "05816",
+      "name": "Chouli",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8894381638, 8278746241",
+          "to": "9816938516"
+        }
+      ]
+    },
+    {
+      "branch_code": "05820",
+      "name": "Khewra (sonipat)",
+      "changes": [
+        {
+          "field": "sub_zone",
+          "from": "DELHI SUB ZONE",
+          "to": "DELHI RAJOURI"
+        }
+      ]
+    },
+    {
+      "branch_code": "05823",
+      "name": "Muzaffarnagar Bamanheri",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Muzaffarnagar Bamanheri ",
+          "to": "Muzaffarnagar Bamanheri"
+        },
+        {
+          "field": "slug",
+          "from": "muzaffarnagar-bamanheri-",
+          "to": "muzaffarnagar-bamanheri"
         }
       ]
     }
   ],
-  "deleted": []
+  "deleted": [
+    {
+      "branch_code": "00962",
+      "name": "Gurugram D.l.f. Phase 2"
+    },
+    {
+      "branch_code": "03951",
+      "name": "Gurugram Sector 57"
+    },
+    {
+      "branch_code": "03956",
+      "name": "New Delhi Ashok Vihar Phase 4"
+    },
+    {
+      "branch_code": "04468",
+      "name": "Noida Sector 48"
+    },
+    {
+      "branch_code": "04494",
+      "name": "Roopbas Rachoiya Mohalla"
+    },
+    {
+      "branch_code": "04828",
+      "name": "Noida Sector-117"
+    }
+  ]
 }
