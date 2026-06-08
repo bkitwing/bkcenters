@@ -1,153 +1,223 @@
 {
-  "timestamp": "2026-06-04T03:32:50.473Z",
+  "timestamp": "2026-06-08T10:07:41.493Z",
   "summary": {
-    "created": 13,
-    "updated": 4,
-    "deleted": 1
+    "created": 12,
+    "updated": 6,
+    "deleted": 0
   },
   "created": [
     {
-      "branch_code": "04468",
-      "name": "Noida Sector 48",
-      "district": "Gautam Buddha Nagar",
-      "state": "Uttar Pradesh",
+      "branch_code": "05859",
+      "name": "New Delhi Vishwas Park",
+      "district": "West Delhi",
+      "state": "Delhi",
       "region": "India"
     },
     {
-      "branch_code": "04828",
-      "name": "Noida Sector 117",
-      "district": "Gautam Buddha Nagar",
-      "state": "Uttar Pradesh",
+      "branch_code": "05860",
+      "name": "Pandiya Chhapara",
+      "district": "Seoni",
+      "state": "Madhya Pradesh",
       "region": "India"
     },
     {
-      "branch_code": "05848",
-      "name": "Marthapur",
-      "district": "Dhenkanal",
-      "state": "Odisha",
+      "branch_code": "05861",
+      "name": "Bhanupli",
+      "district": "Rupnagar",
+      "state": "Punjab",
       "region": "India"
     },
     {
-      "branch_code": "05849",
-      "name": "Bolua (tumisinga)",
-      "district": "Dhenkanal",
-      "state": "Odisha",
-      "region": "India"
-    },
-    {
-      "branch_code": "05850",
-      "name": "Jaipur Maharani Farm",
-      "district": "Jaipur",
-      "state": "Rajasthan",
-      "region": "India"
-    },
-    {
-      "branch_code": "05851",
-      "name": "Indore New York City",
+      "branch_code": "05862",
+      "name": "Indore Treasure Fantasy",
       "district": "Indore",
       "state": "Madhya Pradesh",
       "region": "India"
     },
     {
-      "branch_code": "05852",
-      "name": "Bhubaneswar District Centre",
-      "district": "Khordha",
-      "state": "Odisha",
+      "branch_code": "05863",
+      "name": "Dhaula Kuan",
+      "district": "Sirmaur",
+      "state": "Himachal Pradesh",
       "region": "India"
     },
     {
-      "branch_code": "05853",
-      "name": "Khed Shivapur",
-      "district": "Pune",
-      "state": "Maharashtra",
+      "branch_code": "05864",
+      "name": "Satuan (paonta Sahib)",
+      "district": "Sirmaur",
+      "state": "Himachal Pradesh",
       "region": "India"
     },
     {
-      "branch_code": "05854",
-      "name": "Bengaluru Puradapalya",
-      "district": "Bengaluru",
+      "branch_code": "05865",
+      "name": "Sondwa (alirajpur)",
+      "district": "Alirajpur",
+      "state": "Madhya Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05866",
+      "name": "Belagavi Rani Chennamma Nagar",
+      "district": "Belagavi",
       "state": "Karnataka",
       "region": "India"
     },
     {
-      "branch_code": "05855",
-      "name": "Lohsinghani",
-      "district": "Gurugram",
-      "state": "Haryana",
+      "branch_code": "05867",
+      "name": "Ganiyari",
+      "district": "Bilaspur",
+      "state": "Chhattisgarh",
       "region": "India"
     },
     {
-      "branch_code": "05856",
-      "name": "Vadodara Vaikunth Society 1",
-      "district": "Vadodara",
-      "state": "Gujarat",
+      "branch_code": "05868",
+      "name": "Tumakuru Srinagar",
+      "district": "Tumakuru",
+      "state": "Karnataka",
       "region": "India"
     },
     {
-      "branch_code": "05857",
-      "name": "Mirpur (agroha)",
-      "district": "Hisar",
-      "state": "Haryana",
+      "branch_code": "05869",
+      "name": "Barauni",
+      "district": "Begusarai",
+      "state": "Bihar",
       "region": "India"
     },
     {
-      "branch_code": "05858",
-      "name": "Anand Bakrol",
-      "district": "Anand",
-      "state": "Gujarat",
+      "branch_code": "05870",
+      "name": "Ballialakhminia",
+      "district": "Begusarai",
+      "state": "Bihar",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "00869",
-      "name": "Banda (up)",
+      "branch_code": "00646",
+      "name": "Mumbai Vikroli",
       "changes": [
         {
-          "field": "mobile",
-          "from": "9450143811",
-          "to": "9140475822, 7014163469"
+          "field": "address_line1",
+          "from": "Block No: 239, Room No: 9358-9359",
+          "to": "Bldg No: 222/c Wing, 8th Floor, Flat No: 803"
+        },
+        {
+          "field": "address_line2",
+          "from": "Kannamwar Nagar No: 2",
+          "to": "Vaibhav Laxmi Central Park"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Sambhaji Maidan, Vikroli (east)",
+          "to": "Kannamwar Nagar 1, Vikhroli (east)"
         }
       ]
     },
     {
-      "branch_code": "01598",
-      "name": "Chennai Royapuram",
+      "branch_code": "01143",
+      "name": "Mungeli Gol Bazar",
       "changes": [
         {
-          "field": "mobile",
-          "from": "8939090753, 9444622047",
-          "to": "9514149768, 8939090753"
+          "field": "name",
+          "from": "Mungeli",
+          "to": "Mungeli Gol Bazar"
+        },
+        {
+          "field": "slug",
+          "from": "mungeli",
+          "to": "mungeli-gol-bazar"
+        },
+        {
+          "field": "address_line2",
+          "from": "Above Dharmada Trust Office, Gol Bazar",
+          "to": "Above Dharmada Trust Office"
+        },
+        {
+          "field": "address_line3",
+          "from": "",
+          "to": "Gol Bazar"
         }
       ]
     },
     {
-      "branch_code": "02197",
-      "name": "Vijaypur Jammu",
+      "branch_code": "02097",
+      "name": "Pune Baner Raikar Farm",
       "changes": [
         {
           "field": "mobile",
-          "from": "7780804710",
-          "to": "7780804710, 9796615168"
+          "from": "7588475889",
+          "to": "9359309013"
         }
       ]
     },
     {
-      "branch_code": "03746",
-      "name": "Karamsad",
+      "branch_code": "02164",
+      "name": "Faridabad S.g.memorial Nagar",
       "changes": [
         {
-          "field": "section",
-          "from": "00304",
-          "to": "05858"
+          "field": "mobile",
+          "from": "8700609747",
+          "to": "7004496521"
+        }
+      ]
+    },
+    {
+      "branch_code": "02816",
+      "name": "Sivagangai",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "04575-241507",
+          "to": "04575-299707"
+        },
+        {
+          "field": "mobile",
+          "from": "9487951211",
+          "to": "9487951211, 9443977542"
+        }
+      ]
+    },
+    {
+      "branch_code": "05051",
+      "name": "Zirakpur V.i.p Road",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Zirakpur Savitry Enclave",
+          "to": "Zirakpur V.i.p Road"
+        },
+        {
+          "field": "slug",
+          "from": "zirakpur-savitry-enclave",
+          "to": "zirakpur-v.i.p-road"
+        },
+        {
+          "field": "address_line1",
+          "from": "H No: 5a, Swadarshan Dham, Ground Floor",
+          "to": "Flat No: 101, Block A1, Swadarshan Dham"
+        },
+        {
+          "field": "address_line2",
+          "from": "Park View, V.i.p. Road",
+          "to": "Savitry Heights - 2, Gate No-4, V.i.p Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "Savitry Enclave- Gate No-2",
+          "to": ""
+        },
+        {
+          "field": "latitude",
+          "from": 30.639147,
+          "to": 30.637907
+        },
+        {
+          "field": "longitude",
+          "from": 76.813815,
+          "to": 76.812218
         }
       ]
     }
   ],
-  "deleted": [
-    {
-      "branch_code": "05563",
-      "name": "Vadodara Harni"
-    }
-  ]
+  "deleted": []
 }
