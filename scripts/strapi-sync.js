@@ -88,13 +88,29 @@ function parseBaseUrl(url) {
 
 const { hostname, basePath } = parseBaseUrl(STRAPI_BASE_URL);
 
-function strapiRequest(method, endpoint, body) {
+// Reuse a small pool of keep-alive connections. Opening a fresh TLS handshake
+// per request (and many in parallel) intermittently triggers the server to drop
+// connections mid-handshake -> "EPROTO ... decrypt error / tlsv1 alert". Capping
+// sockets keeps the connection count the server has to juggle low and stable.
+const agent = new https.Agent({ keepAlive: true, maxSockets: 4 });
+
+// Transient network/TLS errors worth retrying instead of aborting the whole sync.
+function isRetryableError(err) {
+  const msg = err && err.message ? err.message : '';
+  return (
+    err && (err.code === 'EPROTO' || err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT') ||
+    /EPROTO|ECONNRESET|decrypt|tlsv1 alert|socket hang up|timeout/i.test(msg)
+  );
+}
+
+function strapiRequestRaw(method, endpoint, body) {
   return new Promise((resolve, reject) => {
     const data = body ? JSON.stringify({ data: body }) : null;
     const options = {
       hostname,
       path: basePath + '/' + endpoint,
       method,
+      agent,
       headers: {
         'Authorization': 'Bearer ' + STRAPI_TOKEN,
         ...(data ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } : {})
@@ -117,6 +133,24 @@ function strapiRequest(method, endpoint, body) {
     if (data) req.write(data);
     req.end();
   });
+}
+
+// Wrapper with automatic retries on transient TLS/network errors.
+async function strapiRequest(method, endpoint, body, retries = 3) {
+  let lastErr;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await strapiRequestRaw(method, endpoint, body);
+    } catch (err) {
+      lastErr = err;
+      if (attempt < retries && isRetryableError(err)) {
+        await sleep(500 * (attempt + 1)); // backoff: 500ms, 1s, 1.5s
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr;
 }
 
 // Fetch all entries from a collection (handles pagination)
