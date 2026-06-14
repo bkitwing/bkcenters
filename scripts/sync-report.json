@@ -1,11 +1,19 @@
 {
-  "timestamp": "2026-06-14T06:26:49.134Z",
+  "timestamp": "2026-06-14T06:27:56.557Z",
   "summary": {
-    "created": 0,
+    "created": 1,
     "updated": 0,
     "deleted": 0
   },
-  "created": [],
+  "created": [
+    {
+      "branch_code": "05872",
+      "name": "Sikandra  (kanpur)",
+      "district": "Kanpur Dehat",
+      "state": "Uttar Pradesh",
+      "region": "India"
+    }
+  ],
   "updated": [],
   "deleted": []
 }
