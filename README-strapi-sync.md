@@ -76,6 +76,13 @@ Strapi Base URL: `https://webapp.brahmakumaris.com/api`
 
 ```bash
 curl -s -u "bkpad_bkc:merababa" "http://padt.bkivv.app:8080/locations/c/india" -o Centers_Raw.json
+
+New URL
+
+curl -s -u "bkpad_bkc:merababa" \
+  "https://padds.bkivv.app/pad-data-services/locations/c/India" \
+  -o Centers_Raw.json
+
 ```
 
 > **Note:** This endpoint only works over **HTTP** (not HTTPS) on port 8080.
