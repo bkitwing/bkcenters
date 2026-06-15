@@ -1,19 +1,33 @@
 {
-  "timestamp": "2026-06-14T06:27:56.557Z",
+  "timestamp": "2026-06-15T08:41:11.560Z",
   "summary": {
-    "created": 1,
-    "updated": 0,
+    "created": 0,
+    "updated": 1,
     "deleted": 0
   },
-  "created": [
+  "created": [],
+  "updated": [
     {
       "branch_code": "05872",
       "name": "Sikandra  (kanpur)",
-      "district": "Kanpur Dehat",
-      "state": "Uttar Pradesh",
-      "region": "India"
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Sharma's House, 1st Floor",
+          "to": "Plot No: 150b, Sharma's House, 1st Floor"
+        },
+        {
+          "field": "city",
+          "from": "Sikandra ",
+          "to": "Sikandra"
+        },
+        {
+          "field": "mobile",
+          "from": "9125377468,  9325796890",
+          "to": "9125377468, 9325796890"
+        }
+      ]
     }
   ],
-  "updated": [],
   "deleted": []
 }
