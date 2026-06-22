@@ -68,12 +68,8 @@ export default function StickyBottomNav({ center }: StickyBottomNavProps) {
   const handleCallClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const allNumbers = getAllPhoneNumbers();
-    
-    if (allNumbers.length > 1) {
+    if (allNumbers.length > 0) {
       setShowPhoneModal(true);
-    } else if (allNumbers.length === 1) {
-      const cleanNum = allNumbers[0].replace(/\D/g, '');
-      window.location.href = `tel:+91${cleanNum}`;
     }
   };
 

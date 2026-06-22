@@ -24,7 +24,7 @@ import NewsSection from '@/components/NewsSection';
 import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel } from '@/lib/centerContent';
+import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel, getShortLocationLine, TIMING_CONFIRM_NOTE } from '@/lib/centerContent';
 import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
@@ -295,9 +295,10 @@ export default async function CenterPage({ params }: CenterPageProps) {
     const nearbyLocalities = nearbyCenters
       .map(c => c.address?.city || c.district)
       .filter((v): v is string => !!v);
+    const shortLocationLine = getShortLocationLine(center);
     const centerIntro = generateCenterIntro(center, nearbyLocalities);
     const timings = getCenterTimings(center);
-    const localizedFaqs = getLocalizedFaqs(center, formattedAddress);
+    const localizedFaqs = getLocalizedFaqs(center);
 
     // Prepare centers for map display
     const mapCenters = [
@@ -362,7 +363,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
         {/* Structured Data for SEO */}
-        <LocalBusinessSchema center={center} pageUrl={absoluteUrl} />
+        <LocalBusinessSchema center={center} pageUrl={absoluteUrl} description={centerIntro} />
         <BreadcrumbSchema items={breadcrumbItems} />
         <FAQPageSchema faqs={faqData} />
         <CourseSchema centerName={center.name} centerUrl={absoluteUrl} />
@@ -410,7 +411,14 @@ export default async function CenterPage({ params }: CenterPageProps) {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">{center.name}</h1>
               <div className="flex items-start gap-2 text-white/80 text-sm max-w-2xl">
                 <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <p>{formattedAddress}</p>
+                <p>
+                  {shortLocationLine}
+                  {center.address?.pincode ? ` · ${center.address.pincode}` : ''}
+                  <span className="text-white/50"> · </span>
+                  <a href="#info" className="text-white/90 underline underline-offset-2 hover:text-white transition-colors">
+                    Full address
+                  </a>
+                </p>
               </div>
             </div>
 
@@ -458,14 +466,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         />
 
         {/* ===== MAIN CONTENT ===== */}
-        <div className="container mx-auto px-4 py-8 space-y-12 md:space-y-16">
-
-          {/* ===== LOCALIZED INTRO (unique per center for SEO) ===== */}
-          <section aria-label={`About ${center.name}`} className="-mb-4 md:-mb-8">
-            <p className="text-neutral-600 dark:text-neutral-300 text-base md:text-lg leading-relaxed max-w-4xl">
-              {centerIntro}
-            </p>
-          </section>
+        <div className="container mx-auto px-4 py-6 space-y-8 md:space-y-10">
 
           {/* ===== CENTER INFO + MAP SECTION ===== */}
           <section id="info" className="scroll-mt-20">
@@ -557,8 +558,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
                           </div>
                         </div>
                       )}
-                      <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-2 italic">
-                        Timings may vary — please call the center to confirm.
+                      <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-2 italic leading-relaxed">
+                        {TIMING_CONFIRM_NOTE}
                       </p>
                     </div>
 

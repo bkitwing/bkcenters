@@ -11,14 +11,18 @@ interface CenterCardProps {
   distance?: number;
   showDistance?: boolean;
   hideViewIcon?: boolean;
+  /** Compact layout for home-page nearby results — no contact lines or icon footer */
+  variant?: 'default' | 'nearby';
 }
 
 const CenterCard: React.FC<CenterCardProps> = ({ 
   center, 
   distance, 
   showDistance = false,
-  hideViewIcon = false
+  hideViewIcon = false,
+  variant = 'default',
 }) => {
+  const isNearby = variant === 'nearby';
   const [showShareTooltip, setShowShareTooltip] = useState(false);
   const [showViewTooltip, setShowViewTooltip] = useState(false);
   const [showLocationTooltip, setShowLocationTooltip] = useState(false);
@@ -87,22 +91,31 @@ const CenterCard: React.FC<CenterCardProps> = ({
   const fullUrl = formatCenterUrl(center.region, center.state, center.district, center.name);
   
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-neutral-800 p-3">
-      <div className="mb-2">
-        <Link href={fullUrl}>
-          <h3 className="text-2xl font-bold spiritual-text-gradient">{center.name}</h3>
+    <div className={`flex flex-col h-full p-3 ${isNearby ? 'bg-transparent' : 'bg-white dark:bg-neutral-800'}`}>
+      <div className="mb-1">
+        <Link
+          href={fullUrl}
+          onClick={(e) => {
+            if (isNearby) e.stopPropagation();
+            CenterLocatorAnalytics.viewCenter(center);
+          }}
+        >
+          <h3 className={`font-bold spiritual-text-gradient ${isNearby ? 'text-lg leading-snug' : 'text-2xl'}`}>
+            {center.name}
+          </h3>
         </Link>
-        {showDistance && distance && (
-          <span className="text-sm font-bold spiritual-text-gradient">
+        {showDistance && distance != null && (
+          <span className="text-xs font-semibold text-spirit-purple-600 dark:text-spirit-purple-400">
             {distance.toFixed(1)} km away
           </span>
         )}
       </div>
       
-      <p className="text-neutral-600 dark:text-neutral-400 mt-1 mb-2 text-sm line-clamp-2">
+      <p className={`text-neutral-600 dark:text-neutral-400 text-sm line-clamp-2 ${isNearby ? 'mt-1 mb-0' : 'mt-1 mb-2'}`}>
         {formattedAddress}
       </p>
       
+      {!isNearby && (
       <div className="contact-info text-sm flex-grow">
         {center.contact && (
           <div className="flex items-center text-neutral-600 dark:text-neutral-400 mb-1">
@@ -169,10 +182,13 @@ const CenterCard: React.FC<CenterCardProps> = ({
           </div>
         )}
       </div>
-      
+      )}
+
+      {!isNearby && (
       <div className="flex justify-between mt-auto pt-2 border-t border-neutral-100 dark:border-neutral-700">
         <div className="flex gap-4">
           {/* View Details Icon */}
+          {!hideViewIcon && (
           <Link 
             href={fullUrl}
             className="relative text-neutral-600 dark:text-neutral-400 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-400 transition-colors"
@@ -190,6 +206,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
               </span>
             )}
           </Link>
+          )}
           
           {/* Location Icon */}
           {hasAddress && (
@@ -232,6 +249,7 @@ const CenterCard: React.FC<CenterCardProps> = ({
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 };

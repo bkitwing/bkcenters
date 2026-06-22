@@ -116,7 +116,7 @@ export default function FAQSection({ center }: FAQSectionProps) {
 
   // Localized FAQs (unique per center) — shown first so the visible FAQ matches
   // the FAQPage structured data and targets high-intent local queries.
-  const localizedFaqs: FAQItem[] = getLocalizedFaqs(center, formatAddress());
+  const localizedFaqs: FAQItem[] = getLocalizedFaqs(center);
 
   // Static FAQs with the center-specific one inserted at position 2
   const faqs: FAQItem[] = [

@@ -50,12 +50,12 @@ export default function CallNowButton({ mobile, contact, className, children }: 
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const allNumbers = getAllPhoneNumbers();
-    if (allNumbers.length > 1) {
+    // Always open the picker modal (even for a single number) so the
+    // experience matches the detail page and avoids abrupt OS dialer prompts.
+    if (allNumbers.length > 0) {
       setShowModal(true);
-    } else if (allNumbers.length === 1) {
-      const cleanNum = allNumbers[0].replace(/\D/g, '');
-      window.location.href = `tel:+91${cleanNum}`;
     }
   };
 

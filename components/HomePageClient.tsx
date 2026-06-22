@@ -10,7 +10,7 @@ import CallNowButton from "@/components/CallNowButton";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
-import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, Navigation, Compass, ArrowRight, SlidersHorizontal, List as ListIcon, Map as MapIcon, Phone } from 'lucide-react';
+import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, Navigation, Compass, ArrowRight, SlidersHorizontal, Phone } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
@@ -101,8 +101,6 @@ export default function HomePageClient({
   
   const [sortBy, setSortBy] = useState<SortOption>("centers");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  // Mobile-only toggle for the search-results view (list-first by default)
-  const [mobileResultsView, setMobileResultsView] = useState<ViewMode>("list");
   // Collapsible distance control (kept out of the way until tapped)
   const [showDistanceControl, setShowDistanceControl] = useState(false);
   const [regionViewMode, setRegionViewMode] = useState<ViewMode>("list");
@@ -197,15 +195,6 @@ export default function HomePageClient({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lat, lng]);
 
-  // When the mobile view switches to the map, the map container goes from
-  // hidden -> visible; nudge Google Maps to recompute its size so tiles render.
-  useEffect(() => {
-    if (mobileResultsView === 'map') {
-      const t = setTimeout(() => window.dispatchEvent(new Event('resize')), 150);
-      return () => clearTimeout(t);
-    }
-  }, [mobileResultsView]);
-
   // Re-filter when maxDistance slider changes (no new API call)
   useEffect(() => {
     if (allNearestCenters.length === 0) return;
@@ -216,13 +205,11 @@ export default function HomePageClient({
     setDisplayLimit(10);
   }, [maxDistance, allNearestCenters]);
 
-  // Intersection observer for lazy loading
+  // Intersection observer for lazy loading (viewport scroll, not inner box)
   useEffect(() => {
-    if (!resultsContainerRef.current) return;
-
     const options = {
-      root: resultsContainerRef.current,
-      rootMargin: "100px",
+      root: null,
+      rootMargin: "200px",
       threshold: 0.1,
     };
 
@@ -236,9 +223,6 @@ export default function HomePageClient({
         if (nearestCenters.length < filteredCenters.length) {
           setLoadingMore(true);
 
-          const scrollContainer = resultsContainerRef.current;
-          const scrollPosition = scrollContainer?.scrollTop;
-
           const nextBatchSize = 10;
           const nextCenters = [
             ...nearestCenters,
@@ -249,13 +233,7 @@ export default function HomePageClient({
           ];
 
           setNearestCenters(nextCenters);
-
-          requestAnimationFrame(() => {
-            if (scrollContainer && scrollPosition !== undefined) {
-              scrollContainer.scrollTop = scrollPosition;
-            }
-            setLoadingMore(false);
-          });
+          setLoadingMore(false);
         }
       }
     };
@@ -399,26 +377,33 @@ export default function HomePageClient({
     router.push("/");
   };
 
-  // Handle center selection on map
+  // Scroll the page to a center card and highlight it (map marker → list sync)
+  const scrollToCenterCard = useCallback((branchCode: string) => {
+    const centerElement = document.getElementById(`center-card-${branchCode}`);
+    if (centerElement) {
+      centerElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      centerElement.classList.add("highlight-card");
+      setTimeout(() => centerElement.classList.remove("highlight-card"), 2000);
+    }
+  }, []);
+
+  const getCenterMapsUrl = useCallback((center: Center) => {
+    const addr = center.address
+      ? [center.address.line1, center.address.city, center.address.pincode].filter(Boolean).join(", ")
+      : "";
+    if (center.coords && center.coords.length === 2 && center.coords[0] && center.coords[1]) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${center.coords[0]},${center.coords[1]}`;
+    }
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`;
+  }, []);
+
+  // Handle center selection on map — always scroll list to the matching card
   const handleCenterSelect = (center: Center) => {
     setSelectedCenter(center);
-    
     CenterLocatorAnalytics.viewCenter(center);
 
-    if (
-      resultsContainerRef.current &&
-      nearestCenters.some((c) => c.branch_code === center.branch_code)
-    ) {
-      const centerElement = document.getElementById(
-        `center-card-${center.branch_code}`
-      );
-      if (centerElement) {
-        resultsContainerRef.current.scrollTop = centerElement.offsetTop - 100;
-        centerElement.classList.add("highlight-card");
-        setTimeout(() => {
-          centerElement.classList.remove("highlight-card");
-        }, 2000);
-      }
+    if (nearestCenters.some((c) => c.branch_code === center.branch_code)) {
+      scrollToCenterCard(center.branch_code);
     }
 
     if (center.is_state_summary && center.name) {
@@ -427,41 +412,26 @@ export default function HomePageClient({
     }
   };
 
-  // Handle card click to center map
+  // Handle card click — highlight on map
   const handleCardClick = (center: Center) => {
     setSelectedCenter(center);
-    
     CenterLocatorAnalytics.viewCenter(center);
 
     if (center.coords && center.coords.length === 2) {
       const [lat, lng] = center.coords.map(parseFloat);
 
       if (!isNaN(lat) && !isNaN(lng) && mapRef.current) {
-        if (window.innerWidth < 768 && mapRef.current) {
-          mapRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-
-        const centerElement = document.getElementById(
-          `center-card-${center.branch_code}`
-        );
+        const centerElement = document.getElementById(`center-card-${center.branch_code}`);
         if (centerElement) {
           centerElement.classList.add("highlight-card");
-
-          setTimeout(() => {
-            centerElement.classList.remove("highlight-card");
-          }, 1500);
+          setTimeout(() => centerElement.classList.remove("highlight-card"), 1500);
         }
 
         const marker = markers.get(center.branch_code);
         if (marker) {
           marker.setAnimation(google.maps.Animation.BOUNCE);
-
-          setTimeout(() => {
-            marker.setAnimation(null);
-          }, 1500);
-
+          setTimeout(() => marker.setAnimation(null), 1500);
           mapRef.current.map?.panTo({ lat, lng });
-
           const currentZoom = mapRef.current.map?.getZoom() || defaultZoom;
           if (currentZoom < 14) {
             mapRef.current.map?.setZoom(14);
@@ -661,31 +631,6 @@ export default function HomePageClient({
                       <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
                       <span className="whitespace-nowrap">{maxDistance} km</span>
                     </button>
-                    {/* Mobile-only List/Map toggle */}
-                    <div className="flex md:hidden bg-neutral-100 dark:bg-neutral-700 rounded-xl p-0.5 border border-neutral-200 dark:border-neutral-600">
-                      <button
-                        onClick={() => setMobileResultsView("list")}
-                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          mobileResultsView === "list"
-                            ? "bg-white dark:bg-neutral-800 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
-                            : "text-neutral-500 dark:text-neutral-400"
-                        }`}
-                        aria-pressed={mobileResultsView === "list"}
-                      >
-                        <ListIcon className="w-3.5 h-3.5" /> List
-                      </button>
-                      <button
-                        onClick={() => setMobileResultsView("map")}
-                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          mobileResultsView === "map"
-                            ? "bg-white dark:bg-neutral-800 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
-                            : "text-neutral-500 dark:text-neutral-400"
-                        }`}
-                        aria-pressed={mobileResultsView === "map"}
-                      >
-                        <MapIcon className="w-3.5 h-3.5" /> Map
-                      </button>
-                    </div>
                   </div>
                 </div>
 
@@ -708,69 +653,73 @@ export default function HomePageClient({
                 )}
               </div>
 
-              {/* Closest-center hero card (mobile) — one tap to Call or get Directions */}
+              {/* Nearest 3 centers — quick actions (all screen sizes) */}
               {!loading && nearestCenters.length > 0 && (
-                <div className="md:hidden mb-4">
-                  {(() => {
-                    const top = nearestCenters[0];
-                    const addr = top.address
-                      ? [top.address.line1, top.address.city, top.address.pincode].filter(Boolean).join(", ")
-                      : "";
-                    const mapsUrl =
-                      top.coords && top.coords.length === 2 && top.coords[0] && top.coords[1]
-                        ? `https://www.google.com/maps/dir/?api=1&destination=${top.coords[0]},${top.coords[1]}`
-                        : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`;
-                    return (
-                      <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-spirit-purple-200 dark:border-spirit-purple-700 shadow-sm p-4">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-spirit-purple-600 dark:text-spirit-purple-400 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 px-2 py-0.5 rounded-full">
-                            Closest Center
-                          </span>
-                          {typeof top.distance === "number" && (
-                            <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                              {top.distance.toFixed(1)} km away
-                            </span>
-                          )}
-                        </div>
-                        <Link
-                          href={formatCenterUrl(top.region || "INDIA", top.state, top.district, top.name)}
-                          className="block"
-                          onClick={() => CenterLocatorAnalytics.viewCenter(top)}
+                <div className="mb-5">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-3">
+                    Nearest centers
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {nearestCenters.slice(0, 3).map((top, index) => {
+                      const addr = top.address
+                        ? [top.address.line1, top.address.city, top.address.pincode].filter(Boolean).join(", ")
+                        : "";
+                      const rankLabel = index === 0 ? "Closest" : index === 1 ? "2nd nearest" : "3rd nearest";
+                      return (
+                        <div
+                          key={`quick-${top.branch_code}`}
+                          className="bg-white dark:bg-neutral-800 rounded-2xl border border-spirit-purple-200 dark:border-spirit-purple-700 shadow-sm p-4"
                         >
-                          <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 leading-tight hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 transition-colors">
-                            {top.name}
-                          </h3>
-                        </Link>
-                        {addr && <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2">{addr}</p>}
-                        <div className="flex gap-2 mt-3">
-                          {(top.mobile || top.contact) && (
-                            <CallNowButton
-                              mobile={top.mobile}
-                              contact={top.contact}
-                              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-gold-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-600 transition-colors"
-                            >
-                              <Phone className="w-4 h-4" /> Call
-                            </CallNowButton>
-                          )}
-                          <a
-                            href={mapsUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-purple-600 text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-purple-700 transition-colors"
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-spirit-purple-600 dark:text-spirit-purple-400 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 px-2 py-0.5 rounded-full">
+                              {rankLabel}
+                            </span>
+                            {typeof top.distance === "number" && (
+                              <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                                {top.distance.toFixed(1)} km
+                              </span>
+                            )}
+                          </div>
+                          <Link
+                            href={formatCenterUrl(top.region || "INDIA", top.state, top.district, top.name)}
+                            className="block"
+                            onClick={() => CenterLocatorAnalytics.viewCenter(top)}
                           >
-                            <Navigation className="w-4 h-4" /> Directions
-                          </a>
+                            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 leading-tight hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 transition-colors">
+                              {top.name}
+                            </h3>
+                          </Link>
+                          {addr && <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2">{addr}</p>}
+                          <div className="flex gap-2 mt-3">
+                            {(top.mobile || top.contact) && (
+                              <CallNowButton
+                                mobile={top.mobile}
+                                contact={top.contact}
+                                className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-gold-500 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-600 transition-colors"
+                              >
+                                <Phone className="w-4 h-4" /> Call
+                              </CallNowButton>
+                            )}
+                            <a
+                              href={getCenterMapsUrl(top)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-purple-600 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-purple-700 transition-colors"
+                            >
+                              <Navigation className="w-4 h-4" /> Directions
+                            </a>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })()}
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
-              {/* Map + List Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5 mb-8">
-                {/* Map — hidden on mobile unless toggled; always visible on desktop */}
-                <div className={`${mobileResultsView === "map" ? "block" : "hidden"} md:block order-1 md:col-span-6 md:sticky md:top-16 md:self-start h-[65vh] md:h-[calc(100vh-80px)]`}>
+              {/* Map + list — always visible together; page scrolls naturally */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+                {/* Map — compact on mobile, sticky on desktop */}
+                <div className="lg:sticky lg:top-16 lg:self-start h-[42vh] sm:h-[45vh] lg:h-[min(560px,70vh)]">
                   <div ref={mapRef} className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden h-full">
                     <CenterMap
                       centers={nearestCenters}
@@ -783,14 +732,13 @@ export default function HomePageClient({
                       userLocation={userLocation}
                     />
                   </div>
+                  <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-2 text-center lg:text-left">
+                    Tap a marker to jump to that center in the list below
+                  </p>
                 </div>
 
-                {/* Centers list — hidden on mobile when map is toggled on */}
-                <div className={`${mobileResultsView === "list" ? "block" : "hidden"} md:block order-2 md:col-span-6 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm centers-list-container`}>
-                  <div
-                    ref={resultsContainerRef}
-                    className="h-[calc(100vh-230px)] sm:h-[calc(100vh-240px)] md:h-[calc(100vh-80px)] overflow-y-auto p-4"
-                  >
+                {/* Centers list — normal page scroll (no inner scroll box) */}
+                <div ref={resultsContainerRef} className="space-y-3">
                     {loading ? (
                       <div className="flex flex-col items-center justify-center py-16 px-6">
                         {/* Peaceful loading animation */}
@@ -825,18 +773,48 @@ export default function HomePageClient({
                             <div
                               key={center.branch_code}
                               id={`center-card-${center.branch_code}`}
-                              onClick={() => handleCardClick(center)}
-                              className={`cursor-pointer rounded-xl border transition-all duration-200 p-1 ${
+                              className={`rounded-xl border transition-all duration-200 bg-white dark:bg-neutral-800 overflow-hidden ${
                                 selectedCenter?.branch_code === center.branch_code
-                                  ? "border-spirit-purple-300 dark:border-spirit-purple-600 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 shadow-md ring-1 ring-spirit-purple-200 dark:ring-spirit-purple-700"
-                                  : "border-neutral-100 dark:border-neutral-700 hover:border-spirit-purple-200 dark:hover:border-spirit-purple-700 hover:shadow-sm"
+                                  ? "border-spirit-purple-300 dark:border-spirit-purple-600 ring-1 ring-spirit-purple-200 dark:ring-spirit-purple-700 shadow-md"
+                                  : "border-neutral-200 dark:border-neutral-700 hover:border-spirit-purple-200 dark:hover:border-spirit-purple-700"
                               }`}
                             >
-                              <CenterCard
-                                center={center}
-                                distance={center.distance}
-                                showDistance={true}
-                              />
+                              <div
+                                className="cursor-pointer"
+                                onClick={() => handleCardClick(center)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => e.key === 'Enter' && handleCardClick(center)}
+                              >
+                                <CenterCard
+                                  center={center}
+                                  distance={center.distance}
+                                  showDistance={true}
+                                  variant="nearby"
+                                />
+                              </div>
+                              <div
+                                className="flex gap-2 px-3 pb-3"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {(center.mobile || center.contact) && (
+                                  <CallNowButton
+                                    mobile={center.mobile}
+                                    contact={center.contact}
+                                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-gold-500 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-600 transition-colors"
+                                  >
+                                    <Phone className="w-4 h-4" /> Call
+                                  </CallNowButton>
+                                )}
+                                <a
+                                  href={getCenterMapsUrl(center)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-purple-600 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-purple-700 transition-colors"
+                                >
+                                  <Navigation className="w-4 h-4" /> Directions
+                                </a>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -866,7 +844,6 @@ export default function HomePageClient({
                         </button>
                       </div>
                     )}
-                  </div>
                 </div>
               </div>
             </div>

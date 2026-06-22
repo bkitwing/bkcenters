@@ -16,6 +16,24 @@ export const DEFAULT_TIMINGS = {
   evening: '5:00 – 8:00 PM',
 };
 
+/** Respectful note shown under class timings on every center detail page. */
+export const TIMING_CONFIRM_NOTE =
+  'Timings may vary — kindly call to confirm before you visit.';
+
+/** Short location line for hero (city, district, state) — full street address lives in Center Details only. */
+export function getShortLocationLine(
+  center: Pick<Center, 'address' | 'district' | 'state'>
+): string {
+  const city = getLocalityLabel(center);
+  const district = titleCase(center.district);
+  const state = titleCase(center.state);
+  const parts: string[] = [];
+  if (city) parts.push(city);
+  if (district && district.toLowerCase() !== city.toLowerCase()) parts.push(district);
+  if (state && state.toLowerCase() !== district.toLowerCase()) parts.push(state);
+  return parts.join(', ');
+}
+
 // Machine-readable opening hours for schema.org openingHoursSpecification (24h, IST).
 export const OPENING_HOURS_SPEC = [
   { opens: '07:00', closes: '09:00', label: 'Morning Session' },
@@ -62,9 +80,8 @@ function firstPhone(center: Pick<Center, 'contact' | 'mobile'>): string {
 }
 
 /**
- * Unique, localized introduction paragraph for the center.
- * Uses data already on hand (name, city, district, state, region) plus nearby
- * locality names so every page has differentiated, crawlable body content.
+ * Unique, localized description for JSON-LD and meta (not shown as a visible paragraph).
+ * Weaves in city/district/state + nearby areas so each of 5,600+ pages has differentiated text.
  */
 export function generateCenterIntro(
   center: Center,
@@ -75,43 +92,25 @@ export function generateCenterIntro(
   const district = titleCase(center.district);
   const state = titleCase(center.state);
 
-  // Build a clean "located in" clause without repeating the same place twice.
   const placeParts: string[] = [];
   if (city) placeParts.push(city);
   if (district && district.toLowerCase() !== city.toLowerCase()) placeParts.push(`${district} district`);
   if (state && state.toLowerCase() !== district.toLowerCase()) placeParts.push(state);
   const placeClause = placeParts.join(', ');
 
-  const sentences: string[] = [];
-
-  sentences.push(
-    `Brahma Kumaris ${name} is a Rajyoga meditation center${placeClause ? ` located in ${placeClause}` : ''}.`
-  );
-
-  sentences.push(
-    `The center offers a free 7-day Rajyoga meditation course along with daily morning (${DEFAULT_TIMINGS.morning}) and evening (${DEFAULT_TIMINGS.evening}) meditation classes, open to everyone regardless of age, background, or faith.`
-  );
-
-  // Localized "who can attend" sentence using nearby locality names (unique per page).
   const uniqueNearby = Array.from(
     new Set(
       nearbyLocalities
         .map((n) => titleCase(n))
         .filter((n) => n && n.toLowerCase() !== city.toLowerCase())
     )
-  ).slice(0, 4);
+  ).slice(0, 3);
 
   if (city && uniqueNearby.length > 0) {
-    sentences.push(
-      `Residents of ${city} and nearby areas such as ${uniqueNearby.join(', ')} are warmly welcome to visit, learn meditation, and experience inner peace in person.`
-    );
-  } else {
-    sentences.push(
-      `Whether you are beginning your spiritual journey or deepening an existing practice, you are warmly welcome to visit and learn meditation in a calm, supportive environment.`
-    );
+    return `Brahma Kumaris ${name} offers a free 7-day Rajyoga meditation course and daily classes${placeClause ? ` in ${placeClause}` : ''}, open to everyone. Visitors from ${city} and nearby areas such as ${uniqueNearby.join(', ')} are warmly welcome.`;
   }
 
-  return sentences.join(' ');
+  return `Brahma Kumaris ${name} offers a free 7-day Rajyoga meditation course and daily meditation classes${placeClause ? ` in ${placeClause}` : ''}. All are welcome — whether you are new to meditation or continuing your spiritual journey.`;
 }
 
 /**
@@ -120,22 +119,21 @@ export function generateCenterIntro(
  * targets high-intent queries like "learn meditation in <city>" / "timings".
  */
 export function getLocalizedFaqs(
-  center: Center,
-  formattedAddress: string
+  center: Center
 ): { question: string; answer: string }[] {
   const name = titleCase(center.name);
   const locality = getLocalityLabel(center) || titleCase(center.district) || titleCase(center.state);
   const phone = firstPhone(center);
-  const callClause = phone ? ` You can call ${phone} to confirm class timings before visiting.` : ' Please call the center to confirm class timings before visiting.';
+  const callClause = phone ? ` Call ${phone} to confirm before visiting.` : ' Please call the center to confirm before visiting.';
 
   return [
     {
       question: `Where can I learn meditation in ${locality}?`,
-      answer: `You can learn Rajyoga meditation for free at Brahma Kumaris ${name}${formattedAddress ? `, located at ${formattedAddress}` : ''}. The center runs a free 7-day meditation course as well as daily morning and evening classes that are open to everyone.${callClause}`,
+      answer: `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and daily morning and evening classes, open to everyone.${callClause}`,
     },
     {
       question: `What are the class timings at ${name}?`,
-      answer: `Classes are generally held in the morning from ${DEFAULT_TIMINGS.morning} and in the evening from ${DEFAULT_TIMINGS.evening}. Timings may vary by center and on special days, so we recommend calling before you visit.${phone ? ` Call ${phone} to confirm.` : ''}`,
+      answer: `Morning classes are typically ${DEFAULT_TIMINGS.morning}; evening classes ${DEFAULT_TIMINGS.evening}. ${TIMING_CONFIRM_NOTE}`,
     },
     {
       question: `Is the 7-day meditation course really free at ${name}?`,

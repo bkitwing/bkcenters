@@ -63,9 +63,11 @@ export function OrganizationSchema({ baseUrl = 'https://www.brahmakumaris.com' }
 interface LocalBusinessSchemaProps {
   center: Center;
   pageUrl: string;
+  /** Unique per-center description for JSON-LD (not shown on page). */
+  description?: string;
 }
 
-export function LocalBusinessSchema({ center, pageUrl }: LocalBusinessSchemaProps) {
+export function LocalBusinessSchema({ center, pageUrl, description }: LocalBusinessSchemaProps) {
   const formatAddress = () => {
     const { line1, line2, line3, city, pincode } = center.address || {};
     let parts = [];
@@ -80,7 +82,7 @@ export function LocalBusinessSchema({ center, pageUrl }: LocalBusinessSchemaProp
     '@type': ['LocalBusiness', 'Place', 'SpiritualOrganization'],
     '@id': pageUrl,
     name: center.name,
-    description: `Brahma Kumaris Rajyoga Meditation Center - ${center.name}. Free meditation classes and spiritual courses available.`,
+    description: description || `Brahma Kumaris Rajyoga Meditation Center - ${center.name}. Free meditation classes and spiritual courses available.`,
     url: pageUrl,
     image: 'https://www.brahmakumaris.com/centers/brahma-kumaris-logo.webp',
     address: {
@@ -105,14 +107,14 @@ export function LocalBusinessSchema({ center, pageUrl }: LocalBusinessSchemaProp
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         opens: '07:00',
         closes: '09:00',
-        description: 'Morning Session - Please contact center to confirm timings',
+        description: 'Morning Session — timings may vary; kindly call to confirm before visiting',
       },
       {
         '@type': 'OpeningHoursSpecification',
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         opens: '17:00',
         closes: '20:00',
-        description: 'Evening Session - Please contact center to confirm timings',
+        description: 'Evening Session — timings may vary; kindly call to confirm before visiting',
       },
     ],
     parentOrganization: {
