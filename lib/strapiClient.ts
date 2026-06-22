@@ -76,6 +76,7 @@ interface StrapiCenterAttributes {
   latitude: number | null;
   longitude: number | null;
   is_retreat: boolean;
+  timings?: string | null;
   district_center?: {
     data: {
       id: number;
@@ -145,6 +146,7 @@ function transformStrapiCenter(entry: StrapiCenterEntry): Center {
       a.latitude != null ? String(a.latitude) : '',
       a.longitude != null ? String(a.longitude) : '',
     ] as [string, string],
+    ...(a.timings ? { timings: a.timings } : {}),
   };
 }
 

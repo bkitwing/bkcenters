@@ -240,6 +240,26 @@ const CenterMap: React.FC<CenterMapProps> = ({
     }
   }, [autoZoom, mapRef, centers, fitBounds, markersReady]);
 
+  // Recover from container size changes (e.g. window resize, orientation change,
+  // or being revealed after a show/hide toggle). Without this, a map that was
+  // first laid out at zero/small size renders blank gray tiles when shown.
+  useEffect(() => {
+    if (!mapRef || !google?.maps) return;
+
+    const handleResize = () => {
+      const currentCenter = mapRef.getCenter();
+      google.maps.event.trigger(mapRef, 'resize');
+      if (autoZoom && centers.length > 0) {
+        fitBounds();
+      } else if (currentCenter) {
+        mapRef.setCenter(currentCenter);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [mapRef, autoZoom, centers, fitBounds]);
+
   // Auto-select center if we're in highlight mode and showInfoWindowOnLoad is true
   useEffect(() => {
     if (highlightCenter && centers.length === 1 && !selectedCenter && showInfoWindowOnLoad && markersReady) {

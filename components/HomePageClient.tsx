@@ -6,10 +6,11 @@ import Link from "next/link";
 import dynamic from 'next/dynamic';
 import SearchBar from "@/components/SearchBar";
 import CenterCard from "@/components/CenterCard";
+import CallNowButton from "@/components/CallNowButton";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
-import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, Navigation, Compass, ArrowRight, SlidersHorizontal } from 'lucide-react';
+import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, Navigation, Compass, ArrowRight, SlidersHorizontal, List as ListIcon, Map as MapIcon, Phone } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
@@ -100,6 +101,10 @@ export default function HomePageClient({
   
   const [sortBy, setSortBy] = useState<SortOption>("centers");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+  // Mobile-only toggle for the search-results view (list-first by default)
+  const [mobileResultsView, setMobileResultsView] = useState<ViewMode>("list");
+  // Collapsible distance control (kept out of the way until tapped)
+  const [showDistanceControl, setShowDistanceControl] = useState(false);
   const [regionViewMode, setRegionViewMode] = useState<ViewMode>("list");
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [showAllRegions, setShowAllRegions] = useState(false);
@@ -191,6 +196,15 @@ export default function HomePageClient({
     return () => controller.abort();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lat, lng]);
+
+  // When the mobile view switches to the map, the map container goes from
+  // hidden -> visible; nudge Google Maps to recompute its size so tiles render.
+  useEffect(() => {
+    if (mobileResultsView === 'map') {
+      const t = setTimeout(() => window.dispatchEvent(new Event('resize')), 150);
+      return () => clearTimeout(t);
+    }
+  }, [mobileResultsView]);
 
   // Re-filter when maxDistance slider changes (no new API call)
   useEffect(() => {
@@ -598,10 +612,10 @@ export default function HomePageClient({
       {lat && lng ? (
         <div className="min-h-screen">
           {/* Golden gradient search header */}
-          <div className="bg-gradient-to-b from-spirit-purple-700 via-spirit-purple-600 to-transparent dark:from-spirit-purple-900 dark:via-spirit-purple-900/50 dark:to-transparent pb-20 pt-6">
+          <div className="bg-gradient-to-b from-spirit-purple-700 via-spirit-purple-600 to-transparent dark:from-spirit-purple-900 dark:via-spirit-purple-900/50 dark:to-transparent pb-16 sm:pb-20 pt-4 sm:pt-6">
             <div className="container mx-auto px-4">
               <div className="max-w-2xl mx-auto">
-                <p className="text-center text-white/70 text-xs font-medium uppercase tracking-wider mb-3">Find Your Center</p>
+                <p className="hidden sm:block text-center text-white/70 text-xs font-medium uppercase tracking-wider mb-3">Find Your Center</p>
                 <div className="bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-4">
                   <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1">
@@ -627,37 +641,136 @@ export default function HomePageClient({
 
           <div className="container mx-auto px-4 -mt-14">
             <div ref={searchResultsRef}>
-              {/* Results header with distance slider */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm px-5 py-4">
-                <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
+              {/* Results header: title + compact distance chip + mobile List/Map toggle */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between gap-2 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm px-4 sm:px-5 py-3">
+                  <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center shrink-0">
+                      <MapPin className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                    </div>
+                    <span className="truncate">Centers Near You{nearestCenters.length > 0 ? ` (${nearestCenters.length})` : ''}</span>
+                  </h2>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* Distance filter chip — expands on tap to keep header compact */}
+                    <button
+                      onClick={() => setShowDistanceControl((v) => !v)}
+                      className="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-200 dark:border-neutral-600 rounded-xl px-3 py-2 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:border-spirit-purple-300 dark:hover:border-spirit-purple-500 transition-colors"
+                      aria-expanded={showDistanceControl}
+                      aria-controls="distance-control-panel"
+                    >
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
+                      <span className="whitespace-nowrap">{maxDistance} km</span>
+                    </button>
+                    {/* Mobile-only List/Map toggle */}
+                    <div className="flex md:hidden bg-neutral-100 dark:bg-neutral-700 rounded-xl p-0.5 border border-neutral-200 dark:border-neutral-600">
+                      <button
+                        onClick={() => setMobileResultsView("list")}
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          mobileResultsView === "list"
+                            ? "bg-white dark:bg-neutral-800 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
+                            : "text-neutral-500 dark:text-neutral-400"
+                        }`}
+                        aria-pressed={mobileResultsView === "list"}
+                      >
+                        <ListIcon className="w-3.5 h-3.5" /> List
+                      </button>
+                      <button
+                        onClick={() => setMobileResultsView("map")}
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          mobileResultsView === "map"
+                            ? "bg-white dark:bg-neutral-800 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
+                            : "text-neutral-500 dark:text-neutral-400"
+                        }`}
+                        aria-pressed={mobileResultsView === "map"}
+                      >
+                        <MapIcon className="w-3.5 h-3.5" /> Map
+                      </button>
+                    </div>
                   </div>
-                  Centers Near You
-                  {nearestCenters.length > 0 && (
-                    <span className="text-sm font-normal text-neutral-400 dark:text-neutral-500">({nearestCenters.length})</span>
-                  )}
-                </h2>
-                <div className="flex items-center gap-2 bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-200 dark:border-neutral-600 rounded-xl px-3 py-2">
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
-                  <input
-                    id="distance-filter"
-                    type="range"
-                    min="5"
-                    max="100"
-                    step="5"
-                    value={maxDistance}
-                    onChange={handleDistanceChange}
-                    className="w-24 sm:w-32 accent-spirit-purple-600"
-                  />
-                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400 whitespace-nowrap">{maxDistance} km</span>
                 </div>
+
+                {/* Expandable distance slider */}
+                {showDistanceControl && (
+                  <div id="distance-control-panel" className="mt-2 flex items-center gap-3 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm px-4 py-3">
+                    <span className="text-xs text-neutral-500 dark:text-neutral-400 whitespace-nowrap">Within</span>
+                    <input
+                      id="distance-filter"
+                      type="range"
+                      min="5"
+                      max="100"
+                      step="5"
+                      value={maxDistance}
+                      onChange={handleDistanceChange}
+                      className="flex-1 accent-spirit-purple-600"
+                    />
+                    <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 whitespace-nowrap">{maxDistance} km</span>
+                  </div>
+                )}
               </div>
+
+              {/* Closest-center hero card (mobile) — one tap to Call or get Directions */}
+              {!loading && nearestCenters.length > 0 && (
+                <div className="md:hidden mb-4">
+                  {(() => {
+                    const top = nearestCenters[0];
+                    const addr = top.address
+                      ? [top.address.line1, top.address.city, top.address.pincode].filter(Boolean).join(", ")
+                      : "";
+                    const mapsUrl =
+                      top.coords && top.coords.length === 2 && top.coords[0] && top.coords[1]
+                        ? `https://www.google.com/maps/dir/?api=1&destination=${top.coords[0]},${top.coords[1]}`
+                        : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`;
+                    return (
+                      <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-spirit-purple-200 dark:border-spirit-purple-700 shadow-sm p-4">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-spirit-purple-600 dark:text-spirit-purple-400 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 px-2 py-0.5 rounded-full">
+                            Closest Center
+                          </span>
+                          {typeof top.distance === "number" && (
+                            <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                              {top.distance.toFixed(1)} km away
+                            </span>
+                          )}
+                        </div>
+                        <Link
+                          href={formatCenterUrl(top.region || "INDIA", top.state, top.district, top.name)}
+                          className="block"
+                          onClick={() => CenterLocatorAnalytics.viewCenter(top)}
+                        >
+                          <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 leading-tight hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 transition-colors">
+                            {top.name}
+                          </h3>
+                        </Link>
+                        {addr && <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2">{addr}</p>}
+                        <div className="flex gap-2 mt-3">
+                          {(top.mobile || top.contact) && (
+                            <CallNowButton
+                              mobile={top.mobile}
+                              contact={top.contact}
+                              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-gold-500 text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-600 transition-colors"
+                            >
+                              <Phone className="w-4 h-4" /> Call
+                            </CallNowButton>
+                          )}
+                          <a
+                            href={mapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-purple-600 text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-purple-700 transition-colors"
+                          >
+                            <Navigation className="w-4 h-4" /> Directions
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
 
               {/* Map + List Grid */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5 mb-8">
-                {/* Map */}
-                <div className="order-1 md:col-span-6 md:sticky md:top-16 md:self-start h-[40vh] sm:h-[45vh] md:h-[calc(100vh-80px)]">
+                {/* Map — hidden on mobile unless toggled; always visible on desktop */}
+                <div className={`${mobileResultsView === "map" ? "block" : "hidden"} md:block order-1 md:col-span-6 md:sticky md:top-16 md:self-start h-[65vh] md:h-[calc(100vh-80px)]`}>
                   <div ref={mapRef} className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden h-full">
                     <CenterMap
                       centers={nearestCenters}
@@ -672,11 +785,11 @@ export default function HomePageClient({
                   </div>
                 </div>
 
-                {/* Centers list */}
-                <div className="order-2 md:col-span-6 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm centers-list-container">
+                {/* Centers list — hidden on mobile when map is toggled on */}
+                <div className={`${mobileResultsView === "list" ? "block" : "hidden"} md:block order-2 md:col-span-6 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm centers-list-container`}>
                   <div
                     ref={resultsContainerRef}
-                    className="h-[50vh] sm:h-[55vh] md:h-[calc(100vh-80px)] overflow-y-auto p-4"
+                    className="h-[calc(100vh-230px)] sm:h-[calc(100vh-240px)] md:h-[calc(100vh-80px)] overflow-y-auto p-4"
                   >
                     {loading ? (
                       <div className="flex flex-col items-center justify-center py-16 px-6">

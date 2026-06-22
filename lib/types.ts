@@ -25,7 +25,11 @@ export interface Center {
   country_id: string;
   mobile: string;
   coords: [string, string]; // [latitude, longitude]
-  
+
+  // Optional center-specific class timings (free text from Strapi, e.g. "Morning 7-9 AM, Evening 5-8 PM").
+  // When absent, the UI/schema fall back to the standard default timings.
+  timings?: string;
+
   // Additional fields for district view and enhanced display
   description?: string;
   summary?: string;

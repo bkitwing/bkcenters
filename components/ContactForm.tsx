@@ -27,7 +27,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("I'm interested in learning meditation. Please provide information about your classes and timings.");
+  const [preferredTime, setPreferredTime] = useState('');
   const [contactType, setContactType] = useState<ContactType>('LearnMeditation');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -42,8 +43,20 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // A visitor must give us at least one way to reach them.
+    if (!phone && !email) {
+      setError('Please provide a phone number or email so the center can reach you.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
+
+    // Fold the preferred class time into the message so the center sees it.
+    const fullMessage = preferredTime
+      ? `${message}\n\nPreferred time to attend: ${preferredTime}`
+      : message;
 
     try {
       // Use the full API URL including the base path
@@ -61,7 +74,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
           name,
           email,
           phone,
-          message,
+          message: fullMessage,
           contactType,
           centerEmail: center.email,
           centerName: center.name,
@@ -107,6 +120,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
       setEmail('');
       setPhone('');
       setMessage('');
+      setPreferredTime('');
     } catch (err: any) {
       console.error('Email submission error:', err);
       setError(err.message || 'An error occurred while sending your message');
@@ -156,9 +170,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
 
   return (
     <div className="bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-neutral-200 dark:border-neutral-700">
-      <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Contact Us</h2>
+      <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Request a Callback</h2>
       <p className="text-neutral-600 dark:text-neutral-400 mb-4">
-        Send a message to the meditation center. We'll do our best to respond to your query.
+        Want to attend the free 7-day course or have a question? Share your details and the center will reach out. Leave a phone number and we&apos;ll call you back.
       </p>
 
       {error && (
@@ -247,32 +261,50 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
-            Email <span className="text-primary">*</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Your email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
           <label htmlFor="phone" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
-            Phone Number
+            Phone Number <span className="text-primary">*</span>
           </label>
           <input
             type="tel"
             id="phone"
             className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Your phone number (optional)"
+            placeholder="Phone number for a callback"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            required
           />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+            Email <span className="text-neutral-400 text-sm font-normal">(optional)</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            placeholder="Your email address (optional)"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="preferredTime" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+            Preferred time to attend
+          </label>
+          <select
+            id="preferredTime"
+            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            value={preferredTime}
+            onChange={(e) => setPreferredTime(e.target.value)}
+          >
+            <option value="">No preference</option>
+            <option value="Morning (7:00 – 9:00 AM)">Morning (7:00 – 9:00 AM)</option>
+            <option value="Evening (5:00 – 8:00 PM)">Evening (5:00 – 8:00 PM)</option>
+            <option value="Either morning or evening">Either morning or evening</option>
+            <option value="Weekends only">Weekends only</option>
+          </select>
         </div>
 
         <div className="mb-6">
@@ -301,7 +333,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </>
           ) : (
-            'Send Message'
+            'Request Callback'
           )}
         </button>
       </form>

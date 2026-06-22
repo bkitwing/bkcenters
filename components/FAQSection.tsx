@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Center } from '@/lib/types';
+import { getLocalizedFaqs } from '@/lib/centerContent';
 
 interface FAQSectionProps {
   center: Center;
@@ -113,8 +114,13 @@ export default function FAQSection({ center }: FAQSectionProps) {
     )
   };
 
+  // Localized FAQs (unique per center) — shown first so the visible FAQ matches
+  // the FAQPage structured data and targets high-intent local queries.
+  const localizedFaqs: FAQItem[] = getLocalizedFaqs(center, formatAddress());
+
   // Static FAQs with the center-specific one inserted at position 2
   const faqs: FAQItem[] = [
+    ...localizedFaqs,
     {
       question: "What is the Brahma Kumaris?",
       answer: (

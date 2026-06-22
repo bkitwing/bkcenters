@@ -24,6 +24,7 @@ import NewsSection from '@/components/NewsSection';
 import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
+import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel } from '@/lib/centerContent';
 import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
@@ -64,8 +65,11 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       `${center.address.line1 || ''}, ${center.address.city || ''}, ${center.address.pincode || ''}` : 
       'Address not available';
 
+    const localityLabel = getLocalityLabel(center);
     const title = `${center.name} - Brahma Kumaris Rajyog Meditation Center - ${center.state}`;
-    const description = `Visit the Brahma Kumaris Rajyog meditation center at ${address} - ${center.state}, Contact information, Nearby Meditation Centers, directions, and more.`;
+    // Unique, localized description (name + locality + timings) so each of the
+    // 5,600+ pages has a differentiated snippet rather than duplicate boilerplate.
+    const description = `Learn Rajyoga meditation for free at Brahma Kumaris ${center.name}${localityLabel ? ` in ${localityLabel}, ` : ' in '}${center.state}. Free 7-day course and daily morning (7–9 AM) & evening (5–8 PM) classes. Address, contact numbers, timings & directions.`;
     
     // Format complete address
     const getCompleteAddress = () => {
@@ -287,6 +291,14 @@ export default async function CenterPage({ params }: CenterPageProps) {
       .filter(c => c.branch_code !== center.branch_code)
       .slice(0, 6);
 
+    // Localized, unique-per-center content (intro paragraph, timings, FAQs)
+    const nearbyLocalities = nearbyCenters
+      .map(c => c.address?.city || c.district)
+      .filter((v): v is string => !!v);
+    const centerIntro = generateCenterIntro(center, nearbyLocalities);
+    const timings = getCenterTimings(center);
+    const localizedFaqs = getLocalizedFaqs(center, formattedAddress);
+
     // Prepare centers for map display
     const mapCenters = [
       centerForMap,
@@ -321,8 +333,10 @@ export default async function CenterPage({ params }: CenterPageProps) {
       { name: center.name, url: absoluteUrl },
     ];
 
-    // Prepare FAQ data for structured data (plain text versions)
+    // Prepare FAQ data for structured data (plain text versions).
+    // Localized FAQs are prepended so each page's FAQPage schema is unique.
     const faqData = [
+      ...localizedFaqs,
       {
         question: "What is the Brahma Kumaris?",
         answer: "Brahma Kumaris is a worldwide spiritual movement led by women, dedicated to personal transformation and world renewal through Rajyoga Meditation. Founded in India in 1937, Brahma Kumaris has spread to over 110 countries on all continents and has had an extensive impact in many sectors as an international NGO."
@@ -439,12 +453,19 @@ export default async function CenterPage({ params }: CenterPageProps) {
             ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', iconName: 'Newspaper' }] : []),
             ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', iconName: 'Map' }] : []),
             { id: 'faq', label: 'FAQ', iconName: 'HelpCircle' },
-            ...(center.email && center.email.includes('@') ? [{ id: 'contact', label: 'Contact', iconName: 'MessageCircle' }] : []),
+            { id: 'contact', label: 'Contact', iconName: 'MessageCircle' },
           ]}
         />
 
         {/* ===== MAIN CONTENT ===== */}
         <div className="container mx-auto px-4 py-8 space-y-12 md:space-y-16">
+
+          {/* ===== LOCALIZED INTRO (unique per center for SEO) ===== */}
+          <section aria-label={`About ${center.name}`} className="-mb-4 md:-mb-8">
+            <p className="text-neutral-600 dark:text-neutral-300 text-base md:text-lg leading-relaxed max-w-4xl">
+              {centerIntro}
+            </p>
+          </section>
 
           {/* ===== CENTER INFO + MAP SECTION ===== */}
           <section id="info" className="scroll-mt-20">
@@ -511,16 +532,35 @@ export default async function CenterPage({ params }: CenterPageProps) {
                       </div>
                     )}
 
-                    {/* Timings */}
-                    {center.timings && (
-                      <div className="mb-5">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1.5">Timings</p>
+                    {/* Class Timings — always shown. Uses center-specific timings
+                        when available (from Strapi), else the standard defaults. */}
+                    <div className="mb-5">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2">Class Timings</p>
+                      {timings.custom ? (
                         <div className="flex items-start gap-2">
                           <Clock className="w-4 h-4 text-neutral-400 dark:text-neutral-500 mt-0.5" />
-                          <p className="text-sm text-neutral-700 dark:text-neutral-300">{center.timings}</p>
+                          <p className="text-sm text-neutral-700 dark:text-neutral-300">{timings.custom}</p>
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+                            <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                              <span className="font-medium text-neutral-900 dark:text-neutral-100">Morning:</span> {timings.morning}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+                            <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                              <span className="font-medium text-neutral-900 dark:text-neutral-100">Evening:</span> {timings.evening}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-2 italic">
+                        Timings may vary — please call the center to confirm.
+                      </p>
+                    </div>
 
                     {/* Services */}
                     {center.services && center.services.length > 0 && (
@@ -700,7 +740,9 @@ export default async function CenterPage({ params }: CenterPageProps) {
           </section>
 
           {/* ===== CONTACT SECTION ===== */}
-          {center.email && center.email.includes('@') && (
+          {/* Always shown — inquiries route to a central inbox, so centers
+              without their own email still receive enquiries via the team. */}
+          {(
             <section id="contact" className="scroll-mt-20">
               <CollapsibleSection 
                 title="Contact Us" 

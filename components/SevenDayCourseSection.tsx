@@ -109,7 +109,7 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         {[
           { icon: Calendar, label: 'Monday to Sunday', sub: 'Start any day' },
-          { icon: Clock, label: 'Morning & Evening', sub: 'Flexible timings' },
+          { icon: Clock, label: 'Morning & Evening', sub: '7–9 AM · 5–8 PM' },
           { icon: Sparkles, label: '100% Free', sub: 'No fees ever' },
           { icon: Users, label: 'Open to All', sub: 'No experience needed' },
         ].map((item, i) => (
@@ -187,7 +187,7 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
         <div className="border-t border-neutral-100 dark:border-neutral-700 bg-gradient-to-r from-spirit-purple-50/50 via-spirit-blue-50/50 to-spirit-gold-50/50 dark:from-spirit-purple-900/10 dark:via-spirit-blue-900/10 dark:to-spirit-gold-900/10 px-6 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              <span className="font-semibold text-neutral-800 dark:text-neutral-200">Walk in anytime</span> — Classes run daily at {centerName}. No registration required.
+              <span className="font-semibold text-neutral-800 dark:text-neutral-200">Walk in anytime</span> — Classes run daily at {centerName}, morning 7–9 AM &amp; evening 5–8 PM. No registration required.
             </p>
             <div className="flex items-center gap-1.5 text-sm text-spirit-purple-600 dark:text-spirit-purple-400 font-medium">
               <Sparkles className="w-4 h-4" />
@@ -218,6 +218,13 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
                 Visit Center &amp; Start Learning
               </CallNowButton>
             )}
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 bg-spirit-gold-400/90 text-spirit-purple-900 px-6 py-3 rounded-xl font-semibold text-sm hover:bg-spirit-gold-400 hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+            >
+              <Users className="w-4 h-4" />
+              Register Your Interest
+            </a>
           </div>
 
           {/* Online Course Links */}

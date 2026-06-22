@@ -628,8 +628,11 @@ export async function POST(request: Request) {
   try {
     const body: EmailRequestBody = await request.json();
     
-    // Basic validation
-    if (!body.name || !body.email || !body.message || !body.centerEmail) {
+    // Basic validation. The visitor must supply a name, a message, and at least
+    // one contact method (phone OR email). The center's own email is NOT required —
+    // inquiries are routed to the central inbox regardless, so centers without an
+    // email address still receive enquiries.
+    if (!body.name || !body.message || (!body.email && !body.phone)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
     
@@ -703,35 +706,47 @@ export async function POST(request: Request) {
       // Pre-generate both HTML templates before sending
       const centerHtml = getCenterEmailTemplate(body);
       const ackHtml = getAcknowledgmentTemplate(body);
-      const emailSubject = `[${contactType}] ${name} <${email}> - ${centerName}`;
+      const contactRef = email || phone || 'no contact provided';
+      const emailSubject = `[${contactType}] ${name} <${contactRef}> - ${centerName}`;
       
-      // Send BOTH emails in parallel — saves ~1-2 seconds vs sequential
-      const [centerResult, ackResult] = await Promise.allSettled([
+      // Primary inquiry email (always) + acknowledgment to the visitor (only if
+      // they provided an email). Sent in parallel to save ~1-2 seconds.
+      const sends: Promise<unknown>[] = [
         transporter.sendMail({
           from: `"${name} via Contact Form" <${emailFrom}>`,
           to: 'contact@brahmakumaris.com',
-          replyTo: email,
+          replyTo: email || undefined,
           subject: emailSubject,
           html: centerHtml,
         }),
-        transporter.sendMail({
-          from: `"Brahma Kumaris" <${emailFrom}>`,
-          to: email,
-          replyTo: 'contact@brahmakumaris.com',
-          subject: `Om Shanti ${name} — Thank you for contacting ${centerName}`,
-          html: ackHtml,
-        }),
-      ]);
+      ];
+
+      const willSendAck = !!(email && email.includes('@'));
+      if (willSendAck) {
+        sends.push(
+          transporter.sendMail({
+            from: `"Brahma Kumaris" <${emailFrom}>`,
+            to: email,
+            replyTo: 'contact@brahmakumaris.com',
+            subject: `Om Shanti ${name} — Thank you for contacting ${centerName}`,
+            html: ackHtml,
+          })
+        );
+      }
+
+      const results = await Promise.allSettled(sends);
 
       // Close the pooled connection
       transporter.close();
 
       // Check results — primary email to contact@ must succeed
+      const centerResult = results[0];
       if (centerResult.status === 'rejected') {
         console.error('Center email failed:', centerResult.reason?.message);
         throw centerResult.reason;
       }
-      if (ackResult.status === 'rejected') {
+      const ackResult = willSendAck ? results[1] : undefined;
+      if (ackResult && ackResult.status === 'rejected') {
         console.warn('Acknowledgment email failed (non-critical):', ackResult.reason?.message);
       }
       

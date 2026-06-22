@@ -104,7 +104,7 @@ export function LocalBusinessSchema({ center, pageUrl }: LocalBusinessSchemaProp
         '@type': 'OpeningHoursSpecification',
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         opens: '07:00',
-        closes: '10:00',
+        closes: '09:00',
         description: 'Morning Session - Please contact center to confirm timings',
       },
       {
@@ -401,7 +401,7 @@ export function EventSchema({ center, centerUrl }: EventSchemaProps) {
   const daysUntilNextMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek;
   const nextMonday = new Date(now);
   nextMonday.setDate(now.getDate() + daysUntilNextMonday);
-  const startDateStr = nextMonday.toISOString().split('T')[0] + 'T06:00:00+05:30';
+  const startDateStr = nextMonday.toISOString().split('T')[0] + 'T07:00:00+05:30';
 
   // End date is 1 year from start for recurring schedule visibility
   const endDate = new Date(nextMonday);
@@ -412,7 +412,7 @@ export function EventSchema({ center, centerUrl }: EventSchemaProps) {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: `Rajyoga Meditation Class at ${center.name}`,
-    description: `Free Rajyoga meditation class at ${center.name}, a Brahma Kumaris center in ${center.district}, ${center.state}. Open to all, no prior experience required. Classes held daily — morning and evening sessions.`,
+    description: `Free Rajyoga meditation class at ${center.name}, a Brahma Kumaris center in ${center.district}, ${center.state}. Open to all, no prior experience required. Classes held daily — morning (7:00–9:00 AM) and evening (5:00–8:00 PM) sessions. Please call to confirm timings.`,
     startDate: startDateStr,
     endDate: endDateStr,
     eventSchedule: {
@@ -427,8 +427,8 @@ export function EventSchema({ center, centerUrl }: EventSchemaProps) {
         'https://schema.org/Saturday',
         'https://schema.org/Sunday',
       ],
-      startTime: '06:00:00+05:30',
-      endTime: '20:00:00+05:30',
+      startTime: '07:00:00+05:30',
+      endTime: '09:00:00+05:30',
       scheduleTimezone: 'Asia/Kolkata',
     },
     organizer: {
@@ -527,7 +527,7 @@ export function HowToSchema({ center, centerUrl }: HowToSchemaProps) {
     '@type': 'HowToStep',
     position: String(steps.length + 1),
     name: 'Attend the Meditation Class',
-    text: 'Morning classes: 7:00\u201310:00. Evening classes: 17:00\u201320:00. All are welcome. Classes are free. No registration or membership required.',
+    text: 'Morning classes: 7:00\u20139:00 AM. Evening classes: 5:00\u20138:00 PM. All are welcome. Classes are free. No registration or membership required.',
   });
 
   const schema = {
