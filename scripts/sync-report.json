@@ -1,228 +1,47 @@
 {
-  "timestamp": "2026-06-18T04:38:42.968Z",
+  "timestamp": "2026-06-22T14:22:43.332Z",
   "summary": {
     "created": 3,
-    "updated": 12,
+    "updated": 1,
     "deleted": 0
   },
   "created": [
     {
-      "branch_code": "05873",
-      "name": "Vasai (east) Vasant Nagari",
-      "district": "Palghar",
-      "state": "Maharashtra",
+      "branch_code": "05876",
+      "name": "Bareta (mansa)",
+      "district": "Mansa",
+      "state": "Punjab",
       "region": "India"
     },
     {
-      "branch_code": "05874",
-      "name": "Jalgaon Rukmani Nagar",
-      "district": "Jalgaon",
-      "state": "Maharashtra",
+      "branch_code": "05877",
+      "name": "Gurugram Sector 87",
+      "district": "Gurugram",
+      "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05875",
-      "name": "Balipal (balasore)",
-      "district": "Balasore",
-      "state": "Odisha",
+      "branch_code": "05878",
+      "name": "Gorakhpur Taramandal",
+      "district": "Gorakhpur",
+      "state": "Uttar Pradesh",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "01777",
-      "name": "Jaleswar",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "01777"
-        }
-      ]
-    },
-    {
-      "branch_code": "03035",
-      "name": "Soro (balasore)",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "03035"
-        }
-      ]
-    },
-    {
-      "branch_code": "03385",
-      "name": "Chandabali",
+      "branch_code": "04817",
+      "name": "Sahibabad Lajpat Nagar",
       "changes": [
         {
           "field": "email",
           "from": null,
-          "to": "chandabali@bkivv.org"
-        },
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "03385"
-        }
-      ]
-    },
-    {
-      "branch_code": "03386",
-      "name": "Baliapal",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "03386"
-        }
-      ]
-    },
-    {
-      "branch_code": "04006",
-      "name": "Chennai Sholinganallur",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "D.no: 20-a, Saptagiri Nagar",
-          "to": "Old No: 26, New No: 35"
-        },
-        {
-          "field": "address_line2",
-          "from": "2nd Street",
-          "to": "Annai Indira Street, Parameshwara Nagar"
-        },
-        {
-          "field": "address_line3",
-          "from": "Sholinganallur",
-          "to": "2nd Street, Sholinganallur"
-        },
-        {
-          "field": "latitude",
-          "from": 12.90967,
-          "to": 12.88745
-        },
-        {
-          "field": "longitude",
-          "from": 80.2328,
-          "to": 80.22874
-        }
-      ]
-    },
-    {
-      "branch_code": "04375",
-      "name": "Vasai (east) Waliv",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00699",
-          "to": "05873"
-        }
-      ]
-    },
-    {
-      "branch_code": "04625",
-      "name": "Singla (balasore)",
-      "changes": [
-        {
-          "field": "name",
-          "from": "Singla",
-          "to": "Singla (balasore)"
-        },
-        {
-          "field": "slug",
-          "from": "singla",
-          "to": "singla-(balasore)"
-        },
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "03386"
-        }
-      ]
-    },
-    {
-      "branch_code": "04676",
-      "name": "Basta Machhia",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "01777"
-        }
-      ]
-    },
-    {
-      "branch_code": "05385",
-      "name": "Remuna (balasore)",
-      "changes": [
-        {
-          "field": "name",
-          "from": "Remuna",
-          "to": "Remuna (balasore)"
-        },
-        {
-          "field": "slug",
-          "from": "remuna",
-          "to": "remuna-(balasore)"
-        },
-        {
-          "field": "address_line1",
-          "from": "Khatian No : 588/41",
-          "to": "H No: C.n: 90(1)"
-        },
-        {
-          "field": "address_line2",
-          "from": "Near Khusaliganj Primary School",
-          "to": "Khirachora Gopinath Road"
-        },
-        {
-          "field": "address_line3",
-          "from": "Khirachora Gopinath Road",
-          "to": "Goundadanda"
+          "to": "lajpatnagar.sbb@bkivv.org"
         },
         {
           "field": "mobile",
-          "from": "9348777362",
-          "to": "9348777362, 79780609110"
-        },
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "05385"
-        }
-      ]
-    },
-    {
-      "branch_code": "05420",
-      "name": "Saud (balasore)",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "03035"
-        }
-      ]
-    },
-    {
-      "branch_code": "05632",
-      "name": "Dhamara",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9348318134",
-          "to": "8984658689"
-        }
-      ]
-    },
-    {
-      "branch_code": "05798",
-      "name": "Ghanteswar",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00119",
-          "to": "03385"
+          "from": "8447595841",
+          "to": "8447595841, 7827203922"
         }
       ]
     }
