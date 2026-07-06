@@ -1,431 +1,325 @@
 {
-  "timestamp": "2026-07-01T14:49:58.777Z",
+  "timestamp": "2026-07-06T04:32:43.776Z",
   "summary": {
-    "created": 15,
-    "updated": 16,
+    "created": 9,
+    "updated": 12,
     "deleted": 0
   },
   "created": [
     {
-      "branch_code": "02983",
-      "name": "Pune Maan",
-      "district": "Pune",
-      "state": "Maharashtra",
+      "branch_code": "05893",
+      "name": "Bilaspur Birkona Road",
+      "district": "Bilaspur",
+      "state": "Chhattisgarh",
       "region": "India"
     },
     {
-      "branch_code": "05879",
-      "name": "Etah Shanti Nagar",
-      "district": "Etah",
-      "state": "Uttar Pradesh",
+      "branch_code": "05894",
+      "name": "Jandheri",
+      "district": "Kurukshetra",
+      "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05880",
-      "name": "New Delhi Kirti Nagar",
-      "district": "West Delhi",
-      "state": "Delhi",
+      "branch_code": "05895",
+      "name": "Kathumar",
+      "district": "Alwar",
+      "state": "Rajasthan",
       "region": "India"
     },
     {
-      "branch_code": "05881",
-      "name": "Coimbatore Kovaipudur",
-      "district": "Coimbatore",
-      "state": "Tamil Nadu",
+      "branch_code": "05896",
+      "name": "Januthar",
+      "district": "Deeg",
+      "state": "Rajasthan",
       "region": "India"
     },
     {
-      "branch_code": "05882",
-      "name": "Pune Kalas",
-      "district": "Pune",
-      "state": "Maharashtra",
+      "branch_code": "05897",
+      "name": "Malda (kasdol)",
+      "district": "Raipur",
+      "state": "Chhattisgarh",
       "region": "India"
     },
     {
-      "branch_code": "05883",
-      "name": "Pune Khadakwasla",
-      "district": "Pune",
-      "state": "Maharashtra",
+      "branch_code": "05898",
+      "name": "Hyderabad Tukkuguda",
+      "district": "Rangareddy",
+      "state": "Telangana",
       "region": "India"
     },
     {
-      "branch_code": "05884",
-      "name": "Pune Charholi Budruk ",
-      "district": "Pune",
-      "state": "Maharashtra",
-      "region": "India"
-    },
-    {
-      "branch_code": "05885",
-      "name": "Dattawad",
-      "district": "Kolhapur",
-      "state": "Maharashtra",
-      "region": "India"
-    },
-    {
-      "branch_code": "05886",
-      "name": "Sarawade",
-      "district": "Kolhapur",
-      "state": "Maharashtra",
-      "region": "India"
-    },
-    {
-      "branch_code": "05887",
-      "name": "Ghaziabad Morti Village",
-      "district": "Ghaziabad",
-      "state": "Uttar Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05888",
-      "name": "Ghaziabad Nehru Nagar",
-      "district": "Ghaziabad",
-      "state": "Uttar Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05889",
-      "name": "Supedi (dhoraji)",
-      "district": "Rajkot",
+      "branch_code": "05899",
+      "name": "Botad Paliyad Road",
+      "district": "Botad",
       "state": "Gujarat",
       "region": "India"
     },
     {
-      "branch_code": "05890",
-      "name": "Bhadrawati (chandrapur)",
-      "district": "Chandrapur",
-      "state": "Maharashtra",
+      "branch_code": "05900",
+      "name": "Arambag",
+      "district": "Hooghly",
+      "state": "West Bengal",
       "region": "India"
     },
     {
-      "branch_code": "05891",
-      "name": "Nirvi (pune)",
-      "district": "Pune",
-      "state": "Maharashtra",
-      "region": "India"
-    },
-    {
-      "branch_code": "05892",
-      "name": "Delhi Pratap Nagar",
-      "district": "North Delhi",
-      "state": "Delhi",
+      "branch_code": "05901",
+      "name": "Kulgachia",
+      "district": "Howrah",
+      "state": "West Bengal",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "00258",
-      "name": "Junagadh Girnar Darwaja",
-      "changes": [
-        {
-          "field": "name",
-          "from": "Junagadh",
-          "to": "Junagadh Girnar Darwaja"
-        },
-        {
-          "field": "slug",
-          "from": "junagadh",
-          "to": "junagadh-girnar-darwaja"
-        }
-      ]
-    },
-    {
-      "branch_code": "00573",
-      "name": "Chakan",
+      "branch_code": "00123",
+      "name": "Kolkata Behala",
       "changes": [
         {
           "field": "mobile",
-          "from": "9766342610, 9834166477",
-          "to": "9604790950, 9834166477"
+          "from": "9836912303",
+          "to": "9733594442"
         }
       ]
     },
     {
-      "branch_code": "00912",
-      "name": "Varanasi Gaighat",
+      "branch_code": "00139",
+      "name": "Contai",
       "changes": [
         {
           "field": "mobile",
-          "from": "",
-          "to": "7617038619, 8076516750"
+          "from": "9733594442",
+          "to": "9749592722, 9733594442"
         }
       ]
     },
     {
-      "branch_code": "00960",
-      "name": "Gohana Gudda Road",
+      "branch_code": "00933",
+      "name": "Brij Nagar",
       "changes": [
         {
           "field": "name",
-          "from": "Gohana Baroda Road",
-          "to": "Gohana Gudda Road"
+          "from": "Nagar (bharatpur)",
+          "to": "Brij Nagar"
         },
         {
           "field": "slug",
-          "from": "gohana-baroda-road",
-          "to": "gohana-gudda-road"
-        },
-        {
-          "field": "address_line1",
-          "from": "H No: 722/19, Hukmchand Mandi",
-          "to": "H No: 326, Shiv Shakti Bhawan"
+          "from": "nagar-(bharatpur)",
+          "to": "brij-nagar"
         },
         {
           "field": "address_line2",
-          "from": "Baroda Road",
-          "to": "Gudda Road, Uttam Nagar"
+          "from": "Old Bus Stand",
+          "to": "Old Bus Stand, Ward- 8, Adrash Colony"
         },
         {
           "field": "address_line3",
-          "from": "Kansba",
-          "to": "Near Gita Vidya Mandir, Gohana"
+          "from": "8 Adrash Colony",
+          "to": "Brij Nagar"
         },
         {
           "field": "city",
-          "from": "Gohana Baroda Road",
-          "to": "Gohana Gudda Road"
+          "from": "Nagar (bharatpur)",
+          "to": "Brij Nagar"
         },
         {
-          "field": "contact",
-          "from": "01263- 252036",
-          "to": ""
+          "field": "mobile",
+          "from": "9929797895, 8209318762",
+          "to": "7414891994, 8209318762"
         },
         {
-          "field": "latitude",
-          "from": 29.136611,
-          "to": 29.133666
-        },
-        {
-          "field": "longitude",
-          "from": 76.687597,
-          "to": 76.687956
+          "field": "section",
+          "from": "00035",
+          "to": "00933"
         }
       ]
     },
     {
-      "branch_code": "01274",
-      "name": "Bengaluru Cholourpalya",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "H.no: 83, First Floor, Kala Baireshwara Nilaya",
-          "to": "H.no:63, First Floor, Anand Nilaya"
-        },
-        {
-          "field": "address_line2",
-          "from": "3rd Cross, Near Ganesh Temple",
-          "to": "2nd Cross, Near Shiva Medicals"
-        },
-        {
-          "field": "address_line3",
-          "from": "Cholourpalya",
-          "to": "Cholourpalya, Magadi Road"
-        },
-        {
-          "field": "latitude",
-          "from": 12.971528,
-          "to": 12.971424
-        },
-        {
-          "field": "longitude",
-          "from": 77.550487,
-          "to": 77.551471
-        }
-      ]
-    },
-    {
-      "branch_code": "01346",
-      "name": "Gargoti Khanapur",
+      "branch_code": "01082",
+      "name": "Botad Bhavnagar Road",
       "changes": [
         {
           "field": "name",
-          "from": "Gargoti",
-          "to": "Gargoti Khanapur"
+          "from": "Botad (guj)",
+          "to": "Botad Bhavnagar Road"
         },
         {
           "field": "slug",
-          "from": "gargoti",
-          "to": "gargoti-khanapur"
+          "from": "botad-(guj)",
+          "to": "botad-bhavnagar-road"
+        }
+      ]
+    },
+    {
+      "branch_code": "01225",
+      "name": "Honnali Gowdarakeri",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Honnali",
+          "to": "Honnali Gowdarakeri"
         },
         {
-          "field": "section",
-          "from": "01355",
-          "to": "01346"
-        }
-      ]
-    },
-    {
-      "branch_code": "01853",
-      "name": "Pune Chinchwad Sambhaji Nagar",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00664",
-          "to": "01853"
-        }
-      ]
-    },
-    {
-      "branch_code": "02316",
-      "name": "Vasad Maganvadi-2",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "7043802420, 9265454287",
-          "to": "9265454287"
-        }
-      ]
-    },
-    {
-      "branch_code": "03447",
-      "name": "Sheoganj",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "8209936542, 8107038221, 9414192270",
-          "to": "8209936542, 7737655338"
-        }
-      ]
-    },
-    {
-      "branch_code": "04817",
-      "name": "Sahibabad Lajpat Nagar",
-      "changes": [
-        {
-          "field": "section",
-          "from": "01758",
-          "to": "04817"
-        }
-      ]
-    },
-    {
-      "branch_code": "04992",
-      "name": "Katra Bazar",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9161295335, 8115236872",
-          "to": "9161295335"
-        }
-      ]
-    },
-    {
-      "branch_code": "05575",
-      "name": "Bengaluru Dodda Dunnasandra",
-      "changes": [
-        {
-          "field": "latitude",
-          "from": 12.975452,
-          "to": 12.972215
-        },
-        {
-          "field": "longitude",
-          "from": 77.819987,
-          "to": 77.822732
-        }
-      ]
-    },
-    {
-      "branch_code": "05644",
-      "name": "Tetali",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9441908085, 9494702597",
-          "to": "9898594474, 9494702597"
-        }
-      ]
-    },
-    {
-      "branch_code": "05712",
-      "name": "New Mumbai Talvali",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "Flat No: 101, H No: 34, Ganesh Residency",
-          "to": "Flat No: 101, First Floor, Manik Smruti Building"
+          "field": "slug",
+          "from": "honnali",
+          "to": "honnali-gowdarakeri"
         },
         {
           "field": "address_line2",
-          "from": "Near Kheteswar Temple, Ganesh Nagar",
-          "to": "Anand Nagar, Talvali Road"
-        },
-        {
-          "field": "address_line3",
-          "from": "Talvali, Ghansoli",
-          "to": "Talvali, Ghansoli, Tal: Rabale"
-        },
-        {
-          "field": "latitude",
-          "from": 19.125322,
-          "to": 19.12626
-        },
-        {
-          "field": "longitude",
-          "from": 73.000484,
-          "to": 72.99901
+          "from": "Durgigudi Road",
+          "to": "Gowdarakeri, Durgigudi Road"
         }
       ]
     },
     {
-      "branch_code": "05780",
-      "name": "Patna Malsalami",
+      "branch_code": "01933",
+      "name": "Kaimganj",
       "changes": [
         {
-          "field": "address_line1",
-          "from": "Khata No: 30/35/276, 276, Khasra No: 1729, 1730",
-          "to": "House No: 159/161/123, Laxmi Niwas"
-        },
-        {
-          "field": "address_line2",
-          "from": "Purvi Nand Gola, Near Shiva Mandir",
-          "to": "Near Gauri Das Ki Mandi, Nagla Main Road"
-        },
-        {
-          "field": "address_line3",
-          "from": "Malsalami, Tal: Sampat Chak",
-          "to": "Madho Mill, Malsalami, Tal: Sampat Chak"
-        },
-        {
-          "field": "latitude",
-          "from": 25.587527,
-          "to": 25.586172
-        },
-        {
-          "field": "longitude",
-          "from": 85.241755,
-          "to": 85.242731
+          "field": "mobile",
+          "from": "9450107271, 9026308926",
+          "to": "9450107271, 9450202010"
         }
       ]
     },
     {
-      "branch_code": "05781",
-      "name": "Jandaha",
+      "branch_code": "02478",
+      "name": "Pune Katraj",
       "changes": [
         {
           "field": "address_line1",
-          "from": "H No: 8",
-          "to": "Khata No: 124, Khasra No:902, Shiv Shakti Bhawan"
+          "from": "Flat No: 102, Siddhi Vinayak Society",
+          "to": "Flat No: 203, Survey No:44/2/2, Shri Swami Samarth Niwas"
         },
         {
           "field": "address_line2",
-          "from": "Mahua Road",
-          "to": "Near Sarvoday Maidan, Om Shanti Colony"
+          "from": "Near Telco Colony Stop, Indrani Nagar",
+          "to": "Near Smriti Kondre Office, Ambegaon Bk"
         },
         {
-          "field": "address_line3",
-          "from": "Near Bandhan Bank",
-          "to": "Jandaha"
+          "field": "mobile",
+          "from": "7020678622",
+          "to": "7020678622, 7378736908"
         },
         {
           "field": "latitude",
-          "from": 25.712373,
-          "to": 25.712301
+          "from": 18.444051,
+          "to": 18.446368
         },
         {
           "field": "longitude",
-          "from": 85.53339,
-          "to": 85.538501
+          "from": 73.849155,
+          "to": 73.849141
+        }
+      ]
+    },
+    {
+      "branch_code": "03351",
+      "name": "Egra (purba Medinipur)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8016909054",
+          "to": "8436377680"
+        }
+      ]
+    },
+    {
+      "branch_code": "04045",
+      "name": "Nepanagar",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9425337057, 7999870012",
+          "to": "9425337057, 7999870012, 8817823791"
+        }
+      ]
+    },
+    {
+      "branch_code": "05725",
+      "name": "Nawanshahr Saloh Road",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Nawanshahr Banga Road",
+          "to": "Nawanshahr Saloh Road"
+        },
+        {
+          "field": "slug",
+          "from": "nawanshahr-banga-road",
+          "to": "nawanshahr-saloh-road"
+        },
+        {
+          "field": "address_line1",
+          "from": "B2/46, Saini Colony",
+          "to": "B2/503, Sirsa Colony"
+        },
+        {
+          "field": "address_line2",
+          "from": "Banga Road",
+          "to": "Saloh Road, Bhatti Tower"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Saini Tower,",
+          "to": "Near Discount Shop"
+        },
+        {
+          "field": "latitude",
+          "from": 31.130945,
+          "to": 31.119401
+        },
+        {
+          "field": "longitude",
+          "from": 76.113719,
+          "to": 76.119802
+        }
+      ]
+    },
+    {
+      "branch_code": "05825",
+      "name": "Ajmer Madar",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 71",
+          "to": "H No: 121, Indranagar Gali No 1"
+        },
+        {
+          "field": "address_line2",
+          "from": "60 Feet Road",
+          "to": "Nehru Nagar Road, Near Madar Railway Underpass"
+        },
+        {
+          "field": "address_line3",
+          "from": "Madhav Colony, Madar",
+          "to": "Madar"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "madar.ajm@bkivv.org"
+        },
+        {
+          "field": "latitude",
+          "from": 26.464083,
+          "to": 26.458486
+        },
+        {
+          "field": "longitude",
+          "from": 74.679157,
+          "to": 74.681878
+        }
+      ]
+    },
+    {
+      "branch_code": "05888",
+      "name": "Ghaziabad Nehru Nagar",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Block No: Iii J/68, Ist Floor",
+          "to": "Block No: Iii J/69, Ist Floor"
         }
       ]
     }
