@@ -68,6 +68,31 @@ To enable the contact form functionality, you need to create an app password for
 
 This method is much simpler than using OAuth and doesn't require setting up a Google Cloud project.
 
+### Google Maps API Setup
+
+The app uses one key: `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`.
+
+**Enable these 3 APIs** in [Google Cloud Console](https://console.cloud.google.com) (APIs & Services → Library):
+
+| API | Used for |
+|-----|----------|
+| **Maps JavaScript API** | Embedded maps, markers (`CenterMap`, home page) |
+| **Places API** | Location search autocomplete (`SearchBar`, `DirectionsButton`) |
+| **Geocoding API** | Reverse geocoding — GPS → address name |
+
+**Not required:** Directions, Distance Matrix, Static Maps, or Routes APIs. “Get Directions” links open Google Maps in the browser (no API key).
+
+**Key restrictions (recommended):**
+- HTTP referrers: `https://www.brahmakumaris.com/*`, `http://localhost:5400/*`
+- API restrictions: limit to the 3 APIs above
+
+**Quick test:**
+```bash
+curl -s "https://maps.googleapis.com/maps/api/geocode/json?latlng=19.0760,72.8777&key=YOUR_KEY" | head -c 100
+```
+
+Billing must be enabled on the Google Cloud project.
+
 ## Deployment
 
 This application can be deployed to Vercel with minimal configuration:
