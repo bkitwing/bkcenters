@@ -67,17 +67,21 @@ const OTHER_APP_META: Record<string, { hook: string; gradient: string }> = {
     hook: "Daily messages & spiritual insights",
     gradient: "from-violet-500/10 to-purple-500/5 dark:from-violet-500/20 dark:to-purple-500/10",
   },
-  events: {
-    hook: "Upcoming Retreat, Conferences, Talks",
-    gradient: "from-rose-500/10 to-pink-500/5 dark:from-rose-500/20 dark:to-pink-500/10",
-  },
-  news: {
-    hook: "How Services are done in Society",
-    gradient: "from-amber-500/10 to-yellow-500/5 dark:from-amber-500/20 dark:to-yellow-500/10",
+  updates: {
+    hook: "Events, gatherings & latest news",
+    gradient: "from-rose-500/10 to-amber-500/5 dark:from-rose-500/20 dark:to-amber-500/10",
   },
   aboutus: {
-    hook: "Its All about us",
+    hook: "Our story, journey & guiding lights",
     gradient: "from-slate-500/10 to-gray-500/5 dark:from-slate-500/20 dark:to-gray-500/10",
+  },
+  initiative: {
+    hook: "Seva across environment, education & society",
+    gradient: "from-emerald-500/10 to-green-500/5 dark:from-emerald-500/20 dark:to-green-500/10",
+  },
+  contact: {
+    hook: "FAQs and ways to reach us",
+    gradient: "from-sky-500/10 to-cyan-500/5 dark:from-sky-500/20 dark:to-cyan-500/10",
   },
 };
 
@@ -97,14 +101,8 @@ const SIMPLE_DROPDOWN_GRADIENTS: Record<string, string> = {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-function getAppFromHref(href: string): AppId | null {
-  if (href.startsWith("/meditation")) return "meditation";
-  if (href.startsWith("/centers")) return "centers";
-  if (href.startsWith("/wisdom")) return "wisdom";
-  if (href.startsWith("/events")) return "events";
-  if (href.startsWith("/news")) return "news";
-  if (href.startsWith("/about-us") || href.startsWith("/journey") || href.startsWith("/founder-and-instruments") || href.startsWith("/current-leaders") || href.startsWith("/contributions")) return "aboutus";
-  return null;
+function isInternalHref(href: string): boolean {
+  return href === BASE_PATH || href.startsWith(BASE_PATH + "/") || href.startsWith(BASE_PATH + "?");
 }
 
 function toInternalHref(href: string): string {
@@ -115,9 +113,6 @@ function toInternalHref(href: string): string {
   return href;
 }
 
-// ---------------------------------------------------------------------------
-// SmartLink — uses Next Link for same-app, <a> for cross-app
-// ---------------------------------------------------------------------------
 function SmartLink({
   href,
   children,
@@ -133,8 +128,7 @@ function SmartLink({
   title?: string;
   "aria-current"?: "page" | undefined;
 }) {
-  const targetApp = getAppFromHref(href);
-  if (targetApp === CURRENT_APP) {
+  if (isInternalHref(href)) {
     return (
       <Link href={toInternalHref(href)} prefetch={false} className={className} onClick={onClick} title={title} aria-current={ariaCurrent}>
         {children}
@@ -261,15 +255,21 @@ function SimpleDropdown({
         {section.subItems.map((item) => {
           const ItemIcon = item.icon;
           return (
-            <SmartLink
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 hover:translate-x-0.5"
-            >
-              <ItemIcon className="w-4 h-4 opacity-60" />
-              {item.label}
-            </SmartLink>
+            <div key={item.id ?? item.href}>
+              {item.group && (
+                <div className="mx-2 mt-1.5 mb-1 border-t border-neutral-100 dark:border-neutral-800 pt-2">
+                  <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500">{item.group}</span>
+                </div>
+              )}
+              <SmartLink
+                href={item.href}
+                onClick={onClose}
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 hover:translate-x-0.5"
+              >
+                <ItemIcon className="w-4 h-4 opacity-60" />
+                {item.label}
+              </SmartLink>
+            </div>
           );
         })}
       </div>
@@ -662,8 +662,8 @@ export function UnifiedHeader() {
         className="sticky top-0 z-[70] w-full bg-gradient-to-r from-white/90 via-emerald-50/30 to-white/90 dark:from-neutral-950/90 dark:via-emerald-950/20 dark:to-neutral-950/90 backdrop-blur-2xl backdrop-saturate-[1.8] border-b border-emerald-200/40 dark:border-emerald-800/20 shadow-[0_1px_8px_rgba(16,185,129,0.06)] dark:shadow-[0_1px_8px_rgba(16,185,129,0.08)]"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="flex items-center justify-between h-16">
+        <div className="container mx-auto max-w-7xl px-3 sm:px-4">
+          <div className="flex items-center justify-between h-16 gap-3 lg:gap-4">
             {/* Logo */}
             <a
               href="https://www.brahmakumaris.com"
@@ -675,7 +675,7 @@ export function UnifiedHeader() {
                 alt="Brahma Kumaris"
                 width={160}
                 height={44}
-                className="h-9 w-auto object-contain"
+                className="h-8 lg:h-9 w-auto object-contain"
                 fetchPriority="high"
               />
             </a>
@@ -687,7 +687,7 @@ export function UnifiedHeader() {
               role="navigation"
               aria-label="Main navigation"
             >
-              <div className="flex items-center gap-0.5 rounded-full bg-neutral-100/60 dark:bg-neutral-800/50 p-1 ring-1 ring-neutral-200/40 dark:ring-neutral-700/30">
+              <div className="flex items-center gap-0.5 rounded-full bg-neutral-100/60 dark:bg-neutral-800/50 p-0.5 ring-1 ring-neutral-200/40 dark:ring-neutral-700/30">
                 {NAVIGATION.map((section) => {
                   const isCurrentSection = section.id === CURRENT_APP;
                   const Icon = section.icon;
@@ -704,18 +704,18 @@ export function UnifiedHeader() {
                       {isCurrentSection ? (
                         <button
                           onClick={() => setActiveDropdown(isDropdownOpen ? null : section.id)}
-                          className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-200 whitespace-nowrap select-none bg-gradient-to-r from-white via-emerald-50/80 to-white dark:from-neutral-800 dark:via-emerald-900/30 dark:to-neutral-800 shadow-sm shadow-emerald-500/10 ${colors.text} ring-1 ring-emerald-200/50 dark:ring-emerald-700/30`}
+                          className={`relative flex items-center gap-1 px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-[11px] xl:text-xs font-bold transition-all duration-200 whitespace-nowrap select-none bg-gradient-to-r from-white via-emerald-50/80 to-white dark:from-neutral-800 dark:via-emerald-900/30 dark:to-neutral-800 shadow-sm shadow-emerald-500/10 ${colors.text} ring-1 ring-emerald-200/50 dark:ring-emerald-700/30`}
                           aria-expanded={isDropdownOpen}
                           aria-haspopup="true"
                         >
-                          <Icon className="w-3.5 h-3.5" />
+                          <Icon className="w-3.5 h-3.5 shrink-0" />
                           <span>{section.label}</span>
                           <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                         </button>
                       ) : (
                         <button
                           onClick={() => setActiveDropdown(isDropdownOpen ? null : section.id)}
-                          className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold transition-all duration-200 whitespace-nowrap select-none ${
+                          className={`relative flex items-center gap-1 px-2 xl:px-2.5 py-1.5 xl:py-2 rounded-full text-[11px] xl:text-xs font-semibold transition-all duration-200 whitespace-nowrap select-none ${
                             isDropdownOpen
                               ? `bg-white/70 dark:bg-neutral-700/50 ${colors.text} shadow-sm`
                               : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-white/70 dark:hover:bg-neutral-700/50"
@@ -723,7 +723,7 @@ export function UnifiedHeader() {
                           aria-expanded={isDropdownOpen}
                           aria-haspopup="true"
                         >
-                          <Icon className="w-3.5 h-3.5" />
+                          <Icon className="hidden xl:block w-3.5 h-3.5 shrink-0" />
                           <span>{section.label}</span>
                           <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                         </button>
@@ -742,7 +742,7 @@ export function UnifiedHeader() {
                         <SimpleDropdown
                           section={section}
                           onClose={closeDropdown}
-                          align={section.id === "aboutus" || section.id === "news" ? "right" : "left"}
+                          align={["updates", "aboutus", "initiative", "contact"].includes(section.id) ? "right" : "left"}
                         />
                       )}
                     </div>
