@@ -1,385 +1,125 @@
 {
-  "timestamp": "2026-07-14T08:28:50.535Z",
+  "timestamp": "2026-07-22T17:13:20.978Z",
   "summary": {
-    "created": 15,
-    "updated": 15,
+    "created": 7,
+    "updated": 6,
     "deleted": 0
   },
   "created": [
     {
-      "branch_code": "05902",
-      "name": "Anehda (up)",
-      "district": "Bulandshahr",
-      "state": "Uttar Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05903",
-      "name": "Honnali Hirekalmatha",
-      "district": "Davangere",
-      "state": "Karnataka",
-      "region": "India"
-    },
-    {
-      "branch_code": "05904",
-      "name": "Kantabana",
-      "district": "Kendrapara",
-      "state": "Odisha",
-      "region": "India"
-    },
-    {
-      "branch_code": "05905",
-      "name": "Bengaluru Madanayakanahalli",
-      "district": "Bengaluru Rural",
-      "state": "Karnataka",
-      "region": "India"
-    },
-    {
-      "branch_code": "05906",
-      "name": "Gurugram Sushant Lok Phase 1",
-      "district": "Gurugram",
+      "branch_code": "05917",
+      "name": "Faridabad Surya Vihar Part 3",
+      "district": "Faridabad",
       "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05907",
-      "name": "Secunderabad Mahendra Hills",
-      "district": "Hyderabad",
-      "state": "Telangana",
+      "branch_code": "05918",
+      "name": "Upper Dadh",
+      "district": "Kangra",
+      "state": "Himachal Pradesh",
       "region": "India"
     },
     {
-      "branch_code": "05908",
-      "name": "Bengaluru Sulibele",
-      "district": "Bengaluru Rural",
-      "state": "Karnataka",
-      "region": "India"
-    },
-    {
-      "branch_code": "05909",
-      "name": "Bramhanwada Thadi",
-      "district": "Amravati",
+      "branch_code": "05919",
+      "name": "Jalgaon Mahabal",
+      "district": "Jalgaon",
       "state": "Maharashtra",
       "region": "India"
     },
     {
-      "branch_code": "05910",
-      "name": "Kusur (talkhi)",
-      "district": "Pune",
-      "state": "Maharashtra",
-      "region": "India"
-    },
-    {
-      "branch_code": "05911",
-      "name": "Goreswar",
-      "district": "Tamulpur",
+      "branch_code": "05920",
+      "name": "Panerihat",
+      "district": "Udalguri",
       "state": "Assam",
       "region": "India"
     },
     {
-      "branch_code": "05912",
-      "name": "Amipur Baleni",
-      "district": "Baghpat",
-      "state": "Uttar Pradesh",
+      "branch_code": "05921",
+      "name": "Kurtha",
+      "district": "Arwal",
+      "state": "Bihar",
       "region": "India"
     },
     {
-      "branch_code": "05913",
-      "name": "Greater Noida Zeta 1",
-      "district": "Gautam Buddha Nagar",
-      "state": "Uttar Pradesh",
+      "branch_code": "05922",
+      "name": "Paliganj",
+      "district": "Patna",
+      "state": "Bihar",
       "region": "India"
     },
     {
-      "branch_code": "05914",
-      "name": "Surat Jahangirpura",
-      "district": "Surat",
-      "state": "Gujarat",
-      "region": "India"
-    },
-    {
-      "branch_code": "05915",
-      "name": "Surat Jahangirabad",
-      "district": "Surat",
-      "state": "Gujarat",
-      "region": "India"
-    },
-    {
-      "branch_code": "05916",
-      "name": "New Mumbai Taloja",
-      "district": "Raigad",
-      "state": "Maharashtra",
+      "branch_code": "05923",
+      "name": "Bhabua (kaimur)",
+      "district": "Kaimur",
+      "state": "Bihar",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "01677",
-      "name": "Baihata Chariali",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00152",
-          "to": "01677"
-        }
-      ]
-    },
-    {
-      "branch_code": "01785",
-      "name": "Udaipur Rajarbag (tpr)",
+      "branch_code": "01081",
+      "name": "Porbandar Bokhira",
       "changes": [
         {
           "field": "mobile",
-          "from": "9436472524, 8787789123",
-          "to": "7002919348"
+          "from": "9726158965, 9265845324",
+          "to": "9265845324"
         }
       ]
     },
     {
-      "branch_code": "02029",
-      "name": "Pinjore Abdulapur",
-      "changes": [
-        {
-          "field": "name",
-          "from": "Pinjore",
-          "to": "Pinjore Abdulapur"
-        },
-        {
-          "field": "slug",
-          "from": "pinjore",
-          "to": "pinjore-abdulapur"
-        },
-        {
-          "field": "section",
-          "from": "00724",
-          "to": "02029"
-        }
-      ]
-    },
-    {
-      "branch_code": "02249",
-      "name": "Indore Sainath Colony",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "36- A, Vandana Nagar",
-          "to": "H No:186, Tilak Nagar"
-        },
-        {
-          "field": "address_line3",
-          "from": "Main Road, Sainath Colony",
-          "to": "Vandana Nagar Main Road, Sainath Colony"
-        },
-        {
-          "field": "latitude",
-          "from": 22.715367,
-          "to": 22.715441
-        },
-        {
-          "field": "longitude",
-          "from": 75.89998,
-          "to": 75.899785
-        }
-      ]
-    },
-    {
-      "branch_code": "02969",
-      "name": "Bengaluru Nagasandra",
-      "changes": [
-        {
-          "field": "section",
-          "from": "01702",
-          "to": "02969"
-        }
-      ]
-    },
-    {
-      "branch_code": "03232",
-      "name": "Amroha (up)",
-      "changes": [
-        {
-          "field": "name",
-          "from": "Amroha",
-          "to": "Amroha (up)"
-        },
-        {
-          "field": "slug",
-          "from": "amroha",
-          "to": "amroha-(up)"
-        },
-        {
-          "field": "address_line2",
-          "from": "Sardar Khaa Road, Kot Mohalla",
-          "to": "Sardar Khaa Road"
-        },
-        {
-          "field": "address_line3",
-          "from": "",
-          "to": "Kot Mohalla"
-        },
-        {
-          "field": "section",
-          "from": "00970",
-          "to": "03232"
-        }
-      ]
-    },
-    {
-      "branch_code": "03716",
-      "name": "Vadodara Samta",
-      "changes": [
-        {
-          "field": "latitude",
-          "from": 22.325532,
-          "to": 22.325766
-        },
-        {
-          "field": "longitude",
-          "from": 73.143545,
-          "to": 73.143613
-        }
-      ]
-    },
-    {
-      "branch_code": "03742",
-      "name": "Sawai Madhopur City",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "Plot No: 84, Tikam Chand Agarwal",
-          "to": "House Of Babulal Gupta, Dang House"
-        },
-        {
-          "field": "address_line2",
-          "from": "Bal Mandir Colony",
-          "to": "Near Sabji Mandi"
-        },
-        {
-          "field": "address_line3",
-          "from": "Mon Town Station",
-          "to": ""
-        },
-        {
-          "field": "mobile",
-          "from": "9413657466, 9413275625",
-          "to": "9413657466"
-        },
-        {
-          "field": "latitude",
-          "from": 26.017502,
-          "to": 25.991806
-        },
-        {
-          "field": "longitude",
-          "from": 76.348628,
-          "to": 76.383028
-        }
-      ]
-    },
-    {
-      "branch_code": "04347",
-      "name": "Kunigal Kote",
-      "changes": [
-        {
-          "field": "email",
-          "from": null,
-          "to": "kunigalkote@bkivv.org"
-        }
-      ]
-    },
-    {
-      "branch_code": "04787",
-      "name": "Pune Sus",
+      "branch_code": "01707",
+      "name": "Srikalahasti",
       "changes": [
         {
           "field": "mobile",
-          "from": "8329096736, 9011896692",
-          "to": "9067112519, 9011896692"
+          "from": "6281194400",
+          "to": "9985570469"
         }
       ]
     },
     {
-      "branch_code": "04831",
-      "name": "Jhargram",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "H No: 1234/n",
-          "to": "H No: H-22/1-21/1, Jl No: 394"
-        },
-        {
-          "field": "address_line2",
-          "from": "Near K.k.i. High School",
-          "to": "Near Young Eleven Club"
-        },
-        {
-          "field": "address_line3",
-          "from": "Behind Raghunathpur Post Office",
-          "to": "Ward No-2, Bachurdoba, Jhargram"
-        },
-        {
-          "field": "email",
-          "from": null,
-          "to": "jhargram@bkivv.org"
-        },
-        {
-          "field": "mobile",
-          "from": "7318826243, 8670269760",
-          "to": "7318826243"
-        },
-        {
-          "field": "latitude",
-          "from": 22.442561,
-          "to": 22.458106
-        },
-        {
-          "field": "longitude",
-          "from": 86.997351,
-          "to": 87.000756
-        }
-      ]
-    },
-    {
-      "branch_code": "04884",
-      "name": "Joya (amroha)",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00970",
-          "to": "03232"
-        }
-      ]
-    },
-    {
-      "branch_code": "04934",
-      "name": "Noida Sector 50",
-      "changes": [
-        {
-          "field": "section",
-          "from": "01758",
-          "to": "04934"
-        }
-      ]
-    },
-    {
-      "branch_code": "04966",
-      "name": "Kavi (panipat)",
+      "branch_code": "01784",
+      "name": "Teliamura",
       "changes": [
         {
           "field": "mobile",
-          "from": "7206842902, 8307293693",
-          "to": "8708158033, 8307293693"
+          "from": "7005618095, 9233157438",
+          "to": "9233157438, 8258894462"
         }
       ]
     },
     {
-      "branch_code": "05793",
-      "name": "Panchkula Amravati Dlf",
+      "branch_code": "02861",
+      "name": "Ghatal",
       "changes": [
         {
-          "field": "section",
-          "from": "00724",
-          "to": "02029"
+          "field": "mobile",
+          "from": "9609245851",
+          "to": "9679194935, 8670269760"
+        }
+      ]
+    },
+    {
+      "branch_code": "05383",
+      "name": "Bengaluru Garudacharpalya",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9986629610",
+          "to": "9739949459"
+        }
+      ]
+    },
+    {
+      "branch_code": "05435",
+      "name": "Kapadne",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9309934583, 9079298181",
+          "to": "9898354341, 9309934583"
         }
       ]
     }
