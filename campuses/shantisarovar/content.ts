@@ -3,7 +3,7 @@ import { Center } from '@/lib/types';
 /**
  * Shanti Sarovar micro-site content — copy from crawl, CMS-ready section keys.
  * Gallery full set is loaded from Strapi website-section 59 (see ss-gallery-data.ts).
- * Home hero / courses / gallery teaser: website-section 60 (see ss-home-data.ts).
+ * Home hero / about / courses / gallery teaser: website-section 60 (see ss-home-data.ts).
  * Hero Section = desktop/tablet; Hero Mobile = phones.
  */
 export const SS_SLUG = 'shantisarovar';
@@ -230,8 +230,9 @@ export const SS_CONTENT = {
     } satisfies MediaSlot,
   },
   visit: {
-    title: 'Plan your visit',
-    support: 'Come for a retreat, a course, or a quiet day on campus.',
+    title: 'Come to campus',
+    support:
+      'Need directions, course timings, or help planning a day at Shanti Sarovar? Contact us — we\'ll share what you need and guide you to our Gachibowli campus.',
     addressLines: [
       'Brahma Kumaris – Shanti Sarovar',
       'Academy for a Better World',
@@ -239,7 +240,7 @@ export const SS_CONTENT = {
     ],
     landmark:
       'Landmark: behind Pullela Gopichand Badminton Academy, near ISB–Infosys Road.',
-    cta: 'Directions & enquire',
+    cta: 'Visit & enquire',
   },
   contactCta: {
     title: 'Contact us',
@@ -248,9 +249,9 @@ export const SS_CONTENT = {
     phones: ['040-23001234', '040-23005983', '040-23006749', '9396503335'],
     email: 'shantisarovar@bkivv.org',
     socials: [
-      { label: 'Facebook', href: 'https://www.facebook.com/shantisarovarhyd/' },
-      { label: 'X / Twitter', href: 'https://twitter.com/ShantiSarovar' },
-      { label: 'YouTube', href: 'https://www.youtube.com/channel/UCE6BPK4rrmuIQ-D1_YcQCKQ' },
+      { label: 'Facebook', href: 'https://www.facebook.com/shantisarovarhyd/', icon: 'facebook' as const },
+      { label: 'X', href: 'https://x.com/ShantiSarovar', icon: 'twitter' as const },
+      { label: 'YouTube', href: 'https://www.youtube.com/channel/UCE6BPK4rrmuIQ-D1_YcQCKQ', icon: 'youtube' as const },
     ],
   },
 } as const;

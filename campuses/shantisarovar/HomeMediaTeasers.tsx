@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Calendar, Newspaper } from 'lucide-react';
-import type { SsEventPost, SsNewsPost } from './ss-media-data';
+import { SS_NEWS_TAG_ID, type SsEventPost, type SsNewsPost } from './ss-media-data';
 import { SS_EVENTS_HREF, SS_NEWS_HREF } from './nav';
 
 function isHttpUrl(s: string | null | undefined): s is string {
@@ -99,7 +99,7 @@ export function HomeNewsTeaser({ news }: { news: SsNewsPost[] }) {
         <div className="ss-home-news__head">
           <div>
             <p className="ss-eyebrow">
-              <Newspaper className="inline h-3.5 w-3.5 -translate-y-px" aria-hidden /> Dispatches
+              <Newspaper className="inline h-3.5 w-3.5 -translate-y-px" aria-hidden /> News
             </p>
             <h2 className="ss-heading !mb-0">Latest news</h2>
             <span className="ss-rule" />
@@ -111,31 +111,34 @@ export function HomeNewsTeaser({ news }: { news: SsNewsPost[] }) {
 
         <div className="ss-home-news__row">
           {news.slice(0, 3).map((p) => {
-            const day = p.dateLabel?.split(/[\s,]+/)[0] ?? '';
+            const category =
+              p.tags.find((t) => t.id !== SS_NEWS_TAG_ID)?.name ||
+              p.tags[0]?.name ||
+              'Campus';
             return (
               <a
                 key={p.id}
                 href={p.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ss-home-dispatch"
+                className="ss-home-news-card"
               >
-                <div className="ss-home-dispatch__date" aria-hidden>
-                  <span className="ss-home-dispatch__day">{day}</span>
-                  <time dateTime={p.date}>{p.dateLabel}</time>
-                </div>
-                <div className="ss-home-dispatch__media">
+                <div className="ss-home-news-card__media">
                   {p.imageThumbUrl || p.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.imageThumbUrl || p.imageUrl} alt="" loading="lazy" />
                   ) : (
-                    <div className="ss-home-dispatch__ph" />
+                    <div className="ss-home-news-card__ph" />
                   )}
+                  <span className="ss-home-news-card__cat">{category}</span>
                 </div>
-                <h3 className="ss-home-dispatch__title">{p.title}</h3>
-                <span className="ss-home-dispatch__go">
-                  Read <ArrowRight className="w-3.5 h-3.5" />
-                </span>
+                <div className="ss-home-news-card__body">
+                  <time dateTime={p.date}>{p.dateLabel}</time>
+                  <h3>{p.title}</h3>
+                  <span className="ss-home-news-card__go">
+                    Read more <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
               </a>
             );
           })}

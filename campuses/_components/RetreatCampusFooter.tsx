@@ -7,7 +7,6 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import {
   Facebook,
-  Twitter,
   Instagram,
   Youtube,
   ExternalLink,
@@ -24,9 +23,18 @@ import './retreat-footer.css';
 const BK_LOGO =
   'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/BK_Logo_c6ca9ac104.png';
 
+/** Official X (formerly Twitter) mark — Lucide still ships the bird as Twitter. */
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
 const BK_SOCIAL = [
   { href: 'https://www.facebook.com/BrahmaKumaris', label: 'Facebook', icon: Facebook },
-  { href: 'https://twitter.com/BrahmaKumaris', label: 'X (Twitter)', icon: Twitter },
+  { href: 'https://x.com/BrahmaKumaris', label: 'X', icon: XIcon },
   { href: 'https://www.instagram.com/brahmakumaris/', label: 'Instagram', icon: Instagram },
   { href: 'https://www.youtube.com/brahmakumaris', label: 'YouTube', icon: Youtube },
 ] as const;
@@ -113,14 +121,30 @@ function WhatsAppIcon({ className }: { className?: string }) {
 /**
  * Multi-column footer for exclusive retreat micro-sites (NMBA / initiatives pattern).
  */
+const SOCIAL_ICONS = {
+  facebook: Facebook,
+  twitter: XIcon,
+  instagram: Instagram,
+  youtube: Youtube,
+} as const;
+
 export function RetreatCampusFooter({
   campusName,
   campusTagline,
   campusBlurb,
   campusLinks,
+  socialLinks,
   enquireHref,
 }: RetreatCampusFooterProps) {
   const year = new Date().getFullYear();
+  const socials =
+    socialLinks && socialLinks.length > 0
+      ? socialLinks.map((s) => ({
+          href: s.href,
+          label: s.label,
+          icon: SOCIAL_ICONS[s.icon ?? 'facebook'] ?? Facebook,
+        }))
+      : BK_SOCIAL;
 
   return (
     <footer className="ss-ft" aria-labelledby="ss-ft-heading">
@@ -141,8 +165,11 @@ export function RetreatCampusFooter({
               All HQ Campuses
             </Link>
           </div>
-          <div className="ss-ft__social" aria-label="Brahma Kumaris on social media">
-            {BK_SOCIAL.map((s) => (
+          <div
+            className="ss-ft__social"
+            aria-label={socialLinks?.length ? `${campusName} on social media` : 'Brahma Kumaris on social media'}
+          >
+            {socials.map((s) => (
               <a
                 key={s.href}
                 href={s.href}

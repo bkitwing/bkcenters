@@ -1,6 +1,6 @@
 /**
  * Shanti Sarovar home — Strapi website-section #60
- * Galleries: Hero Mobile | Hero Section | Courses offered | Photo Gallery
+ * Galleries: About Section | Hero Mobile | Hero Section | Courses offered | Photo Gallery
  *
  * https://portal.brahmakumaris.com/admin/content-manager/collection-types/api::website-section.website-section/60
  */
@@ -47,6 +47,8 @@ export type SsHomePageData = {
   heroSlides: SsHomeImage[];
   /** Phone hero (Strapi "Hero Mobile"); falls back to heroSlides when empty. */
   heroSlidesMobile: SsHomeImage[];
+  /** About section featured image (Strapi "About Section"). */
+  aboutImage: SsHomeImage | null;
   courses: SsHomeCourse[];
   galleryThumbs: SsHomeGalleryThumb[];
   heroImage: string | null;
@@ -125,7 +127,7 @@ function pickUrl(formats: ImageFormats | null | undefined, fallback: string, thu
   return fallback;
 }
 
-/** Hero landing: HD on desktop, miniHD on mobile — never pull FullHD by default. */
+/** Hero landing: FullHD on desktop, miniHD on mobile — fall back through HD → miniHD. */
 function mapHeroImage(raw: unknown, index: number): SsHomeImage | null {
   const attrs = unwrap(raw);
   const url = typeof attrs.url === 'string' ? attrs.url : '';
@@ -143,8 +145,8 @@ function mapHeroImage(raw: unknown, index: number): SsHomeImage | null {
       : `home-hero-${index}`;
 
   const desktop =
-    formatUrl(formats, 'HD') ||
     formatUrl(formats, 'FullHD') ||
+    formatUrl(formats, 'HD') ||
     formatUrl(formats, 'miniHD') ||
     url;
   const mobile =
@@ -239,6 +241,7 @@ async function strapiGet(path: string): Promise<unknown | null> {
 const EMPTY: SsHomePageData = {
   heroSlides: [],
   heroSlidesMobile: [],
+  aboutImage: null,
   courses: [],
   galleryThumbs: [],
   heroImage: null,
@@ -274,6 +277,12 @@ export const getSsHome = cache(async (): Promise<SsHomePageData> => {
     .map((m, i) => mapHeroImage(m, i))
     .filter((img): img is SsHomeImage => Boolean(img));
 
+  // About visual: "About Section" (single featured image)
+  const aboutImage =
+    findGallery(sectionType, /about/i)
+      .map((m, i) => mapHeroImage(m, i))
+      .filter((img): img is SsHomeImage => Boolean(img))[0] ?? null;
+
   const courseImages = findGallery(sectionType, /course/i)
     .map((m, i) => mapImage(m, i))
     .filter((img): img is SsHomeImage => Boolean(img));
@@ -295,7 +304,7 @@ export const getSsHome = cache(async (): Promise<SsHomePageData> => {
     };
   });
 
-  const galleryImages = findGallery(sectionType, /photo\s*gallery|gallery/i)
+  const galleryImages = findGallery(sectionType, /photo\s*gallery/i)
     .map((m, i) => mapImage(m, i))
     .filter((img): img is SsHomeImage => Boolean(img));
 
@@ -317,6 +326,7 @@ export const getSsHome = cache(async (): Promise<SsHomePageData> => {
   return {
     heroSlides,
     heroSlidesMobile,
+    aboutImage,
     courses,
     galleryThumbs,
     heroImage: heroSlides[0]?.srcDesktop || heroSlides[0]?.src || null,

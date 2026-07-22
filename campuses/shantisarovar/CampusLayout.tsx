@@ -2,6 +2,7 @@ import { Noto_Sans } from 'next/font/google';
 import { CampusBodyScope } from './CampusBodyScope';
 import { SsHeader } from './SsHeader';
 import { RetreatCampusFooter } from '../_components/RetreatCampusFooter';
+import { SS_CONTENT } from './content';
 import {
   SS_ABOUT_HREF,
   SS_CONTACT_HREF,
@@ -39,6 +40,11 @@ export default function ShantiSarovarLayout({
         campusTagline="Academy for a Better World · Gachibowli, Hyderabad"
         campusBlurb="A 34-acre Brahma Kumaris retreat campus for Rajyoga, values courses and quiet reflection."
         enquireHref={SS_CONTACT_HREF}
+        socialLinks={SS_CONTENT.contactCta.socials.map((s) => ({
+          label: s.label,
+          href: s.href,
+          icon: s.icon,
+        }))}
         campusLinks={[
           { label: 'Home', href: SS_HOME_HREF },
           { label: 'About', href: SS_ABOUT_HREF },

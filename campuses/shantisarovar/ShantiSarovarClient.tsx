@@ -11,7 +11,6 @@ import {
 import {
   ArrowDown,
   ArrowRight,
-  MapPin,
   Navigation,
   TreePine,
 } from 'lucide-react';
@@ -103,6 +102,7 @@ export default function ShantiSarovarClient({
   const mapsUrl = `https://www.google.com/maps?q=${SS_CENTER.coords[0]},${SS_CENTER.coords[1]}`;
   const heroSlides = home?.heroSlides ?? [];
   const heroSlidesMobile = home?.heroSlidesMobile ?? [];
+  const aboutImage = home?.aboutImage ?? null;
   const courses = home?.courses?.length ? home.courses : c.courses.items;
   const galleryThumbs = home?.galleryThumbs?.length
     ? home.galleryThumbs
@@ -207,26 +207,18 @@ export default function ShantiSarovarClient({
               <div className="ss-campus__sticky">
                 <MediaPlaceholder
                   media={
-                    heroSlides[2]
+                    aboutImage
                       ? {
-                          id: heroSlides[2].id,
-                          src: heroSlides[2].thumbSrc || heroSlides[2].src,
-                          alt: heroSlides[2].alt,
-                          label: heroSlides[2].label,
+                          id: aboutImage.id,
+                          src: aboutImage.srcDesktop || aboutImage.src,
+                          alt: aboutImage.alt,
+                          label: aboutImage.label,
                         }
                       : c.about.media
                   }
-                  aspect="aspect-square md:aspect-[4/5]"
+                  aspect=""
                   className="ss-campus__photo"
                 />
-                <ul className="ss-campus__metrics" aria-label="Campus at a glance">
-                  {c.about.stats.map((stat) => (
-                    <li key={stat.label}>
-                      <strong>{stat.value}</strong>
-                      <span>{stat.label}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
             </Reveal>
 
@@ -237,7 +229,18 @@ export default function ShantiSarovarClient({
                 <span className="ss-rule" />
               </Reveal>
 
-              <Reveal delay={0.05}>
+              <Reveal delay={0.04}>
+                <ul className="ss-campus__metrics" aria-label="Campus at a glance">
+                  {c.about.stats.map((stat) => (
+                    <li key={stat.label}>
+                      <strong>{stat.value}</strong>
+                      <span>{stat.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+
+              <Reveal delay={0.08}>
                 <article className="ss-campus__chapter">
                   <header className="ss-campus__chapter-head">
                     <span className="ss-campus__chapter-n" aria-hidden>
@@ -250,7 +253,7 @@ export default function ShantiSarovarClient({
               </Reveal>
 
               {c.about.body2 ? (
-                <Reveal delay={0.1}>
+                <Reveal delay={0.12}>
                   <article className="ss-campus__chapter">
                     <header className="ss-campus__chapter-head">
                       <span className="ss-campus__chapter-n" aria-hidden>
@@ -327,6 +330,7 @@ export default function ShantiSarovarClient({
 
           <HomeCoursesCarousel
             ariaLabel="Photo gallery"
+            peek="roomy"
             items={galleryThumbs.map((thumb) => ({
               id: thumb.id,
               title: thumb.label || 'Gallery',
@@ -350,67 +354,32 @@ export default function ShantiSarovarClient({
                 <h2 className="ss-heading !mb-0">{c.visit.title}</h2>
                 <span className="ss-rule" />
                 <p className="ss-lede !max-w-md mt-3">{c.visit.support}</p>
-
-                <ol className="ss-home-visit__steps">
-                  <li>
-                    <span className="ss-home-visit__step-n">1</span>
-                    <span>
-                      <strong>Arrive</strong>
-                      <em>Gachibowli campus — open for courses &amp; quiet days.</em>
-                    </span>
-                  </li>
-                  <li>
-                    <span className="ss-home-visit__step-n">2</span>
-                    <span>
-                      <strong>Enquire</strong>
-                      <em>Share dates or questions — we help you plan.</em>
-                    </span>
-                  </li>
-                  <li>
-                    <span className="ss-home-visit__step-n">3</span>
-                    <span>
-                      <strong>On campus</strong>
-                      <em>Meditation, courses, and space to rest the mind.</em>
-                    </span>
-                  </li>
-                </ol>
-
                 <div className="ss-home-visit__actions">
+                  <Link href={SS_CONTACT_HREF} className="ss-btn ss-btn--primary !min-h-10 !text-sm">
+                    {c.visit.cta}
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
                   <a
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="ss-btn ss-btn--primary !min-h-10 !text-sm"
+                    className="ss-btn ss-btn--ink !min-h-10 !text-sm"
                   >
                     <Navigation className="w-4 h-4" />
                     Open in Maps
                   </a>
-                  <Link href={SS_CONTACT_HREF} className="ss-btn ss-btn--ink !min-h-10 !text-sm">
-                    {c.visit.cta}
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
                 </div>
               </div>
-
-              <aside className="ss-home-visit__card" aria-label="Campus address">
-                <p className="ss-home-visit__card-label">
-                  <MapPin className="w-4 h-4" aria-hidden /> Destination
-                </p>
-                <div className="ss-home-visit__address">
-                  {c.visit.addressLines.map((line) => (
-                    <p key={line}>{line}</p>
-                  ))}
-                  <p className="ss-home-visit__landmark">{c.visit.landmark}</p>
-                </div>
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ss-home-visit__maplink"
-                >
-                  View on Google Maps <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-              </aside>
+              <div className="ss-home-visit__map ss-media">
+                <iframe
+                  title="Shanti Sarovar map"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                    'Shanti Sarovar Gachibowli Hyderabad'
+                  )}&t=m&z=15&output=embed&iwloc=near`}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
             </div>
           </Reveal>
         </div>

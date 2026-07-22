@@ -20,9 +20,12 @@ export type SquareCarouselItem = {
 export function HomeCoursesCarousel({
   items,
   ariaLabel = 'Courses offered',
+  peek = 'default',
 }: {
   items: SquareCarouselItem[];
   ariaLabel?: string;
+  /** `roomy` ≈ 4.5 cards visible on desktop (gallery). */
+  peek?: 'default' | 'roomy';
 }) {
   const reduce = useReducedMotion();
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -74,35 +77,9 @@ export function HomeCoursesCarousel({
   if (items.length === 0) return null;
 
   return (
-    <div className="ss-course-carousel">
-      <div className="ss-course-carousel__toolbar">
-        <p className="ss-course-carousel__count">
-          <span>{String(active + 1).padStart(2, '0')}</span>
-          <span aria-hidden>/</span>
-          <span>{String(items.length).padStart(2, '0')}</span>
-        </p>
-        <div className="ss-course-carousel__nav">
-          <button
-            type="button"
-            className="ss-course-carousel__btn"
-            aria-label={`Previous ${ariaLabel.toLowerCase()}`}
-            disabled={!canPrev}
-            onClick={() => scrollByCard(-1)}
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            className="ss-course-carousel__btn"
-            aria-label={`Next ${ariaLabel.toLowerCase()}`}
-            disabled={!canNext}
-            onClick={() => scrollByCard(1)}
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
+    <div
+      className={`ss-course-carousel${peek === 'roomy' ? ' ss-course-carousel--roomy' : ''}`}
+    >
       <div
         ref={scrollerRef}
         className="ss-course-carousel__track"
@@ -154,24 +131,46 @@ export function HomeCoursesCarousel({
         })}
       </div>
 
-      <div className="ss-course-carousel__dots" role="tablist" aria-label={`${ariaLabel} slides`}>
-        {items.map((item, i) => (
+      <div className="ss-course-carousel__footer">
+        <div className="ss-course-carousel__dots" role="tablist" aria-label={`${ariaLabel} slides`}>
+          {items.map((item, i) => (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={i === active}
+              aria-label={`Go to ${item.title}`}
+              className={`ss-course-carousel__dot${i === active ? ' is-active' : ''}`}
+              onClick={() => {
+                const el = scrollerRef.current;
+                const card = el?.querySelectorAll<HTMLElement>('[data-course-card]')[i];
+                if (el && card) {
+                  el.scrollTo({ left: card.offsetLeft - 8, behavior: reduce ? 'auto' : 'smooth' });
+                }
+              }}
+            />
+          ))}
+        </div>
+        <div className="ss-course-carousel__nav">
           <button
-            key={item.id}
             type="button"
-            role="tab"
-            aria-selected={i === active}
-            aria-label={`Go to ${item.title}`}
-            className={`ss-course-carousel__dot${i === active ? ' is-active' : ''}`}
-            onClick={() => {
-              const el = scrollerRef.current;
-              const card = el?.querySelectorAll<HTMLElement>('[data-course-card]')[i];
-              if (el && card) {
-                el.scrollTo({ left: card.offsetLeft - 8, behavior: reduce ? 'auto' : 'smooth' });
-              }
-            }}
-          />
-        ))}
+            className="ss-course-carousel__btn"
+            aria-label={`Previous ${ariaLabel.toLowerCase()}`}
+            disabled={!canPrev}
+            onClick={() => scrollByCard(-1)}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            className="ss-course-carousel__btn"
+            aria-label={`Next ${ariaLabel.toLowerCase()}`}
+            disabled={!canNext}
+            onClick={() => scrollByCard(1)}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
