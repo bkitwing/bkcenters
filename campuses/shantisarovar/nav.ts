@@ -42,7 +42,7 @@ export const SS_NAV: readonly SsNavItem[] = [
     label: 'About',
     href: SS_ABOUT_HREF,
     children: [
-      { label: 'About', href: SS_ABOUT_HREF },
+      { label: 'About Shanti Sarovar', href: SS_ABOUT_HREF },
       { label: 'About Brahma Kumaris', href: BK_ABOUT_HREF, external: true },
     ],
   },

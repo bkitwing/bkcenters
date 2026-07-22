@@ -155,7 +155,6 @@ function NavLink({
             </span>
             <span>
               <span className="ss-pill-nav__menu-title">About</span>
-              <span className="ss-pill-nav__menu-sub">Campus &amp; Brahma Kumaris</span>
             </span>
           </div>
           <div className="ss-pill-nav__menu-list">
