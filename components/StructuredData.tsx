@@ -65,6 +65,8 @@ interface LocalBusinessSchemaProps {
   pageUrl: string;
   /** Unique per-center description for JSON-LD (not shown on page). */
   description?: string;
+  /** Optional primary image (featured / OG). Defaults to BK logo. */
+  image?: string;
   /** Skip fixed openingHours when hours are not published on the page. */
   omitOpeningHours?: boolean;
 }
@@ -73,6 +75,7 @@ export function LocalBusinessSchema({
   center,
   pageUrl,
   description,
+  image,
   omitOpeningHours = false,
 }: LocalBusinessSchemaProps) {
   const formatAddress = () => {
@@ -91,7 +94,9 @@ export function LocalBusinessSchema({
     name: center.name,
     description: description || `Brahma Kumaris Rajyoga Meditation Center - ${center.name}. Free meditation classes and spiritual courses available.`,
     url: pageUrl,
-    image: 'https://www.brahmakumaris.com/centers/brahma-kumaris-logo.webp',
+    image:
+      image ||
+      'https://www.brahmakumaris.com/centers/brahma-kumaris-logo.webp',
     address: {
       '@type': 'PostalAddress',
       streetAddress: formatAddress(),

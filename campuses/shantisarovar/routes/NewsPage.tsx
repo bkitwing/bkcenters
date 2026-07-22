@@ -1,32 +1,20 @@
 import { Metadata } from 'next';
 import { BreadcrumbSchema } from '@/components/StructuredData';
-import { generateOgImageUrl } from '@/lib/ogUtils';
-import { SS_CANONICAL } from '../content';
+import { SS_CANONICAL, SS_OG_IMAGES, SS_SEO } from '../content';
 import { getSsNews } from '../ss-media-data';
 import NewsClient from '../news/NewsClient';
 
 export const revalidate = 14400;
 
 const pageUrl = `${SS_CANONICAL}/news`;
-const title = 'News — Shanti Sarovar | Brahma Kumaris Hyderabad';
-const description =
-  'Campus news from Shanti Sarovar, Hyderabad — retreats, conferences, seva and campus highlights.';
+const { title, description, keywords, ogAlt } = SS_SEO.news;
+const ogImage = SS_OG_IMAGES.news;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getSsNews();
-  const ogImage =
-    data.heroImage ||
-    generateOgImageUrl({
-      title: 'Shanti Sarovar News',
-      description: `${data.total || ''} campus stories · Hyderabad`,
-      type: 'retreat',
-      location: 'Hyderabad, Telangana',
-    });
-
   return {
     title,
     description,
-    keywords: [],
+    keywords,
     robots: {
       index: true,
       follow: true,
@@ -45,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: pageUrl,
       siteName: 'Brahma Kumaris Centers',
       locale: 'en_IN',
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -61,7 +49,6 @@ export default async function ShantiSarovarNewsPage() {
 
   return (
     <>
-      {/* JSON-LD BreadcrumbList only — not rendered as visible UI */}
       <BreadcrumbSchema
         items={[
           { name: 'Centers', url: 'https://www.brahmakumaris.com/centers' },
@@ -69,35 +56,53 @@ export default async function ShantiSarovarNewsPage() {
             name: 'Retreat Centers',
             url: 'https://www.brahmakumaris.com/centers/retreat',
           },
-          { name: 'Shanti Sarovar', url: SS_CANONICAL },
-          { name: 'News', url: pageUrl },
+          { name: 'Shanti Sarovar Retreat Center', url: SS_CANONICAL },
+          { name: 'Service News', url: pageUrl },
         ]}
       />
-      {data.posts.length > 0 ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'CollectionPage',
-              name: title,
-              description,
-              url: pageUrl,
-              isPartOf: { '@type': 'WebPage', url: SS_CANONICAL },
-              mainEntity: {
-                '@type': 'ItemList',
-                numberOfItems: data.total,
-                itemListElement: data.latest.map((p, i) => ({
-                  '@type': 'ListItem',
-                  position: i + 1,
-                  url: p.href,
-                  name: p.title,
-                })),
-              },
-            }),
-          }}
-        />
-      ) : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            '@id': `${pageUrl}#webpage`,
+            name: title,
+            description,
+            url: pageUrl,
+            keywords: keywords.join(', '),
+            isPartOf: { '@id': `${SS_CANONICAL}#webpage` },
+            about: {
+              '@type': 'Place',
+              name: 'Shanti Sarovar Retreat Center',
+              url: SS_CANONICAL,
+            },
+            primaryImageOfPage: {
+              '@type': 'ImageObject',
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              caption: ogAlt,
+            },
+            inLanguage: 'en-IN',
+            ...(data.posts.length > 0
+              ? {
+                  mainEntity: {
+                    '@type': 'ItemList',
+                    name: 'Service News from Shanti Sarovar Retreat Center',
+                    numberOfItems: data.total,
+                    itemListElement: data.latest.map((p, i) => ({
+                      '@type': 'ListItem',
+                      position: i + 1,
+                      url: p.href,
+                      name: p.title,
+                    })),
+                  },
+                }
+              : {}),
+          }),
+        }}
+      />
       <NewsClient data={data} />
     </>
   );

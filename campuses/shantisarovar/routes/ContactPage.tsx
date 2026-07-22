@@ -15,11 +15,10 @@ import {
 import { BreadcrumbSchema, FAQPageSchema } from '@/components/StructuredData';
 import ContactForm from '@/components/ContactForm';
 import SoulSustenance from '@/components/SoulSustenance';
-import { generateOgImageUrl } from '@/lib/ogUtils';
 import { getCenterByCode } from '@/lib/serverCenterData';
 import { getLocalizedFaqs } from '@/lib/centerContent';
 import type { Center } from '@/lib/types';
-import { SS_CANONICAL, SS_CENTER } from '../content';
+import { SS_CANONICAL, SS_CENTER, SS_OG_IMAGES, SS_SEO } from '../content';
 import { SsMediaHero } from '../SsMediaHero';
 import { ContactSectionNav } from '../contact/ContactSectionNav';
 import { SsCourseStory } from '../contact/SsCourseStory';
@@ -31,9 +30,8 @@ import { ContactAuraAnimation } from '../contact/ContactAuraAnimation';
 export const revalidate = 86400;
 
 const pageUrl = `${SS_CANONICAL}/contact`;
-const title = 'Visit & Contact — Shanti Sarovar | Brahma Kumaris Hyderabad';
-const description =
-  'Visit Shanti Sarovar, Gachibowli. Directions, free 7-day Rajyoga course, guided meditation, FAQ and enquiry.';
+const { title, description, keywords, ogAlt } = SS_SEO.contact;
+const ogImage = SS_OG_IMAGES.contact;
 
 function mergeCenter(live: Center | null): Center {
   if (!live) return SS_CENTER;
@@ -56,18 +54,20 @@ function mergeCenter(live: Center | null): Center {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const ogImage = generateOgImageUrl({
-    title: 'Visit Shanti Sarovar',
-    description: 'Gachibowli · Directions, courses & enquire',
-    type: 'retreat',
-    location: 'Hyderabad, Telangana',
-  });
-
   return {
     title,
     description,
-    keywords: [],
-    robots: { index: true, follow: true },
+    keywords,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     alternates: { canonical: pageUrl },
     openGraph: {
       title,
@@ -76,9 +76,14 @@ export async function generateMetadata(): Promise<Metadata> {
       type: 'website',
       siteName: 'Brahma Kumaris Centers',
       locale: 'en_IN',
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
     },
-    twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 
@@ -133,8 +138,8 @@ export default async function ShantiSarovarContactPage() {
         items={[
           { name: 'Centers', url: 'https://www.brahmakumaris.com/centers' },
           { name: 'Retreat Centers', url: 'https://www.brahmakumaris.com/centers/retreat' },
-          { name: 'Shanti Sarovar', url: SS_CANONICAL },
-          { name: 'Visit & Contact', url: pageUrl },
+          { name: 'Shanti Sarovar Retreat Center', url: SS_CANONICAL },
+          { name: 'Contact Us', url: pageUrl },
         ]}
       />
       {/* FAQ only here — LocalBusiness/Course live on the campus home URL to avoid duplicate entities */}
@@ -149,8 +154,30 @@ export default async function ShantiSarovarContactPage() {
             name: title,
             description,
             url: pageUrl,
+            keywords: keywords.join(', '),
             isPartOf: { '@id': `${SS_CANONICAL}#webpage` },
-            about: { '@id': SS_CANONICAL },
+            about: {
+              '@type': 'Place',
+              name: 'Shanti Sarovar Retreat Center',
+              url: SS_CANONICAL,
+              telephone: phones[0] || undefined,
+              email: center.email || undefined,
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress: addressLines.slice(0, -1).join(', '),
+                addressLocality: center.address.city,
+                addressRegion: center.state,
+                postalCode: center.address.pincode,
+                addressCountry: 'IN',
+              },
+            },
+            primaryImageOfPage: {
+              '@type': 'ImageObject',
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              caption: ogAlt,
+            },
             inLanguage: 'en-IN',
           }),
         }}

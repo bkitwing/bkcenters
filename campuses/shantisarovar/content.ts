@@ -9,6 +9,96 @@ import { Center } from '@/lib/types';
 export const SS_SLUG = 'shantisarovar';
 export const SS_CANONICAL = 'https://www.brahmakumaris.com/centers/shantisarovar';
 
+/** Featured / Open Graph images (Strapi CDN) — one per campus page. */
+export const SS_OG_IMAGES = {
+  home: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Retreat_center_Fetured_Image_188f4da1c5.jpg',
+  events:
+    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Retreat_Center_Events_page_featured_image_213df8b407.jpg',
+  news: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Service_news_Shanti_Sarovar_Retreat_Center_84cf2e8720.jpg',
+  galleries:
+    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Galleries_Featured_Image_442c6070d8.jpg',
+  contact:
+    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Contact_Us_Shanti_sarovar_Retreat_Center_98575aafb6.jpg',
+} as const;
+
+/**
+ * Per-page SEO — titles keep “Shanti Sarovar Retreat Center” + page intent
+ * within ~50–60 chars; descriptions/keywords align with JSON-LD.
+ */
+export const SS_SEO = {
+  home: {
+    title: 'Shanti Sarovar Retreat Center | Brahma Kumaris Hyderabad',
+    description:
+      'Shanti Sarovar Retreat Center in Gachibowli, Hyderabad — a 34-acre Brahma Kumaris campus for Rajyoga meditation, courses, retreats and workshops.',
+    keywords: [
+      'Shanti Sarovar Retreat Center',
+      'Brahma Kumaris Hyderabad',
+      'Gachibowli retreat',
+      'Rajyoga meditation Hyderabad',
+      'Academy for a Better World',
+      'meditation retreat Telangana',
+    ] as string[],
+    ogAlt:
+      'Shanti Sarovar Retreat Center in Gachibowli featuring the Global Peace Auditorium, seminar halls and cultural events',
+  },
+  events: {
+    title: 'Events | Shanti Sarovar Retreat Center Hyderabad',
+    description:
+      'Upcoming and past events at Shanti Sarovar Retreat Center, Hyderabad — retreats, workshops, conferences and campus programmes.',
+    keywords: [
+      'Shanti Sarovar Retreat Center events',
+      'Hyderabad retreat events',
+      'Brahma Kumaris workshops Hyderabad',
+      'spiritual conferences Gachibowli',
+      'meditation retreat programmes',
+    ] as string[],
+    ogAlt:
+      'Events at Shanti Sarovar Retreat Center — programmes, dignitaries and cultural activities in Hyderabad',
+  },
+  news: {
+    title: 'Service News | Shanti Sarovar Retreat Center',
+    description:
+      'Service news from Shanti Sarovar Retreat Center, Hyderabad — campus highlights, seva, conferences and community programmes.',
+    keywords: [
+      'Shanti Sarovar Retreat Center news',
+      'Service News Brahma Kumaris',
+      'Hyderabad campus news',
+      'Brahma Kumaris seva',
+      'Shanti Sarovar highlights',
+    ] as string[],
+    ogAlt:
+      'Service News from Shanti Sarovar Retreat Center — community service, guests and cultural programmes',
+  },
+  galleries: {
+    title: 'Galleries | Shanti Sarovar Retreat Center Hyderabad',
+    description:
+      'Photo galleries from Shanti Sarovar Retreat Center — campus moments, retreats, conferences, culture and service in Hyderabad.',
+    keywords: [
+      'Shanti Sarovar Retreat Center gallery',
+      'Hyderabad retreat photos',
+      'Brahma Kumaris campus photos',
+      'Moments Captured Shanti Sarovar',
+      'meditation campus gallery',
+    ] as string[],
+    ogAlt:
+      'Moments Captured — photo galleries from Shanti Sarovar Retreat Center in Hyderabad',
+  },
+  contact: {
+    title: 'Contact Us | Shanti Sarovar Retreat Center Hyderabad',
+    description:
+      'Contact Shanti Sarovar Retreat Center in Gachibowli, Hyderabad — address, phone, directions, Rajyoga course and enquiry.',
+    keywords: [
+      'Contact Shanti Sarovar Retreat Center',
+      'Shanti Sarovar Gachibowli address',
+      'visit Brahma Kumaris Hyderabad',
+      'Rajyoga course Hyderabad',
+      'Shanti Sarovar phone email',
+    ] as string[],
+    ogAlt:
+      'Contact Us — Shanti Sarovar Retreat Center entrance in Gachibowli with location, phone and email',
+  },
+};
+
 export const SS_CENTER: Center = {
   name: 'HYDERABAD SHANTI SAROVAR',
   slug: 'hyderabad-shanti-sarovar',

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { LocalBusinessSchema, BreadcrumbSchema } from '@/components/StructuredData';
-import { generateOgImageUrl } from '@/lib/ogUtils';
-import { SS_CANONICAL, SS_CENTER } from '../content';
+import { SS_CANONICAL, SS_CENTER, SS_OG_IMAGES, SS_SEO } from '../content';
 import ShantiSarovarClient from '../ShantiSarovarClient';
 import { HomeEventsTeaser, HomeNewsTeaser } from '../HomeMediaTeasers';
 import { getSsEvents, getSsNews } from '../ss-media-data';
@@ -10,26 +9,14 @@ import { getSsHome } from '../ss-home-data';
 
 export const revalidate = 14400;
 
-const title = 'Shanti Sarovar Hyderabad — Brahma Kumaris Retreat Campus';
-const description =
-  '34-acre Brahma Kumaris retreat campus in Gachibowli, Hyderabad. Rajyoga meditation, courses, retreats and how to visit.';
+const { title, description, keywords, ogAlt } = SS_SEO.home;
+const ogImage = SS_OG_IMAGES.home;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const home = await getSsHome();
-  const ogImage =
-    home.heroImage ||
-    generateOgImageUrl({
-      title: 'Shanti Sarovar',
-      description:
-        'Academy for a Better World · Gachibowli, Hyderabad · 34-acre retreat campus',
-      type: 'retreat',
-      location: 'Hyderabad, Telangana',
-    });
-
   return {
     title,
     description,
-    keywords: [],
+    keywords,
     robots: {
       index: true,
       follow: true,
@@ -55,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: 'Shanti Sarovar — Brahma Kumaris Retreat Campus, Hyderabad',
+          alt: ogAlt,
         },
       ],
     },
@@ -70,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ShantiSarovarPage() {
   const intro =
-    'Shanti Sarovar (Academy for a Better World) is a 34-acre Brahma Kumaris retreat campus in Gachibowli, Hyderabad — the largest in South India — offering Rajyoga meditation, values courses, retreats and workshops.';
+    'Shanti Sarovar Retreat Center (Academy for a Better World) is a 34-acre Brahma Kumaris campus in Gachibowli, Hyderabad — the largest in South India — offering Rajyoga meditation, values courses, retreats and workshops.';
 
   const [newsData, eventsData, home] = await Promise.all([
     getSsNews(),
@@ -90,6 +77,7 @@ export default async function ShantiSarovarPage() {
         center={SS_CENTER}
         pageUrl={SS_CANONICAL}
         description={intro}
+        image={ogImage}
         omitOpeningHours
       />
       <BreadcrumbSchema
@@ -99,7 +87,7 @@ export default async function ShantiSarovarPage() {
             name: 'Retreat Centers',
             url: 'https://www.brahmakumaris.com/centers/retreat',
           },
-          { name: 'Shanti Sarovar', url: SS_CANONICAL },
+          { name: 'Shanti Sarovar Retreat Center', url: SS_CANONICAL },
         ]}
       />
       <script
@@ -109,24 +97,24 @@ export default async function ShantiSarovarPage() {
             '@context': 'https://schema.org',
             '@type': 'WebPage',
             '@id': `${SS_CANONICAL}#webpage`,
-            name: 'Shanti Sarovar — Brahma Kumaris Retreat Campus',
-            description: intro,
+            name: title,
+            description,
             url: SS_CANONICAL,
+            keywords: keywords.join(', '),
             isPartOf: {
               '@type': 'WebSite',
               name: 'Brahma Kumaris Centers',
               url: 'https://www.brahmakumaris.com/centers',
             },
             about: { '@id': SS_CANONICAL },
+            primaryImageOfPage: {
+              '@type': 'ImageObject',
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              caption: ogAlt,
+            },
             inLanguage: 'en-IN',
-            ...(home.heroImage
-              ? {
-                  primaryImageOfPage: {
-                    '@type': 'ImageObject',
-                    url: home.heroImage,
-                  },
-                }
-              : {}),
           }),
         }}
       />

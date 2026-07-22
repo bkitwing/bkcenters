@@ -1,39 +1,20 @@
 import { Metadata } from 'next';
 import { BreadcrumbSchema } from '@/components/StructuredData';
-import { generateOgImageUrl } from '@/lib/ogUtils';
-import { SS_CANONICAL } from '../content';
+import { SS_CANONICAL, SS_OG_IMAGES, SS_SEO } from '../content';
 import { getSsGalleries } from '../ss-gallery-data';
 import GalleriesClient from '../galleries/GalleriesClient';
 
 export const revalidate = 86400;
 
 const pageUrl = `${SS_CANONICAL}/galleries`;
-const defaultTitle = 'Photo Galleries — Shanti Sarovar | Brahma Kumaris Hyderabad';
+const { title, description, keywords, ogAlt } = SS_SEO.galleries;
+const ogImage = SS_OG_IMAGES.galleries;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getSsGalleries();
-  const primary = data.groups[0];
-  const title = defaultTitle;
-  const description =
-    primary?.subheading ||
-    `Browse ${data.totalImages || ''} photos from Shanti Sarovar — campus, retreats, conferences and service at the Brahma Kumaris Academy for a Better World, Hyderabad.`.replace(
-      /\s+/g,
-      ' '
-    );
-
-  const ogImage =
-    data.heroImage ||
-    generateOgImageUrl({
-      title: primary?.heading || 'Shanti Sarovar Galleries',
-      description: `${data.totalImages || ''} photos · Hyderabad retreat campus`,
-      type: 'retreat',
-      location: 'Hyderabad, Telangana',
-    });
-
   return {
     title,
     description,
-    keywords: [],
+    keywords,
     robots: {
       index: true,
       follow: true,
@@ -52,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: pageUrl,
       siteName: 'Brahma Kumaris Centers',
       locale: 'en_IN',
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -66,13 +47,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ShantiSarovarGalleriesPage() {
   const data = await getSsGalleries();
   const primary = data.groups[0];
-  const description =
-    primary?.subheading ||
-    `Browse ${data.totalImages} photos from Shanti Sarovar — campus, retreats, conferences and service at the Brahma Kumaris Academy for a Better World, Hyderabad.`;
 
   return (
     <>
-      {/* JSON-LD BreadcrumbList only — not rendered as visible UI */}
       <BreadcrumbSchema
         items={[
           { name: 'Centers', url: 'https://www.brahmakumaris.com/centers' },
@@ -80,7 +57,7 @@ export default async function ShantiSarovarGalleriesPage() {
             name: 'Retreat Centers',
             url: 'https://www.brahmakumaris.com/centers/retreat',
           },
-          { name: 'Shanti Sarovar', url: SS_CANONICAL },
+          { name: 'Shanti Sarovar Retreat Center', url: SS_CANONICAL },
           { name: 'Galleries', url: pageUrl },
         ]}
       />
@@ -90,16 +67,29 @@ export default async function ShantiSarovarGalleriesPage() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'ImageGallery',
+            '@id': `${pageUrl}#webpage`,
             name: primary?.heading
-              ? `${primary.heading} — Shanti Sarovar`
-              : 'Shanti Sarovar Photo Galleries',
+              ? `${primary.heading} | Shanti Sarovar Retreat Center`
+              : title,
             description,
             url: pageUrl,
+            keywords: keywords.join(', '),
             numberOfItems: data.totalImages,
-            isPartOf: { '@type': 'WebPage', url: SS_CANONICAL },
-            ...(data.heroImage
-              ? { image: data.heroImage }
-              : {}),
+            isPartOf: { '@id': `${SS_CANONICAL}#webpage` },
+            about: {
+              '@type': 'Place',
+              name: 'Shanti Sarovar Retreat Center',
+              url: SS_CANONICAL,
+            },
+            image: ogImage,
+            primaryImageOfPage: {
+              '@type': 'ImageObject',
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              caption: ogAlt,
+            },
+            inLanguage: 'en-IN',
           }),
         }}
       />
