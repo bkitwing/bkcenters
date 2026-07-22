@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmail, getEventsByEmail } from '@/lib/serverCenterData';
@@ -26,6 +26,9 @@ import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel, getShortLocationLine, TIMING_CONFIRM_NOTE } from '@/lib/centerContent';
 import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
+import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
+
+const EXCLUSIVE_CAMPUS_CONTACT = exclusiveCampusContactByBranch();
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   ssr: false,
@@ -59,6 +62,11 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
         title: 'Center Not Found',
         description: 'The meditation center you are looking for could not be found.',
       };
+    }
+
+    const campusContact = EXCLUSIVE_CAMPUS_CONTACT[center.branch_code];
+    if (campusContact) {
+      permanentRedirect(campusContact);
     }
     
     const address = center.address ? 
@@ -237,6 +245,12 @@ export default async function CenterPage({ params }: CenterPageProps) {
       return (
         <EmptyCenterView region={actualRegion} state={state} district={district} branchCode={branchCode} />
       );
+    }
+
+    // Exclusive retreat campuses use their micro-site contact as the canonical detail URL
+    const campusContact = EXCLUSIVE_CAMPUS_CONTACT[center.branch_code];
+    if (campusContact) {
+      permanentRedirect(campusContact);
     }
     
     const formatAddress = () => {

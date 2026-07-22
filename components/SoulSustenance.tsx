@@ -3,7 +3,14 @@
 import React from 'react';
 import { Send, Globe, ChevronRight, Sparkles } from 'lucide-react';
 
-export default function SoulSustenance() {
+type SoulSustenanceProps = {
+  /** Override heading; portal default kept for directory pages. */
+  title?: string;
+};
+
+export default function SoulSustenance({
+  title = 'Nourish Your Soul Daily',
+}: SoulSustenanceProps) {
   return (
     <section className="scroll-mt-20">
       <div className="relative bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
@@ -20,7 +27,7 @@ export default function SoulSustenance() {
 
             {/* Heading */}
             <h2 className="text-xl sm:text-2xl lg:text-[1.7rem] font-bold text-neutral-900 dark:text-neutral-100 mb-3 tracking-tight">
-              Nourish Your Soul Daily
+              {title}
             </h2>
             <p className="text-sm sm:text-[15px] text-neutral-600 dark:text-neutral-400 leading-relaxed mb-8">
               Receive daily spiritual messages, blogs, meditation commentary &amp; soul sustenance to support your spiritual journey — straight to your phone.

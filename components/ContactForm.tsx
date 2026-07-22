@@ -7,6 +7,11 @@ import { CenterLocatorAnalytics } from './GoogleAnalytics';
 interface ContactFormProps {
   center: Center;
   pageUrl: string;
+  /** Hide preferred-time select (e.g. retreat campuses that avoid fixed hours). */
+  hidePreferredTime?: boolean;
+  defaultMessage?: string;
+  /** Plain form without nested card / heavy intro (for campus enquire panels). */
+  embedded?: boolean;
 }
 
 type ContactType = 'LearnMeditation' | 'Query' | 'AttendEvent' | 'Feedback' | 'Others';
@@ -23,11 +28,20 @@ const getApiUrl = () => {
   return 'https://www.brahmakumaris.com/centers';
 };
 
-const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
+const DEFAULT_MESSAGE =
+  "I'm interested in learning meditation. Please provide information about your classes and timings.";
+
+const ContactForm: React.FC<ContactFormProps> = ({
+  center,
+  pageUrl,
+  hidePreferredTime = false,
+  defaultMessage = DEFAULT_MESSAGE,
+  embedded = false,
+}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [message, setMessage] = useState("I'm interested in learning meditation. Please provide information about your classes and timings.");
+  const [message, setMessage] = useState(defaultMessage);
   const [preferredTime, setPreferredTime] = useState('');
   const [contactType, setContactType] = useState<ContactType>('LearnMeditation');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,10 +67,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
     setIsSubmitting(true);
     setError(null);
 
-    // Fold the preferred class time into the message so the center sees it.
-    const fullMessage = preferredTime
-      ? `${message}\n\nPreferred time to attend: ${preferredTime}`
-      : message;
+    const fullMessage =
+      !hidePreferredTime && preferredTime
+        ? `${message}\n\nPreferred time to attend: ${preferredTime}`
+        : message;
 
     try {
       // Use the full API URL including the base path
@@ -137,7 +151,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
     
     // Set default message templates based on contact type
     if (type === 'LearnMeditation') {
-      setMessage("I'm interested in learning meditation. Please provide information about your classes and timings.");
+      setMessage(
+        hidePreferredTime
+          ? defaultMessage
+          : "I'm interested in learning meditation. Please provide information about your classes and timings."
+      );
     } else if (type === 'AttendEvent') {
       setMessage("I would like to attend an event. Please provide more information about upcoming events.");
     } else if (type === 'Query') {
@@ -150,7 +168,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   // If the message was successfully submitted, show a success message
   if (isSubmitted) {
     return (
-      <div className="bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-spirit-blue-200 dark:border-spirit-blue-800 text-center">
+      <div
+        className={
+          embedded
+            ? 'text-center py-4'
+            : 'bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-spirit-blue-200 dark:border-spirit-blue-800 text-center'
+        }
+      >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-spirit-blue-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -169,11 +193,21 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
   }
 
   return (
-    <div className="bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-neutral-200 dark:border-neutral-700">
-      <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Request a Callback</h2>
-      <p className="text-neutral-600 dark:text-neutral-400 mb-4">
-        Want to attend the free 7-day course or have a question? Share your details and the center will reach out. Leave a phone number and we&apos;ll call you back.
-      </p>
+    <div
+      className={
+        embedded
+          ? ''
+          : 'bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-neutral-200 dark:border-neutral-700'
+      }
+    >
+      {!embedded ? (
+        <>
+          <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Request a Callback</h2>
+          <p className="text-neutral-600 dark:text-neutral-400 mb-4">
+            Want to attend the free 7-day course or have a question? Share your details and the center will reach out. Leave a phone number and we&apos;ll call you back.
+          </p>
+        </>
+      ) : null}
 
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md mb-4">
@@ -182,8 +216,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="contactType" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+        <div className={embedded ? 'mb-3' : 'mb-4'}>
+          <label htmlFor="contactType" className="sr-only">
             How can we help you?
           </label>
           <div className="flex flex-wrap gap-2">
@@ -245,77 +279,107 @@ const ContactForm: React.FC<ContactFormProps> = ({ center, pageUrl }) => {
           </div>
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+        <div className={embedded ? 'mb-3' : 'mb-4'}>
+          <label
+            htmlFor="name"
+            className={
+              embedded
+                ? 'sr-only'
+                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
+            }
+          >
             Name <span className="text-primary">*</span>
           </label>
           <input
             type="text"
             id="name"
             className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Your name"
+            placeholder={embedded ? 'Name *' : 'Your name'}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="phone" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+        <div className={embedded ? 'mb-3' : 'mb-4'}>
+          <label
+            htmlFor="phone"
+            className={
+              embedded
+                ? 'sr-only'
+                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
+            }
+          >
             Phone Number <span className="text-primary">*</span>
           </label>
           <input
             type="tel"
             id="phone"
             className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Phone number for a callback"
+            placeholder={embedded ? 'Phone *' : 'Phone number for a callback'}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+        <div className={embedded ? 'mb-3' : 'mb-4'}>
+          <label
+            htmlFor="email"
+            className={
+              embedded
+                ? 'sr-only'
+                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
+            }
+          >
             Email <span className="text-neutral-400 text-sm font-normal">(optional)</span>
           </label>
           <input
             type="email"
             id="email"
             className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Your email address (optional)"
+            placeholder={embedded ? 'Email (optional)' : 'Your email address (optional)'}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="preferredTime" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
-            Preferred time to attend
-          </label>
-          <select
-            id="preferredTime"
-            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            value={preferredTime}
-            onChange={(e) => setPreferredTime(e.target.value)}
-          >
-            <option value="">No preference</option>
-            <option value="Morning (7:00 – 9:00 AM)">Morning (7:00 – 9:00 AM)</option>
-            <option value="Evening (5:00 – 8:00 PM)">Evening (5:00 – 8:00 PM)</option>
-            <option value="Either morning or evening">Either morning or evening</option>
-            <option value="Weekends only">Weekends only</option>
-          </select>
-        </div>
+        {!hidePreferredTime ? (
+          <div className="mb-4">
+            <label htmlFor="preferredTime" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+              Preferred time to attend
+            </label>
+            <select
+              id="preferredTime"
+              className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              value={preferredTime}
+              onChange={(e) => setPreferredTime(e.target.value)}
+            >
+              <option value="">No preference</option>
+              <option value="Morning (7:00 – 9:00 AM)">Morning (7:00 – 9:00 AM)</option>
+              <option value="Evening (5:00 – 8:00 PM)">Evening (5:00 – 8:00 PM)</option>
+              <option value="Either morning or evening">Either morning or evening</option>
+              <option value="Weekends only">Weekends only</option>
+            </select>
+          </div>
+        ) : null}
 
-        <div className="mb-6">
-          <label htmlFor="message" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
+        <div className={embedded ? 'mb-4' : 'mb-6'}>
+          <label
+            htmlFor="message"
+            className={
+              embedded
+                ? 'sr-only'
+                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
+            }
+          >
             Message <span className="text-primary">*</span>
           </label>
           <textarea
             id="message"
             className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Your message"
-            rows={5}
+            placeholder={embedded ? 'Message *' : 'Your message'}
+            rows={embedded ? 4 : 5}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required

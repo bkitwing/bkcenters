@@ -4,6 +4,8 @@ const https = require('https');
 const prettier = require('prettier');
 require('dotenv').config();
 
+const { campuses: CAMPUS_SITES } = require('../lib/campuses/sitemap-data.js');
+
 // Base URL for the website
 const BASE_URL = 'https://www.brahmakumaris.com/centers';
 
@@ -110,6 +112,17 @@ async function generateSitemap() {
     // Retreat centers page
     { url: `${BASE_URL}/retreat`, changefreq: 'weekly', priority: 0.9 },
   ];
+
+  // Campus micro-sites (from lib/campuses/sitemap-data.js — sync with registry.ts)
+  CAMPUS_SITES.forEach((campus) => {
+    campus.pages.forEach((page) => {
+      urls.push({
+        url: `${BASE_URL}/${campus.slug}${page.path}`,
+        changefreq: page.changefreq,
+        priority: page.priority,
+      });
+    });
+  });
   
   // Add region pages
   regions.forEach((region) => {

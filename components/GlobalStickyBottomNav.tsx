@@ -10,6 +10,7 @@ export default function GlobalStickyBottomNav({}: GlobalStickyBottomNavProps) {
   const router = useRouter();
 
   // Don't show on center detail pages (pages with 5 path segments like /region/state/district/branchCode)
+  // Campus micro-sites are gated by CentersChrome (bottomNav not rendered).
   const pathSegments = pathname.split('/').filter(segment => segment !== '');
   const isCenterDetailPage = pathSegments.length === 4;
 

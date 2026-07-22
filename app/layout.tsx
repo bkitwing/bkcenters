@@ -7,26 +7,23 @@ import GoogleAnalytics from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
 import { OrganizationSchema, WebSiteSchema, DatasetSchema } from "../components/StructuredData";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
-// Lightweight Strapi queries — only fetch counts, not all 5612 centers
 import { fetchCenterCount, fetchStatAndDistrictCounts } from "@/lib/strapiClient";
-import Link from "next/link";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Footer } from "@/components/Footer";
-
+import { CentersChrome } from "@/components/CentersChrome";
 
 const inter = Inter({ subsets: ["latin"] });
 
 async function getHomeMetadata() {
-  // 3 tiny API calls instead of loading all centers
   const [totalCenters, { stateCount: totalStates, districtCount: totalDistricts }] = await Promise.all([
     fetchCenterCount(),
     fetchStatAndDistrictCounts(),
   ]);
-  
+
   return {
     totalCenters,
     totalStates,
-    totalDistricts
+    totalDistricts,
   };
 }
 
@@ -46,43 +43,45 @@ export async function generateMetadata(): Promise<Metadata> {
       googleBot: {
         index: true,
         follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
     },
     alternates: {
-      canonical: 'https://www.brahmakumaris.com/centers',
+      canonical: "https://www.brahmakumaris.com/centers",
     },
     openGraph: {
-      type: 'website',
-      locale: 'en_US',
-      url: 'https://www.brahmakumaris.com/centers',
-      siteName: 'Brahma Kumaris Centers',
+      type: "website",
+      locale: "en_US",
+      url: "https://www.brahmakumaris.com/centers",
+      siteName: "Brahma Kumaris Centers",
       title,
       description,
       images: [
         {
           url: generateOgImageUrl({
-            title: 'Brahma Kumaris Centers',
+            title: "Brahma Kumaris Centers",
             description: `${stats.totalCenters} Centers across India`,
-            type: 'home'
+            type: "home",
           }),
           width: 1200,
           height: 630,
-          alt: 'Brahma Kumaris Centers',
+          alt: "Brahma Kumaris Centers",
         },
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title,
       description,
-      images: [generateOgImageUrl({
-        title: 'Brahma Kumaris Centers',
-        description: `${stats.totalCenters} Centers across India`,
-        type: 'home'
-      })],
+      images: [
+        generateOgImageUrl({
+          title: "Brahma Kumaris Centers",
+          description: `${stats.totalCenters} Centers across India`,
+          type: "home",
+        }),
+      ],
     },
   };
 }
@@ -108,10 +107,13 @@ export default async function RootLayout({
           <Suspense fallback={null}>
             <GoogleAnalytics />
           </Suspense>
-          <UnifiedHeader />
-          <main>{children}</main>
-          <GlobalStickyBottomNav />
-          <Footer />
+          <CentersChrome
+            header={<UnifiedHeader />}
+            footer={<Footer />}
+            bottomNav={<GlobalStickyBottomNav />}
+          >
+            {children}
+          </CentersChrome>
         </ThemeProvider>
       </body>
     </html>

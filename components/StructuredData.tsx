@@ -65,9 +65,16 @@ interface LocalBusinessSchemaProps {
   pageUrl: string;
   /** Unique per-center description for JSON-LD (not shown on page). */
   description?: string;
+  /** Skip fixed openingHours when hours are not published on the page. */
+  omitOpeningHours?: boolean;
 }
 
-export function LocalBusinessSchema({ center, pageUrl, description }: LocalBusinessSchemaProps) {
+export function LocalBusinessSchema({
+  center,
+  pageUrl,
+  description,
+  omitOpeningHours = false,
+}: LocalBusinessSchemaProps) {
   const formatAddress = () => {
     const { line1, line2, line3, city, pincode } = center.address || {};
     let parts = [];
@@ -101,22 +108,44 @@ export function LocalBusinessSchema({ center, pageUrl, description }: LocalBusin
     telephone: center.contact || center.mobile || undefined,
     email: center.email || undefined,
     priceRange: 'Free',
-    openingHoursSpecification: [
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        opens: '07:00',
-        closes: '09:00',
-        description: 'Morning Session — timings may vary; kindly call to confirm before visiting',
-      },
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        opens: '17:00',
-        closes: '20:00',
-        description: 'Evening Session — timings may vary; kindly call to confirm before visiting',
-      },
-    ],
+    ...(omitOpeningHours
+      ? {}
+      : {
+          openingHoursSpecification: [
+            {
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday',
+              ],
+              opens: '07:00',
+              closes: '09:00',
+              description:
+                'Morning Session — timings may vary; kindly call to confirm before visiting',
+            },
+            {
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: [
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday',
+                'Sunday',
+              ],
+              opens: '17:00',
+              closes: '20:00',
+              description:
+                'Evening Session — timings may vary; kindly call to confirm before visiting',
+            },
+          ],
+        }),
     parentOrganization: {
       '@type': 'Organization',
       name: 'Brahma Kumaris',

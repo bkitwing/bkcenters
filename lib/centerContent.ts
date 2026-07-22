@@ -119,25 +119,45 @@ export function generateCenterIntro(
  * targets high-intent queries like "learn meditation in <city>" / "timings".
  */
 export function getLocalizedFaqs(
-  center: Center
+  center: Center,
+  options?: { omitTimings?: boolean }
 ): { question: string; answer: string }[] {
+  const omitTimings = Boolean(options?.omitTimings);
   const name = titleCase(center.name);
-  const locality = getLocalityLabel(center) || titleCase(center.district) || titleCase(center.state);
+  const locality =
+    getLocalityLabel(center) || titleCase(center.district) || titleCase(center.state);
   const phone = firstPhone(center);
-  const callClause = phone ? ` Call ${phone} to confirm before visiting.` : ' Please call the center to confirm before visiting.';
+  const callClause = phone
+    ? ` Call ${phone} to confirm before visiting.`
+    : ' Please call the center to confirm before visiting.';
 
-  return [
+  const faqs: { question: string; answer: string }[] = [
     {
       question: `Where can I learn meditation in ${locality}?`,
-      answer: `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and daily morning and evening classes, open to everyone.${callClause}`,
-    },
-    {
-      question: `What are the class timings at ${name}?`,
-      answer: `Morning classes are typically ${DEFAULT_TIMINGS.morning}; evening classes ${DEFAULT_TIMINGS.evening}. ${TIMING_CONFIRM_NOTE}`,
-    },
-    {
-      question: `Is the 7-day meditation course really free at ${name}?`,
-      answer: `Yes. The 7-day Rajyoga meditation course and all classes and services at Brahma Kumaris ${name} are offered completely free of charge. There are no fees, and no prior experience is required.`,
+      answer: omitTimings
+        ? `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and regular classes, open to everyone.${callClause}`
+        : `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and daily morning and evening classes, open to everyone.${callClause}`,
     },
   ];
+
+  if (omitTimings) {
+    faqs.push({
+      question: `How can I plan a visit to ${name}?`,
+      answer: phone
+        ? `Use the enquiry form on this page, call ${phone}, or email the campus. The team will share the details you need for your visit.`
+        : `Use the enquiry form on this page or contact the campus. The team will share the details you need for your visit.`,
+    });
+  } else {
+    faqs.push({
+      question: `What are the class timings at ${name}?`,
+      answer: `Morning classes are typically ${DEFAULT_TIMINGS.morning}; evening classes ${DEFAULT_TIMINGS.evening}. ${TIMING_CONFIRM_NOTE}`,
+    });
+  }
+
+  faqs.push({
+    question: `Is the 7-day meditation course really free at ${name}?`,
+    answer: `Yes. The 7-day Rajyoga meditation course and all classes and services at Brahma Kumaris ${name} are offered completely free of charge. There are no fees, and no prior experience is required.`,
+  });
+
+  return faqs;
 }

@@ -483,11 +483,16 @@ interface StrapiNameEntry {
  * Get total center count. (1 API call, tiny payload)
  */
 export async function fetchCenterCount(): Promise<number> {
-  const res = await strapiGet<StrapiCenterEntry[]>(
-    `centers?pagination[pageSize]=1&fields[0]=branch_code`,
-    { revalidate: 86400, tags: ['center-count'] }
-  );
-  return res.meta.pagination.total;
+  try {
+    const res = await strapiGet<StrapiCenterEntry[]>(
+      `centers?pagination[pageSize]=1&fields[0]=branch_code`,
+      { revalidate: 86400, tags: ['center-count'] }
+    );
+    return res.meta.pagination.total;
+  } catch (error) {
+    logger.error('strapiClient: Error fetching center count:', error);
+    return 0;
+  }
 }
 
 /**
@@ -765,18 +770,23 @@ export async function fetchEventsByEmailPaginated(
 }
 
 export async function fetchStatAndDistrictCounts(): Promise<{ stateCount: number; districtCount: number }> {
-  const [stateRes, districtRes] = await Promise.all([
-    strapiGet<StrapiNameEntry[]>(
-      `state-centers?pagination[pageSize]=1&fields[0]=name`,
-      { revalidate: 86400, tags: ['state-count'] }
-    ),
-    strapiGet<StrapiNameEntry[]>(
-      `district-centers?pagination[pageSize]=1&fields[0]=name`,
-      { revalidate: 86400, tags: ['district-count'] }
-    ),
-  ]);
-  return {
-    stateCount: stateRes.meta.pagination.total,
-    districtCount: districtRes.meta.pagination.total,
-  };
+  try {
+    const [stateRes, districtRes] = await Promise.all([
+      strapiGet<StrapiNameEntry[]>(
+        `state-centers?pagination[pageSize]=1&fields[0]=name`,
+        { revalidate: 86400, tags: ['state-count'] }
+      ),
+      strapiGet<StrapiNameEntry[]>(
+        `district-centers?pagination[pageSize]=1&fields[0]=name`,
+        { revalidate: 86400, tags: ['district-count'] }
+      ),
+    ]);
+    return {
+      stateCount: stateRes.meta.pagination.total,
+      districtCount: districtRes.meta.pagination.total,
+    };
+  } catch (error) {
+    logger.error('strapiClient: Error fetching state/district counts:', error);
+    return { stateCount: 0, districtCount: 0 };
+  }
 }

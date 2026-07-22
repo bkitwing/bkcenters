@@ -107,7 +107,7 @@ export default async function RetreatCentersPage() {
         </nav>
         
         <h1 className="text-3xl font-bold spiritual-text-gradient mb-2">Brahma Kumaris Retreat Centers</h1>
-        <p className="text-sm text-neutral-600 mb-6">
+        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
           {retreatCenters.length} dedicated retreat {retreatCenters.length === 1 ? 'center' : 'centers'} across India for spiritual renewal and meditation practice
         </p>
         

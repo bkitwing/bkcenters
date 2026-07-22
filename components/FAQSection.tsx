@@ -6,6 +6,14 @@ import { getLocalizedFaqs } from '@/lib/centerContent';
 
 interface FAQSectionProps {
   center: Center;
+  /** Skip class-timing FAQ copy (retreat campuses that don't publish fixed hours). */
+  omitTimings?: boolean;
+  /** Show this many FAQs first, then a Load more control. */
+  initialVisible?: number;
+  /** Optional filter — return true to hide a question. */
+  excludeQuestion?: (question: string) => boolean;
+  /** Start with all items collapsed (default opens the first). */
+  startCollapsed?: boolean;
 }
 
 interface FAQItem {
@@ -13,9 +21,18 @@ interface FAQItem {
   answer: string | React.ReactNode;
 }
 
-export default function FAQSection({ center }: FAQSectionProps) {
+export default function FAQSection({
+  center,
+  omitTimings = false,
+  initialVisible,
+  excludeQuestion,
+  startCollapsed = false,
+}: FAQSectionProps) {
   // State to track which FAQ item is expanded (only one at a time)
-  const [expandedItem, setExpandedItem] = useState<number | null>(0); // First item expanded by default
+  const [expandedItem, setExpandedItem] = useState<number | null>(
+    startCollapsed ? null : 0
+  );
+  const [showAll, setShowAll] = useState(false);
 
   // Toggle FAQ item expansion (accordion style - only one open at a time)
   const toggleItem = (index: number) => {
@@ -116,10 +133,10 @@ export default function FAQSection({ center }: FAQSectionProps) {
 
   // Localized FAQs (unique per center) — shown first so the visible FAQ matches
   // the FAQPage structured data and targets high-intent local queries.
-  const localizedFaqs: FAQItem[] = getLocalizedFaqs(center);
+  const localizedFaqs: FAQItem[] = getLocalizedFaqs(center, { omitTimings });
 
   // Static FAQs with the center-specific one inserted at position 2
-  const faqs: FAQItem[] = [
+  const allFaqs: FAQItem[] = [
     ...localizedFaqs,
     {
       question: "What is the Brahma Kumaris?",
@@ -217,11 +234,21 @@ export default function FAQSection({ center }: FAQSectionProps) {
     }
   ];
 
+  const faqs = excludeQuestion
+    ? allFaqs.filter((faq) => !excludeQuestion(faq.question))
+    : allFaqs;
+
+  const limit =
+    typeof initialVisible === 'number' && initialVisible > 0 && !showAll
+      ? initialVisible
+      : faqs.length;
+  const visibleFaqs = faqs.slice(0, limit);
+  const hiddenCount = Math.max(0, faqs.length - limit);
+
   return (
     <div>
-      
       <div className="space-y-2">
-        {faqs.map((faq, index) => (
+        {visibleFaqs.map((faq, index) => (
           <div 
             key={index} 
             className="border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 bg-white dark:bg-neutral-800"
@@ -276,6 +303,17 @@ export default function FAQSection({ center }: FAQSectionProps) {
           </div>
         ))}
       </div>
+      {hiddenCount > 0 ? (
+        <div className="mt-4 flex justify-center">
+          <button
+            type="button"
+            className="inline-flex items-center justify-center min-h-10 px-4 rounded-full border border-neutral-300 dark:border-neutral-600 text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            onClick={() => setShowAll(true)}
+          >
+            Load more ({hiddenCount})
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
