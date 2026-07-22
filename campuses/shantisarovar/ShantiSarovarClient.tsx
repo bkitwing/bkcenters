@@ -102,11 +102,12 @@ export default function ShantiSarovarClient({
 
   const mapsUrl = `https://www.google.com/maps?q=${SS_CENTER.coords[0]},${SS_CENTER.coords[1]}`;
   const heroSlides = home?.heroSlides ?? [];
+  const heroSlidesMobile = home?.heroSlidesMobile ?? [];
   const courses = home?.courses?.length ? home.courses : c.courses.items;
   const galleryThumbs = home?.galleryThumbs?.length
     ? home.galleryThumbs
     : c.galleryGlimpse.thumbs;
-  const cinematic = heroSlides.length > 0;
+  const cinematic = heroSlides.length > 0 || heroSlidesMobile.length > 0;
 
   return (
     <div>
@@ -116,7 +117,7 @@ export default function ShantiSarovarClient({
       >
         <motion.div style={{ opacity: heroOpacity }} className="ss-hero__media">
           {cinematic ? (
-            <HomeHeroSlideshow slides={heroSlides} />
+            <HomeHeroSlideshow slides={heroSlides} mobileSlides={heroSlidesMobile} />
           ) : (
             <div className="absolute inset-0">
               <MediaPlaceholder

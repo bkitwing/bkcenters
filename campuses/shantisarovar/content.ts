@@ -4,6 +4,7 @@ import { Center } from '@/lib/types';
  * Shanti Sarovar micro-site content — copy from crawl, CMS-ready section keys.
  * Gallery full set is loaded from Strapi website-section 59 (see ss-gallery-data.ts).
  * Home hero / courses / gallery teaser: website-section 60 (see ss-home-data.ts).
+ * Hero Section = desktop/tablet; Hero Mobile = phones.
  */
 export const SS_SLUG = 'shantisarovar';
 export const SS_CANONICAL = 'https://www.brahmakumaris.com/centers/shantisarovar';

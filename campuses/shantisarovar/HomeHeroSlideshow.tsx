@@ -1,11 +1,30 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useReducedMotion } from 'motion/react';
 import type { SsHomeImage } from './ss-home-data';
 
 const FADE_MS = 1200;
 const REDUCED_MOTION_MS = 6000;
+const MOBILE_MQ = '(max-width: 767px)';
+
+function subscribeMobile(cb: () => void) {
+  const mq = window.matchMedia(MOBILE_MQ);
+  mq.addEventListener('change', cb);
+  return () => mq.removeEventListener('change', cb);
+}
+
+function getMobileSnapshot() {
+  return window.matchMedia(MOBILE_MQ).matches;
+}
+
+function getServerMobileSnapshot() {
+  return false;
+}
+
+function useIsMobileViewport() {
+  return useSyncExternalStore(subscribeMobile, getMobileSnapshot, getServerMobileSnapshot);
+}
 
 function slideUrls(slide: SsHomeImage) {
   const desktop = slide.srcDesktop || slide.src;
@@ -13,10 +32,9 @@ function slideUrls(slide: SsHomeImage) {
   return { desktop, mobile };
 }
 
-function preferredUrl(slide: SsHomeImage) {
+function preferredUrl(slide: SsHomeImage, isMobile: boolean) {
   const { desktop, mobile } = slideUrls(slide);
-  if (typeof window === 'undefined') return desktop;
-  return window.matchMedia('(max-width: 767px)').matches ? mobile : desktop;
+  return isMobile ? mobile : desktop;
 }
 
 function identityOrder(length: number): number[] {
@@ -34,8 +52,8 @@ function shuffleOrder(length: number): number[] {
   return [0, ...rest];
 }
 
-function preloadSlide(slide: SsHomeImage): Promise<void> {
-  const url = preferredUrl(slide);
+function preloadSlide(slide: SsHomeImage, isMobile: boolean): Promise<void> {
+  const url = preferredUrl(slide, isMobile);
   if (!url || typeof window === 'undefined') return Promise.resolve();
 
   return new Promise((resolve) => {
@@ -53,11 +71,21 @@ function preloadSlide(slide: SsHomeImage): Promise<void> {
 
 /**
  * Hero slideshow: Ken Burns completes → crossfade to next (random shuffled deck).
- * Outgoing slide holds its final zoom frame while fading — no snap-back.
+ * Desktop uses `slides` (Hero Section); phones use `mobileSlides` (Hero Mobile) when present.
  */
-export function HomeHeroSlideshow({ slides }: { slides: SsHomeImage[] }) {
+export function HomeHeroSlideshow({
+  slides,
+  mobileSlides,
+}: {
+  slides: SsHomeImage[];
+  mobileSlides?: SsHomeImage[];
+}) {
   const reduce = useReducedMotion();
-  const total = slides.length;
+  const isMobile = useIsMobileViewport();
+  const deckKey = isMobile && mobileSlides && mobileSlides.length > 0 ? 'mobile' : 'desktop';
+  const deck =
+    deckKey === 'mobile' && mobileSlides ? mobileSlides : slides;
+  const total = deck.length;
   const [order, setOrder] = useState<number[]>(() => identityOrder(total));
   const [ready, setReady] = useState(false);
 
@@ -66,14 +94,14 @@ export function HomeHeroSlideshow({ slides }: { slides: SsHomeImage[] }) {
   const transitioningRef = useRef(false);
   const posRef = useRef(0);
 
-  // Stable order for SSR/first paint; shuffle after hydration only.
+  // Reset deck when viewport or gallery set changes (mobile ↔ desktop).
   useEffect(() => {
     setPos(0);
     setExitingSlide(null);
     transitioningRef.current = false;
     setOrder(shuffleOrder(total));
     setReady(true);
-  }, [total]);
+  }, [total, deckKey]);
 
   const activeSlide = order[pos] ?? 0;
   const nextPos = total > 1 ? (pos + 1) % total : 0;
@@ -90,11 +118,11 @@ export function HomeHeroSlideshow({ slides }: { slides: SsHomeImage[] }) {
     if (fromSlide === toSlide) return;
 
     transitioningRef.current = true;
-    await preloadSlide(slides[toSlide]);
+    await preloadSlide(deck[toSlide], isMobile);
 
     setExitingSlide(fromSlide);
     setPos(targetPos);
-  }, [order, slides, total]);
+  }, [deck, isMobile, order, total]);
 
   const onExitFadeEnd = useCallback(
     (slideIndex: number, e: React.TransitionEvent<HTMLDivElement>) => {
@@ -115,9 +143,9 @@ export function HomeHeroSlideshow({ slides }: { slides: SsHomeImage[] }) {
   );
 
   useEffect(() => {
-    const upcoming = slides[nextSlide];
-    if (upcoming) void preloadSlide(upcoming);
-  }, [nextSlide, slides]);
+    const upcoming = deck[nextSlide];
+    if (upcoming) void preloadSlide(upcoming, isMobile);
+  }, [deck, isMobile, nextSlide]);
 
   useEffect(() => {
     if (!ready || !reduce || total < 2) return;
@@ -140,7 +168,7 @@ export function HomeHeroSlideshow({ slides }: { slides: SsHomeImage[] }) {
 
   return (
     <div className="ss-hero-slides" aria-hidden>
-      {slides.map((slide, i) => {
+      {deck.map((slide, i) => {
         const active = i === activeSlide;
         const exiting = i === exitingSlide;
         const shouldMount = active || exiting || i === nextSlide;
@@ -154,17 +182,16 @@ export function HomeHeroSlideshow({ slides }: { slides: SsHomeImage[] }) {
 
         return (
           <div
-            key={slide.id}
+            key={`${deckKey}-${slide.id}`}
             className={`ss-hero-slide${active ? ' is-active' : ''}${
               exiting ? ' is-exiting' : ''
             }${reduce ? '' : ' has-kenburns'}`}
             onTransitionEnd={(e) => onExitFadeEnd(i, e)}
           >
-            <picture>
-              <source media="(max-width: 767px)" srcSet={mobile} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+            {deckKey === 'mobile' ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={desktop}
+                src={preferredUrl(slide, true)}
                 alt=""
                 width={slide.width}
                 height={slide.height}
@@ -174,7 +201,23 @@ export function HomeHeroSlideshow({ slides }: { slides: SsHomeImage[] }) {
                 className="ss-hero-slide__img"
                 onAnimationEnd={(e) => onKenBurnsEnd(i, e)}
               />
-            </picture>
+            ) : (
+              <picture>
+                <source media="(max-width: 767px)" srcSet={mobile} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={desktop}
+                  alt=""
+                  width={slide.width}
+                  height={slide.height}
+                  decoding="async"
+                  loading={isLcp ? 'eager' : 'lazy'}
+                  fetchPriority={isLcp ? 'high' : 'low'}
+                  className="ss-hero-slide__img"
+                  onAnimationEnd={(e) => onKenBurnsEnd(i, e)}
+                />
+              </picture>
+            )}
           </div>
         );
       })}

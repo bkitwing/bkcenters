@@ -131,20 +131,32 @@ export default async function ShantiSarovarPage() {
         }}
       />
 
-      {home.heroImage ? (
-        // eslint-disable-next-line @next/next/no-head-element -- preload LCP slide only
-        <link
-          rel="preload"
-          as="image"
-          href={home.heroImage}
-          fetchPriority="high"
-          {...(home.heroSlides[0]?.srcMobile && home.heroSlides[0]?.srcDesktop
-            ? {
-                imageSrcSet: `${home.heroSlides[0].srcMobile} 900w, ${home.heroSlides[0].srcDesktop} 1920w`,
-                imageSizes: '100vw',
+      {home.heroImage || home.heroSlidesMobile[0] ? (
+        <>
+          {home.heroSlidesMobile[0] ? (
+            // eslint-disable-next-line @next/next/no-head-element -- mobile LCP
+            <link
+              rel="preload"
+              as="image"
+              href={
+                home.heroSlidesMobile[0].srcMobile ||
+                home.heroSlidesMobile[0].src
               }
-            : {})}
-        />
+              media="(max-width: 767px)"
+              fetchPriority="high"
+            />
+          ) : null}
+          {home.heroImage ? (
+            // eslint-disable-next-line @next/next/no-head-element -- desktop LCP
+            <link
+              rel="preload"
+              as="image"
+              href={home.heroImage}
+              media="(min-width: 768px)"
+              fetchPriority="high"
+            />
+          ) : null}
+        </>
       ) : null}
 
       <ShantiSarovarClient

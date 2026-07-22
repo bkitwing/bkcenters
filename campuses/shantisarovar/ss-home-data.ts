@@ -1,8 +1,8 @@
 /**
  * Shanti Sarovar home — Strapi website-section #60
- * Galleries: Hero Section | Courses offered Section | Photo Gallery Section
+ * Galleries: Hero Mobile | Hero Section | Courses offered | Photo Gallery
  *
- * https://webapp.brahmakumaris.com/admin/content-manager/collection-types/api::website-section.website-section/60
+ * https://portal.brahmakumaris.com/admin/content-manager/collection-types/api::website-section.website-section/60
  */
 
 import { cache } from 'react';
@@ -43,7 +43,10 @@ export type SsHomeGalleryThumb = MediaSlot & {
 };
 
 export type SsHomePageData = {
+  /** Desktop / tablet hero (Strapi "Hero Section"). */
   heroSlides: SsHomeImage[];
+  /** Phone hero (Strapi "Hero Mobile"); falls back to heroSlides when empty. */
+  heroSlidesMobile: SsHomeImage[];
   courses: SsHomeCourse[];
   galleryThumbs: SsHomeGalleryThumb[];
   heroImage: string | null;
@@ -197,12 +200,17 @@ function mediaList(gallery: unknown): unknown[] {
   return [];
 }
 
-function findGallery(components: unknown[], titleMatch: RegExp): unknown[] {
+function findGallery(
+  components: unknown[],
+  titleMatch: RegExp,
+  options?: { exclude?: RegExp }
+): unknown[] {
   for (const raw of components) {
     if (!raw || typeof raw !== 'object') continue;
     const c = raw as Record<string, unknown>;
     if (c.__component !== 'wisdom.post-gallery') continue;
     const title = typeof c.gallery_title === 'string' ? c.gallery_title : '';
+    if (options?.exclude?.test(title)) continue;
     if (titleMatch.test(title)) return mediaList(c.gallery);
   }
   return [];
@@ -230,6 +238,7 @@ async function strapiGet(path: string): Promise<unknown | null> {
 
 const EMPTY: SsHomePageData = {
   heroSlides: [],
+  heroSlidesMobile: [],
   courses: [],
   galleryThumbs: [],
   heroImage: null,
@@ -255,7 +264,13 @@ export const getSsHome = cache(async (): Promise<SsHomePageData> => {
   const attrs = unwrap(json.data);
   const sectionType = Array.isArray(attrs.section_type) ? attrs.section_type : [];
 
-  const heroSlides = findGallery(sectionType, /hero/i)
+  // Desktop/tablet: "Hero Section" (exclude "Hero Mobile")
+  const heroSlides = findGallery(sectionType, /hero/i, { exclude: /mobile/i })
+    .map((m, i) => mapHeroImage(m, i))
+    .filter((img): img is SsHomeImage => Boolean(img));
+
+  // Phones: dedicated "Hero Mobile" gallery from the same website-section
+  const heroSlidesMobile = findGallery(sectionType, /hero\s*mobile|mobile\s*hero/i)
     .map((m, i) => mapHeroImage(m, i))
     .filter((img): img is SsHomeImage => Boolean(img));
 
@@ -301,6 +316,7 @@ export const getSsHome = cache(async (): Promise<SsHomePageData> => {
 
   return {
     heroSlides,
+    heroSlidesMobile,
     courses,
     galleryThumbs,
     heroImage: heroSlides[0]?.srcDesktop || heroSlides[0]?.src || null,
