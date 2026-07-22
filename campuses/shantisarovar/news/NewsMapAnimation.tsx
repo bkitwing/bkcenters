@@ -2,16 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
-import { feature } from 'topojson-client';
-import type { Feature, FeatureCollection, Geometry } from 'geojson';
-import type { GeometryCollection, Topology } from 'topojson-specification';
+import type { FeatureCollection, Geometry } from 'geojson';
 
 /**
- * Telangana-only map for the campus news hero (avoids India map clipping).
+ * Telangana-only map for the campus news hero.
  * Hyderabad / Shanti Sarovar pulse marker.
  */
-const TOPO_URL = '/centers/campuses/shantisarovar/india-states.json';
-const FOCUS = 'telangana';
+const GEO_URL = '/centers/campuses/shantisarovar/telangana.json';
 /** Rough visual center of Telangana */
 const TG_CENTER: [number, number] = [79.05, 17.95];
 /** Shanti Sarovar / Gachibowli */
@@ -19,27 +16,15 @@ const HYD: [number, number] = [78.35, 17.44];
 
 type StateFc = FeatureCollection<Geometry, { st_nm: string; st_code?: string }>;
 
-function norm(name: string) {
-  return name.toLowerCase().replace(/[^a-z]/g, '');
-}
-
 export function NewsMapAnimation() {
   const [geo, setGeo] = useState<StateFc | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch(TOPO_URL)
+    fetch(GEO_URL)
       .then((r) => r.json())
-      .then((topo: Topology) => {
-        if (cancelled) return;
-        const fc = feature(
-          topo,
-          topo.objects.states as GeometryCollection
-        ) as unknown as StateFc;
-        const onlyTg: Feature<Geometry, { st_nm: string }>[] = fc.features.filter(
-          (f) => norm(String(f.properties?.st_nm || '')) === FOCUS
-        );
-        setGeo({ type: 'FeatureCollection', features: onlyTg });
+      .then((fc: StateFc) => {
+        if (!cancelled) setGeo(fc);
       })
       .catch((err) => console.error('SS news map failed to load', err));
     return () => {

@@ -5,7 +5,7 @@ import { SS_CANONICAL } from '../content';
 import { getSsNews } from '../ss-media-data';
 import NewsClient from '../news/NewsClient';
 
-export const revalidate = 3600;
+export const revalidate = 14400;
 
 const pageUrl = `${SS_CANONICAL}/news`;
 const title = 'News — Shanti Sarovar | Brahma Kumaris Hyderabad';

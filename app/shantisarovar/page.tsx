@@ -4,7 +4,7 @@ export async function generateMetadata() {
   return campusPageMetadata('shantisarovar', 'home');
 }
 
-export const revalidate = 3600;
+export const revalidate = 14400;
 
 export default async function ShantiSarovarHomePage() {
   const mod = await loadCampusPage('shantisarovar', 'home');

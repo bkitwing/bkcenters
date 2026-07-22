@@ -5,7 +5,7 @@ import { SS_CANONICAL } from '../content';
 import { getSsEvents } from '../ss-media-data';
 import EventsClient from '../events/EventsClient';
 
-export const revalidate = 3600;
+export const revalidate = 14400;
 
 const pageUrl = `${SS_CANONICAL}/events`;
 const title = 'Events — Shanti Sarovar | Brahma Kumaris Hyderabad';

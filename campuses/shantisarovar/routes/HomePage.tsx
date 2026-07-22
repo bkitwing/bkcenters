@@ -8,7 +8,7 @@ import { HomeEventsTeaser, HomeNewsTeaser } from '../HomeMediaTeasers';
 import { getSsEvents, getSsNews } from '../ss-media-data';
 import { getSsHome } from '../ss-home-data';
 
-export const revalidate = 3600;
+export const revalidate = 14400;
 
 const title = 'Shanti Sarovar Hyderabad — Brahma Kumaris Retreat Campus';
 const description =

@@ -17,7 +17,7 @@ export const NEWS_POST_BASE = 'https://www.brahmakumaris.com/news/post';
 export const EVENT_POST_BASE = 'https://www.brahmakumaris.com/events';
 
 const PORTAL = 'https://portal.brahmakumaris.com/api';
-const ISR = 3600;
+const ISR = 14400;
 const NEWS_PAGE_SIZE = 100;
 export const EVENTS_SSR_PAGE_SIZE = 50;
 export const EVENTS_INITIAL_PAGE_SIZE = EVENTS_SSR_PAGE_SIZE;

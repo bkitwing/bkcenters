@@ -28,7 +28,7 @@ import { SsHowToReach } from '../contact/SsHowToReach';
 import { SsFaqSection } from '../contact/SsFaqSection';
 import { ContactAuraAnimation } from '../contact/ContactAuraAnimation';
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 const pageUrl = `${SS_CANONICAL}/contact`;
 const title = 'Visit & Contact — Shanti Sarovar | Brahma Kumaris Hyderabad';

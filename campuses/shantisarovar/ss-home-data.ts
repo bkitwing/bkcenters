@@ -9,7 +9,7 @@ import { cache } from 'react';
 import { SS_CONTENT, type CourseItem, type MediaSlot } from './content';
 
 export const SS_HOME_SECTION_ID = 60;
-const ISR = 3600;
+const ISR = 14400;
 
 const IS_PROD = process.env.NODE_ENV === 'production';
 const STRAPI_URL =
