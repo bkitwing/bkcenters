@@ -6,6 +6,8 @@ import type { SsHomeImage } from './ss-home-data';
 
 const FADE_MS = 1200;
 const REDUCED_MOTION_MS = 6000;
+/** Mobile: Ken Burns CSS is disabled — advance on a fixed interval instead. */
+const MOBILE_SLIDE_MS = 5500;
 const MOBILE_MQ = '(max-width: 767px)';
 
 function subscribeMobile(cb: () => void) {
@@ -152,6 +154,13 @@ export function HomeHeroSlideshow({
     const id = window.setInterval(() => void advance(), REDUCED_MOTION_MS);
     return () => window.clearInterval(id);
   }, [advance, ready, reduce, total]);
+
+  // Mobile: no Ken Burns animationend — use interval to crossfade.
+  useEffect(() => {
+    if (!ready || reduce || !isMobile || total < 2) return;
+    const id = window.setInterval(() => void advance(), MOBILE_SLIDE_MS);
+    return () => window.clearInterval(id);
+  }, [advance, isMobile, ready, reduce, total]);
 
   useEffect(() => {
     if (exitingSlide == null) return;

@@ -650,8 +650,11 @@ html.dark body.ss-campus-body {
   isolation: isolate;
   overflow: hidden;
   margin-top: calc(-1 * var(--ss-header-h));
+  /*
+   * Use svh only — dvh grows/shrinks when the mobile URL bar collapses,
+   * which resizes the hero and makes cover images look like they zoom/jerk on scroll.
+   */
   min-height: 100svh;
-  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -759,7 +762,7 @@ html.dark body.ss-campus-body {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transform: scale(1.04) translateZ(0);
+  transform: scale(1.02) translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -768,18 +771,33 @@ html.dark body.ss-campus-body {
   animation: ss-hero-kenburns 8s ease-out forwards;
 }
 
-/* Hold final zoom while crossfading out — never snap back to scale(1.04) */
+/* Hold final zoom while crossfading out — never snap back to base scale */
 .ss-hero-slide.is-exiting .ss-hero-slide__img {
   animation: none;
-  transform: scale(1.14) translate3d(-1.5%, -1%, 0);
+  transform: scale(1.08) translate3d(-1%, -0.6%, 0);
 }
 
 @keyframes ss-hero-kenburns {
   from {
-    transform: scale(1.04) translate3d(0, 0, 0);
+    transform: scale(1.02) translate3d(0, 0, 0);
   }
   to {
-    transform: scale(1.14) translate3d(-1.5%, -1%, 0);
+    transform: scale(1.08) translate3d(-1%, -0.6%, 0);
+  }
+}
+
+/* Phones: skip Ken Burns — scroll + URL-bar resize already feel like zoom */
+@media (max-width: 767px) {
+  .ss-hero-slide__img {
+    transform: none;
+  }
+
+  .ss-hero-slide.has-kenburns.is-active:not(.is-exiting) .ss-hero-slide__img {
+    animation: none;
+  }
+
+  .ss-hero-slide.is-exiting .ss-hero-slide__img {
+    transform: none;
   }
 }
 
@@ -958,7 +976,8 @@ html.dark body.ss-campus-body {
 
 /* ---- Campus story (sticky visual + chapters) ---- */
 .ss-campus {
-  --ss-campus-photo-max-h: calc(95dvh - var(--ss-header-h) - 2rem);
+  /* svh stays stable when the mobile browser chrome collapses (dvh does not) */
+  --ss-campus-photo-max-h: calc(95svh - var(--ss-header-h) - 2rem);
   display: grid;
   gap: 1.75rem;
 }
@@ -976,11 +995,19 @@ html.dark body.ss-campus-body {
   .ss-campus__photo {
     margin-inline: auto;
     width: 100%;
+    max-width: 100%;
+    /* Fixed frame so the image cannot grow/shrink mid-scroll */
+    max-height: none;
+    aspect-ratio: 4 / 5;
+    height: auto;
   }
 
   .ss-campus__photo img {
     width: 100%;
-    max-height: min(70dvh, var(--ss-campus-photo-max-h));
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    object-position: center top;
   }
 }
 
@@ -2294,8 +2321,20 @@ html.dark body.ss-campus-body {
 
 .ss-media-hero__anim {
   justify-self: center;
-  width: min(100%, 15rem);
+  width: min(100%, 11.5rem);
+  max-width: 100%;
   overflow: visible;
+}
+
+@media (max-width: 639px) {
+  .ss-media-hero__anim {
+    width: min(100%, 9.75rem);
+  }
+
+  /* Keep map + caption inside the rounded hero (overflow:hidden) */
+  .ss-media-hero {
+    padding-bottom: 1.35rem;
+  }
 }
 
 /* News Telangana map */
@@ -2304,36 +2343,48 @@ html.dark body.ss-campus-body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  max-width: 11.5rem;
+  margin-inline: auto;
   overflow: visible;
 }
 
 .ss-news-map__glow {
   position: absolute;
-  inset: 18% 12%;
+  inset: 12% 10% 22%;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(184, 149, 90, 0.4), transparent 70%);
-  filter: blur(16px);
+  background: radial-gradient(circle, rgba(184, 149, 90, 0.35), transparent 70%);
+  filter: blur(14px);
   pointer-events: none;
 }
 
-.ss-news-map__svg {
-  width: 100%;
-  max-width: 14rem;
-  height: auto;
-  display: block;
+/* Frame holds the SVG; overflow hidden only here so rings stay neat
+   without chopping the state outline (map is projected to fit inside). */
+.ss-news-map__frame {
   position: relative;
   z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.65rem;
+}
+
+.ss-news-map__svg {
+  width: 100% !important;
+  max-width: 100%;
+  height: auto !important;
+  display: block;
   overflow: visible;
 }
 
 .ss-news-map__state.is-focus {
-  filter: drop-shadow(0 0 10px rgba(184, 149, 90, 0.55));
+  filter: drop-shadow(0 0 6px rgba(184, 149, 90, 0.45));
 }
 
 .ss-news-map__ring {
   fill: none;
   stroke: rgba(255, 232, 192, 0.55);
-  stroke-width: 1.5;
+  stroke-width: 1.4;
   transform-origin: center;
   animation: ss-news-pulse 2.8s ease-out infinite;
 }
@@ -2352,31 +2403,36 @@ html.dark body.ss-campus-body {
 @keyframes ss-news-pulse {
   0% {
     opacity: 0.85;
-    transform: scale(0.55);
+    transform: scale(0.65);
   }
   70% {
     opacity: 0;
-    transform: scale(1.15);
+    transform: scale(1.05);
   }
   100% {
     opacity: 0;
-    transform: scale(1.2);
+    transform: scale(1.08);
   }
 }
 
 .ss-news-map__caption {
-  margin: 0.15rem 0 0;
-  font-size: 0.72rem;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.68rem;
   font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 232, 192, 0.7);
+  color: rgba(255, 232, 192, 0.78);
+  text-align: center;
+  white-space: nowrap;
 }
 
 .ss-news-map__skeleton {
-  width: 11rem;
-  height: 11rem;
-  border-radius: 1rem;
+  width: 100%;
+  aspect-ratio: 200 / 220;
+  height: auto;
+  border-radius: 0.65rem;
   background: rgba(255, 255, 255, 0.08);
 }
 
