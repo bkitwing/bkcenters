@@ -4,6 +4,7 @@ import {
   EVENTS_INITIAL_PAGE_SIZE,
   fetchSsEventsPage,
 } from '@/campuses/shantisarovar/ss-media-data';
+import { fetchJbEventsPage } from '@/campuses/jagdamba-bhawan/jb-media-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,11 +18,6 @@ export async function GET(
       return NextResponse.json({ error: 'Unknown campus' }, { status: 404 });
     }
 
-    // Only Shanti Sarovar events are wired today; extend per campus as needed.
-    if (params.slug !== 'shantisarovar') {
-      return NextResponse.json({ error: 'Events API not configured' }, { status: 404 });
-    }
-
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1', 10);
     const pageSize = parseInt(
@@ -32,7 +28,14 @@ export async function GET(
     const safePage = Math.max(1, page);
     const safePageSize = Math.min(Math.max(1, pageSize), 50);
 
-    const batch = await fetchSsEventsPage(safePage, safePageSize);
+    let batch;
+    if (params.slug === 'shantisarovar') {
+      batch = await fetchSsEventsPage(safePage, safePageSize);
+    } else if (params.slug === 'jagdamba-bhawan') {
+      batch = await fetchJbEventsPage(safePage, safePageSize);
+    } else {
+      return NextResponse.json({ error: 'Events API not configured' }, { status: 404 });
+    }
 
     return new NextResponse(JSON.stringify(batch), {
       status: 200,

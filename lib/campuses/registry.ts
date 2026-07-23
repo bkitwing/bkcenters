@@ -7,7 +7,7 @@
  * scale by adding a thin wrapper folder + registry entry per campus.
  */
 
-export type CampusPageKey = 'home' | 'contact' | 'news' | 'events' | 'galleries';
+export type CampusPageKey = 'home' | 'contact' | 'news' | 'events' | 'galleries' | 'about';
 
 export type CampusDefinition = {
   slug: string;
@@ -36,6 +36,13 @@ export const CAMPUS_REGISTRY: Record<string, CampusDefinition> = {
     basePath: '/shantisarovar',
     canonical: 'https://www.brahmakumaris.com/centers/shantisarovar',
     branchCode: '02284',
+  },
+  'jagdamba-bhawan': {
+    slug: 'jagdamba-bhawan',
+    name: 'Jagdamba Bhawan Retreat Center',
+    basePath: '/jagdamba-bhawan',
+    canonical: 'https://www.brahmakumaris.com/centers/jagdamba-bhawan',
+    branchCode: '04543',
   },
 };
 

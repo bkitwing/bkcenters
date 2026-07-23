@@ -17,7 +17,7 @@ type CampusLayoutModule = {
 
 const PAGE_LOADERS: Record<
   string,
-  Record<CampusPageKey, () => Promise<CampusPageModule>>
+  Partial<Record<CampusPageKey, () => Promise<CampusPageModule>>>
 > = {
   shantisarovar: {
     home: () => import('@/campuses/shantisarovar/routes/HomePage'),
@@ -26,10 +26,19 @@ const PAGE_LOADERS: Record<
     events: () => import('@/campuses/shantisarovar/routes/EventsPage'),
     galleries: () => import('@/campuses/shantisarovar/routes/GalleriesPage'),
   },
+  'jagdamba-bhawan': {
+    home: () => import('@/campuses/jagdamba-bhawan/routes/HomePage'),
+    contact: () => import('@/campuses/jagdamba-bhawan/routes/ContactPage'),
+    about: () => import('@/campuses/jagdamba-bhawan/routes/AboutPage'),
+    news: () => import('@/campuses/jagdamba-bhawan/routes/NewsPage'),
+    events: () => import('@/campuses/jagdamba-bhawan/routes/EventsPage'),
+    galleries: () => import('@/campuses/jagdamba-bhawan/routes/GalleriesPage'),
+  },
 };
 
 const LAYOUT_LOADERS: Record<string, () => Promise<CampusLayoutModule>> = {
   shantisarovar: () => import('@/campuses/shantisarovar/CampusLayout'),
+  'jagdamba-bhawan': () => import('@/campuses/jagdamba-bhawan/CampusLayout'),
 };
 
 export async function loadCampusLayout(slug: string) {

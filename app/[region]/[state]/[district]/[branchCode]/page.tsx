@@ -28,6 +28,17 @@ import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLab
 import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
 
+/** Next throws this for redirect()/permanentRedirect(); catch blocks must rethrow it. */
+function isNextRedirectError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'digest' in error &&
+    typeof (error as { digest?: unknown }).digest === 'string' &&
+    (error as { digest: string }).digest.startsWith('NEXT_REDIRECT')
+  );
+}
+
 const EXCLUSIVE_CAMPUS_CONTACT = exclusiveCampusContactByBranch();
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
@@ -158,6 +169,8 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       },
     };
   } catch (error) {
+    // permanentRedirect() throws — must rethrow or campus redirects never fire
+    if (isNextRedirectError(error)) throw error;
     console.error('Error generating metadata:', error);
     return {
       title: 'Brahma Kumaris Meditation Center',
@@ -839,6 +852,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
       </div>
     );
   } catch (error) {
+    // permanentRedirect() throws — must rethrow or campus redirects never fire
+    if (isNextRedirectError(error)) throw error;
     console.error('Error rendering center page:', error);
     return <EmptyCenterView region={actualRegion} state={state} district={district} branchCode={branchCode} />;
   }
