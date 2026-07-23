@@ -13,7 +13,7 @@ const GEO_URL = '/centers/campuses/jagdamba-bhawan/maharashtra.json';
 /** Geographic center of Maharashtra bbox */
 const MH_CENTER: [number, number] = [76.82, 18.82];
 /** Jagdamba Bhawan / Pune (lng, lat) */
-const PUNE: [number, number] = [73.906126, 18.433823];
+const PUNE: [number, number] = [73.908701, 18.433823];
 
 /** SVG canvas — slightly taller so marker rings clear the edge */
 const MAP_W = 200;
