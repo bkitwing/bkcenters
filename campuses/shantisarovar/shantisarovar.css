@@ -5,6 +5,7 @@
    Map (edit in place; delete old families when replacing UI):
    tokens → layout → buttons → header/sheet → hero → media → courses
    → galleries → news/events heroes+lists → contact → home sections
+   Body type: --ss-text / --ss-lede-size / --ss-text-sm (mobile bump ≤767px)
    Shared footer: ../_components/retreat-footer.css
    ============================================================================ */
 
@@ -46,6 +47,15 @@ html.dark body.ss-campus-body {
   /* header + one sticky pill bar clearance (galleries / news / events) */
   --ss-gal-sticky-offset: calc(var(--ss-header-h) + 3.5rem);
 
+  /*
+   * Body typography — one place for paragraph sizing.
+   * Components should use these tokens instead of one-off rem values.
+   */
+  --ss-text: 1.0625rem; /* 17px */
+  --ss-text-lh: 1.7;
+  --ss-lede-size: 1.125rem; /* 18px */
+  --ss-text-sm: 0.9375rem; /* 15px */
+
   --ss-hero-wash:
     radial-gradient(ellipse 75% 50% at 0% 0%, rgba(184, 149, 90, 0.14), transparent 55%),
     radial-gradient(ellipse 60% 45% at 100% 0%, rgba(61, 92, 74, 0.1), transparent 50%),
@@ -77,7 +87,19 @@ html.dark body.ss-campus-body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-ss-sans), "Noto Sans", system-ui, sans-serif;
+  font-size: var(--ss-text);
+  line-height: var(--ss-text-lh);
   scroll-behavior: smooth;
+}
+
+/* Phones: slightly larger body type for reading comfort */
+@media (max-width: 767px) {
+  .ss-oasis {
+    --ss-text: 1.125rem; /* 18px */
+    --ss-text-lh: 1.72;
+    --ss-lede-size: 1.1875rem; /* 19px */
+    --ss-text-sm: 1rem; /* 16px */
+  }
 }
 
 .ss-oasis::before {
@@ -200,8 +222,8 @@ html.dark body.ss-campus-body {
 
 .ss-lede {
   margin: 0.85rem 0 0;
-  font-size: 1.02rem;
-  line-height: 1.7;
+  font-size: var(--ss-lede-size);
+  line-height: var(--ss-text-lh);
   color: var(--ss-muted);
   max-width: 46ch;
 }
@@ -892,8 +914,8 @@ html.dark body.ss-campus-body {
 
 .ss-hero__support {
   margin: 0 0 1.6rem;
-  font-size: 1.02rem;
-  line-height: 1.65;
+  font-size: var(--ss-lede-size);
+  line-height: var(--ss-text-lh);
   color: var(--ss-muted);
   max-width: 38ch;
 }
@@ -982,7 +1004,19 @@ html.dark body.ss-campus-body {
   gap: 1.75rem;
 }
 
-/* Mobile: text first, image second */
+.ss-campus__sticky {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.ss-campus__photo {
+  border-radius: 1rem !important;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Mobile: text first, image second — full-width photo, no crop */
 @media (max-width: 899px) {
   .ss-campus__story {
     order: 1;
@@ -990,23 +1024,30 @@ html.dark body.ss-campus-body {
 
   .ss-campus__visual {
     order: 2;
+    width: 100%;
+  }
+
+  .ss-campus__sticky {
+    width: 100%;
   }
 
   .ss-campus__photo {
-    margin-inline: auto;
+    display: block;
     width: 100%;
     max-width: 100%;
-    /* Fixed frame so the image cannot grow/shrink mid-scroll */
-    max-height: none;
-    aspect-ratio: 4 / 5;
+    margin-inline: 0;
+    /* Let the collage keep its natural proportions (no 4:5 crop) */
+    aspect-ratio: auto;
     height: auto;
+    max-height: none;
   }
 
   .ss-campus__photo img {
+    display: block;
     width: 100%;
-    height: 100%;
+    height: auto;
     max-height: none;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center top;
   }
 }
@@ -1018,40 +1059,29 @@ html.dark body.ss-campus-body {
     gap: 2.5rem 2.85rem;
     align-items: center;
   }
-}
 
-.ss-campus__sticky {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-@media (min-width: 900px) {
   .ss-campus__sticky {
     position: sticky;
     top: calc(var(--ss-header-h) + 1rem);
   }
-}
 
-.ss-campus__photo {
-  border-radius: 1rem !important;
-  aspect-ratio: auto;
-  height: auto;
-  max-height: var(--ss-campus-photo-max-h);
-  width: fit-content;
-  max-width: 100%;
-  margin-inline: auto 0;
-  overflow: hidden;
-}
+  .ss-campus__photo {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: var(--ss-campus-photo-max-h);
+    width: fit-content;
+    margin-inline: auto 0;
+  }
 
-.ss-campus__photo img {
-  display: block;
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  max-height: var(--ss-campus-photo-max-h);
-  object-fit: contain;
-  object-position: top center;
+  .ss-campus__photo img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: var(--ss-campus-photo-max-h);
+    object-fit: contain;
+    object-position: top center;
+  }
 }
 
 /* Metrics — mobile: one compact row; desktop: editorial fact rail */
@@ -1179,19 +1209,13 @@ html.dark body.ss-campus-body {
 
 .ss-campus__chapter p {
   margin: 0;
-  font-size: 0.94rem;
-  line-height: 1.62;
+  font-size: var(--ss-text);
+  line-height: var(--ss-text-lh);
   color: var(--ss-muted);
   max-width: 42rem;
   text-align: justify;
   text-justify: inter-word;
   hyphens: auto;
-}
-
-@media (min-width: 900px) {
-  .ss-campus__chapter p {
-    font-size: 0.98rem;
-  }
 }
 
 /* ---- Stats / panels ---- */
@@ -1272,6 +1296,8 @@ html.dark body.ss-campus-body {
 .ss-home-gallery__lede {
   margin-bottom: 0;
   max-width: 36rem;
+  font-size: var(--ss-lede-size);
+  line-height: var(--ss-text-lh);
 }
 
 .ss-home-courses__all,
@@ -2264,8 +2290,8 @@ html.dark body.ss-campus-body {
 .ss-media-hero__lede {
   margin: 0.85rem 0 0;
   max-width: 36rem;
-  font-size: 1.02rem;
-  line-height: 1.6;
+  font-size: var(--ss-lede-size);
+  line-height: var(--ss-text-lh);
   color: rgba(255, 248, 235, 0.78);
 }
 
@@ -3401,8 +3427,8 @@ html.dark body.ss-campus-body {
 .ss-story-lede {
   margin: 0 0 0.85rem;
   color: var(--ss-muted);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: var(--ss-text);
+  line-height: var(--ss-text-lh);
 }
 
 .ss-story-linkgrid {
@@ -3979,9 +4005,9 @@ html.dark body.ss-campus-body {
 
 .ss-reach__landmark-text {
   margin: 0.3rem 0 0;
-  font-size: 0.95rem;
+  font-size: var(--ss-text);
   font-weight: 650;
-  line-height: 1.45;
+  line-height: var(--ss-text-lh);
   color: var(--ss-ink);
 }
 
@@ -4248,9 +4274,9 @@ html.dark body.ss-campus-body {
 .ss-course-journey__blurb {
   margin: 0.45rem 0 0;
   position: relative;
-  font-size: 1.02rem;
+  font-size: var(--ss-lede-size);
   color: var(--ss-muted);
-  line-height: 1.5;
+  line-height: var(--ss-text-lh);
 }
 
 .ss-course-journey__note {
