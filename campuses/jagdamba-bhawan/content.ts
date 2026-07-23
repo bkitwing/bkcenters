@@ -141,8 +141,17 @@ export const JB_CENTER: Center = {
   district_id: '',
   state_id: '',
   country_id: '',
-  coords: ['18.433709', '73.909236'],
+  /** Lat, lng — Google Maps place pin for Jagdamba Bhawan Meditation & Retreat Centre */
+  coords: ['18.433823', '73.906126'],
 };
+
+/** Official Google Maps embed for home + contact (exact campus pin). */
+export const JB_MAP_EMBED_URL =
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4839.800670526627!2d73.9061261761336!3d18.43382258264306!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2ebb7984e7293%3A0xda939dac61ce3a49!2sJagdamba%20Bhawan%20Meditation%20%26%20Retreat%20Centre!5e1!3m2!1sen!2sin!4v1784802949175!5m2!1sen!2sin';
+
+/** Opens the same place in Google Maps (external). */
+export const JB_MAPS_URL =
+  'https://www.google.com/maps/place/Jagdamba+Bhawan+Meditation+%26+Retreat+Centre/@18.4338226,73.9061262,17z';
 
 export type MediaSlot = {
   id: string;

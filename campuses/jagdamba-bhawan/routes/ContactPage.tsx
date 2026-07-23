@@ -18,7 +18,7 @@ import SoulSustenance from '@/components/SoulSustenance';
 import { getCenterByCode } from '@/lib/serverCenterData';
 import { getLocalizedFaqs } from '@/lib/centerContent';
 import type { Center } from '@/lib/types';
-import { JB_CANONICAL, JB_CENTER, JB_OG_IMAGES, JB_RETREAT_NAME, JB_SEO } from '../content';
+import { JB_CANONICAL, JB_CENTER, JB_MAP_EMBED_URL, JB_MAPS_URL, JB_OG_IMAGES, JB_RETREAT_NAME, JB_SEO } from '../content';
 import { JbMediaHero } from '../JbMediaHero';
 import { ContactSectionNav } from '../contact/ContactSectionNav';
 import { JbCourseStory } from '../contact/JbCourseStory';
@@ -48,8 +48,7 @@ function mergeCenter(live: Center | null): Center {
     email: live.email || JB_CENTER.email,
     contact: live.contact || JB_CENTER.contact,
     mobile: live.mobile || JB_CENTER.mobile,
-    coords:
-      live.coords?.[0] && live.coords?.[1] ? live.coords : JB_CENTER.coords,
+    coords: JB_CENTER.coords,
   };
 }
 
@@ -106,7 +105,7 @@ export default async function JagdambaBhawanContactPage() {
     ...(center.mobile ? [center.mobile] : []),
   ].filter((p, i, arr) => arr.indexOf(p) === i);
 
-  const mapsUrl = `https://www.google.com/maps?q=${center.coords[0]},${center.coords[1]}`;
+  const mapsUrl = JB_MAPS_URL;
 
   const localizedFaqs = getLocalizedFaqs(center, { omitTimings: true });
   const faqSchema = [
@@ -273,12 +272,11 @@ export default async function JagdambaBhawanContactPage() {
               <div className="jb-contact-main__map jb-media aspect-[16/10]">
                 <iframe
                   title="Jagdamba Bhawan map"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                    'Jagdamba Bhawan Pisoli Pune'
-                  )}&t=m&z=15&output=embed&iwloc=near`}
+                  src={JB_MAP_EMBED_URL}
                   className="w-full h-full border-0"
                   loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
                 />
               </div>
             </div>

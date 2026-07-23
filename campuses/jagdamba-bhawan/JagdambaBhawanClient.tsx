@@ -14,7 +14,7 @@ import {
   Navigation,
   TreePine,
 } from 'lucide-react';
-import { JB_CENTER, JB_CONTENT, type MediaSlot } from './content';
+import { JB_CONTENT, JB_MAP_EMBED_URL, JB_MAPS_URL, type MediaSlot } from './content';
 import { JB_ABOUT_HREF, JB_CONTACT_HREF } from './nav';
 import type { JbHomePageData } from './jb-home-data';
 import type { JbTestimonialsData } from './jb-testimonials-data';
@@ -104,7 +104,7 @@ export default function JagdambaBhawanClient({
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.9], [1, reduce ? 1 : 0.35]);
 
-  const mapsUrl = `https://www.google.com/maps?q=${JB_CENTER.coords[0]},${JB_CENTER.coords[1]}`;
+  const mapsUrl = JB_MAPS_URL;
   const heroSlides = home?.heroSlides ?? [];
   const heroSlidesMobile = home?.heroSlidesMobile ?? [];
   const aboutImage = home?.aboutImage ?? null;
@@ -381,11 +381,10 @@ export default function JagdambaBhawanClient({
               <div className="jb-home-visit__map jb-media">
                 <iframe
                   title="Jagdamba Bhawan map"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                    'Jagdamba Bhawan Pisoli Pune'
-                  )}&t=m&z=15&output=embed&iwloc=near`}
+                  src={JB_MAP_EMBED_URL}
                   loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
                 />
               </div>
             </div>

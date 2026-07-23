@@ -98,14 +98,28 @@ function slugify(text: string): string {
 function titleFromName(name: string): string {
   let n = name.replace(/\.[a-z0-9]+$/i, '');
   n = n.replace(/[-_]+/g, ' ');
+  // Version / export clutter: V2, V2 1, v3-2, (1), copy, final
+  n = n.replace(/\bv\s*\d+(?:\s*[-_.]?\s*\d+)*\b/gi, '');
+  n = n.replace(/\(\s*\d+\s*\)/g, '');
+  n = n.replace(/\b(?:copy|final|edited|export|result)\b/gi, '');
   n = n.replace(/\b\d{3,4}\s*[x×]\s*\d{3,4}\b/gi, '');
   n = n.replace(/\b\d{3,4}x\b/gi, '');
-  n = n.replace(/\bresult\b/gi, '');
   n = n.replace(/^\d+\s+/, '');
+  n = n.replace(/\s+\d+$/g, '');
   n = n.replace(/\s+/g, ' ').trim();
   n = n.replace(/^jagdamba bhawan\s+/i, '').trim();
   n = n.replace(/^shanti sarovar\s+/i, '').trim();
-  return n.replace(/\b\w/g, (c) => c.toUpperCase());
+  // Title case, keep short connectors lowercase mid-phrase
+  const small = new Set(['a', 'an', 'and', 'at', 'for', 'in', 'of', 'on', 'the', 'to']);
+  return n
+    .split(' ')
+    .filter(Boolean)
+    .map((word, i) => {
+      const lower = word.toLowerCase();
+      if (i > 0 && small.has(lower)) return lower;
+      return lower.replace(/^\w/, (c) => c.toUpperCase());
+    })
+    .join(' ');
 }
 
 function formatUrl(
