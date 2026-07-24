@@ -702,6 +702,22 @@ async function sync() {
   console.log(`  Deleted: ${report.summary.deleted}`);
   console.log(`  Report saved to: scripts/sync-report.json`);
   console.log('=====================\n');
+
+  // Refresh sitemap after real syncs (not dry-run). Fail soft — sync already succeeded.
+  if (!DRY_RUN) {
+    try {
+      console.log('Refreshing sitemap.xml from Strapi...');
+      require('child_process').execSync('npm run generate-sitemap', {
+        cwd: path.join(__dirname, '..'),
+        stdio: 'inherit',
+      });
+    } catch (err) {
+      console.warn(
+        'WARNING: sitemap refresh failed — keeping existing public/sitemap.xml.',
+        err.message || err
+      );
+    }
+  }
 }
 
 sync().catch(err => {

@@ -254,7 +254,8 @@ Sitemap: https://www.brahmakumaris.com/centers/sitemap.xml
   console.log(`Robots.txt written to ${robotsPath}`);
 }
 
-// Run the script
+// Run the script. Exit 1 on failure so callers (CI / GENERATE_SITEMAP=1) can detect it;
+// build.sh and strapi-sync treat failure as non-fatal and keep the previous sitemap.
 generateSitemap().catch((err) => {
   console.error('Error generating sitemap:', err);
   process.exit(1);
