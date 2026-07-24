@@ -19,6 +19,7 @@ export const SS_OG_IMAGES = {
     'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Galleries_Featured_Image_442c6070d8.jpg',
   contact:
     'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Contact_Us_Shanti_sarovar_Retreat_Center_98575aafb6.jpg',
+  csr: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Retreat_center_Fetured_Image_188f4da1c5.jpg',
 } as const;
 
 /**
@@ -96,6 +97,21 @@ export const SS_SEO = {
     ] as string[],
     ogAlt:
       'Contact Us — Shanti Sarovar Retreat Center entrance in Gachibowli with location, phone and email',
+  },
+  csr: {
+    title: 'CSR Partnerships & Social Impact | Shanti Sarovar',
+    description:
+      'Explore the Brahma Kumaris Shanti Sarovar CSR Partnership Portfolio and Impact Overview, featuring opportunities in renewable energy, water conservation, community wellbeing, rural development and human empowerment.',
+    keywords: [
+      'Shanti Sarovar CSR',
+      'Brahma Kumaris CSR partnerships',
+      'CSR Hyderabad',
+      'Shanti Sarovar social impact',
+      'renewable energy CSR India',
+      'water conservation CSR',
+    ] as string[],
+    ogAlt:
+      'CSR partnerships at Shanti Sarovar Retreat Center — community wellbeing, sustainability and social impact',
   },
 };
 

@@ -25,6 +25,7 @@ const PAGE_LOADERS: Record<
     news: () => import('@/campuses/shantisarovar/routes/NewsPage'),
     events: () => import('@/campuses/shantisarovar/routes/EventsPage'),
     galleries: () => import('@/campuses/shantisarovar/routes/GalleriesPage'),
+    csr: () => import('@/campuses/shantisarovar/routes/CsrPage'),
   },
   'jagdamba-bhawan': {
     home: () => import('@/campuses/jagdamba-bhawan/routes/HomePage'),

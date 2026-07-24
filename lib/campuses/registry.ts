@@ -7,7 +7,14 @@
  * scale by adding a thin wrapper folder + registry entry per campus.
  */
 
-export type CampusPageKey = 'home' | 'contact' | 'news' | 'events' | 'galleries' | 'about';
+export type CampusPageKey =
+  | 'home'
+  | 'contact'
+  | 'news'
+  | 'events'
+  | 'galleries'
+  | 'about'
+  | 'csr';
 
 export type CampusDefinition = {
   slug: string;

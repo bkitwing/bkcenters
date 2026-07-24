@@ -7,6 +7,7 @@ export const SS_GALLERIES_HREF = `${SS_HOME_HREF}/galleries`;
 export const SS_NEWS_HREF = `${SS_HOME_HREF}/news`;
 export const SS_EVENTS_HREF = `${SS_HOME_HREF}/events`;
 export const SS_COURSES_HREF = `${SS_HOME_HREF}#courses`;
+export const SS_CSR_HREF = `${SS_HOME_HREF}/csr`;
 /** Canonical campus contact / visit / enquire URL (SS chrome). */
 export const SS_CONTACT_HREF = `${SS_HOME_HREF}/contact`;
 
@@ -47,6 +48,7 @@ export const SS_NAV: readonly SsNavItem[] = [
     ],
   },
   { label: 'Courses Offered', href: SS_COURSES_HREF },
+  { label: 'CSR', href: SS_CSR_HREF },
   { label: 'Galleries', href: SS_GALLERIES_HREF },
   { label: 'News', href: SS_NEWS_HREF },
   { label: 'Events', href: SS_EVENTS_HREF },
