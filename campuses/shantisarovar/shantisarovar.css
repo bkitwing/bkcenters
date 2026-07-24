@@ -4586,7 +4586,6 @@ html.dark body.ss-campus-body {
   --ss-csr-ivory: #f7f1e6;
   --ss-csr-bk-red: #b91c1c;
   position: relative;
-  overflow-x: hidden;
 }
 
 .ss-csr-eyebrow {
