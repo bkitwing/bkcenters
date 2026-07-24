@@ -48,7 +48,6 @@ export const SS_NAV: readonly SsNavItem[] = [
     ],
   },
   { label: 'Courses Offered', href: SS_COURSES_HREF },
-  { label: 'CSR', href: SS_CSR_HREF },
   { label: 'Galleries', href: SS_GALLERIES_HREF },
   { label: 'News', href: SS_NEWS_HREF },
   { label: 'Events', href: SS_EVENTS_HREF },
