@@ -1,7 +1,5 @@
 /**
  * Shanti Sarovar CSR cinema gallery — Strapi website-section #65
- * Dynamic zone: wisdom.post-gallery ("Image Slider").
- *
  * https://webapp.brahmakumaris.com/admin/content-manager/collection-types/api::website-section.website-section/65
  */
 
@@ -16,11 +14,6 @@ const STRAPI_URL =
   process.env.STRAPI_BASE_URL ||
   (IS_PROD ? 'https://portal.brahmakumaris.com/api' : 'https://webapp.brahmakumaris.com/api');
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN || '';
-
-export type SsCsrGalleryData = {
-  sectionTitle: string;
-  slides: SsHomeImage[];
-};
 
 type ImageFormats = {
   thumbnail?: { url: string };
@@ -44,16 +37,7 @@ function formatUrl(
   formats: ImageFormats | null | undefined,
   key: keyof ImageFormats
 ): string | null {
-  const u = formats?.[key]?.url;
-  return u || null;
-}
-
-function titleFromName(name: string): string {
-  return name
-    .replace(/\.[a-z0-9]+$/i, '')
-    .replace(/[_-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  return formats?.[key]?.url || null;
 }
 
 function leadingIndex(name: string): number {
@@ -79,7 +63,9 @@ function mapSlide(raw: unknown, index: number): SsHomeImage | null {
   if (!url) return null;
   const formats = (attrs.formats as ImageFormats) || null;
   const name = typeof attrs.name === 'string' ? attrs.name : '';
-  const label = titleFromName(name) || `Photograph ${index + 1}`;
+  const label =
+    name.replace(/\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim() ||
+    `Photograph ${index + 1}`;
   const alt =
     (typeof attrs.alternativeText === 'string' && attrs.alternativeText) ||
     (typeof attrs.caption === 'string' && attrs.caption) ||
@@ -113,32 +99,7 @@ function mapSlide(raw: unknown, index: number): SsHomeImage | null {
   };
 }
 
-async function strapiGet(path: string): Promise<unknown | null> {
-  try {
-    const res = await fetch(`${STRAPI_URL}/${path}`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: ISR, tags: ['ss-csr-gallery'] },
-    } as RequestInit);
-    if (!res.ok) {
-      console.error(`SS CSR gallery API ${res.status} for ${path}`);
-      return null;
-    }
-    return res.json();
-  } catch (err) {
-    console.error('SS CSR gallery fetch failed:', err);
-    return null;
-  }
-}
-
-const EMPTY: SsCsrGalleryData = {
-  sectionTitle: 'Shanti Sarovar CSR',
-  slides: [],
-};
-
-export const getSsCsrGallery = cache(async (): Promise<SsCsrGalleryData> => {
+export const getSsCsrGallery = cache(async (): Promise<SsHomeImage[]> => {
   const populate = [
     'populate[section_type][on][wisdom.post-gallery][populate][gallery][fields][0]=url',
     'populate[section_type][on][wisdom.post-gallery][populate][gallery][fields][1]=formats',
@@ -149,38 +110,47 @@ export const getSsCsrGallery = cache(async (): Promise<SsCsrGalleryData> => {
     'populate[section_type][on][wisdom.post-gallery][populate][gallery][fields][6]=height',
   ].join('&');
 
-  const json = (await strapiGet(
-    `website-sections/${SS_CSR_GALLERY_SECTION_ID}?${populate}`
-  )) as { data?: unknown } | null;
-
-  if (!json?.data) return EMPTY;
-
-  const attrs = unwrap(json.data);
-  const sectionTitle =
-    typeof attrs.title === 'string' && attrs.title
-      ? attrs.title
-      : EMPTY.sectionTitle;
-  const sectionType = Array.isArray(attrs.section_type) ? attrs.section_type : [];
-
-  const media: { raw: unknown; name: string }[] = [];
-  for (const raw of sectionType) {
-    if (!raw || typeof raw !== 'object') continue;
-    const c = raw as Record<string, unknown>;
-    if (c.__component !== 'wisdom.post-gallery') continue;
-    for (const item of mediaList(c.gallery)) {
-      const a = unwrap(item);
-      media.push({
-        raw: item,
-        name: typeof a.name === 'string' ? a.name : '',
-      });
+  try {
+    const res = await fetch(
+      `${STRAPI_URL}/website-sections/${SS_CSR_GALLERY_SECTION_ID}?${populate}`,
+      {
+        headers: {
+          Authorization: `Bearer ${STRAPI_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        next: { revalidate: ISR, tags: ['ss-csr-gallery'] },
+      } as RequestInit
+    );
+    if (!res.ok) {
+      console.error(`SS CSR gallery API ${res.status}`);
+      return [];
     }
+    const json = (await res.json()) as { data?: unknown };
+    if (!json?.data) return [];
+
+    const attrs = unwrap(json.data);
+    const sectionType = Array.isArray(attrs.section_type) ? attrs.section_type : [];
+    const media: { raw: unknown; name: string }[] = [];
+
+    for (const raw of sectionType) {
+      if (!raw || typeof raw !== 'object') continue;
+      const c = raw as Record<string, unknown>;
+      if (c.__component !== 'wisdom.post-gallery') continue;
+      for (const item of mediaList(c.gallery)) {
+        const a = unwrap(item);
+        media.push({
+          raw: item,
+          name: typeof a.name === 'string' ? a.name : '',
+        });
+      }
+    }
+
+    media.sort((a, b) => leadingIndex(a.name) - leadingIndex(b.name));
+    return media
+      .map((m, i) => mapSlide(m.raw, i))
+      .filter((img): img is SsHomeImage => Boolean(img));
+  } catch (err) {
+    console.error('SS CSR gallery fetch failed:', err);
+    return [];
   }
-
-  media.sort((a, b) => leadingIndex(a.name) - leadingIndex(b.name));
-
-  const slides = media
-    .map((m, i) => mapSlide(m.raw, i))
-    .filter((img): img is SsHomeImage => Boolean(img));
-
-  return { sectionTitle, slides };
 });

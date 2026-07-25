@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ShantiSarovarCsrPage() {
-  const gallery = await getSsCsrGallery();
+  const cinemaSlides = await getSsCsrGallery();
 
   return (
     <>
@@ -90,7 +90,7 @@ export default async function ShantiSarovarCsrPage() {
           }),
         }}
       />
-      <CsrPageClient cinemaSlides={gallery.slides} />
+      <CsrPageClient cinemaSlides={cinemaSlides} />
     </>
   );
 }

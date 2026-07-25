@@ -4763,12 +4763,21 @@ html.dark body.ss-campus-body {
   color: rgba(232, 210, 160, 0.95);
 }
 
-/* ---- Cinema gallery (text-free hero band, Strapi #65) — desktop only ---- */
+/* ---- Cinema gallery (Strapi #65) — desktop only ---- */
 .ss-csr-cinema {
   display: none;
 }
 
 @media (min-width: 768px) {
+  html:has(.ss-csr-page) {
+    scroll-snap-type: y proximity;
+  }
+
+  .ss-csr-hero,
+  .ss-csr-cinema {
+    scroll-snap-align: start;
+  }
+
   .ss-csr-cinema {
     display: block;
     position: relative;
@@ -4777,9 +4786,7 @@ html.dark body.ss-campus-body {
     overflow: hidden;
     isolation: isolate;
     background: #0f2438;
-    scroll-snap-align: start;
     scroll-snap-stop: always;
-    scroll-margin-top: 0;
   }
 
   .ss-csr-cinema__media {
@@ -4788,23 +4795,14 @@ html.dark body.ss-campus-body {
     z-index: 0;
   }
 
-  /* Swiper: both slides translate on one track (true parallel handoff) */
   .ss-csr-swiper {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     background: #0f2438;
-    --swiper-theme-color: #c4a35a;
   }
 
-  .ss-csr-swiper--empty {
-    background:
-      radial-gradient(ellipse 70% 50% at 30% 40%, rgba(196, 163, 90, 0.22), transparent 60%),
-      #0f2438;
-  }
-
-  /* Long ease-in-out — slow start, soft middle, soft settle */
   .ss-csr-swiper .swiper-wrapper {
     transition-timing-function: cubic-bezier(0.45, 0.02, 0.2, 1);
   }
@@ -4823,12 +4821,8 @@ html.dark body.ss-campus-body {
     object-position: center;
     user-select: none;
     -webkit-user-drag: none;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
   }
 
-  /* Soft film grain of light at the seam while sliding */
   .ss-csr-swiper .swiper-slide::after {
     content: '';
     position: absolute;
@@ -4875,30 +4869,16 @@ html.dark body.ss-campus-body {
       inset 0 0 80px rgba(15, 36, 56, 0.35);
   }
 
-  /* Soft page snap so the cinema band lands like a TV frame */
-  html:has(.ss-csr-page) {
-    scroll-snap-type: y proximity;
+  .ss-oasis:has(.ss-csr-page) .ss-header-wrap {
+    transition:
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.35s ease;
   }
 
-  .ss-csr-hero,
-  .ss-csr-cinema {
-    scroll-snap-align: start;
-  }
-
-  /* Hide floating header while cinema is the focused frame */
   .ss-oasis.is-csr-cinema-active .ss-header-wrap {
     transform: translateY(calc(-100% - 0.75rem));
     opacity: 0;
     pointer-events: none;
-    transition:
-      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.4s ease;
-  }
-
-  .ss-oasis:not(.is-csr-cinema-active) .ss-header-wrap {
-    transition:
-      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.35s ease;
   }
 }
 
@@ -4907,8 +4887,7 @@ html.dark body.ss-campus-body {
     display: none;
   }
 
-  .ss-oasis.is-csr-cinema-active .ss-header-wrap,
-  .ss-oasis:not(.is-csr-cinema-active) .ss-header-wrap {
+  .ss-oasis:has(.ss-csr-page) .ss-header-wrap {
     transition: none;
   }
 }
