@@ -4763,6 +4763,99 @@ html.dark body.ss-campus-body {
   color: rgba(232, 210, 160, 0.95);
 }
 
+/* ---- Cinema gallery (text-free hero band, Strapi #65) — desktop only ---- */
+.ss-csr-cinema {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .ss-csr-cinema {
+    display: block;
+    position: relative;
+    min-height: 100svh;
+    height: 100svh;
+    overflow: hidden;
+    isolation: isolate;
+    background: #0f2438;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .ss-csr-cinema__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .ss-csr-cinema__wash {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(15, 36, 56, 0.22) 0%, transparent 30%),
+      linear-gradient(0deg, rgba(15, 36, 56, 0.36) 0%, transparent 36%),
+      linear-gradient(95deg, rgba(15, 36, 56, 0.18) 0%, transparent 55%);
+  }
+
+  .ss-csr-cinema__particles {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  .ss-csr-cinema__vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 88% 72% at 50% 48%, transparent 42%, rgba(8, 16, 28, 0.45) 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(196, 163, 90, 0.08),
+      inset 0 0 80px rgba(15, 36, 56, 0.35);
+  }
+
+  /* Soft page snap so the cinema band lands like a TV frame */
+  html:has(.ss-csr-page) {
+    scroll-snap-type: y proximity;
+  }
+
+  .ss-csr-hero,
+  .ss-csr-cinema {
+    scroll-snap-align: start;
+  }
+
+  /* Hide floating header while cinema is the focused frame */
+  .ss-oasis.is-csr-cinema-active .ss-header-wrap {
+    transform: translateY(calc(-100% - 0.75rem));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.4s ease;
+  }
+
+  .ss-oasis:not(.is-csr-cinema-active) .ss-header-wrap {
+    transition:
+      transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.35s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-csr-cinema__particles {
+    display: none;
+  }
+
+  .ss-oasis.is-csr-cinema-active .ss-header-wrap,
+  .ss-oasis:not(.is-csr-cinema-active) .ss-header-wrap {
+    transition: none;
+  }
+}
+
 /* ---- Intro ---- */
 .ss-csr-intro__inner {
   max-width: 46rem;

@@ -78,9 +78,12 @@ function preloadSlide(slide: SsHomeImage, isMobile: boolean): Promise<void> {
 export function HomeHeroSlideshow({
   slides,
   mobileSlides,
+  /** Keep Strapi order (e.g. CSR numbered slides). Default: shuffle for home hero. */
+  ordered = false,
 }: {
   slides: SsHomeImage[];
   mobileSlides?: SsHomeImage[];
+  ordered?: boolean;
 }) {
   const reduce = useReducedMotion();
   const isMobile = useIsMobileViewport();
@@ -101,9 +104,9 @@ export function HomeHeroSlideshow({
     setPos(0);
     setExitingSlide(null);
     transitioningRef.current = false;
-    setOrder(shuffleOrder(total));
+    setOrder(ordered ? identityOrder(total) : shuffleOrder(total));
     setReady(true);
-  }, [total, deckKey]);
+  }, [total, deckKey, ordered]);
 
   const activeSlide = order[pos] ?? 0;
   const nextPos = total > 1 ? (pos + 1) % total : 0;

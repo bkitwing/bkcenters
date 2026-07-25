@@ -35,6 +35,8 @@ import {
   Users,
 } from 'lucide-react';
 import { HomeHeroParticles } from '../HomeHeroParticles';
+import type { SsHomeImage } from '../ss-home-data';
+import { CsrCinemaGallery } from './CsrCinemaGallery';
 import {
   CSR_CONTACT_DETAILS,
   CSR_CONTACT_HREF,
@@ -426,7 +428,11 @@ function PublicationCard({
   );
 }
 
-export default function CsrPageClient() {
+export default function CsrPageClient({
+  cinemaSlides = [],
+}: {
+  cinemaSlides?: SsHomeImage[];
+}) {
   const [toast, setToast] = useState(false);
   const downloadLock = useRef(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -498,6 +504,9 @@ export default function CsrPageClient() {
           ))}
         </div>
       </section>
+
+      {/* Full-viewport cinema gallery (Strapi website-section #65) */}
+      <CsrCinemaGallery slides={cinemaSlides} />
 
       {/* Global initiatives */}
       <section

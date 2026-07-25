@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { BreadcrumbSchema } from '@/components/StructuredData';
 import { SS_CANONICAL, SS_OG_IMAGES, SS_SEO } from '../content';
 import CsrPageClient from '../csr/CsrPageClient';
+import { getSsCsrGallery } from '../csr/ss-csr-gallery-data';
 
 export const revalidate = 86400;
 
@@ -45,7 +46,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function ShantiSarovarCsrPage() {
+export default async function ShantiSarovarCsrPage() {
+  const gallery = await getSsCsrGallery();
+
   return (
     <>
       <BreadcrumbSchema
@@ -87,7 +90,7 @@ export default function ShantiSarovarCsrPage() {
           }),
         }}
       />
-      <CsrPageClient />
+      <CsrPageClient cinemaSlides={gallery.slides} />
     </>
   );
 }
