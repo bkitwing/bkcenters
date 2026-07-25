@@ -4779,12 +4779,69 @@ html.dark body.ss-campus-body {
     background: #0f2438;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+    scroll-margin-top: 0;
   }
 
   .ss-csr-cinema__media {
     position: absolute;
     inset: 0;
     z-index: 0;
+  }
+
+  /* Swiper: both slides translate on one track (true parallel handoff) */
+  .ss-csr-swiper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #0f2438;
+    --swiper-theme-color: #c4a35a;
+  }
+
+  .ss-csr-swiper--empty {
+    background:
+      radial-gradient(ellipse 70% 50% at 30% 40%, rgba(196, 163, 90, 0.22), transparent 60%),
+      #0f2438;
+  }
+
+  /* Long ease-in-out — slow start, soft middle, soft settle */
+  .ss-csr-swiper .swiper-wrapper {
+    transition-timing-function: cubic-bezier(0.45, 0.02, 0.2, 1);
+  }
+
+  .ss-csr-swiper .swiper-slide {
+    height: 100%;
+    overflow: hidden;
+    background: #0f2438;
+  }
+
+  .ss-csr-swiper__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    user-select: none;
+    -webkit-user-drag: none;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Soft film grain of light at the seam while sliding */
+  .ss-csr-swiper .swiper-slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(8, 16, 28, 0.12) 0%,
+      transparent 18%,
+      transparent 82%,
+      rgba(8, 16, 28, 0.16) 100%
+    );
+    opacity: 0.55;
   }
 
   .ss-csr-cinema__wash {

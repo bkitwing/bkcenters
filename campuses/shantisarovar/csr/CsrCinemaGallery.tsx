@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { HomeHeroSlideshow } from '../HomeHeroSlideshow';
 import { HomeHeroParticles } from '../HomeHeroParticles';
 import type { SsHomeImage } from '../ss-home-data';
+import { CsrCinemaSlideshow } from './CsrCinemaSlideshow';
+
+export const CSR_CINEMA_HASH = 'csr-cinema';
 
 const DESKTOP_MQ = '(min-width: 768px)';
 
@@ -29,29 +31,82 @@ function useIsDesktop() {
   );
 }
 
+function currentHash() {
+  return window.location.hash.replace(/^#/, '');
+}
+
+function setHash(id: string | null) {
+  const { pathname, search, hash } = window.location;
+  const next = id ? `#${id}` : '';
+  if (hash === next || (!id && !hash)) return;
+  window.history.replaceState(window.history.state, '', `${pathname}${search}${next}`);
+}
+
+function scrollToCinema(el: HTMLElement, behavior: ScrollBehavior = 'smooth') {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior, block: 'start' });
+    });
+  });
+}
+
 /**
- * Full-viewport, text-free cinema band — desktop only.
- * Same Ken Burns / crossfade as home hero; hides the campus header while in view.
+ * Full-viewport cinema band (desktop via CSS).
+ * Shell always in the DOM so `/csr#csr-cinema` deep links work; URL hash syncs on scroll.
  */
 export function CsrCinemaGallery({ slides }: { slides: SsHomeImage[] }) {
   const sectionRef = useRef<HTMLElement>(null);
   const isDesktop = useIsDesktop();
   const [inView, setInView] = useState(false);
+  const skipUrlSync = useRef(false);
+
+  // Deep-link: /csr#csr-cinema
+  useEffect(() => {
+    if (!slides.length) return;
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const go = (behavior: ScrollBehavior = 'smooth') => {
+      if (currentHash() !== CSR_CINEMA_HASH) return;
+      if (!window.matchMedia(DESKTOP_MQ).matches) return;
+      skipUrlSync.current = true;
+      scrollToCinema(el, behavior);
+      window.setTimeout(() => {
+        skipUrlSync.current = false;
+      }, 900);
+    };
+
+    go('auto');
+    const t = window.setTimeout(() => go('smooth'), 150);
+
+    const onHash = () => go('smooth');
+    window.addEventListener('hashchange', onHash);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('hashchange', onHash);
+    };
+  }, [slides.length]);
 
   useEffect(() => {
-    if (!isDesktop || !slides.length) return;
+    if (!slides.length) return;
     const el = sectionRef.current;
     if (!el) return;
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        setInView(Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.35));
+        setInView(Boolean(entry?.isIntersecting && (entry.intersectionRatio ?? 0) >= 0.28));
       },
-      { threshold: [0, 0.35, 0.55, 0.8] }
+      { threshold: [0, 0.28, 0.45, 0.7, 1] }
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [isDesktop, slides.length]);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (!isDesktop || skipUrlSync.current) return;
+    if (inView) setHash(CSR_CINEMA_HASH);
+    else if (currentHash() === CSR_CINEMA_HASH) setHash(null);
+  }, [inView, isDesktop]);
 
   useEffect(() => {
     const root = document.querySelector('.ss-oasis');
@@ -68,16 +123,17 @@ export function CsrCinemaGallery({ slides }: { slides: SsHomeImage[] }) {
     };
   }, [isDesktop, inView]);
 
-  if (!slides.length || !isDesktop) return null;
+  if (!slides.length) return null;
 
   return (
     <section
+      id={CSR_CINEMA_HASH}
       ref={sectionRef}
       className="ss-csr-cinema"
       aria-label="Shanti Sarovar CSR image gallery"
     >
       <div className="ss-csr-cinema__media" aria-hidden="true">
-        <HomeHeroSlideshow slides={slides} ordered />
+        <CsrCinemaSlideshow slides={slides} active={isDesktop && inView} />
       </div>
       <div className="ss-csr-cinema__wash" aria-hidden="true" />
       <div className="ss-csr-cinema__particles" aria-hidden="true">
