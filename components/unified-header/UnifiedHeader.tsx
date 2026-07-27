@@ -15,7 +15,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { lockBodyScroll } from "@/lib/scroll-lock";
 import {
   NAVIGATION,
   BK_LOGO_URL,
@@ -235,7 +236,7 @@ function SimpleDropdown({
   const Icon = section.icon;
 
   return (
-    <div className={`absolute top-full mt-1.5 w-60 bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-xl shadow-black/8 dark:shadow-black/30 overflow-hidden animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-150 z-50 ${align === "right" ? "right-0" : "left-0"}`}>
+    <div className={`absolute top-full mt-1.5 w-72 bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-xl shadow-black/8 dark:shadow-black/30 overflow-hidden animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-150 z-50 ${align === "right" ? "right-0" : "left-0"}`}>
       {/* Gradient hero header — soft */}
       <div className={`relative overflow-hidden bg-gradient-to-br ${gradient} px-4 py-3.5`}>
         <div className="absolute top-0 right-0 w-24 h-24 bg-current opacity-[0.04] rounded-full -translate-y-10 translate-x-10" />
@@ -568,7 +569,7 @@ function MobileWhatsAppSection() {
 }
 
 // ===========================================================================
-// MAIN HEADER COMPONENT
+// MAIN HEADER COMPONENT — floating pill (About/Wisdom pattern)
 // ===========================================================================
 export function UnifiedHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -577,6 +578,7 @@ export function UnifiedHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const navRef = useRef<HTMLElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const whatsappDesktopRef = useRef<HTMLDivElement>(null);
   const whatsappMobileRef = useRef<HTMLDivElement>(null);
@@ -585,16 +587,42 @@ export function UnifiedHeader() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setActiveDropdown(null);
+    setIsWhatsAppOpen(false);
   }, [pathname]);
 
-  // Lock body scroll when mobile menu is open
+  // Publish measured pill height for sticky sub-bars / scroll offsets
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
+    const el = wrapRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const pill = el.querySelector<HTMLElement>(".uh-pill-header");
+      const wrapTop = el.getBoundingClientRect().top;
+      const bottom = pill
+        ? pill.getBoundingClientRect().bottom
+        : el.getBoundingClientRect().bottom;
+      document.documentElement.style.setProperty("--bk-header-h", `${bottom - wrapTop}px`);
+      // Keep legacy alias used by SectionNav / older CSS
+      document.documentElement.style.setProperty("--header-h", `${bottom - wrapTop}px`);
+    };
+
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    const pill = el.querySelector<HTMLElement>(".uh-pill-header");
+    if (pill) ro.observe(pill);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+      document.documentElement.style.removeProperty("--bk-header-h");
+      document.documentElement.style.removeProperty("--header-h");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    return lockBodyScroll();
   }, [isMobileMenuOpen]);
 
   // Close dropdown on outside click
@@ -658,40 +686,52 @@ export function UnifiedHeader() {
 
   return (
     <>
-      <header
-        className="sticky top-0 z-[70] w-full bg-gradient-to-r from-white/90 via-emerald-50/30 to-white/90 dark:from-neutral-950/90 dark:via-emerald-950/20 dark:to-neutral-950/90 backdrop-blur-2xl backdrop-saturate-[1.8] border-b border-emerald-200/40 dark:border-emerald-800/20 shadow-[0_1px_8px_rgba(16,185,129,0.06)] dark:shadow-[0_1px_8px_rgba(16,185,129,0.08)]"
+      <div
+        ref={wrapRef}
+        className="uh-header-wrap"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="container mx-auto max-w-7xl px-3 sm:px-4">
-          <div className="flex items-center justify-between h-16 gap-3 lg:gap-4">
+        <div className="uh-header-wrap__inner">
+          <header className="uh-pill-header">
+            <div className="uh-pill-header__fx" aria-hidden>
+              <BorderBeam
+                size={90}
+                duration={18}
+                colorFrom="rgba(184, 134, 11, 0.35)"
+                colorTo="rgba(143, 106, 31, 0.45)"
+                borderWidth={1.25}
+                transition={{ ease: "linear" }}
+              />
+            </div>
+            <div className="uh-pill-header__row">
             {/* Logo */}
             <a
               href="https://www.brahmakumaris.com"
               className="flex items-center shrink-0"
               aria-label="Brahma Kumaris Home"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={BK_LOGO_URL}
                 alt="Brahma Kumaris"
+                title="Brahma Kumaris"
                 width={160}
                 height={44}
-                className="h-8 lg:h-9 w-auto object-contain"
+                className="uh-pill-header__logo"
                 fetchPriority="high"
               />
             </a>
 
             {/* ========== Desktop Navigation ========== */}
             <nav
-              className="hidden lg:flex items-center gap-1"
+              className="hidden lg:flex items-center gap-1 min-w-0"
               ref={navRef}
-              role="navigation"
               aria-label="Main navigation"
             >
-              <div className="flex items-center gap-0.5 rounded-full bg-neutral-100/60 dark:bg-neutral-800/50 p-0.5 ring-1 ring-neutral-200/40 dark:ring-neutral-700/30">
+              <div className="uh-pill-nav">
                 {NAVIGATION.map((section) => {
                   const isCurrentSection = section.id === CURRENT_APP;
                   const Icon = section.icon;
-                  const colors = ACCENT_COLORS[section.accentColor];
                   const isDropdownOpen = activeDropdown === section.id;
 
                   return (
@@ -701,33 +741,22 @@ export function UnifiedHeader() {
                       onMouseEnter={() => handleMouseEnter(section.id)}
                       onMouseLeave={handleMouseLeave}
                     >
-                      {isCurrentSection ? (
-                        <button
+                      <button
                           onClick={() => setActiveDropdown(isDropdownOpen ? null : section.id)}
-                          className={`relative flex items-center gap-1 px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-[11px] xl:text-xs font-bold transition-all duration-200 whitespace-nowrap select-none bg-gradient-to-r from-white via-emerald-50/80 to-white dark:from-neutral-800 dark:via-emerald-900/30 dark:to-neutral-800 shadow-sm shadow-emerald-500/10 ${colors.text} ring-1 ring-emerald-200/50 dark:ring-emerald-700/30`}
-                          aria-expanded={isDropdownOpen}
-                          aria-haspopup="true"
-                        >
-                          <Icon className="w-3.5 h-3.5 shrink-0" />
-                          <span>{section.label}</span>
-                          <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => setActiveDropdown(isDropdownOpen ? null : section.id)}
-                          className={`relative flex items-center gap-1 px-2 xl:px-2.5 py-1.5 xl:py-2 rounded-full text-[11px] xl:text-xs font-semibold transition-all duration-200 whitespace-nowrap select-none ${
-                            isDropdownOpen
-                              ? `bg-white/70 dark:bg-neutral-700/50 ${colors.text} shadow-sm`
-                              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-white/70 dark:hover:bg-neutral-700/50"
+                          className={`uh-pill-nav__btn ${
+                            isCurrentSection ? "is-active px-2.5 xl:px-3" : "px-2 xl:px-2.5"
+                          } py-1.5 xl:py-2 text-[11px] xl:text-xs ${
+                            isDropdownOpen && !isCurrentSection ? "uh-pill-nav__btn--open" : ""
                           }`}
                           aria-expanded={isDropdownOpen}
                           aria-haspopup="true"
                         >
-                          <Icon className="hidden xl:block w-3.5 h-3.5 shrink-0" />
+                          <Icon
+                            className={`w-3.5 h-3.5 shrink-0 ${isCurrentSection ? "" : "hidden xl:block"}`}
+                          />
                           <span>{section.label}</span>
                           <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                         </button>
-                      )}
 
                       {isDropdownOpen && isCurrentSection && (
                         <CentersMegaDropdown
@@ -750,7 +779,7 @@ export function UnifiedHeader() {
                 })}
               </div>
 
-              <div className="flex items-center gap-0.5 ml-1">
+              <div className="flex items-center gap-0.5 ml-1 uh-pill-controls">
                 {/* WhatsApp button */}
                 <div className="relative" ref={whatsappDesktopRef}>
                   <button
@@ -820,12 +849,11 @@ export function UnifiedHeader() {
                     </div>
                   )}
                 </div>
-                <ThemeToggle />
               </div>
             </nav>
 
             {/* ========== Mobile Controls ========== */}
-            <div className="flex lg:hidden items-center gap-0.5">
+            <div className="relative z-10 uh-header-mobile-only gap-0.5 uh-pill-controls">
               <Link
                 href="/"
                 prefetch={false}
@@ -885,42 +913,33 @@ export function UnifiedHeader() {
                   </div>
                 )}
               </div>
-              <ThemeToggle />
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-xl relative"
+                className="h-10 w-10 rounded-xl relative hover:bg-[var(--uh-wash-gold)]"
                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMobileMenuOpen}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
                 <Menu className={`w-5 h-5 transition-all duration-300 absolute ${isMobileMenuOpen ? "rotate-90 opacity-0 scale-0" : "rotate-0 opacity-100 scale-100"}`} />
                 <X className={`w-5 h-5 transition-all duration-300 absolute ${isMobileMenuOpen ? "rotate-0 opacity-100 scale-100" : "-rotate-90 opacity-0 scale-0"}`} />
               </Button>
             </div>
-          </div>
+            </div>
+          </header>
         </div>
-      </header>
+      </div>
 
-      {/* ================================================================ */}
-      {/* FULL-SCREEN MOBILE MENU                                          */}
-      {/* ================================================================ */}
       {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-[60] lg:hidden"
-          style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
-        >
+        <div className="fixed inset-0 z-[60] lg:hidden">
           <div
-            className="absolute top-16 inset-x-0 bottom-0 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200"
-            style={{ marginTop: "env(safe-area-inset-top, 0px)" }}
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={closeMobileMenu}
           />
 
           <div
-            className="absolute top-16 left-0 right-0 bottom-0 bg-white dark:bg-neutral-950 overflow-y-auto overscroll-contain animate-in slide-in-from-top-2 fade-in duration-200"
-            style={{
-              paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 1rem)",
-              marginTop: "env(safe-area-inset-top, 0px)",
-            }}
+            id="mobile-menu-panel"
+            className="absolute uh-pill-menu-panel animate-in slide-in-from-top-2 fade-in duration-200"
           >
             {/* 1. Current App Hero */}
             <MobileCurrentAppHero onNavigate={closeMobileMenu} />

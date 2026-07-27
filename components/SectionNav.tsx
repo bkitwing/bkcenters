@@ -18,11 +18,11 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function SectionNav({ items }: SectionNavProps) {
+  const shellRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState(items[0]?.id || '');
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // Check if scrollable to the right
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -42,10 +42,9 @@ export default function SectionNav({ items }: SectionNavProps) {
     };
   }, [checkScroll]);
 
-  // Track active section via IntersectionObserver
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
-    const sectionIds = items.map(i => i.id);
+    const sectionIds = items.map((i) => i.id);
 
     sectionIds.forEach((id) => {
       const el = document.getElementById(id);
@@ -62,30 +61,30 @@ export default function SectionNav({ items }: SectionNavProps) {
       observers.push(observer);
     });
 
-    return () => observers.forEach(o => o.disconnect());
+    return () => observers.forEach((o) => o.disconnect());
   }, [items]);
 
-  // Scroll the clicked nav item to center of the scrollable area
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     setActiveId(id);
 
-    // Scroll the target section into view
     const section = document.getElementById(id);
     section?.scrollIntoView({ behavior: 'smooth' });
 
-    // Scroll the nav item to center of the nav bar
     const navItem = e.currentTarget;
     const container = scrollRef.current;
     if (container && navItem) {
       const containerRect = container.getBoundingClientRect();
       const itemRect = navItem.getBoundingClientRect();
-      const scrollLeft = container.scrollLeft + (itemRect.left - containerRect.left) - (containerRect.width / 2) + (itemRect.width / 2);
+      const scrollLeft =
+        container.scrollLeft +
+        (itemRect.left - containerRect.left) -
+        containerRect.width / 2 +
+        itemRect.width / 2;
       container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
     }
   };
 
-  // Scroll nav bar to the right when chevron is tapped
   const handleScrollRight = () => {
     const container = scrollRef.current;
     if (container) {
@@ -93,16 +92,29 @@ export default function SectionNav({ items }: SectionNavProps) {
     }
   };
 
-  return (
-    <div className="sticky z-40 backdrop-blur-md border-b border-neutral-200/40 dark:border-neutral-800/40 shadow-sm" style={{ top: 'var(--header-h, 3.5rem)' }}>
-      {/* Subtle gradient background — matches the golden spiritual theme */}
-      <div className="absolute inset-0 bg-neutral-50/95 dark:bg-neutral-900/95" />
+  // Publish sticky chrome height (shell bottom − header bottom gap included via offsetHeight)
+  useEffect(() => {
+    const el = shellRef.current;
+    if (!el) return;
+    const update = () => {
+      document.documentElement.style.setProperty('--bk-sticky-h', `${el.offsetHeight}px`);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      document.documentElement.style.removeProperty('--bk-sticky-h');
+    };
+  }, []);
 
-      <div className="container mx-auto px-4 relative">
-        <div className="relative">
+  return (
+    <div ref={shellRef} data-bk-section-nav className="bk-section-nav-shell">
+      <div className="bk-section-nav-shell__inner">
+        <div className="bk-section-nav-pill relative">
           <div
             ref={scrollRef}
-            className="flex overflow-x-auto scrollbar-hide -mb-px scroll-smooth"
+            className="flex flex-1 overflow-x-auto scrollbar-hide scroll-smooth px-1.5 py-1"
           >
             {items.map((item) => {
               const Icon = iconMap[item.iconName];
@@ -113,28 +125,27 @@ export default function SectionNav({ items }: SectionNavProps) {
                   data-nav-id={item.id}
                   href={`#${item.id}`}
                   onClick={(e) => handleClick(e, item.id)}
-                  className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
+                  className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-full transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
                     isActive
-                      ? 'text-spirit-purple-700 dark:text-spirit-purple-300 border-spirit-purple-600 dark:border-spirit-purple-400'
-                      : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 hover:border-spirit-purple-300 dark:hover:border-spirit-purple-600'
+                      ? 'text-[var(--uh-ink-gold-deep,#7a5a14)] bg-[rgba(184,134,11,0.14)] dark:text-[#f0d78c] dark:bg-[rgba(226,197,106,0.18)]'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-[var(--uh-ink-gold-deep,#7a5a14)] hover:bg-[rgba(184,134,11,0.08)] dark:hover:text-[#e2c56a] dark:hover:bg-[rgba(226,197,106,0.1)]'
                   }`}
                 >
-                  {Icon && <Icon className="w-4 h-4" />}
+                  {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
                   {item.label}
                 </a>
               );
             })}
           </div>
 
-          {/* Scroll-more chevron button — tapping scrolls nav right, mobile only */}
           {canScrollRight && (
             <button
               onClick={handleScrollRight}
               aria-label="Scroll for more"
               className="absolute right-0 top-0 bottom-0 flex items-center md:hidden z-10"
             >
-              <div className="w-9 h-full bg-gradient-to-l from-neutral-50 dark:from-neutral-900 via-neutral-50/80 dark:via-neutral-900/80 to-transparent flex items-center justify-end pr-1">
-                <ChevronRight className="w-4 h-4 text-spirit-purple-500 dark:text-spirit-purple-400 animate-pulse" />
+              <div className="w-10 h-full bg-gradient-to-l from-[rgba(255,253,250,0.98)] dark:from-[rgba(32,26,22,0.95)] via-[rgba(255,253,250,0.85)] dark:via-[rgba(32,26,22,0.75)] to-transparent flex items-center justify-end pr-2 rounded-r-full">
+                <ChevronRight className="w-4 h-4 text-amber-700/70 dark:text-amber-300/80 animate-pulse" />
               </div>
             </button>
           )}

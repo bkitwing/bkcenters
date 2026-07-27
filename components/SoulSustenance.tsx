@@ -9,10 +9,10 @@ type SoulSustenanceProps = {
 };
 
 export default function SoulSustenance({
-  title = 'Nourish Your Soul Daily',
+  title = 'Nourish yourself daily',
 }: SoulSustenanceProps) {
   return (
-    <section className="scroll-mt-20">
+    <section className="scroll-mt-bk">
       <div className="relative bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
         {/* Subtle gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-spirit-purple-50/60 via-white to-spirit-gold-50/40 dark:from-spirit-purple-900/20 dark:via-neutral-800 dark:to-spirit-gold-900/10" />

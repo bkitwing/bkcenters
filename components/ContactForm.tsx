@@ -202,9 +202,9 @@ const ContactForm: React.FC<ContactFormProps> = ({
     >
       {!embedded ? (
         <>
-          <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Request a Callback</h2>
+          <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Send a Message</h2>
           <p className="text-neutral-600 dark:text-neutral-400 mb-4">
-            Want to attend the free 7-day course or have a question? Share your details and the center will reach out. Leave a phone number and we&apos;ll call you back.
+            Have a question, want to join the free 7-day course, or need help finding timings? Share your details and we&apos;ll get back to you.
           </p>
         </>
       ) : null}
@@ -316,7 +316,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
             type="tel"
             id="phone"
             className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder={embedded ? 'Phone *' : 'Phone number for a callback'}
+            placeholder={embedded ? 'Phone *' : 'Your phone number'}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
@@ -397,7 +397,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             </>
           ) : (
-            'Request Callback'
+            'Send Message'
           )}
         </button>
       </form>

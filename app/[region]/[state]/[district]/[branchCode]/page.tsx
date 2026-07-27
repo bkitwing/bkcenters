@@ -4,7 +4,6 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
 import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmail, getEventsByEmail } from '@/lib/serverCenterData';
-import DirectionsButton from '@/components/DirectionsButton';
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
 import ShareCenter from '@/components/ShareCenter';
@@ -24,8 +23,8 @@ import NewsSection from '@/components/NewsSection';
 import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel, getShortLocationLine, TIMING_CONFIRM_NOTE } from '@/lib/centerContent';
-import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ArrowLeft, Clock, Sparkles, BookOpen, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
+import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel, TIMING_CONFIRM_NOTE } from '@/lib/centerContent';
+import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
 
 /** Next throws this for redirect()/permanentRedirect(); catch blocks must rethrow it. */
@@ -322,7 +321,6 @@ export default async function CenterPage({ params }: CenterPageProps) {
     const nearbyLocalities = nearbyCenters
       .map(c => c.address?.city || c.district)
       .filter((v): v is string => !!v);
-    const shortLocationLine = getShortLocationLine(center);
     const centerIntro = generateCenterIntro(center, nearbyLocalities);
     const timings = getCenterTimings(center);
     const localizedFaqs = getLocalizedFaqs(center);
@@ -399,84 +397,233 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <NewsArticleListSchema posts={newsPosts} centerName={center.name} centerUrl={absoluteUrl} />
         <EventListSchema events={eventPosts} center={center} centerUrl={absoluteUrl} />
 
-        {/* ===== HERO SECTION ===== */}
-        <div className="relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
-          {/* Decorative Elements */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-            <div className="absolute bottom-10 right-10 w-96 h-96 bg-spirit-gold-400 rounded-full blur-3xl" />
-          </div>
+        {/* ===== UNIFIED HERO: identity + contact (left) · map (right) ===== */}
+        <section
+          id="info"
+          className="bk-center-hero bk-hero-underlap relative scroll-mt-bk overflow-hidden min-h-[100svh] flex flex-col"
+        >
+          <div className="bk-center-hero__glow" aria-hidden />
 
-          <div className="container mx-auto px-4 pt-6 pb-10 md:pb-14 relative z-10">
-            {/* Breadcrumb */}
-            <nav className="mb-6">
+          <div className="container mx-auto px-4 pt-4 pb-6 md:pb-8 relative z-10 flex-1 flex flex-col min-h-0">
+            <nav className="mb-4 shrink-0" aria-label="Breadcrumb">
               <ol className="flex items-center text-sm flex-wrap gap-1">
                 <li className="flex items-center">
-                  <Link href="/" className="text-white/60 hover:text-white text-xs transition-colors">Home</Link>
-                  <ChevronRight className="w-3 h-3 mx-1.5 text-white/40" />
+                  <Link href="/" className="text-[color:var(--bk-hero-muted)] hover:text-[color:var(--bk-hero-ink)] text-xs transition-colors">Home</Link>
+                  <ChevronRight className="w-3 h-3 mx-1.5 text-[color:var(--bk-hero-muted)] opacity-60" />
                 </li>
                 <li className="flex items-center">
-                  <Link href={formatCenterUrl(center.region || actualRegion, "", "", "")} className="text-white/60 hover:text-white text-xs transition-colors">{center.region || actualRegion}</Link>
-                  <ChevronRight className="w-3 h-3 mx-1.5 text-white/40" />
+                  <Link href={formatCenterUrl(center.region || actualRegion, "", "", "")} className="text-[color:var(--bk-hero-muted)] hover:text-[color:var(--bk-hero-ink)] text-xs transition-colors">{center.region || actualRegion}</Link>
+                  <ChevronRight className="w-3 h-3 mx-1.5 text-[color:var(--bk-hero-muted)] opacity-60" />
                 </li>
                 <li className="flex items-center">
-                  <Link href={formatCenterUrl(center.region || actualRegion, center.state, "", "")} className="text-white/60 hover:text-white text-xs transition-colors">{center.state}</Link>
-                  <ChevronRight className="w-3 h-3 mx-1.5 text-white/40" />
+                  <Link href={formatCenterUrl(center.region || actualRegion, center.state, "", "")} className="text-[color:var(--bk-hero-muted)] hover:text-[color:var(--bk-hero-ink)] text-xs transition-colors">{center.state}</Link>
+                  <ChevronRight className="w-3 h-3 mx-1.5 text-[color:var(--bk-hero-muted)] opacity-60" />
                 </li>
                 <li>
-                  <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-white/80 text-xs">{center.district}</Link>
+                  <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="text-[color:var(--bk-hero-ink-soft)] text-xs font-medium">{center.district}</Link>
                 </li>
               </ol>
             </nav>
 
-            {/* Center Name & Badge */}
-            <div className="mb-6">
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white/90 px-3 py-1 rounded-full text-xs font-medium mb-3">
-                <Sparkles className="w-3.5 h-3.5" />
-                Brahma Kumaris Rajyoga Meditation Center
-              </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">{center.name}</h1>
-              <div className="flex items-start gap-2 text-white/80 text-sm max-w-2xl">
-                <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <p>
-                  {shortLocationLine}
-                  {center.address?.pincode ? ` · ${center.address.pincode}` : ''}
-                  <span className="text-white/50"> · </span>
-                  <a href="#info" className="text-white/90 underline underline-offset-2 hover:text-white transition-colors">
-                    Full address
+            <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-center min-h-0">
+              {/* Left — one place for identity + contact (no duplicate card below) */}
+              <div className="lg:col-span-5 xl:col-span-5 space-y-5 lg:self-center">
+                <div>
+                  <div className="bk-center-hero__badge mb-3">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Brahma Kumaris Rajyoga Meditation Center
+                  </div>
+                  <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold text-[color:var(--bk-hero-ink)] mb-1 leading-tight tracking-tight">
+                    {center.name}
+                  </h1>
+                  {/* Intro kept for SEO only — not shown in the visual UI */}
+                  {centerIntro ? (
+                    <p className="sr-only">{centerIntro}</p>
+                  ) : null}
+                </div>
+
+                <div className="bk-center-hero__facts">
+                  <div className="bk-center-hero__fact">
+                    <span className="bk-center-hero__fact-label">Address</span>
+                    <div className="bk-center-hero__fact-body flex items-start gap-2">
+                      <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-[color:var(--bk-hero-gold)]" />
+                      <p>{formattedAddress}</p>
+                    </div>
+                  </div>
+
+                  {hasMobileOrContact && (
+                    <div className="bk-center-hero__fact">
+                      <span className="bk-center-hero__fact-label">Phone</span>
+                      <div className="bk-center-hero__fact-body flex flex-wrap gap-x-4 gap-y-1.5">
+                        {center.contact &&
+                          center.contact.split(',').map((number, index) => {
+                            const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
+                            return (
+                              <ContactLink
+                                key={`contact-${index}`}
+                                href={`tel:${cleanNumber}`}
+                                className="inline-flex items-center gap-1.5 text-[color:var(--bk-hero-gold)] font-medium hover:text-[color:var(--bk-hero-gold-soft)] transition-colors"
+                                center={center}
+                              >
+                                <Phone className="w-3.5 h-3.5 opacity-70" />
+                                {number.trim()}
+                              </ContactLink>
+                            );
+                          })}
+                        {center.mobile &&
+                          center.mobile.split(',').map((number, index) => {
+                            const cleanNumber = number.trim();
+                            return (
+                              <a
+                                key={`mobile-${index}`}
+                                href={`tel:${cleanNumber}`}
+                                className="inline-flex items-center gap-1.5 text-[color:var(--bk-hero-gold)] font-medium hover:text-[color:var(--bk-hero-gold-soft)] transition-colors"
+                              >
+                                <Smartphone className="w-3.5 h-3.5 opacity-70" />
+                                {number.trim()}
+                              </a>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+
+                  {center.email && (
+                    <div className="bk-center-hero__fact">
+                      <span className="bk-center-hero__fact-label">Email</span>
+                      <div className="bk-center-hero__fact-body">
+                        <ContactLink
+                          href={`mailto:${center.email}`}
+                          className="inline-flex items-center gap-1.5 text-[color:var(--bk-hero-gold)] font-medium hover:text-[color:var(--bk-hero-gold-soft)] transition-colors break-all"
+                          center={center}
+                        >
+                          <Mail className="w-3.5 h-3.5 opacity-70 shrink-0" />
+                          {center.email}
+                        </ContactLink>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bk-center-hero__fact">
+                    <span className="bk-center-hero__fact-label">Timings</span>
+                    <div className="bk-center-hero__fact-body">
+                      {timings.custom ? (
+                        <p className="flex items-start gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-[color:var(--bk-hero-gold)] mt-0.5 shrink-0" />
+                          {timings.custom}
+                        </p>
+                      ) : (
+                        <div className="flex flex-wrap gap-x-4 gap-y-1">
+                          <span className="inline-flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-[color:var(--bk-hero-gold)]" />
+                            <span className="text-[color:var(--bk-hero-muted)]">Morning</span> {timings.morning}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-[color:var(--bk-hero-gold)]" />
+                            <span className="text-[color:var(--bk-hero-muted)]">Evening</span> {timings.evening}
+                          </span>
+                        </div>
+                      )}
+                      <p className="text-[11px] text-[color:var(--bk-hero-muted)] mt-1.5 italic leading-relaxed">
+                        {TIMING_CONFIRM_NOTE}
+                      </p>
+                    </div>
+                  </div>
+
+                  {center.services && center.services.length > 0 && (
+                    <div className="bk-center-hero__fact">
+                      <span className="bk-center-hero__fact-label">Services</span>
+                      <div className="bk-center-hero__fact-body flex flex-wrap gap-1.5">
+                        {center.services.map((service: string, idx: number) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center text-[11px] bg-[rgba(184,134,11,0.1)] text-[color:var(--bk-hero-ink-soft)] px-2.5 py-1 rounded-full font-medium border border-[rgba(168,122,42,0.14)]"
+                          >
+                            {service}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* One quiet action rail — four actions, one visual unit */}
+                <div
+                  className="bk-center-hero__actions"
+                  role="group"
+                  aria-label="Center actions"
+                >
+                  {hasMobileOrContact && (
+                    <CallNowButton
+                      mobile={center.mobile}
+                      contact={center.contact}
+                      className="bk-center-hero__action bk-center-hero__action--call cursor-pointer"
+                    >
+                      <Phone className="w-4 h-4" />
+                      <span>Call</span>
+                    </CallNowButton>
+                  )}
+                  <a
+                    href={getGoogleMapsUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bk-center-hero__action"
+                  >
+                    <Navigation className="w-4 h-4" />
+                    <span>Directions</span>
                   </a>
-                </p>
+                  <a
+                    href="#contact"
+                    className="bk-center-hero__action"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Query</span>
+                  </a>
+                  <ShareCenter center={center} pageUrl={absoluteUrl} variant="hero" />
+                </div>
+
+                <a
+                  href="#seven-day-course"
+                  className="bk-center-hero__explore lg:hidden"
+                >
+                  <span>Explore more</span>
+                  <ChevronDown className="w-4 h-4" aria-hidden />
+                </a>
+              </div>
+
+              {/* Right — map (moderately tall on desktop) */}
+              <div className="lg:col-span-7 xl:col-span-7 h-full min-h-0 flex">
+                <div className="w-full lg:sticky bk-hero-map-sticky rounded-2xl overflow-hidden border border-[rgba(168,122,42,0.2)] shadow-[0_18px_40px_-24px_rgba(74,42,28,0.35)] bg-white dark:bg-neutral-900 dark:border-[rgba(226,197,106,0.22)] flex flex-col lg:h-[min(520px,calc(100svh-var(--bk-header-h,4.75rem)-10rem))]">
+                  <div className="h-[260px] sm:h-[320px] lg:h-auto lg:flex-1 min-h-0">
+                    <CenterMap
+                      centers={mapCenters}
+                      height="100%"
+                      autoZoom={true}
+                      defaultZoom={13}
+                      highlightCenter={true}
+                      showInfoWindowOnLoad={true}
+                    />
+                  </div>
+                  <div className="px-3.5 py-2.5 shrink-0 bg-[#fffdf9]/95 dark:bg-neutral-900/95 border-t border-[rgba(168,122,42,0.12)] dark:border-neutral-800">
+                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                      <span className="font-semibold text-spirit-purple-600">Purple</span>: this center
+                      <span className="mx-1.5">·</span>
+                      <span className="font-semibold text-emerald-600">Green</span>: nearby — tap markers for details
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Quick Action Buttons */}
-            <div className="flex flex-wrap gap-3">
-              {hasMobileOrContact && (
-                <CallNowButton
-                  mobile={center.mobile}
-                  contact={center.contact}
-                  className="inline-flex items-center gap-2 bg-white text-spirit-purple-700 px-5 py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-                />
-              )}
-              <a
-                href={getGoogleMapsUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white border border-white/25 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-white/25 transition-all duration-200"
-              >
-                <Navigation className="w-4 h-4" />
-                Get Directions
-              </a>
-              <a
-                href="#seven-day-course"
-                className="inline-flex items-center gap-2 bg-spirit-gold-400/90 text-spirit-purple-900 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-400 transition-all duration-200"
-              >
-                <BookOpen className="w-4 h-4" />
-                Free 7-Day Course
-              </a>
-            </div>
+            <a
+              href="#seven-day-course"
+              className="bk-center-hero__explore hidden lg:inline-flex mt-auto pt-6"
+            >
+              <span>Explore more</span>
+              <ChevronDown className="w-4 h-4" aria-hidden />
+            </a>
           </div>
-        </div>
+        </section>
 
         {/* ===== SECTION NAVIGATION (Sticky) ===== */}
         <SectionNav
@@ -495,155 +642,6 @@ export default async function CenterPage({ params }: CenterPageProps) {
         {/* ===== MAIN CONTENT ===== */}
         <div className="container mx-auto px-4 py-6 space-y-8 md:space-y-10">
 
-          {/* ===== CENTER INFO + MAP SECTION ===== */}
-          <section id="info" className="scroll-mt-20">
-            <div className="grid lg:grid-cols-5 gap-8">
-              {/* Left: Contact Details Card */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Contact Card */}
-                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-                  <div className="p-6">
-                    <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-5 flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
-                        <MapPin className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
-                      </div>
-                      Center Details
-                    </h2>
-
-                    {/* Address */}
-                    <div className="mb-5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1.5">Address</p>
-                      <p className="text-neutral-700 dark:text-neutral-300 text-sm leading-relaxed">{formattedAddress}</p>
-                    </div>
-
-                    {/* Contact Numbers */}
-                    {hasMobileOrContact && (
-                      <div className="mb-5">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2">Phone</p>
-                        <div className="space-y-2">
-                          {center.contact && center.contact.split(',').map((number, index) => {
-                            const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
-                            return (
-                              <div key={`contact-${index}`} className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-neutral-400" />
-                                <ContactLink href={`tel:${cleanNumber}`} className="text-sm text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors" center={center}>
-                                  {number.trim()}
-                                </ContactLink>
-                              </div>
-                            );
-                          })}
-                          {center.mobile && center.mobile.split(',').map((number, index) => {
-                            const cleanNumber = number.trim();
-                            return (
-                              <div key={`mobile-${index}`} className="flex items-center gap-2">
-                                <Smartphone className="w-4 h-4 text-neutral-400" />
-                                <a href={`tel:${cleanNumber}`} className="text-sm text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors">
-                                  {number.trim()}
-                                </a>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Email */}
-                    {center.email && (
-                      <div className="mb-5">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-1.5">Email</p>
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
-                          <ContactLink href={`mailto:${center.email}`} className="text-sm text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors" center={center}>
-                            {center.email}
-                          </ContactLink>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Class Timings — always shown. Uses center-specific timings
-                        when available (from Strapi), else the standard defaults. */}
-                    <div className="mb-5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2">Class Timings</p>
-                      {timings.custom ? (
-                        <div className="flex items-start gap-2">
-                          <Clock className="w-4 h-4 text-neutral-400 dark:text-neutral-500 mt-0.5" />
-                          <p className="text-sm text-neutral-700 dark:text-neutral-300">{timings.custom}</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
-                            <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                              <span className="font-medium text-neutral-900 dark:text-neutral-100">Morning:</span> {timings.morning}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
-                            <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                              <span className="font-medium text-neutral-900 dark:text-neutral-100">Evening:</span> {timings.evening}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-2 italic leading-relaxed">
-                        {TIMING_CONFIRM_NOTE}
-                      </p>
-                    </div>
-
-                    {/* Services */}
-                    {center.services && center.services.length > 0 && (
-                      <div className="mb-5">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2">Services</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {center.services.map((service: string, idx: number) => (
-                            <span key={idx} className="inline-flex items-center text-xs bg-spirit-purple-50 dark:bg-spirit-purple-900/30 text-spirit-purple-700 dark:text-spirit-purple-300 px-2.5 py-1 rounded-full font-medium">
-                              {service}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Directions Button */}
-                  <div className="border-t border-neutral-100 dark:border-neutral-700 p-4">
-                    <DirectionsButton center={center} address={formattedAddress} />
-                  </div>
-                </div>
-
-                {/* Share Card */}
-                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-                  <div className="p-6">
-                    <ShareCenter center={center} pageUrl={absoluteUrl} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: Map */}
-              <div className="lg:col-span-3">
-                <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden sticky top-20">
-                  <div className="h-[400px] md:h-[500px] lg:h-[550px]">
-                    <CenterMap 
-                      centers={mapCenters} 
-                      height="100%" 
-                      autoZoom={true}
-                      defaultZoom={13}
-                      highlightCenter={true}
-                      showInfoWindowOnLoad={true}
-                    />
-                  </div>
-                  <div className="px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-700">
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      <span className="font-semibold text-spirit-purple-600">Purple</span>: This Center
-                      <span className="mx-2">•</span>
-                      <span className="font-semibold text-green-600">Green</span>: Nearby Centers — Click markers for details
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* ===== 7-DAY COURSE SECTION ===== */}
           <SevenDayCourseSection 
             centerName={center.name}
@@ -653,7 +651,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
 
           {/* ===== EVENTS SECTION ===== */}
           {eventPosts.length > 0 && (
-            <div id="events" className="scroll-mt-20">
+            <div id="events" className="scroll-mt-bk">
               <EventsSection
                 initialEvents={eventPosts}
                 totalCount={eventsTotalCount}
@@ -664,7 +662,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
 
           {/* ===== NEWS SECTION ===== */}
           {newsPosts.length > 0 && (
-            <div id="news" className="scroll-mt-20">
+            <div id="news" className="scroll-mt-bk">
               <NewsSection
                 initialPosts={newsPosts}
                 totalCount={newsTotalCount}
@@ -674,13 +672,13 @@ export default async function CenterPage({ params }: CenterPageProps) {
           )}
 
           {/* ===== GUIDED MEDITATION SECTION ===== */}
-          <section id="guided-meditation" className="scroll-mt-20">
+          <section id="guided-meditation" className="scroll-mt-bk">
             <GuidedMeditationSection />
           </section>
 
           {/* ===== NEARBY CENTERS SECTION ===== */}
           {nearbyCenters.length > 0 && (
-            <section id="nearby" className="scroll-mt-20">
+            <section id="nearby" className="scroll-mt-bk">
               <CollapsibleSection 
                 title="Nearby Centers" 
                 defaultExpanded={false}
@@ -707,7 +705,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
           )}
 
           {/* ===== FAQ SECTION ===== */}
-          <section id="faq" className="scroll-mt-20">
+          <section id="faq" className="scroll-mt-bk">
             <CollapsibleSection 
               title="Frequently Asked Questions" 
               defaultExpanded={false}
@@ -771,7 +769,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
           {/* Always shown — inquiries route to a central inbox, so centers
               without their own email still receive enquiries via the team. */}
           {(
-            <section id="contact" className="scroll-mt-20">
+            <section id="contact" className="scroll-mt-bk">
               <CollapsibleSection 
                 title="Contact Us" 
                 defaultExpanded={true}
@@ -848,7 +846,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
         </div>
         
         {/* Sticky Bottom Navigation for Mobile */}
-        <StickyBottomNav center={center} />
+        <StickyBottomNav center={center} pageUrl={absoluteUrl} />
       </div>
     );
   } catch (error) {

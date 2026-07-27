@@ -135,14 +135,14 @@ export default function StatePageClient({
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
       {/* ===== HERO SECTION ===== */}
-      <div className="relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
+      <div className="bk-hero-underlap relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-spirit-gold-400 rounded-full blur-3xl" />
         </div>
 
-        <div className="container mx-auto px-4 pt-6 pb-10 md:pb-14 relative z-10">
+        <div className="container mx-auto px-4 pt-4 pb-10 md:pb-14 relative z-10">
           {/* Breadcrumb */}
           <nav className="mb-6">
             <ol className="flex items-center text-sm flex-wrap gap-1">

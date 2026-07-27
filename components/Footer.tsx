@@ -11,6 +11,7 @@ import {
   Leaf,
   LifeBuoy,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 // Cross-app ecosystem links use plain <a> with root-relative paths. Next <Link>
 // would prepend this app's /centers basePath and break routing.
@@ -37,6 +38,7 @@ const initiativeLinks = [
   { href: "/initiatives/social", label: "Social" },
   { href: "/initiatives/health", label: "Health" },
   { href: "/initiatives/nmba", label: "Nasha Mukt Bharat Abhiyaan" },
+  { href: "/initiatives/blood-donation", label: "Blood Donation Drive" },
 ];
 
 const contactLinks = [
@@ -226,12 +228,18 @@ export function Footer() {
               <span className="hidden sm:inline">•</span>
               <p>All rights reserved</p>
             </div>
-            <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400" aria-label="Legal">
-              <a href="/contact/legal/privacy-policy" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Privacy</a>
-              <a href="/contact/legal/terms-and-conditions" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Terms</a>
-              <a href="/contact/legal" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Policies</a>
-              <a href="https://www.brahmakumaris.com" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">brahmakumaris.com</a>
-            </nav>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+              <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
+                <span className="hidden sm:inline">Theme</span>
+                <ThemeToggle />
+              </div>
+              <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400" aria-label="Legal">
+                <a href="/contact/legal/privacy-policy" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Privacy</a>
+                <a href="/contact/legal/terms-and-conditions" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Terms</a>
+                <a href="/contact/legal" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Policies</a>
+                <a href="https://www.brahmakumaris.com" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">brahmakumaris.com</a>
+              </nav>
+            </div>
           </div>
         </div>
       </div>

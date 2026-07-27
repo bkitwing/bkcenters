@@ -29,11 +29,11 @@ export function CentersChrome({
   }
 
   return (
-    <>
+    <div className="bk-pill-chrome flex min-h-screen flex-col">
       {header}
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
       {bottomNav}
       {footer}
-    </>
+    </div>
   );
 }

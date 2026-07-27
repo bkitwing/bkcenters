@@ -89,7 +89,7 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
   const ActiveIcon = activeItem.icon;
 
   return (
-    <section id="seven-day-course" className="scroll-mt-20">
+    <section id="seven-day-course" className="scroll-mt-bk">
       {/* Section Header */}
       <div className="text-center mb-10">
         <div className="inline-flex items-center gap-2 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 text-spirit-purple-700 dark:text-spirit-purple-300 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
