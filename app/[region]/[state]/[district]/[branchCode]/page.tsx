@@ -7,6 +7,7 @@ import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmai
 import CenterCard from '@/components/CenterCard';
 import ContactForm from '@/components/ContactForm';
 import ShareCenter from '@/components/ShareCenter';
+import FindOtherCenters from '@/components/FindOtherCenters';
 import ContactLink from '@/components/ContactLink';
 import FAQSection from '@/components/FAQSection';
 import CollapsibleSection from '@/components/CollapsibleSection';
@@ -582,13 +583,10 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   <ShareCenter center={center} pageUrl={absoluteUrl} variant="hero" />
                 </div>
 
-                <a
-                  href="#seven-day-course"
-                  className="bk-center-hero__explore lg:hidden"
-                >
-                  <span>Explore more</span>
-                  <ChevronDown className="w-4 h-4" aria-hidden />
-                </a>
+                {/* Desktop: search sits with actions in the left column */}
+                <div className="hidden lg:block">
+                  <FindOtherCenters />
+                </div>
               </div>
 
               {/* Right — map (moderately tall on desktop) */}
@@ -612,6 +610,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Mobile: search after the map so info → actions → map stay first */}
+              <div className="lg:hidden col-span-full">
+                <FindOtherCenters />
               </div>
             </div>
 

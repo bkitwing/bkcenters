@@ -655,7 +655,7 @@ html {
   }
 }
 
-/* Soft bounce cue to scroll past the hero */
+/* Soft bounce cue to scroll past the hero (desktop) */
 .bk-center-hero__explore {
   display: inline-flex;
   flex-direction: column;
@@ -703,6 +703,68 @@ html {
   .bk-center-hero__explore svg {
     animation: none;
   }
+}
+
+/* Find another center — quiet search under action rail */
+.bk-center-hero__find {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  padding-top: 0.15rem;
+}
+
+.bk-center-hero__find-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bk-hero-muted);
+}
+
+.bk-center-hero__find input {
+  padding: 0.7rem 2.75rem 0.7rem 0.95rem !important;
+  border-radius: 9999px !important;
+  border-color: rgba(168, 122, 42, 0.22) !important;
+  background: rgba(255, 253, 250, 0.88) !important;
+  font-size: 0.875rem !important;
+  color: var(--bk-hero-ink) !important;
+  box-shadow: 0 8px 22px -18px rgba(74, 42, 28, 0.35);
+}
+
+.bk-center-hero__find input:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(143, 106, 31, 0.28) !important;
+  border-color: rgba(143, 106, 31, 0.4) !important;
+}
+
+.bk-center-hero__find .absolute.right-3 {
+  top: 50% !important;
+  transform: translateY(-50%);
+}
+
+.bk-center-hero__find-browse {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--bk-hero-gold);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.bk-center-hero__find-browse:hover {
+  color: var(--bk-hero-gold-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dark .bk-center-hero__find input {
+  background: rgba(255, 248, 235, 0.06) !important;
+  border-color: rgba(226, 197, 106, 0.24) !important;
+  color: var(--bk-hero-ink) !important;
 }
 
 /* Directory heroes: wash under floating pill; content clears measured height */
