@@ -253,13 +253,23 @@ function SimpleDropdown({
         </div>
       </div>
       <div className="p-1.5">
-        {section.subItems.map((item) => {
+        {section.subItems.map((item, index) => {
           const ItemIcon = item.icon;
+          const prevGroup = index > 0 ? section.subItems[index - 1]?.group : undefined;
+          const showGroup = Boolean(item.group && item.group !== prevGroup);
           return (
             <div key={item.id ?? item.href}>
-              {item.group && (
-                <div className="mx-2 mt-1.5 mb-1 border-t border-neutral-100 dark:border-neutral-800 pt-2">
-                  <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500">{item.group}</span>
+              {showGroup && (
+                <div
+                  className={`mx-2 mb-1 pt-2 ${
+                    index === 0
+                      ? ""
+                      : "mt-1.5 border-t border-neutral-100 dark:border-neutral-800"
+                  }`}
+                >
+                  <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500">
+                    {item.group}
+                  </span>
                 </div>
               )}
               <SmartLink
