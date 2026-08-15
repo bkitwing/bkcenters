@@ -1,414 +1,256 @@
 {
-  "timestamp": "2026-08-04T09:53:44.003Z",
+  "timestamp": "2026-08-15T07:06:48.023Z",
   "summary": {
-    "created": 22,
-    "updated": 15,
+    "created": 8,
+    "updated": 10,
     "deleted": 0
   },
   "created": [
     {
-      "branch_code": "03376",
-      "name": "Bhuj  Aiyanagar",
-      "district": "Kutch",
-      "state": "Gujarat",
-      "region": "India"
-    },
-    {
-      "branch_code": "05924",
-      "name": "Niwar Pahadi",
-      "district": "Katni",
-      "state": "Madhya Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05925",
-      "name": "Bidal (satara)",
-      "district": "Satara",
-      "state": "Maharashtra",
-      "region": "India"
-    },
-    {
-      "branch_code": "05926",
-      "name": "Indore Joshi Guradiya",
-      "district": "Indore",
-      "state": "Madhya Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05927",
-      "name": "Sham Chaurasi",
-      "district": "Hoshiarpur",
-      "state": "Punjab",
-      "region": "India"
-    },
-    {
-      "branch_code": "05928",
-      "name": "Pirnagra",
-      "district": "Khagaria",
-      "state": "Bihar",
-      "region": "India"
-    },
-    {
-      "branch_code": "05929",
-      "name": "Baandi",
-      "district": "Khordha",
-      "state": "Odisha",
-      "region": "India"
-    },
-    {
-      "branch_code": "05930",
-      "name": "Baniakuchi",
-      "district": "Barpeta",
-      "state": "Assam",
-      "region": "India"
-    },
-    {
-      "branch_code": "05931",
-      "name": "Lebad (dhar)",
-      "district": "Dhar",
-      "state": "Madhya Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05932",
-      "name": "Indore New Patel Colony",
-      "district": "Indore",
-      "state": "Madhya Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05933",
-      "name": "Naraina",
-      "district": "Panipat",
+      "branch_code": "05945",
+      "name": "Badhkhalsa",
+      "district": "Sonipat",
       "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05934",
-      "name": "Mandapeta Tarvanipeta",
-      "district": "East Godavari",
-      "state": "Andhra Pradesh",
+      "branch_code": "05946",
+      "name": "Nangal Kalan",
+      "district": "Sonipat",
+      "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05935",
-      "name": "Madurai Sellur",
-      "district": "Madurai",
-      "state": "Tamil Nadu",
+      "branch_code": "05947",
+      "name": "Nahri (sonipat)",
+      "district": "Sonipat",
+      "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05936",
-      "name": "T.kallupatti",
-      "district": "Madurai",
-      "state": "Tamil Nadu",
+      "branch_code": "05948",
+      "name": "Rai (sonipat)",
+      "district": "Sonipat",
+      "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05937",
-      "name": "Arisal",
-      "district": "Puri",
-      "state": "Odisha",
+      "branch_code": "05949",
+      "name": "Lohagaon",
+      "district": "Vijayapura",
+      "state": "Karnataka",
       "region": "India"
     },
     {
-      "branch_code": "05938",
-      "name": "Greater Noida Sector Xu 1",
-      "district": "Gautam Buddha Nagar",
-      "state": "Uttar Pradesh",
+      "branch_code": "05950",
+      "name": "Gurugram Sector 102",
+      "district": "Gurugram",
+      "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05939",
-      "name": "Noida Sector 22",
-      "district": "Gautam Buddha Nagar",
-      "state": "Uttar Pradesh",
+      "branch_code": "05951",
+      "name": "Gurugram Sector 39 Jharsa",
+      "district": "Gurugram",
+      "state": "Haryana",
       "region": "India"
     },
     {
-      "branch_code": "05940",
-      "name": "Mehadwani",
-      "district": "Dindori",
-      "state": "Madhya Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05941",
-      "name": "Jalandhar Cantt",
-      "district": "Jalandhar",
-      "state": "Punjab",
-      "region": "India"
-    },
-    {
-      "branch_code": "05942",
-      "name": "Punalur",
-      "district": "Kollam",
-      "state": "Kerala",
-      "region": "India"
-    },
-    {
-      "branch_code": "05943",
-      "name": "Jeerabad",
-      "district": "Dhar",
-      "state": "Madhya Pradesh",
-      "region": "India"
-    },
-    {
-      "branch_code": "05944",
-      "name": "Kottarakkara",
-      "district": "Kollam",
-      "state": "Kerala",
+      "branch_code": "05952",
+      "name": "Faridabad Sector 80",
+      "district": "Faridabad",
+      "state": "Haryana",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "00107",
-      "name": "Noida Sector 26",
-      "changes": [
-        {
-          "field": "email",
-          "from": "noida@bkivv.org",
-          "to": "noidasector26@bkivv.org"
-        }
-      ]
-    },
-    {
-      "branch_code": "00216",
-      "name": "Ahmedabad Sanand",
+      "branch_code": "00277",
+      "name": "Modasa",
       "changes": [
         {
           "field": "mobile",
-          "from": "9924798898",
-          "to": "8780740324"
+          "from": "9427744845",
+          "to": "9429545083, 9427744845"
         }
       ]
     },
     {
-      "branch_code": "00251",
-      "name": "Gondal",
+      "branch_code": "01070",
+      "name": "Ahmedabad Maniyasa",
       "changes": [
         {
           "field": "mobile",
-          "from": "8980900837, 9924722356",
-          "to": "9106505285, 9924722356"
+          "from": "9998061602, 9429198221",
+          "to": "9998061602, 9427785308"
         }
       ]
     },
     {
-      "branch_code": "00551",
-      "name": "Udupi (kar)",
+      "branch_code": "01259",
+      "name": "Bengaluru Hebbal",
       "changes": [
         {
           "field": "mobile",
-          "from": "9113967536",
-          "to": "7795532979"
+          "from": "9731820494",
+          "to": "9980888733"
         }
       ]
     },
     {
-      "branch_code": "00747",
-      "name": "Jalandhar Adarsh Nagar",
+      "branch_code": "02918",
+      "name": "Weir (bharatpur)",
       "changes": [
         {
-          "field": "email",
-          "from": "jalandhar@bkivv.org",
-          "to": "adarshnagar.jal@bkivv.org"
+          "field": "mobile",
+          "from": "7023662843, 7023662843",
+          "to": "7023662843, 9829522209"
+        },
+        {
+          "field": "section",
+          "from": "00035",
+          "to": "02918"
         }
       ]
     },
     {
-      "branch_code": "00982",
-      "name": "Arrah Godhna Road",
+      "branch_code": "03376",
+      "name": "Bhuj Aiya Nagar",
       "changes": [
         {
           "field": "name",
-          "from": "Arrah (bhojpur)",
-          "to": "Arrah Godhna Road"
+          "from": "Bhuj  Aiyanagar",
+          "to": "Bhuj Aiya Nagar"
         },
         {
           "field": "slug",
-          "from": "arrah-(bhojpur)",
-          "to": "arrah-godhna-road"
+          "from": "bhuj-aiyanagar",
+          "to": "bhuj-aiya-nagar"
         },
         {
-          "field": "city",
-          "from": "Arrah (bhojpur)",
-          "to": "Arrah"
-        }
-      ]
-    },
-    {
-      "branch_code": "01964",
-      "name": "Perumbavoor",
-      "changes": [
-        {
           "field": "address_line1",
-          "from": "House No: Xxii\\396, Kamala Cottage",
-          "to": "House No: 7/279"
+          "from": "67, Aiyanagar",
+          "to": "H No: 261, Manav Mandir"
         },
         {
           "field": "address_line2",
-          "from": "Esi Road",
-          "to": "Broadway Road"
+          "from": "Opp: Reliance Petrol Pump",
+          "to": "Galli No-2"
         },
         {
           "field": "address_line3",
-          "from": "Kunnathu Nad",
-          "to": ""
+          "from": "Mundra Road",
+          "to": "Gate No-6, Aiya Nagar, Mundra Road"
+        },
+        {
+          "field": "pincode",
+          "from": "370001",
+          "to": "370015"
         },
         {
           "field": "contact",
-          "from": "0484- 2593381",
+          "from": "-",
           "to": ""
         },
         {
           "field": "mobile",
-          "from": "9495424144, 9447677906",
-          "to": "9495424144"
+          "from": "9428311992",
+          "to": "7984126208"
+        },
+        {
+          "field": "section",
+          "from": "00208",
+          "to": "00253"
         },
         {
           "field": "latitude",
-          "from": 10.116464,
-          "to": 10.120584
+          "from": null,
+          "to": 23.226149
         },
         {
           "field": "longitude",
-          "from": 76.47064,
-          "to": 76.476707
+          "from": null,
+          "to": 69.660894
         }
       ]
     },
     {
-      "branch_code": "02100",
-      "name": "Varanasi Sarnath",
+      "branch_code": "04434",
+      "name": "Durg Borsi",
       "changes": [
         {
           "field": "mobile",
-          "from": "9415447215",
-          "to": "8543081969, 9264973557"
+          "from": "7587168627, 8085060818",
+          "to": "9424305684, 9407739841"
         }
       ]
     },
     {
-      "branch_code": "02491",
-      "name": "Gandhawani",
-      "changes": [
-        {
-          "field": "section",
-          "from": "01894",
-          "to": "02491"
-        }
-      ]
-    },
-    {
-      "branch_code": "02622",
-      "name": "Greater Noida Beta 2",
-      "changes": [
-        {
-          "field": "email",
-          "from": null,
-          "to": "greaternoidabeta2@bkivv.org"
-        },
-        {
-          "field": "contact",
-          "from": "0120-2320546",
-          "to": ""
-        },
-        {
-          "field": "section",
-          "from": "00107",
-          "to": "02622"
-        }
-      ]
-    },
-    {
-      "branch_code": "03159",
-      "name": "Adampur Doaba",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "Khasra No: S.7//22, 10//2/1",
-          "to": "B 06-0123, 'gate Way To Heaven'"
-        },
-        {
-          "field": "address_line2",
-          "from": "Back Side Of High Cross Mall Road",
-          "to": "Behind High Cross Mall, Ward No-6"
-        },
-        {
-          "field": "address_line3",
-          "from": "Ward No:8",
-          "to": ""
-        },
-        {
-          "field": "section",
-          "from": "00747",
-          "to": "03159"
-        }
-      ]
-    },
-    {
-      "branch_code": "04453",
-      "name": "Rudawal",
-      "changes": [
-        {
-          "field": "section",
-          "from": "03821",
-          "to": "00035"
-        }
-      ]
-    },
-    {
-      "branch_code": "04953",
-      "name": "Bharatpur Housing Board Colony",
+      "branch_code": "04452",
+      "name": "Bhusawar",
       "changes": [
         {
           "field": "section",
           "from": "00035",
-          "to": "03821"
+          "to": "02918"
         }
       ]
     },
     {
-      "branch_code": "05360",
-      "name": "Prathipadu",
+      "branch_code": "04844",
+      "name": "Hathwala",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8685915603",
+          "to": "9996830743, 9518080872"
+        }
+      ]
+    },
+    {
+      "branch_code": "05287",
+      "name": "Shivamogga Shrirampura",
       "changes": [
         {
           "field": "address_line1",
-          "from": "H No: 9-39",
-          "to": "H No: 9-408/3"
+          "from": "Mig-304",
+          "to": "H.no: 254, Jyothirmaya Shivalaya"
         },
         {
           "field": "address_line2",
-          "from": "Thota Street",
-          "to": "Beside Panchayat Office"
+          "from": "Khb Colony, Iind Stage, Vinobanagar, Om Shanti Road",
+          "to": "Sagar Road, Near Canara Bank Regional Office"
         },
         {
           "field": "address_line3",
-          "from": "High School Road",
-          "to": "Prathipadu Mandal"
+          "from": "Kallahalli, Near Shrirampura",
+          "to": "Vajpayee Layout, Shrirampura"
+        },
+        {
+          "field": "mobile",
+          "from": "7619343856, 9449920990",
+          "to": "7619343856"
         },
         {
           "field": "latitude",
-          "from": 17.230686,
-          "to": 17.231136
+          "from": 13.950348,
+          "to": 13.963573
         },
         {
           "field": "longitude",
-          "from": 82.188419,
-          "to": 82.190097
+          "from": 75.553739,
+          "to": 75.527485
         }
       ]
     },
     {
-      "branch_code": "05690",
-      "name": "Domchanch Dhab Road",
+      "branch_code": "05641",
+      "name": "Bhiloda",
       "changes": [
         {
-          "field": "address_line3",
-          "from": "Near Bairang Bali Mandir",
-          "to": "Near Bajrang Bali Mandir"
+          "field": "mobile",
+          "from": "9016582640, 8160772554",
+          "to": "9428018540, 9016582640"
         }
       ]
     }
