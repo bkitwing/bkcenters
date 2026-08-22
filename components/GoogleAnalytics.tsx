@@ -1,190 +1,231 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import Script from "next/script";
+import { Suspense, useEffect } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
-// Google Analytics tracking ID
-const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-CSYYGVHXN0';
-
-// Google Analytics gtag function and dataLayer
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
   }
 }
 
-// Initialize Google Analytics
-export function initGA() {
-  if (typeof window === 'undefined') return;
-  
-  // Skip GA initialization if no tracking ID is provided
-  if (!GA_TRACKING_ID || GA_TRACKING_ID === '') {
-    console.warn('Google Analytics tracking ID is missing');
-    return;
-  }
-  
-  // Initialize dataLayer
-  window.dataLayer = window.dataLayer || [];
-  
-  // Load gtag script
-  const script1 = document.createElement('script');
-  script1.async = true;
-  script1.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
-  document.head.appendChild(script1);
+let lastSentPath = "";
+let lastPageLocation = "";
 
-  // Initialize gtag
-  const script2 = document.createElement('script');
-  script2.innerHTML = `
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '${GA_TRACKING_ID}', {
-      page_title: document.title,
-      page_location: window.location.href,
-      send_page_view: true,
-      anonymize_ip: true,
-      allow_google_signals: true,
-      allow_ad_personalization_signals: false
-    });
-  `;
-  document.head.appendChild(script2);
+function currentPagePath(): string {
+  return window.location.pathname + window.location.search;
+}
 
-  // Set gtag function globally
-  window.gtag = function() {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(arguments);
+function sendPageView(gaId: string, pagePath: string) {
+  if (pagePath === lastSentPath) return () => {};
+
+  const payload = {
+    send_to: gaId,
+    page_path: pagePath,
+    page_location: window.location.href,
+    page_title: document.title,
+    page_referrer: lastPageLocation || document.referrer,
   };
+
+  const attempt = () => {
+    if (typeof window.gtag !== "function") return false;
+    lastSentPath = pagePath;
+    lastPageLocation = payload.page_location;
+    window.gtag("event", "page_view", payload);
+    return true;
+  };
+
+  if (attempt()) return () => {};
+
+  const started = Date.now();
+  const id = window.setInterval(() => {
+    if (attempt() || Date.now() - started > 8000) window.clearInterval(id);
+  }, 50);
+
+  return () => window.clearInterval(id);
 }
 
-// Track page views
-export function trackPageView(url: string, title?: string) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', GA_TRACKING_ID, {
-      page_path: url,
-      page_title: title || document.title,
-      page_location: window.location.href
-    });
-  }
-}
-
-// Track custom events
-export function trackEvent(action: string, category: string, label?: string, value?: number) {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value
-    });
-  }
-}
-
-// Track center searches
-export function trackCenterSearch(searchTerm: string, resultsCount: number) {
-  trackEvent('search', 'center_locator', searchTerm, resultsCount);
-}
-
-// Track center views
-export function trackCenterView(centerName: string, centerLocation: string) {
-  trackEvent('view_center', 'center_locator', `${centerName} - ${centerLocation}`);
-}
-
-// Track directions requests
-export function trackDirectionsRequest(centerName: string, centerLocation: string) {
-  trackEvent('get_directions', 'center_locator', `${centerName} - ${centerLocation}`);
-}
-
-// Track contact form submissions
-export function trackContactForm(centerName: string, centerLocation: string) {
-  trackEvent('contact_center', 'center_locator', `${centerName} - ${centerLocation}`);
-}
-
-// Track map interactions
-export function trackMapInteraction(action: string, centerName?: string) {
-  trackEvent(action, 'map_interaction', centerName);
-}
-
-// Track filter usage
-export function trackFilterUsage(filterType: string, filterValue: string) {
-  trackEvent('use_filter', 'center_locator', `${filterType}: ${filterValue}`);
-}
-
-// Track location sharing
-export function trackLocationShare(centerName: string, shareMethod: string) {
-  trackEvent('share_center', 'center_locator', `${centerName} via ${shareMethod}`);
-}
-
-// Main Google Analytics component
-export default function GoogleAnalytics() {
+/**
+ * GA4 for the whole App Router tree:
+ * - skip `next dev` so local reloads do not pollute production reports
+ * - load gtag once after hydration
+ * - config with send_page_view: false (no automatic first hit)
+ * - emit a page_view on every route, including the first
+ * - pass page_referrer so SPA clicks still form a path in reports
+ */
+function PageViews({ gaId }: { gaId: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Initialize GA on component mount
-    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'undefined') {
-      initGA();
-    }
-  }, []);
+    let cancelInterval: (() => void) | undefined;
+    const timer = window.setTimeout(() => {
+      cancelInterval = sendPageView(gaId, currentPagePath());
+    }, 0);
+    return () => {
+      window.clearTimeout(timer);
+      cancelInterval?.();
+    };
+  }, [pathname, searchParams, gaId]);
 
-  useEffect(() => {
-    // Track page views on route changes
-    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
-      const url = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
-      trackPageView(url);
-    }
-  }, [pathname, searchParams]);
-
-  return null; // This component doesn't render anything
+  return null;
 }
 
-// Enhanced tracking for center locator specific events
+export function GoogleAnalytics({ gaId }: { gaId: string }) {
+  if (!gaId || process.env.NODE_ENV !== "production") return null;
+
+  return (
+    <>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        strategy="afterInteractive"
+      />
+      <Script id="ga4-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', '${gaId}', { send_page_view: false });
+        `}
+      </Script>
+      <Suspense fallback={null}>
+        <PageViews gaId={gaId} />
+      </Suspense>
+    </>
+  );
+}
+
+export function gaEvent(
+  action: string,
+  params?: Record<string, string | number | boolean>
+) {
+  if (typeof window === "undefined") return;
+  if (typeof window.gtag === "function") window.gtag("event", action, params);
+}
+
+function trackEvent(
+  action: string,
+  category: string,
+  label?: string,
+  value?: number
+) {
+  const params: Record<string, string | number | boolean> = {
+    event_category: category,
+  };
+  if (label !== undefined) params.event_label = label;
+  if (value !== undefined) params.value = value;
+  gaEvent(action, params);
+}
+
+/** Existing center-locator events — kept; no new click streams. */
 export const CenterLocatorAnalytics = {
-  // Track when user searches for centers
-  searchCenters: (query: string, resultsCount: number, searchType: 'text' | 'location' = 'text') => {
-    trackEvent('search_centers', 'user_interaction', `${searchType}: ${query}`, resultsCount);
+  searchCenters: (
+    query: string,
+    resultsCount: number,
+    searchType: "text" | "location" = "text"
+  ) => {
+    trackEvent(
+      "search_centers",
+      "user_interaction",
+      `${searchType}: ${query}`,
+      resultsCount
+    );
   },
 
-  // Track when user views a specific center
-  viewCenter: (center: { name?: string; state?: string; district?: string; branch_code?: string }) => {
-    const centerLabel = `${center.name || 'Unknown'} - ${center.district}, ${center.state}`;
-    trackEvent('view_center_details', 'center_interaction', centerLabel);
+  viewCenter: (center: {
+    name?: string;
+    state?: string;
+    district?: string;
+    branch_code?: string;
+  }) => {
+    const centerLabel = `${center.name || "Unknown"} - ${center.district}, ${center.state}`;
+    trackEvent("view_center_details", "center_interaction", centerLabel);
   },
 
-  // Track when user gets directions to a center
-  getDirections: (center: { name?: string; state?: string; district?: string }) => {
-    const centerLabel = `${center.name || 'Unknown'} - ${center.district}, ${center.state}`;
-    trackEvent('get_directions', 'center_interaction', centerLabel);
+  getDirections: (center: {
+    name?: string;
+    state?: string;
+    district?: string;
+  }) => {
+    const centerLabel = `${center.name || "Unknown"} - ${center.district}, ${center.state}`;
+    trackEvent("get_directions", "center_interaction", centerLabel);
   },
 
-  // Track when user contacts a center
-  contactCenter: (center: { name?: string; state?: string; district?: string }) => {
-    const centerLabel = `${center.name || 'Unknown'} - ${center.district}, ${center.state}`;
-    trackEvent('contact_center', 'center_interaction', centerLabel);
+  contactCenter: (center: {
+    name?: string;
+    state?: string;
+    district?: string;
+  }) => {
+    const centerLabel = `${center.name || "Unknown"} - ${center.district}, ${center.state}`;
+    trackEvent("contact_center", "center_interaction", centerLabel);
   },
 
-  // Track when user shares a center
-  shareCenter: (center: { name?: string; state?: string; district?: string }, method: string) => {
-    const centerLabel = `${center.name || 'Unknown'} - ${center.district}, ${center.state}`;
-    trackEvent('share_center', 'center_interaction', `${centerLabel} via ${method}`);
+  shareCenter: (
+    center: { name?: string; state?: string; district?: string },
+    method: string
+  ) => {
+    const centerLabel = `${center.name || "Unknown"} - ${center.district}, ${center.state}`;
+    trackEvent(
+      "share_center",
+      "center_interaction",
+      `${centerLabel} via ${method}`
+    );
   },
 
-  // Track map interactions
-  mapInteraction: (action: 'zoom_in' | 'zoom_out' | 'pan' | 'marker_click' | 'info_window_open' | 'distance_start_point' | 'distance_measured' | 'distance_mode_on' | 'distance_mode_off', centerName?: string) => {
-    trackEvent('map_interaction', 'map_usage', centerName ? `${action} - ${centerName}` : action);
+  mapInteraction: (
+    action:
+      | "zoom_in"
+      | "zoom_out"
+      | "pan"
+      | "marker_click"
+      | "info_window_open"
+      | "distance_start_point"
+      | "distance_measured"
+      | "distance_mode_on"
+      | "distance_mode_off",
+    centerName?: string
+  ) => {
+    trackEvent(
+      "map_interaction",
+      "map_usage",
+      centerName ? `${action} - ${centerName}` : action
+    );
   },
 
-  // Track filter usage
-  useFilter: (filterType: 'region' | 'state' | 'district' | 'sort' | 'contact_type' | 'distance', filterValue: string) => {
-    trackEvent('use_filter', 'navigation', `${filterType}: ${filterValue}`);
+  useFilter: (
+    filterType:
+      | "region"
+      | "state"
+      | "district"
+      | "sort"
+      | "contact_type"
+      | "distance",
+    filterValue: string
+  ) => {
+    trackEvent("use_filter", "navigation", `${filterType}: ${filterValue}`);
   },
 
-  // Track location permission requests
   locationPermission: (granted: boolean) => {
-    trackEvent('location_permission', 'user_interaction', granted ? 'granted' : 'denied');
+    trackEvent(
+      "location_permission",
+      "user_interaction",
+      granted ? "granted" : "denied"
+    );
   },
 
-  // Track retreat center interactions
-  retreatInteraction: (action: 'view' | 'contact' | 'directions', centerName: string) => {
-    trackEvent('retreat_center', 'retreat_interaction', `${action} - ${centerName}`);
-  }
+  retreatInteraction: (
+    action: "view" | "contact" | "directions",
+    centerName: string
+  ) => {
+    trackEvent(
+      "retreat_center",
+      "retreat_interaction",
+      `${action} - ${centerName}`
+    );
+  },
 };
+
+export default GoogleAnalytics;

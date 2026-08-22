@@ -1,9 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Suspense } from "react";
 import { UnifiedHeader } from "../components/unified-header";
-import GoogleAnalytics from "../components/GoogleAnalytics";
+import { GoogleAnalytics } from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
 import { OrganizationSchema, WebSiteSchema, DatasetSchema } from "../components/StructuredData";
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
@@ -13,6 +12,7 @@ import { Footer } from "@/components/Footer";
 import { CentersChrome } from "@/components/CentersChrome";
 
 const inter = Inter({ subsets: ["latin"] });
+const GA_ID = "G-CSYYGVHXN0";
 
 async function getHomeMetadata() {
   const [totalCenters, { stateCount: totalStates, districtCount: totalDistricts }] = await Promise.all([
@@ -104,9 +104,6 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.className} bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="bk-centers-theme">
-          <Suspense fallback={null}>
-            <GoogleAnalytics />
-          </Suspense>
           <CentersChrome
             header={<UnifiedHeader />}
             footer={<Footer />}
@@ -115,6 +112,7 @@ export default async function RootLayout({
             {children}
           </CentersChrome>
         </ThemeProvider>
+        <GoogleAnalytics gaId={GA_ID} />
       </body>
     </html>
   );
