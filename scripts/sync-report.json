@@ -1,256 +1,49 @@
 {
-  "timestamp": "2026-08-15T07:06:48.023Z",
+  "timestamp": "2026-08-22T12:47:02.114Z",
   "summary": {
-    "created": 8,
-    "updated": 10,
+    "created": 4,
+    "updated": 1,
     "deleted": 0
   },
   "created": [
     {
-      "branch_code": "05945",
-      "name": "Badhkhalsa",
-      "district": "Sonipat",
-      "state": "Haryana",
+      "branch_code": "05953",
+      "name": "New Delhi Nawada",
+      "district": "West Delhi",
+      "state": "Delhi",
       "region": "India"
     },
     {
-      "branch_code": "05946",
-      "name": "Nangal Kalan",
-      "district": "Sonipat",
-      "state": "Haryana",
+      "branch_code": "05954",
+      "name": "Bhubaneswar Chandrasekharpur Damana",
+      "district": "Khordha",
+      "state": "Odisha",
       "region": "India"
     },
     {
-      "branch_code": "05947",
-      "name": "Nahri (sonipat)",
-      "district": "Sonipat",
-      "state": "Haryana",
+      "branch_code": "05955",
+      "name": "Delhi  Kishan Ganj",
+      "district": "North Delhi",
+      "state": "Delhi",
       "region": "India"
     },
     {
-      "branch_code": "05948",
-      "name": "Rai (sonipat)",
-      "district": "Sonipat",
-      "state": "Haryana",
-      "region": "India"
-    },
-    {
-      "branch_code": "05949",
-      "name": "Lohagaon",
-      "district": "Vijayapura",
-      "state": "Karnataka",
-      "region": "India"
-    },
-    {
-      "branch_code": "05950",
-      "name": "Gurugram Sector 102",
-      "district": "Gurugram",
-      "state": "Haryana",
-      "region": "India"
-    },
-    {
-      "branch_code": "05951",
-      "name": "Gurugram Sector 39 Jharsa",
-      "district": "Gurugram",
-      "state": "Haryana",
-      "region": "India"
-    },
-    {
-      "branch_code": "05952",
-      "name": "Faridabad Sector 80",
-      "district": "Faridabad",
-      "state": "Haryana",
+      "branch_code": "05956",
+      "name": "Barun (aurangabad)",
+      "district": "Aurangabad",
+      "state": "Bihar",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "00277",
-      "name": "Modasa",
+      "branch_code": "05851",
+      "name": "Indore New York City",
       "changes": [
         {
           "field": "mobile",
-          "from": "9427744845",
-          "to": "9429545083, 9427744845"
-        }
-      ]
-    },
-    {
-      "branch_code": "01070",
-      "name": "Ahmedabad Maniyasa",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9998061602, 9429198221",
-          "to": "9998061602, 9427785308"
-        }
-      ]
-    },
-    {
-      "branch_code": "01259",
-      "name": "Bengaluru Hebbal",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9731820494",
-          "to": "9980888733"
-        }
-      ]
-    },
-    {
-      "branch_code": "02918",
-      "name": "Weir (bharatpur)",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "7023662843, 7023662843",
-          "to": "7023662843, 9829522209"
-        },
-        {
-          "field": "section",
-          "from": "00035",
-          "to": "02918"
-        }
-      ]
-    },
-    {
-      "branch_code": "03376",
-      "name": "Bhuj Aiya Nagar",
-      "changes": [
-        {
-          "field": "name",
-          "from": "Bhuj  Aiyanagar",
-          "to": "Bhuj Aiya Nagar"
-        },
-        {
-          "field": "slug",
-          "from": "bhuj-aiyanagar",
-          "to": "bhuj-aiya-nagar"
-        },
-        {
-          "field": "address_line1",
-          "from": "67, Aiyanagar",
-          "to": "H No: 261, Manav Mandir"
-        },
-        {
-          "field": "address_line2",
-          "from": "Opp: Reliance Petrol Pump",
-          "to": "Galli No-2"
-        },
-        {
-          "field": "address_line3",
-          "from": "Mundra Road",
-          "to": "Gate No-6, Aiya Nagar, Mundra Road"
-        },
-        {
-          "field": "pincode",
-          "from": "370001",
-          "to": "370015"
-        },
-        {
-          "field": "contact",
-          "from": "-",
-          "to": ""
-        },
-        {
-          "field": "mobile",
-          "from": "9428311992",
-          "to": "7984126208"
-        },
-        {
-          "field": "section",
-          "from": "00208",
-          "to": "00253"
-        },
-        {
-          "field": "latitude",
-          "from": null,
-          "to": 23.226149
-        },
-        {
-          "field": "longitude",
-          "from": null,
-          "to": 69.660894
-        }
-      ]
-    },
-    {
-      "branch_code": "04434",
-      "name": "Durg Borsi",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "7587168627, 8085060818",
-          "to": "9424305684, 9407739841"
-        }
-      ]
-    },
-    {
-      "branch_code": "04452",
-      "name": "Bhusawar",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00035",
-          "to": "02918"
-        }
-      ]
-    },
-    {
-      "branch_code": "04844",
-      "name": "Hathwala",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "8685915603",
-          "to": "9996830743, 9518080872"
-        }
-      ]
-    },
-    {
-      "branch_code": "05287",
-      "name": "Shivamogga Shrirampura",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "Mig-304",
-          "to": "H.no: 254, Jyothirmaya Shivalaya"
-        },
-        {
-          "field": "address_line2",
-          "from": "Khb Colony, Iind Stage, Vinobanagar, Om Shanti Road",
-          "to": "Sagar Road, Near Canara Bank Regional Office"
-        },
-        {
-          "field": "address_line3",
-          "from": "Kallahalli, Near Shrirampura",
-          "to": "Vajpayee Layout, Shrirampura"
-        },
-        {
-          "field": "mobile",
-          "from": "7619343856, 9449920990",
-          "to": "7619343856"
-        },
-        {
-          "field": "latitude",
-          "from": 13.950348,
-          "to": 13.963573
-        },
-        {
-          "field": "longitude",
-          "from": 75.553739,
-          "to": 75.527485
-        }
-      ]
-    },
-    {
-      "branch_code": "05641",
-      "name": "Bhiloda",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9016582640, 8160772554",
-          "to": "9428018540, 9016582640"
+          "from": "8085531264, 7389570229",
+          "to": "9993825465, 8224859569"
         }
       ]
     }
