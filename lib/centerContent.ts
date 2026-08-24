@@ -9,6 +9,7 @@
  */
 
 import { Center } from './types';
+import { formatCenterName } from './formatPlaceName';
 
 // Human-readable default timings (shown on the page and in FAQ answers).
 export const DEFAULT_TIMINGS = {
@@ -69,7 +70,8 @@ function titleCase(str: string): string {
 
 /** Best human-readable locality label for the center (city falls back to district). */
 export function getLocalityLabel(center: Pick<Center, 'address' | 'district'>): string {
-  return titleCase(center.address?.city || center.district || '');
+  const raw = center.address?.city || center.district || '';
+  return center.address?.city ? formatCenterName(raw) : titleCase(raw);
 }
 
 /** First available phone number (mobile preferred) for "call to confirm" copy. */
@@ -87,7 +89,7 @@ export function generateCenterIntro(
   center: Center,
   nearbyLocalities: string[] = []
 ): string {
-  const name = titleCase(center.name);
+  const name = formatCenterName(center.name);
   const city = getLocalityLabel(center);
   const district = titleCase(center.district);
   const state = titleCase(center.state);
@@ -123,7 +125,7 @@ export function getLocalizedFaqs(
   options?: { omitTimings?: boolean }
 ): { question: string; answer: string }[] {
   const omitTimings = Boolean(options?.omitTimings);
-  const name = titleCase(center.name);
+  const name = formatCenterName(center.name);
   const locality =
     getLocalityLabel(center) || titleCase(center.district) || titleCase(center.state);
   const phone = firstPhone(center);

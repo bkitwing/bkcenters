@@ -44,6 +44,14 @@ function capitalizeString(str) {
   return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
 }
 
+// Title-case, then uppercase the letter after each "." so PAD acronyms stay intact:
+// I.S.R.O → I.S.R.O, J.P.NAGAR → J.P.Nagar, H.NO → H.No.
+// Applied to center titles, address lines, and city. Keep in sync with lib/formatPlaceName.ts.
+function formatCenterName(str) {
+  if (!str) return str;
+  return capitalizeString(str).replace(/\.([a-z])/g, (_, c) => '.' + c.toUpperCase());
+}
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -178,13 +186,13 @@ function buildCenterBody(entry, districtStrapiId) {
   }
 
   const body = {
-    name: capitalizeString(entry.name),
+    name: formatCenterName(entry.name),
     slug: generateSlug(entry.name),
     branch_code: entry.branch_code || '',
-    address_line1: capitalizeString(entry.address?.line1) || '',
-    address_line2: capitalizeString(entry.address?.line2) || '',
-    address_line3: capitalizeString(entry.address?.line3) || '',
-    city: capitalizeString(entry.address?.city) || '',
+    address_line1: formatCenterName(entry.address?.line1) || '',
+    address_line2: formatCenterName(entry.address?.line2) || '',
+    address_line3: formatCenterName(entry.address?.line3) || '',
+    city: formatCenterName(entry.address?.city) || '',
     pincode: entry.address?.pincode || '',
     email: extractFirstEmail(entry.email),
     contact: entry.contact || '',
@@ -227,14 +235,14 @@ function buildReport(toCreate, toUpdate, toDelete) {
     },
     created: toCreate.map(e => ({
       branch_code: e.branch_code,
-      name: capitalizeString(e.name),
+      name: formatCenterName(e.name),
       district: capitalizeString(e.district),
       state: capitalizeString(e.state),
       region: capitalizeString(e.region)
     })),
     updated: toUpdate.map(({ entry, diffs }) => ({
       branch_code: entry.branch_code,
-      name: capitalizeString(entry.name),
+      name: formatCenterName(entry.name),
       changes: diffs.map(d => ({ field: d.field, from: d.from, to: d.to }))
     })),
     deleted: toDelete.map(({ code, name }) => ({ branch_code: code, name }))
@@ -388,7 +396,7 @@ async function sync() {
   if (toCreate.length > 0) {
     console.log('┌─── NEW CENTERS ───');
     for (const entry of toCreate) {
-      console.log(`│  + [${entry.branch_code}] ${capitalizeString(entry.name)} — ${capitalizeString(entry.district)}, ${capitalizeString(entry.state)}`);
+      console.log(`│  + [${entry.branch_code}] ${formatCenterName(entry.name)} — ${capitalizeString(entry.district)}, ${capitalizeString(entry.state)}`);
     }
     console.log('└───────────────────\n');
   }
@@ -396,7 +404,7 @@ async function sync() {
   if (toUpdate.length > 0) {
     console.log('┌─── UPDATED CENTERS ───');
     for (const { entry, diffs } of toUpdate) {
-      console.log(`│  ~ [${entry.branch_code}] ${capitalizeString(entry.name)}`);
+      console.log(`│  ~ [${entry.branch_code}] ${formatCenterName(entry.name)}`);
       for (const d of diffs) {
         console.log(`│      ${d.field}: "${d.from}" → "${d.to}"`);
       }

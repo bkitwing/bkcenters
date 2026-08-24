@@ -180,7 +180,7 @@ curl -s -u "bkpad_bkc:merababa" \
 ## Notes
 
 - **Email field**: Strapi validates email format. If a center has multiple emails (comma/semicolon separated), only the first valid email is stored.
-- **Capitalization**: Names, addresses, countries etc. are automatically title-cased during sync.
+- **Capitalization**: Countries and region/state/district names are title-cased during sync. Center **titles**, **address lines**, and **city** are title-cased and then the letter after each `.` is uppercased (`I.S.R.O`, `J.P.Nagar`, `H.No`) so dotted initials from PAD stay intact.
 - **Coordinates**: Stored as `latitude` (Decimal) and `longitude` (Decimal) — converted from the string array `coords` in raw data.
 - **Retreat centers**: Identified by `branch_code` in the hardcoded list (`90001`, `90007`, `90006`). The `is_retreat` boolean flag is set automatically.
 - **Relations**: Each center is linked to its district, which is linked to its state, which is linked to its region. This chain enables efficient queries like "get all centers in Madhya Pradesh" without loading all 5612 centers.
