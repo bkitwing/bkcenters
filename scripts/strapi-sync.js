@@ -646,28 +646,60 @@ async function sync() {
       if (districtByKey[distKey]) return districtByKey[distKey];
 
       const stateId = stateByName[stateName];
-      // Reuse globally unique district by name — re-link to canonical state if needed
-      if (districtIdByName[districtName]) {
-        const distId = districtIdByName[districtName];
-        if (stateId) {
-          await strapiRequest('PUT', `district-centers/${distId}`, {
-            name: districtName,
-            district_id: entry.district_id || '',
-            state_center: stateId,
-          });
-          console.log(`  ~ District re-linked: ${districtName} → ${stateName}`);
+
+      // Reuse district only if it already belongs to this province/state.
+      // Never re-link a same-named district from another province (e.g. Kanchanpur).
+      const existingId = districtIdByName[districtName];
+      if (existingId) {
+        const meta = districtMetaById[existingId];
+        if (meta && meta.stateName === stateName) {
+          districtByKey[distKey] = existingId;
+          return existingId;
         }
-        districtByKey[distKey] = distId;
-        return distId;
       }
 
-      const body = { name: districtName, slug: generateSlug(districtName), district_id: entry.district_id || '' };
-      if (stateId) body.state_center = stateId;
-      const res = await strapiRequest('POST', 'district-centers', body);
-      districtByKey[distKey] = res.data.id;
-      districtIdByName[districtName] = res.data.id;
-      console.log(`  + District: ${districtName} (${stateName})`);
-      return res.data.id;
+      // Prefer exact name; on global uniqueness conflict use Province-scoped name.
+      const candidates = [districtName, `${districtName} (${stateName})`];
+      for (const candidate of candidates) {
+        const candKey = stateName + '::' + candidate;
+        if (districtByKey[candKey]) {
+          districtByKey[distKey] = districtByKey[candKey];
+          return districtByKey[candKey];
+        }
+        if (districtIdByName[candidate]) {
+          const meta = districtMetaById[districtIdByName[candidate]];
+          if (meta && meta.stateName === stateName) {
+            districtByKey[distKey] = districtIdByName[candidate];
+            districtByKey[candKey] = districtIdByName[candidate];
+            return districtIdByName[candidate];
+          }
+          continue; // name taken by another state
+        }
+        try {
+          const body = {
+            name: candidate,
+            slug: generateSlug(candidate),
+            district_id: entry.district_id || '',
+          };
+          if (stateId) body.state_center = stateId;
+          const res = await strapiRequest('POST', 'district-centers', body);
+          districtByKey[distKey] = res.data.id;
+          districtByKey[candKey] = res.data.id;
+          districtIdByName[candidate] = res.data.id;
+          districtMetaById[res.data.id] = { districtName: candidate, stateName };
+          if (candidate !== districtName) {
+            console.log(`  + District: ${candidate} (scoped under ${stateName})`);
+          } else {
+            console.log(`  + District: ${candidate} (${stateName})`);
+          }
+          return res.data.id;
+        } catch (err) {
+          const msg = err && err.message ? err.message : String(err);
+          if (!/unique/i.test(msg)) throw err;
+          // race / unique conflict — try next candidate
+        }
+      }
+      throw new Error(`Could not resolve district "${districtName}" under ${stateName}`);
     }
 
     for (const entry of hierarchyEntries) {
