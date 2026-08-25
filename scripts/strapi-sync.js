@@ -55,6 +55,8 @@ const DETAILED = process.argv.includes('--detailed') || process.argv.includes('-
 const AUTO_YES = process.argv.includes('--yes') || process.argv.includes('-y');
 const DRY_RUN = process.argv.includes('--dry-run');
 
+const { resolveNepalProvince, NEPAL_PROVINCES } = require('./nepal-provinces');
+
 /** Normalize PAD Nepal region variants to a single Strapi region name. */
 function normalizeNepalRegion(region) {
   const upper = (region || '').toUpperCase().trim();
@@ -62,12 +64,22 @@ function normalizeNepalRegion(region) {
   return capitalizeString(region);
 }
 
-/** Apply only known safe Nepal state spelling aliases. */
+/** Apply only known safe Nepal state spelling aliases (legacy). Prefer resolveNepalProvince. */
 function normalizeNepalState(state) {
   const trimmed = (state || '').trim();
   if (!trimmed) return trimmed;
   const alias = NEPAL_STATE_ALIASES[trimmed.toUpperCase()];
   return alias || capitalizeString(trimmed);
+}
+
+/**
+ * Map PAD Nepal state/district into one of the 7 official provinces.
+ * Falls back to spelling-normalized state only if unmapped (should be rare).
+ */
+function resolveNepalStateForSync(state, district) {
+  const province = resolveNepalProvince(state, district);
+  if (province) return province;
+  return normalizeNepalState(state);
 }
 
 function isNepalCountry(country) {
@@ -318,7 +330,7 @@ async function sync() {
       .map(e => ({
         ...e,
         region: normalizeNepalRegion(e.region),
-        state: normalizeNepalState(e.state),
+        state: resolveNepalStateForSync(e.state, e.district),
         district: capitalizeString((e.district || '').trim()),
         country: capitalizeString((e.country || '').trim()) || 'Nepal',
       }));
@@ -327,7 +339,10 @@ async function sync() {
       console.log(`  Skipped ${skipped} non-Nepal entries`);
     }
     console.log(`  Nepal mode: deletes DISABLED, orphan cleanup SKIPPED`);
-    console.log(`  State aliases applied: ${Object.keys(NEPAL_STATE_ALIASES).join(', ')}`);
+    console.log(`  Provinces: ${NEPAL_PROVINCES.join(', ')}`);
+    const provCounts = {};
+    rawEntries.forEach(e => { provCounts[e.state] = (provCounts[e.state] || 0) + 1; });
+    console.log('  Province distribution:', provCounts);
   } else {
     // Filter out excluded regions (e.g. Nepal) — only sync India data
     rawEntries = allRawEntries.filter(e => {

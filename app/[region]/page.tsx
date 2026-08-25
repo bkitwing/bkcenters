@@ -152,7 +152,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
       />
 
       {/* ===== HERO SECTION ===== */}
-      <div className="relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
+      <div className="bk-hero-underlap relative bg-gradient-to-br from-spirit-purple-700 via-spirit-blue-700 to-spirit-purple-800 dark:from-spirit-purple-900 dark:via-spirit-blue-900 dark:to-spirit-purple-900 overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full blur-3xl" />
@@ -160,12 +160,16 @@ export default async function RegionPage({ params }: RegionPageProps) {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-spirit-blue-400 rounded-full blur-3xl" />
         </div>
 
-        <div className="container mx-auto px-4 pt-6 pb-10 md:pb-14 relative z-10">
+        <div className="container mx-auto px-4 pt-4 pb-10 md:pb-14 relative z-10">
           {/* Breadcrumb */}
           <nav className="mb-6">
             <ol className="flex items-center text-sm flex-wrap gap-1">
               <li className="flex items-center">
                 <Link href="/" className="text-white/60 hover:text-white text-xs transition-colors">Home</Link>
+                <ChevronRight className="w-3 h-3 mx-1.5 text-white/40" />
+              </li>
+              <li>
+                <span className="text-white/80 text-xs">{region}</span>
               </li>
             </ol>
           </nav>
@@ -178,7 +182,9 @@ export default async function RegionPage({ params }: RegionPageProps) {
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">{region}</h1>
             <p className="text-white/70 text-sm max-w-2xl">
-              Explore {totalCenters} Brahma Kumaris Rajyoga meditation centers across {states.length} {states.length === 1 ? 'state' : 'states'} and {totalDistricts} districts in {region}
+              {region.toUpperCase() === 'NEPAL'
+                ? `Explore ${totalCenters} Brahma Kumaris Rajyoga meditation centers across ${states.length} provinces and ${totalDistricts} localities in Nepal`
+                : `Explore ${totalCenters} Brahma Kumaris Rajyoga meditation centers across ${states.length} ${states.length === 1 ? 'state' : 'states'} and ${totalDistricts} districts in ${region}`}
             </p>
           </div>
 
@@ -199,7 +205,13 @@ export default async function RegionPage({ params }: RegionPageProps) {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white leading-none">{states.length}</p>
-                <p className="text-xs text-white/60">States &amp; UTs</p>
+                <p className="text-xs text-white/60">
+                  {region.toUpperCase() === 'INDIA'
+                    ? 'States & UTs'
+                    : region.toUpperCase() === 'NEPAL'
+                      ? 'Provinces'
+                      : 'States / Areas'}
+                </p>
               </div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-5 py-3 flex items-center gap-3">
@@ -232,9 +244,17 @@ export default async function RegionPage({ params }: RegionPageProps) {
           <div>
             <div className="text-center mb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-                {region === 'INDIA' ? 'Explore States & Union Territories' : `States in ${region}`}
+                {region.toUpperCase() === 'INDIA'
+                  ? 'Explore States & Union Territories'
+                  : region.toUpperCase() === 'NEPAL'
+                    ? 'Explore Provinces'
+                    : `Explore areas in ${region}`}
               </h2>
-              <p className="text-neutral-500 dark:text-neutral-400 text-sm">Select a state to find meditation centers near you</p>
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+                {region.toUpperCase() === 'NEPAL'
+                  ? 'Select a province to find meditation centers near you'
+                  : 'Select a state to find meditation centers near you'}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

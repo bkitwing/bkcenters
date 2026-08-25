@@ -575,8 +575,20 @@ export default function HomePageClient({
                   <strong className="text-neutral-700 dark:text-neutral-200">36</strong> States &amp; UTs
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-neutral-400 dark:text-neutral-500 max-w-md mx-auto leading-relaxed">
-                Find your nearest center for free meditation classes and 7-day Rajyoga courses
+              <p className="text-[11px] sm:text-xs text-neutral-400 dark:text-neutral-500 max-w-lg mx-auto leading-relaxed">
+                Find your nearest center in India &amp; Nepal for free meditation classes and 7-day Rajyoga courses.
+                <span className="block mt-1 text-neutral-400/80 dark:text-neutral-500/80">
+                  For other countries, kindly visit the{" "}
+                  <a
+                    href="https://www.brahmakumaris.org/centre-locator/centres"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2 decoration-neutral-300 dark:decoration-neutral-600 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 hover:decoration-spirit-purple-400 transition-colors"
+                  >
+                    international centre locator
+                  </a>
+                  .
+                </span>
               </p>
             </div>
           </div>
