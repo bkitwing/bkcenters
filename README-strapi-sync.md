@@ -72,37 +72,70 @@ Strapi Base URL: `https://webapp.brahmakumaris.com/api`
 
 ## How to Sync (Step by Step)
 
-### Step 0: Fetch latest data from PADT API
+### Step 0a: Fetch latest **India** data from PAD API
 
 ```bash
-curl -s -u "bkpad_bkc:merababa" "http://padt.bkivv.app:8080/locations/c/india" -o Centers_Raw.json
-
-New URL
-
 curl -s -u "bkpad_bkc:merababa" \
   "https://padds.bkivv.app/pad-data-services/locations/c/India" \
   -o Centers_Raw.json
-
 ```
 
-> **Note:** This endpoint only works over **HTTP** (not HTTPS) on port 8080.
-> Credentials: username `bkpad_bkc`, password `merababa`
+> India sync **excludes** region `NEPAL` (`EXCLUDED_REGIONS` in `scripts/strapi-sync.js`). Nepal is imported separately below.
 
-### When you get new data from the external API:
+### Step 0b: Fetch latest **Nepal** data (separate API)
 
-1. **Run the curl command above** to fetch and save into `Centers_Raw.json`
+Use env vars so credentials are not committed:
+
+```bash
+# Optional: put these in .env.local (never commit)
+# PAD_NEPAL_USER=bkpadbkc_nepal
+# PAD_NEPAL_PASS=...
+
+curl -s -u "${PAD_NEPAL_USER}:${PAD_NEPAL_PASS}" \
+  "https://padds.bkivv.app/pad-data-services/locations/c/Nepal" \
+  -o Centers_Nepal_Raw.json
+```
+
+### When you get new India data:
+
+1. Fetch into `Centers_Raw.json` (Step 0a)
 2. **Run sync**:
    ```bash
-   npm run strapi-sync
    npm run strapi-sync:dry
+   npm run strapi-sync
    ```
-3. The script will automatically:
+3. The India sync will:
    - Detect **new** centers → create them in Strapi
    - Detect **changed** centers → update them in Strapi
    - Detect **removed** centers → delete them from Strapi
    - Create any new regions/states/districts if needed
+   - Keep excluding Nepal rows that appear in the India API feed
 
-### That's it! One command does everything.
+### When you get new Nepal data:
+
+1. Fetch into `Centers_Nepal_Raw.json` (Step 0b)
+2. **Dry-run first** (never deletes; create/update only):
+   ```bash
+   npm run strapi-sync:nepal:dry
+   ```
+3. If the plan looks correct (~creates only, **0 deletes**):
+   ```bash
+   npm run strapi-sync:nepal
+   ```
+
+Nepal mode is **create/update only** — it never deletes India (or any) centers and skips orphan hierarchy cleanup.
+
+India mode also **never deletes** centers with `country=Nepal`, so a later India sync cannot wipe Nepal imports.
+
+**Nepal state spelling aliases** (conservative only): `Dhanusa→Dhanusha`, `MECHI→Mechi`, `Makawanpur→Makwanpur`. Trailing spaces are trimmed. No fuzzy merges.
+
+**Portal / webapp:** After importing to webapp, verify portal with:
+
+```bash
+STRAPI_BASE_URL=https://portal.brahmakumaris.com/api npm run strapi-sync:nepal:dry
+```
+
+If create count is already `0`, portal already has Nepal (shared or mirrored data) — no second write needed. Only run `strapi-sync:nepal --yes` against portal when dry-run shows creates.
 
 ---
 
@@ -159,7 +192,10 @@ curl -s -u "bkpad_bkc:merababa" \
 
 | Command | Description |
 |---------|-------------|
-| `npm run strapi-sync` | **Main command** — Syncs Centers_Raw.json → Strapi (handles add/update/delete) |
+| `npm run strapi-sync` | **India** — Syncs Centers_Raw.json → Strapi (add/update/delete; excludes Nepal) |
+| `npm run strapi-sync:dry` | India dry-run (no writes) |
+| `npm run strapi-sync:nepal` | **Nepal** — Syncs Centers_Nepal_Raw.json → Strapi (create/update only; never deletes) |
+| `npm run strapi-sync:nepal:dry` | Nepal dry-run (no writes) |
 | `npm run strapi-migrate` | First-time bulk import (only use on empty Strapi) |
 | `npm run strapi-cleanup` | Deletes ALL data from all 4 Strapi collections (use with caution!) |
 

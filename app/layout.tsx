@@ -30,13 +30,13 @@ async function getHomeMetadata() {
 export async function generateMetadata(): Promise<Metadata> {
   const stats = await getHomeMetadata();
   const title = "Brahma Kumaris - Rajyog Meditation Center Locator";
-  const description = `Find the nearest Brahma Kumaris Rajyog Meditation Center. ${stats.totalCenters} centers across ${stats.totalStates} states and ${stats.totalDistricts} districts in India. Free meditation classes available.`;
+  const description = `Find the nearest Brahma Kumaris Rajyog Meditation Center. ${stats.totalCenters} centers across ${stats.totalStates} states and ${stats.totalDistricts} districts in India and Nepal. Free meditation classes available.`;
 
   return {
     metadataBase: getMetadataBase(),
     title,
     description,
-    keywords: `Brahma Kumaris, meditation, center locator, ${stats.totalCenters} meditation centers, ${stats.totalStates} states, ${stats.totalDistricts} districts, Nearby Meditation Centers, Brahma Kumaris Rajyog Meditation Centers, Learn Meditation, Om Shanti, Seva Kendra, 7 day courses, meditation retreats, India`,
+    keywords: `Brahma Kumaris, meditation, center locator, ${stats.totalCenters} meditation centers, ${stats.totalStates} states, ${stats.totalDistricts} districts, Nearby Meditation Centers, Brahma Kumaris Rajyog Meditation Centers, Learn Meditation, Om Shanti, Seva Kendra, 7 day courses, meditation retreats, India, Nepal`,
     robots: {
       index: true,
       follow: true,
@@ -62,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
         {
           url: generateOgImageUrl({
             title: "Brahma Kumaris Centers",
-            description: `${stats.totalCenters} Centers across India`,
+            description: `${stats.totalCenters} Centers across India and Nepal`,
             type: "home",
           }),
           width: 1200,
@@ -78,7 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         generateOgImageUrl({
           title: "Brahma Kumaris Centers",
-          description: `${stats.totalCenters} Centers across India`,
+          description: `${stats.totalCenters} Centers across India and Nepal`,
           type: "home",
         }),
       ],

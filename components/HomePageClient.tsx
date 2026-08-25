@@ -507,17 +507,22 @@ export default function HomePageClient({
     }
   };
 
-  // Get sorted regions based on sort option
+  // Get sorted regions: India (and other non-Nepal) first; Nepal always at the end
   const getSortedRegions = (): {
     name: string;
     stateCount: number;
     centerCount: number;
   }[] => {
-    if (sortBy === "alpha") {
-      return [...regionDetails].sort((a, b) => a.name.localeCompare(b.name));
-    } else {
-      return [...regionDetails].sort((a, b) => b.centerCount - a.centerCount);
-    }
+    const isNepal = (name: string) => name.toUpperCase().startsWith("NEPAL");
+    const compare =
+      sortBy === "alpha"
+        ? (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name)
+        : (a: { centerCount: number }, b: { centerCount: number }) =>
+            b.centerCount - a.centerCount;
+
+    const primary = regionDetails.filter((r) => !isNepal(r.name)).sort(compare);
+    const nepal = regionDetails.filter((r) => isNepal(r.name)).sort(compare);
+    return [...primary, ...nepal];
   };
 
   return (

@@ -35,3 +35,7 @@ next-env.d.ts
 
 # Generated sitemap files
 /public/sitemap.xml
+
+# Nepal PAD raw dump (fetch via curl — see README-strapi-sync.md)
+/Centers_Nepal_Raw.json
+/scripts/sync-report-nepal.json

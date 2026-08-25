@@ -182,7 +182,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     
     try {
       const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
-        componentRestrictions: { country: 'in' },
+        componentRestrictions: { country: ['in', 'np'] },
         fields: ['geometry', 'formatted_address'],
       });
       

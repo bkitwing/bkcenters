@@ -11,7 +11,9 @@
     "test-seo": "curl -s http://localhost:5400/centers | grep -E '<title>|<meta name=\"description\"|application/ld\\+json' | head -20",
     "generate-sitemap": "node scripts/generate-sitemap.js",
     "strapi-sync": "node scripts/strapi-sync.js",
-    "strapi-sync:dry": "node scripts/strapi-sync.js --dry-run"
+    "strapi-sync:dry": "node scripts/strapi-sync.js --dry-run",
+    "strapi-sync:nepal": "node scripts/strapi-sync.js --nepal",
+    "strapi-sync:nepal:dry": "node scripts/strapi-sync.js --nepal --dry-run"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

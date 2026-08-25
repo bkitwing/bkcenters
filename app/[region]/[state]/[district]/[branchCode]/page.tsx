@@ -25,6 +25,7 @@ import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel, TIMING_CONFIRM_NOTE } from '@/lib/centerContent';
+import { countryLabelFromRegion } from '@/lib/countryUtils';
 import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
 
@@ -85,10 +86,11 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       'Address not available';
 
     const localityLabel = getLocalityLabel(center);
-    const title = `${center.name} - Brahma Kumaris Rajyog Meditation Center - ${center.state}`;
+    const country = countryLabelFromRegion(center.region, center.country);
+    const title = `${center.name} - Brahma Kumaris Rajyog Meditation Center - ${center.state}${country ? `, ${country}` : ''}`;
     // Unique, localized description (name + locality + timings) so each of the
     // 5,600+ pages has a differentiated snippet rather than duplicate boilerplate.
-    const description = `Learn Rajyoga meditation for free at Brahma Kumaris ${center.name}${localityLabel ? ` in ${localityLabel}, ` : ' in '}${center.state}. Free 7-day course and daily morning (7–9 AM) & evening (5–8 PM) classes. Address, contact numbers, timings & directions.`;
+    const description = `Learn Rajyoga meditation for free at Brahma Kumaris ${center.name}${localityLabel ? ` in ${localityLabel}, ` : ' in '}${center.state}${country ? `, ${country}` : ''}. Free 7-day course and daily morning (7–9 AM) & evening (5–8 PM) classes. Address, contact numbers, timings & directions.`;
     
     // Format complete address
     const getCompleteAddress = () => {
@@ -120,7 +122,7 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       title: center.name, // Shorter title for OG image
       description: contactLines,
       type: 'center',
-      location: `${center.address?.city || ''}, ${center.state}`,
+      location: `${center.address?.city || ''}, ${center.state}${country ? `, ${country}` : ''}`,
     });
 
     // Build canonical URL
@@ -132,7 +134,7 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
     return {
       title,
       description,
-      keywords: `Brahma Kumaris, meditation, ${center.name}, ${center.district}, ${center.state}, ${center.address?.city ? center.address.city + ', ' : ''}spiritual center, Rajyoga, free meditation classes, 7 day course`,
+      keywords: `Brahma Kumaris, meditation, ${center.name}, ${center.district}, ${center.state}${country ? `, ${country}` : ''}, ${center.address?.city ? center.address.city + ', ' : ''}spiritual center, Rajyoga, free meditation classes, 7 day course`,
       robots: {
         index: true,
         follow: true,

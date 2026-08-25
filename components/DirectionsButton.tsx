@@ -72,7 +72,7 @@ const DirectionsButton: React.FC<DirectionsButtonProps> = ({
     if (showSearchInput && isLoaded && inputRef.current && window.google?.maps?.places) {
       try {
         const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
-          componentRestrictions: { country: 'in' },
+          componentRestrictions: { country: ['in', 'np'] },
           fields: ['formatted_address'],
         });
         

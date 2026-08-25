@@ -1,6 +1,7 @@
 'use client';
 
 import { Center, NewsPost, EventPost } from '@/lib/types';
+import { toIsoCountryCode } from '@/lib/countryUtils';
 
 interface OrganizationSchemaProps {
   baseUrl?: string;
@@ -103,7 +104,7 @@ export function LocalBusinessSchema({
       addressLocality: center.address?.city || center.district,
       addressRegion: center.state,
       postalCode: center.address?.pincode || '',
-      addressCountry: center.country || 'IN',
+      addressCountry: toIsoCountryCode(center.country || center.region),
     },
     geo: center.coords && center.coords.length === 2 ? {
       '@type': 'GeoCoordinates',
@@ -428,7 +429,7 @@ export function EventSchema({ center, centerUrl }: EventSchemaProps) {
     addressLocality: center.address?.city || center.district,
     addressRegion: center.state,
     postalCode: center.address?.pincode || '',
-    addressCountry: center.country || 'IN',
+    addressCountry: toIsoCountryCode(center.country || center.region),
   };
 
   // Calculate next Monday as the startDate for the recurring event
@@ -643,7 +644,7 @@ export function EventListSchema({ events, center, centerUrl }: EventListSchemaPr
     addressLocality: center.address?.city || center.district,
     addressRegion: center.state,
     postalCode: center.address?.pincode || '',
-    addressCountry: center.country || 'IN',
+    addressCountry: toIsoCountryCode(center.country || center.region),
   };
 
   const eventSchemas = events.map((event) => {

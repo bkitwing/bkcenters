@@ -1,20 +1,19 @@
 /**
  * Strapi Sync Script
- * 
- * Reads Centers_Raw.json and syncs data into Strapi CMS.
- * Handles: NEW entries, UPDATED entries, and REMOVED entries.
- * 
- * Usage: node scripts/strapi-sync.js
- * 
- * How it works:
- *   1. Reads Centers_Raw.json (your latest paste from the API)
- *   2. Fetches all existing centers from Strapi
- *   3. Compares by branch_code:
- *      - NEW branch_code   → Creates region/state/district if needed, then creates center
- *      - EXISTING branch_code with changes → Updates the center
- *      - branch_code in Strapi but NOT in raw file → Deletes from Strapi
- *   4. Prints a summary of changes
- * 
+ *
+ * India mode (default):
+ *   Reads Centers_Raw.json, excludes NEPAL region rows, syncs add/update/delete.
+ *   Never deletes centers with country=Nepal (protected after Nepal import).
+ *
+ * Nepal mode (--nepal):
+ *   Reads Centers_Nepal_Raw.json, create/update only — deletes and orphan cleanup disabled.
+ *
+ * Usage:
+ *   node scripts/strapi-sync.js
+ *   node scripts/strapi-sync.js --dry-run
+ *   node scripts/strapi-sync.js --nepal --dry-run
+ *   node scripts/strapi-sync.js --nepal --yes
+ *
  * Requires STRAPI_BASE_URL and STRAPI_TOKEN in .env
  */
 
@@ -27,15 +26,53 @@ require('dotenv').config();
 // --- Config ---
 const STRAPI_BASE_URL = process.env.STRAPI_BASE_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
-const RAW_FILE = path.join(__dirname, '..', 'Centers_Raw.json');
+const NEPAL_MODE = process.argv.includes('--nepal');
+const RAW_FILE = path.join(
+  __dirname,
+  '..',
+  NEPAL_MODE ? 'Centers_Nepal_Raw.json' : 'Centers_Raw.json'
+);
 const BATCH_SIZE = 20;
 const DELAY_MS = 200;
 const RETREAT_BRANCH_CODES = ['90001', '90007', '90006'];
-const EXCLUDED_REGIONS = ['NEPAL']; // Only sync India data
-const REPORT_FILE = path.join(__dirname, 'sync-report.json');
+const EXCLUDED_REGIONS = ['NEPAL']; // India mode only — never sync Nepal from India API
+const NEPAL_REGION_PREFIXES = ['NEPAL']; // Nepal mode: accept regions starting with these
+/**
+ * Conservative Nepal state spelling aliases only (clear duplicates from PAD).
+ * Keys are UPPERCASE trimmed; values are canonical display names.
+ * Do not add fuzzy/guess mappings — only verified near-duplicates.
+ */
+const NEPAL_STATE_ALIASES = {
+  DHANUSA: 'Dhanusha',       // official / majority spelling
+  MECHI: 'Mechi',            // case normalize
+  MAKAWANPUR: 'Makwanpur',   // official district spelling
+};
+const REPORT_FILE = path.join(
+  __dirname,
+  NEPAL_MODE ? 'sync-report-nepal.json' : 'sync-report.json'
+);
 const DETAILED = process.argv.includes('--detailed') || process.argv.includes('-d');
 const AUTO_YES = process.argv.includes('--yes') || process.argv.includes('-y');
 const DRY_RUN = process.argv.includes('--dry-run');
+
+/** Normalize PAD Nepal region variants to a single Strapi region name. */
+function normalizeNepalRegion(region) {
+  const upper = (region || '').toUpperCase().trim();
+  if (upper.startsWith('NEPAL')) return 'Nepal';
+  return capitalizeString(region);
+}
+
+/** Apply only known safe Nepal state spelling aliases. */
+function normalizeNepalState(state) {
+  const trimmed = (state || '').trim();
+  if (!trimmed) return trimmed;
+  const alias = NEPAL_STATE_ALIASES[trimmed.toUpperCase()];
+  return alias || capitalizeString(trimmed);
+}
+
+function isNepalCountry(country) {
+  return (country || '').toUpperCase().trim() === 'NEPAL';
+}
 
 // --- Helpers ---
 
@@ -252,27 +289,55 @@ function buildReport(toCreate, toUpdate, toDelete) {
 // --- Main Sync ---
 
 async function sync() {
-  console.log('=== Strapi Sync ===\n');
+  console.log(NEPAL_MODE ? '=== Strapi Sync (NEPAL — create/update only) ===\n' : '=== Strapi Sync (INDIA) ===\n');
 
   if (!STRAPI_BASE_URL || !STRAPI_TOKEN) {
     console.error('Missing STRAPI_BASE_URL or STRAPI_TOKEN in .env');
     process.exit(1);
   }
 
+  if (!fs.existsSync(RAW_FILE)) {
+    console.error(`Missing raw file: ${RAW_FILE}`);
+    process.exit(1);
+  }
+
   // Step 1: Read raw data
-  console.log('Reading Centers_Raw.json...');
+  console.log(`Reading ${path.basename(RAW_FILE)}...`);
   const rawData = JSON.parse(fs.readFileSync(RAW_FILE, 'utf8'));
   const allRawEntries = rawData.data;
   console.log(`  Raw file: ${allRawEntries.length} entries`);
 
-  // Filter out excluded regions (e.g. Nepal) — only sync India data
-  const rawEntries = allRawEntries.filter(e => {
-    const region = (e.region || '').toUpperCase().trim();
-    return !EXCLUDED_REGIONS.includes(region);
-  });
-  const excludedCount = allRawEntries.length - rawEntries.length;
-  if (excludedCount > 0) {
-    console.log(`  Excluded ${excludedCount} entries from regions: ${EXCLUDED_REGIONS.join(', ')}`);
+  let rawEntries;
+  if (NEPAL_MODE) {
+    // Accept only Nepal-region rows; normalize region/state spelling; trim names
+    rawEntries = allRawEntries
+      .filter(e => {
+        const region = (e.region || '').toUpperCase().trim();
+        return NEPAL_REGION_PREFIXES.some(p => region.startsWith(p));
+      })
+      .map(e => ({
+        ...e,
+        region: normalizeNepalRegion(e.region),
+        state: normalizeNepalState(e.state),
+        district: capitalizeString((e.district || '').trim()),
+        country: capitalizeString((e.country || '').trim()) || 'Nepal',
+      }));
+    const skipped = allRawEntries.length - rawEntries.length;
+    if (skipped > 0) {
+      console.log(`  Skipped ${skipped} non-Nepal entries`);
+    }
+    console.log(`  Nepal mode: deletes DISABLED, orphan cleanup SKIPPED`);
+    console.log(`  State aliases applied: ${Object.keys(NEPAL_STATE_ALIASES).join(', ')}`);
+  } else {
+    // Filter out excluded regions (e.g. Nepal) — only sync India data
+    rawEntries = allRawEntries.filter(e => {
+      const region = (e.region || '').toUpperCase().trim();
+      return !EXCLUDED_REGIONS.includes(region) && !region.startsWith('NEPAL');
+    });
+    const excludedCount = allRawEntries.length - rawEntries.length;
+    if (excludedCount > 0) {
+      console.log(`  Excluded ${excludedCount} entries from regions: ${EXCLUDED_REGIONS.join(', ')}`);
+    }
   }
   console.log(`  Entries to sync: ${rawEntries.length}\n`);
 
@@ -307,7 +372,18 @@ async function sync() {
     centerByCode[c.attributes.branch_code] = { id: c.id, attributes: c.attributes };
   });
 
-  // Step 3: Determine what needs to change
+  // district id -> { districtName, stateName } for Nepal hierarchy drift checks
+  const districtMetaById = {};
+  existingDistricts.forEach(d => {
+    const stateId = d.attributes.state_center?.data?.id;
+    const state = existingStates.find(s => s.id === stateId);
+    districtMetaById[d.id] = {
+      districtName: d.attributes.name,
+      stateName: state?.attributes?.name || '',
+    };
+  });
+
+  // Step 3: Decide what needs to change
   const rawByCode = {};
   rawEntries.forEach(e => { rawByCode[e.branch_code] = e; });
 
@@ -324,6 +400,17 @@ async function sync() {
       // Compare ALL fields to detect changes
       const a = existing.attributes;
       const expected = buildCenterBody(entry, null);
+      const linkedDistId = a.district_center?.data?.id;
+      const linkedMeta = linkedDistId ? districtMetaById[linkedDistId] : null;
+      const expectedState = capitalizeString(entry.state);
+      const expectedDistrict = capitalizeString(entry.district);
+      const hierarchyDrift = !!(
+        NEPAL_MODE &&
+        linkedMeta &&
+        ((linkedMeta.stateName && linkedMeta.stateName !== expectedState) ||
+          (linkedMeta.districtName && linkedMeta.districtName !== expectedDistrict))
+      );
+
       const changed =
         a.name !== expected.name ||
         a.branch_code !== expected.branch_code ||
@@ -343,7 +430,8 @@ async function sync() {
         (a.slug || '') !== expected.slug ||
         (a.email || null) !== expected.email ||
         (a.latitude != null ? a.latitude : null) !== expected.latitude ||
-        (a.longitude != null ? a.longitude : null) !== expected.longitude;
+        (a.longitude != null ? a.longitude : null) !== expected.longitude ||
+        hierarchyDrift;
       
       if (changed) {
         // Build detailed field-level diff
@@ -374,22 +462,36 @@ async function sync() {
             diffs.push({ field, from: oldVal, to: newVal });
           }
         }
+        if (hierarchyDrift && linkedMeta) {
+          if (linkedMeta.stateName !== expectedState) {
+            diffs.push({ field: 'state', from: linkedMeta.stateName, to: expectedState });
+          }
+          if (linkedMeta.districtName !== expectedDistrict) {
+            diffs.push({ field: 'district', from: linkedMeta.districtName, to: expectedDistrict });
+          }
+        }
         toUpdate.push({ entry, strapiId: existing.id, diffs });
       }
     }
   }
 
   // Find deleted entries (in Strapi but not in raw file)
-  for (const [code, existing] of Object.entries(centerByCode)) {
-    if (!rawByCode[code]) {
-      toDelete.push({ code, id: existing.id, name: existing.attributes.name });
+  // Nepal mode: never delete. India mode: never delete Nepal-country centers.
+  if (!NEPAL_MODE) {
+    for (const [code, existing] of Object.entries(centerByCode)) {
+      if (!rawByCode[code]) {
+        if (isNepalCountry(existing.attributes.country)) {
+          continue; // Protect Nepal imports from India sync deletes
+        }
+        toDelete.push({ code, id: existing.id, name: existing.attributes.name });
+      }
     }
   }
 
   console.log('=== Sync Plan ===');
   console.log(`  New centers to create: ${toCreate.length}`);
   console.log(`  Centers to update: ${toUpdate.length}`);
-  console.log(`  Centers to delete: ${toDelete.length}`);
+  console.log(`  Centers to delete: ${toDelete.length}${NEPAL_MODE ? ' (disabled in Nepal mode)' : ''}`);
   console.log('');
 
   // --- Detailed Report ---
@@ -431,7 +533,7 @@ async function sync() {
     console.log('🔍 DRY RUN — No changes were made. Review the plan above.\n');
     const report = buildReport(toCreate, toUpdate, toDelete);
     fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2), 'utf8');
-    console.log(`  Report saved to: scripts/sync-report.json\n`);
+    console.log(`  Report saved to: ${path.relative(path.join(__dirname, '..'), REPORT_FILE)}\n`);
     return;
   }
 
@@ -470,39 +572,105 @@ async function sync() {
     }
   }
 
-  // Step 4: Ensure regions/states/districts exist for new entries
-  if (toCreate.length > 0) {
-    console.log('Ensuring regions/states/districts exist for new entries...');
-    
-    for (const entry of toCreate) {
+  // Step 4: Ensure regions/states/districts exist for creates (and Nepal updates that remount hierarchy)
+  const hierarchyEntries = NEPAL_MODE
+    ? [...toCreate, ...toUpdate.map(u => u.entry)]
+    : toCreate;
+  if (hierarchyEntries.length > 0) {
+    console.log('Ensuring regions/states/districts exist...');
+
+    // Index districts by exact name (Strapi enforces global unique district names)
+    const districtIdByName = {};
+    existingDistricts.forEach(d => {
+      districtIdByName[d.attributes.name] = d.id;
+    });
+
+    async function resolveStateId(stateName, regionName, entry) {
+      if (stateByName[stateName]) return stateByName[stateName];
+
+      // Rename trim/alias variant in place (e.g. "Sagarmatha " → "Sagarmatha", "Makawanpur" → "Makwanpur")
+      const variantKeys = Object.keys(stateByName).filter(n => {
+        if (n.trim() === stateName) return true;
+        const upper = n.toUpperCase().trim();
+        return NEPAL_STATE_ALIASES[upper] === stateName;
+      });
+      if (variantKeys.length === 1) {
+        const oldName = variantKeys[0];
+        const id = stateByName[oldName];
+        await strapiRequest('PUT', `state-centers/${id}`, {
+          name: stateName,
+          slug: generateSlug(stateName),
+          state_id: entry.state_id || '',
+          ...(regionName && regionByName[regionName] ? { region_center: regionByName[regionName] } : {}),
+        });
+        delete stateByName[oldName];
+        stateByName[stateName] = id;
+        // Rewrite district keys that used the old state name
+        for (const key of Object.keys(districtByKey)) {
+          if (key.startsWith(oldName + '::')) {
+            const distName = key.slice(oldName.length + 2);
+            districtByKey[stateName + '::' + distName] = districtByKey[key];
+            delete districtByKey[key];
+          }
+        }
+        console.log(`  ~ State renamed: "${oldName}" → "${stateName}"`);
+        return id;
+      }
+
+      // Create new state
+      const body = { name: stateName, slug: generateSlug(stateName), state_id: entry.state_id || '' };
+      if (regionName && regionByName[regionName]) body.region_center = regionByName[regionName];
+      const res = await strapiRequest('POST', 'state-centers', body);
+      stateByName[stateName] = res.data.id;
+      console.log(`  + State: ${stateName}`);
+      return res.data.id;
+    }
+
+    async function resolveDistrictId(stateName, districtName, entry) {
+      const distKey = stateName + '::' + districtName;
+      if (districtByKey[distKey]) return districtByKey[distKey];
+
+      const stateId = stateByName[stateName];
+      // Reuse globally unique district by name — re-link to canonical state if needed
+      if (districtIdByName[districtName]) {
+        const distId = districtIdByName[districtName];
+        if (stateId) {
+          await strapiRequest('PUT', `district-centers/${distId}`, {
+            name: districtName,
+            district_id: entry.district_id || '',
+            state_center: stateId,
+          });
+          console.log(`  ~ District re-linked: ${districtName} → ${stateName}`);
+        }
+        districtByKey[distKey] = distId;
+        return distId;
+      }
+
+      const body = { name: districtName, slug: generateSlug(districtName), district_id: entry.district_id || '' };
+      if (stateId) body.state_center = stateId;
+      const res = await strapiRequest('POST', 'district-centers', body);
+      districtByKey[distKey] = res.data.id;
+      districtIdByName[districtName] = res.data.id;
+      console.log(`  + District: ${districtName} (${stateName})`);
+      return res.data.id;
+    }
+
+    for (const entry of hierarchyEntries) {
       const regionName = capitalizeString(entry.region);
       const stateName = capitalizeString(entry.state);
       const districtName = capitalizeString(entry.district);
 
-      // Create region if needed
       if (regionName && !regionByName[regionName]) {
         const res = await strapiRequest('POST', 'region-centers', { name: regionName, slug: generateSlug(regionName) });
         regionByName[regionName] = res.data.id;
         console.log(`  + Region: ${regionName}`);
       }
 
-      // Create state if needed
-      if (stateName && !stateByName[stateName]) {
-        const body = { name: stateName, slug: generateSlug(stateName), state_id: entry.state_id || '' };
-        if (regionName && regionByName[regionName]) body.region_center = regionByName[regionName];
-        const res = await strapiRequest('POST', 'state-centers', body);
-        stateByName[stateName] = res.data.id;
-        console.log(`  + State: ${stateName}`);
+      if (stateName) {
+        await resolveStateId(stateName, regionName, entry);
       }
-
-      // Create district if needed
-      const distKey = stateName + '::' + districtName;
-      if (districtName && !districtByKey[distKey]) {
-        const body = { name: districtName, slug: generateSlug(districtName), district_id: entry.district_id || '' };
-        if (stateName && stateByName[stateName]) body.state_center = stateByName[stateName];
-        const res = await strapiRequest('POST', 'district-centers', body);
-        districtByKey[distKey] = res.data.id;
-        console.log(`  + District: ${districtName} (${stateName})`);
+      if (districtName && stateName) {
+        await resolveDistrictId(stateName, districtName, entry);
       }
     }
     console.log('');
@@ -562,7 +730,10 @@ async function sync() {
   }
 
   // Step 8: Clean up orphaned hierarchy entries (districts, states, regions with no centers)
-  {
+  // Nepal mode skips this so India hierarchy is never touched by a Nepal run.
+  if (NEPAL_MODE) {
+    console.log('Skipping orphan hierarchy cleanup (Nepal mode).\n');
+  } else {
     console.log('Checking for orphaned hierarchy entries...');
 
     // Re-fetch current state of all collections after center deletions
@@ -708,7 +879,7 @@ async function sync() {
   console.log(`  Created: ${report.summary.created}`);
   console.log(`  Updated: ${report.summary.updated}`);
   console.log(`  Deleted: ${report.summary.deleted}`);
-  console.log(`  Report saved to: scripts/sync-report.json`);
+  console.log(`  Report saved to: ${path.relative(path.join(__dirname, '..'), REPORT_FILE)}`);
   console.log('=====================\n');
 
   // Refresh sitemap after real syncs (not dry-run). Fail soft — sync already succeeded.

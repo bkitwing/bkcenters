@@ -14,6 +14,7 @@ import { formatCenterUrl } from '@/lib/urlUtils';
 import DistrictPageClient from './DistrictPageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
+import { countryLabelFromRegion } from '@/lib/countryUtils';
 
 // Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
 export const revalidate = 86400;
@@ -39,8 +40,9 @@ export async function generateMetadata({ params }: DistrictPageProps): Promise<M
     getRegionForState(actualState),
   ]);
   
+  const country = countryLabelFromRegion(actualRegion);
   const title = `${actualDistrict} - Brahma Kumaris Rajyog Meditation Centers - ${actualState}`;
-  const description = `Discover ${centers.length} Brahma Kumaris Rajyog meditation centers in ${actualDistrict}, ${actualState}.`;
+  const description = `Discover ${centers.length} Brahma Kumaris Rajyog meditation centers in ${actualDistrict}, ${actualState}, ${country || actualRegion}.`;
 
   const ogImage = generateOgImageUrl({
     title: actualDistrict,
@@ -58,7 +60,7 @@ export async function generateMetadata({ params }: DistrictPageProps): Promise<M
   return {
     title,
     description,
-    keywords: `Brahma Kumaris, Rajyog Meditation centers, ${actualDistrict}, ${actualState}, spiritual centers, 7 day courses, meditation retreats`,
+    keywords: `Brahma Kumaris, Rajyog Meditation centers, ${actualDistrict}, ${actualState}, ${country || actualRegion}, spiritual centers, 7 day courses, meditation retreats`,
     robots: {
       index: true,
       follow: true,

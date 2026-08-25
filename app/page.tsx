@@ -83,7 +83,13 @@ function buildRegionDetails(centers: Center[]): { name: string; stateCount: numb
       stateCount: data.states.size,
       centerCount: data.centerCount,
     }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      // India-first homepage: Nepal (and Nepal*) always last
+      const aNepal = a.name.toUpperCase().startsWith("NEPAL");
+      const bNepal = b.name.toUpperCase().startsWith("NEPAL");
+      if (aNepal !== bNepal) return aNepal ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    });
 }
 
 // Helper function to build region to states mapping from centers
