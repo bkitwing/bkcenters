@@ -3,6 +3,7 @@ import HomePageClient from "@/components/HomePageClient";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { RETREAT_CENTER_BRANCH_CODES } from '@/lib/retreatCenters';
 import { loadCentersLightweight } from '@/lib/strapiClient';
+import { districtLevelLabel } from '@/lib/countryUtils';
 
 // Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
 export const revalidate = 86400;
@@ -183,17 +184,21 @@ function buildStateMapMarkers(
       );
 
       if (stateCenter && stateCenter.coords) {
+        const region = stateCenter.region || 'INDIA';
+        const placesWord = districtLevelLabel(region, {
+          plural: stateSummary.districtCount !== 1,
+        }).toLowerCase();
         return {
           name: stateSummary.state,
           state: stateSummary.state,
-          region: stateCenter.region || 'INDIA',
+          region,
           coords: stateCenter.coords as [string, string],
           description: `${stateSummary.centerCount} meditation ${
             stateSummary.centerCount === 1 ? "center" : "centers"
           }`,
           summary: `${stateSummary.centerCount} ${
             stateSummary.centerCount === 1 ? "center" : "centers"
-          } across ${stateSummary.districtCount} districts`,
+          } across ${stateSummary.districtCount} ${placesWord}`,
           centerCount: stateSummary.centerCount,
           districtCount: stateSummary.districtCount,
         };

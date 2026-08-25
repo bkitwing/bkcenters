@@ -42,6 +42,7 @@ import {
   LifeBuoy,
   HelpCircle,
   HeartHandshake,
+  Globe,
   type LucideIcon,
 } from "lucide-react";
 
@@ -121,10 +122,18 @@ export const NAVIGATION: NavSection[] = [
     description: "Find a meditation center near you",
     accentColor: "emerald",
     subItems: [
-      { label: "Search", href: "/centers", icon: Home },
-      { label: "Nearby", href: "/centers?nearby=true", icon: Navigation },
-      { label: "All States", href: "/centers/india", icon: Compass },
-      { label: "HQ Campuses", href: "/centers/retreat", icon: Building },
+      { id: "centers-search", label: "Search", href: "/centers", icon: Home, group: "Find a Center" },
+      { id: "centers-nearby", label: "Nearby", href: "/centers?nearby=true", icon: Navigation },
+      { id: "centers-india", label: "India", href: "/centers/india", icon: Compass, group: "Browse by Country" },
+      { id: "centers-retreat", label: "HQ Campuses", href: "/centers/retreat", icon: Building },
+      { id: "centers-nepal", label: "Nepal", href: "/centers/nepal", icon: Map },
+      {
+        id: "centers-international",
+        label: "International Centres",
+        href: "https://www.brahmakumaris.org/centre-locator/centres",
+        icon: Globe,
+        group: "Worldwide",
+      },
     ],
   },
   {

@@ -419,11 +419,16 @@ async function sync() {
       const linkedMeta = linkedDistId ? districtMetaById[linkedDistId] : null;
       const expectedState = capitalizeString(entry.state);
       const expectedDistrict = capitalizeString(entry.district);
+      const districtMatches = !!(
+        linkedMeta &&
+        (linkedMeta.districtName === expectedDistrict ||
+          linkedMeta.districtName === `${expectedDistrict} (${expectedState})`)
+      );
       const hierarchyDrift = !!(
         NEPAL_MODE &&
         linkedMeta &&
         ((linkedMeta.stateName && linkedMeta.stateName !== expectedState) ||
-          (linkedMeta.districtName && linkedMeta.districtName !== expectedDistrict))
+          (linkedMeta.districtName && !districtMatches))
       );
 
       const changed =

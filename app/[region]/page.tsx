@@ -11,7 +11,7 @@ import { generateOgImageUrl } from '@/lib/ogUtils';
 import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
 import SoulSustenance from '@/components/SoulSustenance';
 import { MapPin, ChevronRight, ArrowLeft, Building2, Map, Sparkles, BookOpen, Users, Globe } from 'lucide-react';
-import { countryLabelFromRegion } from '@/lib/countryUtils';
+import { countryLabelFromRegion, districtLevelLabel, stateLevelLabel, isNepalRegion } from '@/lib/countryUtils';
 
 // Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
 export const revalidate = 86400;
@@ -38,8 +38,10 @@ export async function generateMetadata({ params }: RegionPageProps): Promise<Met
   const totalCenters = states.reduce((sum, state) => sum + state.centerCount, 0);
   
   const country = countryLabelFromRegion(actualRegion);
+  const areasLabel = stateLevelLabel(actualRegion, { plural: true }).toLowerCase();
+  const placesLabel = districtLevelLabel(actualRegion, { plural: true });
   const title = `${actualRegion} - Brahma Kumaris Rajyog Meditation Centers`;
-  const description = `Explore Brahma Kumaris Rajyog meditation centers in ${actualRegion}${country && country !== actualRegion ? `, ${country}` : ''}. ${totalCenters} centers across ${states.length} states.`;
+  const description = `Explore Brahma Kumaris Rajyog meditation centers in ${actualRegion}${country && country !== actualRegion ? `, ${country}` : ''}. ${totalCenters} centers across ${states.length} ${areasLabel}.`;
 
   // Calculate total districts
   const districts = states.reduce((sum, state) => sum + state.districtCount, 0);
@@ -49,7 +51,7 @@ export async function generateMetadata({ params }: RegionPageProps): Promise<Met
 
   const ogImage = generateOgImageUrl({
     title: actualRegion,
-    description: `${totalCenters} Centers in ( ${states.length} States-Uts & ${districts} Districts)`,
+    description: `${totalCenters} Centers in ( ${states.length} ${stateLevelLabel(actualRegion, { plural: true, short: true })} & ${districts} ${placesLabel})`,
     type: 'region',
     region: actualRegion,
   });
@@ -140,13 +142,13 @@ export default async function RegionPage({ params }: RegionPageProps) {
       <BreadcrumbSchema items={breadcrumbItems} />
       <PlaceSchema 
         name={region}
-        description={`Explore ${totalCenters} Brahma Kumaris Rajyoga Meditation Centers across ${states.length} states in ${region}.`}
+        description={`Explore ${totalCenters} Brahma Kumaris Rajyoga Meditation Centers across ${states.length} ${stateLevelLabel(region, { plural: true }).toLowerCase()} in ${region}.`}
         centerCount={totalCenters}
         pageUrl={pageUrl}
       />
       <ItemListSchema
-        name={`Brahma Kumaris Centers in ${region} — States List`}
-        description={`${states.length} states with Brahma Kumaris Rajyoga meditation centers in ${region}.`}
+        name={`Brahma Kumaris Centers in ${region} — ${stateLevelLabel(region, { plural: true })} List`}
+        description={`${states.length} ${stateLevelLabel(region, { plural: true }).toLowerCase()} with Brahma Kumaris Rajyoga meditation centers in ${region}.`}
         url={pageUrl}
         items={itemListItems}
       />
@@ -206,11 +208,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
               <div>
                 <p className="text-2xl font-bold text-white leading-none">{states.length}</p>
                 <p className="text-xs text-white/60">
-                  {region.toUpperCase() === 'INDIA'
-                    ? 'States & UTs'
-                    : region.toUpperCase() === 'NEPAL'
-                      ? 'Provinces'
-                      : 'States / Areas'}
+                  {stateLevelLabel(region, { plural: true, short: true })}
                 </p>
               </div>
             </div>
@@ -220,7 +218,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white leading-none">{totalDistricts}</p>
-                <p className="text-xs text-white/60">Districts</p>
+                <p className="text-xs text-white/60">{districtLevelLabel(region, { plural: true })}</p>
               </div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-5 py-3 flex items-center gap-3">
@@ -244,14 +242,14 @@ export default async function RegionPage({ params }: RegionPageProps) {
           <div>
             <div className="text-center mb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-                {region.toUpperCase() === 'INDIA'
-                  ? 'Explore States & Union Territories'
-                  : region.toUpperCase() === 'NEPAL'
-                    ? 'Explore Provinces'
+                {isNepalRegion(region)
+                  ? 'Explore Provinces'
+                  : region.toUpperCase() === 'INDIA'
+                    ? 'Explore States & Union Territories'
                     : `Explore areas in ${region}`}
               </h2>
               <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-                {region.toUpperCase() === 'NEPAL'
+                {isNepalRegion(region)
                   ? 'Select a province to find meditation centers near you'
                   : 'Select a state to find meditation centers near you'}
               </p>
@@ -282,7 +280,10 @@ export default async function RegionPage({ params }: RegionPageProps) {
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-spirit-purple-700 dark:group-hover:text-spirit-purple-400 transition-colors truncate">{state.name}</h3>
                       <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                        {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'} &middot; {state.districtCount} {state.districtCount === 1 ? 'district' : 'districts'}
+                        {state.centerCount} {state.centerCount === 1 ? 'center' : 'centers'} &middot; {state.districtCount}{' '}
+                        {state.districtCount === 1
+                          ? districtLevelLabel(region).toLowerCase()
+                          : districtLevelLabel(region, { plural: true }).toLowerCase()}
                       </p>
                       {/* Progress bar */}
                       <div className="w-full h-1 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden mt-2.5">
@@ -303,9 +304,9 @@ export default async function RegionPage({ params }: RegionPageProps) {
         ) : (
           <div className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm p-10 text-center">
             <Globe className="w-14 h-14 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-3 text-neutral-700 dark:text-neutral-300">No States Found</h2>
+            <h2 className="text-2xl font-bold mb-3 text-neutral-700 dark:text-neutral-300">No {stateLevelLabel(region, { plural: true })} Found</h2>
             <p className="text-neutral-500 dark:text-neutral-400 mb-6 text-sm max-w-md mx-auto">
-              We couldn&apos;t find any states in {region}.
+              We couldn&apos;t find any {stateLevelLabel(region, { plural: true }).toLowerCase()} in {region}.
             </p>
             <Link href="/" className="inline-flex items-center gap-2 bg-gradient-to-r from-spirit-purple-600 to-spirit-blue-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:shadow-lg transition-all">
               Explore All Centers

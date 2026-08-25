@@ -14,7 +14,7 @@ import { formatCenterUrl } from '@/lib/urlUtils';
 import StatePageClient from './StatePageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { BreadcrumbSchema, PlaceSchema, ItemListSchema } from '@/components/StructuredData';
-import { countryLabelFromRegion } from '@/lib/countryUtils';
+import { countryLabelFromRegion, districtLevelLabel } from '@/lib/countryUtils';
 
 // Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
 export const revalidate = 86400;
@@ -38,12 +38,13 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
   ]);
   
   const country = countryLabelFromRegion(actualRegion);
+  const placesLabel = districtLevelLabel(actualRegion, { plural: true }).toLowerCase();
   const title = `${actualState} - Brahma Kumaris Rajyog Meditation Centers - ${actualRegion}`;
-  const description = `Find Brahma Kumaris Rajyog meditation centers in ${actualState}, ${country || actualRegion}. ${lightCenters.length} centers across ${districts.length} districts.`;
+  const description = `Find Brahma Kumaris Rajyog meditation centers in ${actualState}, ${country || actualRegion}. ${lightCenters.length} centers across ${districts.length} ${placesLabel}.`;
 
   const ogImage = generateOgImageUrl({
     title: actualState,
-    description: `${lightCenters.length} Centers in ${districts.length} Districts`,
+    description: `${lightCenters.length} Centers in ${districts.length} ${districtLevelLabel(actualRegion, { plural: true })}`,
     type: 'state',
     region: actualRegion,
   });
@@ -170,15 +171,15 @@ export default async function StatePage({ params }: StatePageProps) {
       <BreadcrumbSchema items={breadcrumbItems} />
       <PlaceSchema 
         name={actualState}
-        description={`Find ${lightCenters.length} Brahma Kumaris Rajyoga Meditation Centers across ${districts.length} districts in ${actualState}.`}
+        description={`Find ${lightCenters.length} Brahma Kumaris Rajyoga Meditation Centers across ${districts.length} ${districtLevelLabel(actualRegion, { plural: true }).toLowerCase()} in ${actualState}.`}
         region={actualRegion}
         centerCount={lightCenters.length}
         pageUrl={pageUrl}
         placeType="AdministrativeArea"
       />
       <ItemListSchema
-        name={`Brahma Kumaris Centers in ${actualState} — Districts List`}
-        description={`${districts.length} districts with Brahma Kumaris Rajyoga meditation centers in ${actualState}.`}
+        name={`Brahma Kumaris Centers in ${actualState} — ${districtLevelLabel(actualRegion, { plural: true })} List`}
+        description={`${districts.length} ${districtLevelLabel(actualRegion, { plural: true }).toLowerCase()} with Brahma Kumaris Rajyoga meditation centers in ${actualState}.`}
         url={pageUrl}
         items={itemListItems}
       />

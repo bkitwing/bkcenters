@@ -9,6 +9,7 @@ import SearchBar from '@/components/SearchBar';
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 import { MapPin, ChevronRight, ArrowLeft, Search, Map, Building2, Sparkles, BookOpen, Users, Globe } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
+import { districtLevelLabel, stateLevelLabel } from '@/lib/countryUtils';
 
 interface StatePageClientProps {
   actualRegion: string;
@@ -39,6 +40,12 @@ export default function StatePageClient({
 }: StatePageClientProps) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+  const placeLabel = districtLevelLabel(stateRegion);
+  const placesLabel = districtLevelLabel(stateRegion, { plural: true });
+  const placeLabelLower = placeLabel.toLowerCase();
+  const placesLabelLower = placesLabel.toLowerCase();
+  const areasLabel = stateLevelLabel(stateRegion, { plural: true });
+
   
   // Prepare all district map markers - computed once
   // Built from districtSummary directly (no full Center objects needed)
@@ -164,7 +171,8 @@ export default function StatePageClient({
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">{actualState}</h1>
             <p className="text-white/70 text-sm max-w-2xl">
-              Explore {totalCenters} Brahma Kumaris Rajyoga meditation {totalCenters === 1 ? 'center' : 'centers'} across {districts.length} {districts.length === 1 ? 'district' : 'districts'} in {actualState}
+              Explore {totalCenters} Brahma Kumaris Rajyoga meditation {totalCenters === 1 ? 'center' : 'centers'} across {districts.length}{' '}
+              {districts.length === 1 ? placeLabelLower : placesLabelLower} in {actualState}
             </p>
           </div>
 
@@ -185,7 +193,7 @@ export default function StatePageClient({
               </div>
               <div>
                 <p className="text-2xl font-bold text-white leading-none">{districts.length}</p>
-                <p className="text-xs text-white/60">Districts</p>
+                <p className="text-xs text-white/60">{placesLabel}</p>
               </div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-5 py-3 flex items-center gap-3">
@@ -221,7 +229,7 @@ export default function StatePageClient({
               </div>
               <div className="px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-700">
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  Click any marker to highlight the district. Each marker shows the number of meditation centers in that district.
+                  Click any marker to highlight the {placeLabelLower}. Each marker shows the number of meditation centers in that {placeLabelLower}.
                 </p>
               </div>
             </div>
@@ -236,13 +244,13 @@ export default function StatePageClient({
                   <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
                     <Map className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
                   </div>
-                  Districts in {actualState}
+                  {placesLabel} in {actualState}
                   <span className="ml-auto text-sm font-normal text-neutral-400 dark:text-neutral-500">{filteredDistricts.length}</span>
                 </h2>
 
                 {/* Search */}
                 <SearchBar
-                  placeholder="Search districts..."
+                  placeholder={`Search ${placesLabelLower}...`}
                   value={searchQuery}
                   onClear={handleClearSearch}
                   showClearButton={searchQuery.length > 0}
@@ -293,7 +301,7 @@ export default function StatePageClient({
                 ) : (
                   <div className="text-center py-10 px-5">
                     <Search className="w-10 h-10 text-neutral-300 dark:text-neutral-600 mx-auto mb-3" />
-                    <p className="text-neutral-500 dark:text-neutral-400 text-sm">No districts found matching &ldquo;{searchQuery}&rdquo;</p>
+                    <p className="text-neutral-500 dark:text-neutral-400 text-sm">No {placesLabelLower} found matching &ldquo;{searchQuery}&rdquo;</p>
                     <button 
                       onClick={handleClearSearch}
                       className="mt-2 text-xs text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
@@ -350,7 +358,7 @@ export default function StatePageClient({
                 <Globe className="w-4 h-4" />
                 <span>More in {stateRegion}</span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Explore Other States</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Explore Other {areasLabel}</h2>
               <p className="text-neutral-500 dark:text-neutral-400 text-sm">Discover Brahma Kumaris meditation centers across {stateRegion}</p>
             </div>
 
@@ -374,7 +382,8 @@ export default function StatePageClient({
                   </div>
                   <h3 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 group-hover:text-spirit-blue-700 dark:group-hover:text-spirit-blue-400 transition-colors truncate">{item.name}</h3>
                   <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
-                    {item.centerCount} {item.centerCount === 1 ? 'center' : 'centers'} · {item.districtCount} {item.districtCount === 1 ? 'district' : 'districts'}
+                    {item.centerCount} {item.centerCount === 1 ? 'center' : 'centers'} · {item.districtCount}{' '}
+                    {item.districtCount === 1 ? placeLabelLower : placesLabelLower}
                   </p>
                 </Link>
               ))}

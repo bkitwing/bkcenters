@@ -36,3 +36,37 @@ export function countryLabelFromRegion(
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(' ');
 }
+
+export function isNepalRegion(region: string | null | undefined): boolean {
+  return (region || '').toUpperCase().trim().startsWith('NEPAL');
+}
+
+/** UI label for Strapi "state" level (province in Nepal, state in India). */
+export function stateLevelLabel(
+  region: string | null | undefined,
+  opts?: { plural?: boolean; short?: boolean }
+): string {
+  const plural = opts?.plural ?? false;
+  if (isNepalRegion(region)) {
+    return plural ? 'Provinces' : 'Province';
+  }
+  if (opts?.short) {
+    return plural ? 'States & UTs' : 'State / UT';
+  }
+  return plural ? 'States' : 'State';
+}
+
+/**
+ * UI label for Strapi "district" level.
+ * Nepal PAD values are localities / towns, not admin districts.
+ */
+export function districtLevelLabel(
+  region: string | null | undefined,
+  opts?: { plural?: boolean }
+): string {
+  const plural = opts?.plural ?? false;
+  if (isNepalRegion(region)) {
+    return plural ? 'Localities' : 'Locality';
+  }
+  return plural ? 'Districts' : 'District';
+}

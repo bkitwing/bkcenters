@@ -10,6 +10,7 @@ import { formatCenterUrl } from '@/lib/urlUtils';
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 import { MapPin, ChevronRight, ArrowLeft, Search, Building2, Sparkles, BookOpen, Users } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
+import { districtLevelLabel } from '@/lib/countryUtils';
 
 interface DistrictPageClientProps {
   actualRegion: string;
@@ -26,6 +27,7 @@ export default function DistrictPageClient({
   stateRegion,
   centers,
 }: DistrictPageClientProps) {
+  const placesLabel = districtLevelLabel(stateRegion, { plural: true });
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -257,7 +259,7 @@ export default function DistrictPageClient({
                 href={formatCenterUrl(stateRegion, actualState)} 
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-spirit-purple-600 to-spirit-blue-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:shadow-lg transition-all"
               >
-                View Other Districts in {actualState}
+                View Other {placesLabel} in {actualState}
               </Link>
               <Link href="/" className="inline-flex items-center gap-2 border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 px-5 py-2.5 rounded-xl font-medium text-sm hover:border-spirit-purple-300 dark:hover:border-spirit-purple-600 transition-all">
                 Explore All Centers

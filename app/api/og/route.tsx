@@ -58,7 +58,9 @@ export async function GET(req: NextRequest) {
     headers.set('Cache-Control', 'public, max-age=31536000, immutable');
     
     // Parse stats from description if available (e.g., "611 Centers in 31 Districts")
-    const statsMatch = description.match(/(\d+)\s*Centers?\s*in\s*(\d+)\s*(Districts?|States?)/i);
+    const statsMatch = description.match(
+      /(\d+)\s*Centers?\s*in\s*(?:\(\s*)?(\d+)\s*(Districts?|States?(?:\s*&\s*UTs?)?|Localities|Provinces|States-Uts)/i
+    );
     const centersNum = statsMatch ? statsMatch[1] : '';
     const locationsNum = statsMatch ? statsMatch[2] : '';
     const locationType = statsMatch ? statsMatch[3] : '';

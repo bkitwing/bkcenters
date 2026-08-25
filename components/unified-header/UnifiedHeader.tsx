@@ -45,13 +45,21 @@ const CENTERS_SECTION_META: Record<string, { tagline: string; gradient: string }
     tagline: "Centers around your current location",
     gradient: "from-cyan-500/10 to-sky-500/5 dark:from-cyan-500/20 dark:to-sky-500/10",
   },
-  "All States": {
-    tagline: "Browse centers across India",
+  "India": {
+    tagline: "Browse states & union territories",
     gradient: "from-blue-500/10 to-indigo-500/5 dark:from-blue-500/20 dark:to-indigo-500/10",
+  },
+  "Nepal": {
+    tagline: "Browse provinces & localities",
+    gradient: "from-rose-500/10 to-orange-500/5 dark:from-rose-500/20 dark:to-orange-500/10",
   },
   "HQ Campuses": {
     tagline: "Visit our retreat & headquarters",
     gradient: "from-violet-500/10 to-purple-500/5 dark:from-violet-500/20 dark:to-purple-500/10",
+  },
+  "International Centres": {
+    tagline: "Find centers in other countries",
+    gradient: "from-amber-500/10 to-yellow-500/5 dark:from-amber-500/20 dark:to-yellow-500/10",
   },
 };
 
@@ -161,7 +169,7 @@ function CentersMegaDropdown({
   const Icon = section.icon;
 
   return (
-    <div className="absolute top-full right-0 mt-1.5 w-[320px] bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-2xl shadow-emerald-500/8 dark:shadow-emerald-900/30 overflow-hidden animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-150 z-50">
+    <div className="absolute top-full right-0 mt-1.5 w-[340px] bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-2xl shadow-emerald-500/8 dark:shadow-emerald-900/30 overflow-hidden animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-150 z-50">
       {/* Gradient hero header — soft */}
       <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500/10 via-emerald-500/8 to-teal-500/5 dark:from-emerald-500/20 dark:via-emerald-500/15 dark:to-teal-500/10 px-4 py-3.5">
         <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-400/10 dark:bg-emerald-400/10 rounded-full -translate-y-12 translate-x-12" />
@@ -178,40 +186,68 @@ function CentersMegaDropdown({
         </div>
       </div>
       <div className="p-1.5">
-        {section.subItems.map((item) => {
+        {section.subItems.map((item, index) => {
           const ItemIcon = item.icon;
           const internalHref = toInternalHref(item.href);
           const isNearby = item.href === "/centers?nearby=true";
-          const isActive = !isNearby && (pathname === internalHref || (internalHref !== "/" && pathname.startsWith(internalHref)));
+          const isExternal = item.href.startsWith("http");
+          const isActive =
+            !isNearby &&
+            !isExternal &&
+            (pathname === internalHref || (internalHref !== "/" && pathname.startsWith(internalHref)));
+          const prevGroup = index > 0 ? section.subItems[index - 1]?.group : undefined;
+          const showGroup = Boolean(item.group && item.group !== prevGroup);
 
-          if (isNearby) {
-            return (
-              <button
-                key={item.href}
-                onClick={() => { onClose(); onNearbyClick(); }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${colors.text} hover:${colors.bgSubtle}`}
-              >
-                <ItemIcon className="w-4 h-4" />
-                {item.label}
-                <MapPin className="w-3.5 h-3.5 ml-auto opacity-50" />
-              </button>
-            );
-          }
+          const linkClass = `flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 ${
+            isActive
+              ? `${colors.bgSubtle} ${colors.text} font-semibold`
+              : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 hover:translate-x-0.5"
+          }`;
 
           return (
-            <SmartLink
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 ${
-                isActive
-                  ? `${colors.bgSubtle} ${colors.text} font-semibold`
-                  : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 hover:translate-x-0.5"
-              }`}
-            >
-              <ItemIcon className="w-4 h-4 opacity-60" />
-              {item.label}
-            </SmartLink>
+            <div key={item.id ?? item.href}>
+              {showGroup && (
+                <div
+                  className={`mx-2 mb-1 pt-2 ${
+                    index === 0
+                      ? ""
+                      : "mt-1.5 border-t border-neutral-100 dark:border-neutral-800"
+                  }`}
+                >
+                  <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500">
+                    {item.group}
+                  </span>
+                </div>
+              )}
+
+              {isNearby ? (
+                <button
+                  onClick={() => { onClose(); onNearbyClick(); }}
+                  className={`w-full ${linkClass} ${colors.text} font-medium`}
+                >
+                  <ItemIcon className="w-4 h-4" />
+                  {item.label}
+                  <MapPin className="w-3.5 h-3.5 ml-auto opacity-50" />
+                </button>
+              ) : isExternal ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={onClose}
+                  className={linkClass}
+                >
+                  <ItemIcon className="w-4 h-4 opacity-60" />
+                  {item.label}
+                  <ExternalLink className="w-3.5 h-3.5 ml-auto opacity-40" />
+                </a>
+              ) : (
+                <SmartLink href={item.href} onClick={onClose} className={linkClass}>
+                  <ItemIcon className="w-4 h-4 opacity-60" />
+                  {item.label}
+                </SmartLink>
+              )}
+            </div>
           );
         })}
       </div>
@@ -347,55 +383,24 @@ function MobileCentersContentCards({
 
   return (
     <div className="px-4 py-3">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
-          Find a Center
-        </p>
-        <div className="h-px flex-1 ml-3 bg-neutral-100 dark:bg-neutral-800" />
-      </div>
-
       <div className="space-y-2">
-        {section.subItems.map((item) => {
+        {section.subItems.map((item, index) => {
           const ItemIcon = item.icon;
           const internalHref = toInternalHref(item.href);
           const isNearby = item.href === "/centers?nearby=true";
-          const isActive = !isNearby && (pathname === internalHref || (internalHref !== "/" && pathname.startsWith(internalHref)));
+          const isExternal = item.href.startsWith("http");
+          const isActive =
+            !isNearby &&
+            !isExternal &&
+            (pathname === internalHref || (internalHref !== "/" && pathname.startsWith(internalHref)));
           const meta = CENTERS_SECTION_META[item.label];
           const gradient = meta?.gradient || "from-neutral-500/10 to-neutral-500/5";
           const tagline = meta?.tagline || "";
+          const prevGroup = index > 0 ? section.subItems[index - 1]?.group : undefined;
+          const showGroup = Boolean(item.group && item.group !== prevGroup);
 
-          if (isNearby) {
-            return (
-              <button
-                key={item.href}
-                onClick={() => { onNavigate(); onNearbyClick(); }}
-                className={`w-full flex items-center gap-3.5 p-3.5 bg-gradient-to-r ${gradient} rounded-2xl transition-all duration-200`}
-              >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${colors.bgSubtle} ${colors.text} shadow-sm`}>
-                  <ItemIcon className="w-5 h-5" />
-                </div>
-                <div className="flex-1 text-left min-w-0">
-                  <span className={`block text-[15px] font-semibold ${colors.text}`}>
-                    {item.label}
-                  </span>
-                  {tagline && (
-                    <span className="block text-[12px] text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">
-                      {tagline}
-                    </span>
-                  )}
-                </div>
-                <MapPin className="w-4 h-4 text-neutral-400" />
-              </button>
-            );
-          }
-
-          return (
-            <SmartLink
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={`w-full flex items-center gap-3.5 p-3.5 bg-gradient-to-r ${gradient} rounded-2xl transition-all duration-200`}
-            >
+          const cardInner = (
+            <>
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
                 isActive
                   ? `${colors.bgSubtle} ${colors.text}`
@@ -405,7 +410,7 @@ function MobileCentersContentCards({
               </div>
               <div className="flex-1 text-left min-w-0">
                 <span className={`block text-[15px] font-semibold ${
-                  isActive ? colors.text : "text-neutral-900 dark:text-neutral-100"
+                  isActive || isNearby ? colors.text : "text-neutral-900 dark:text-neutral-100"
                 }`}>
                   {item.label}
                 </span>
@@ -415,8 +420,54 @@ function MobileCentersContentCards({
                   </span>
                 )}
               </div>
-              <ArrowRight className="w-4 h-4 text-neutral-400" />
-            </SmartLink>
+              {isNearby ? (
+                <MapPin className="w-4 h-4 text-neutral-400" />
+              ) : isExternal ? (
+                <ExternalLink className="w-4 h-4 text-neutral-400" />
+              ) : (
+                <ArrowRight className="w-4 h-4 text-neutral-400" />
+              )}
+            </>
+          );
+
+          return (
+            <div key={item.id ?? item.href}>
+              {showGroup && (
+                <div className={`flex items-center justify-between mb-2 ${index === 0 ? "" : "mt-4"}`}>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
+                    {item.group}
+                  </p>
+                  <div className="h-px flex-1 ml-3 bg-neutral-100 dark:bg-neutral-800" />
+                </div>
+              )}
+
+              {isNearby ? (
+                <button
+                  onClick={() => { onNavigate(); onNearbyClick(); }}
+                  className={`w-full flex items-center gap-3.5 p-3.5 bg-gradient-to-r ${gradient} rounded-2xl transition-all duration-200`}
+                >
+                  {cardInner}
+                </button>
+              ) : isExternal ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={onNavigate}
+                  className={`w-full flex items-center gap-3.5 p-3.5 bg-gradient-to-r ${gradient} rounded-2xl transition-all duration-200`}
+                >
+                  {cardInner}
+                </a>
+              ) : (
+                <SmartLink
+                  href={item.href}
+                  onClick={onNavigate}
+                  className={`w-full flex items-center gap-3.5 p-3.5 bg-gradient-to-r ${gradient} rounded-2xl transition-all duration-200`}
+                >
+                  {cardInner}
+                </SmartLink>
+              )}
+            </div>
           );
         })}
       </div>

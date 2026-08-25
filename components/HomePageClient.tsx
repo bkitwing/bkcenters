@@ -12,6 +12,7 @@ import { formatCenterUrl } from "@/lib/urlUtils";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, Navigation, Compass, ArrowRight, SlidersHorizontal, Phone } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
+import { districtLevelLabel } from '@/lib/countryUtils';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   ssr: false,
@@ -1008,7 +1009,10 @@ export default function HomePageClient({
                                     />
                                   </div>
                                   <p className="text-[10px] text-neutral-400 dark:text-neutral-500 mt-1">
-                                    {stateData?.districtCount || 0} districts
+                                    {stateData?.districtCount || 0}{' '}
+                                    {districtLevelLabel(region.name, {
+                                      plural: (stateData?.districtCount || 0) !== 1,
+                                    }).toLowerCase()}
                                   </p>
                                 </div>
                                 <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 group-hover:text-spirit-purple-500 shrink-0 group-hover:translate-x-0.5 transition-all" />

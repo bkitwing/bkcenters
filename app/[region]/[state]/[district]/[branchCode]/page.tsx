@@ -25,7 +25,7 @@ import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel, TIMING_CONFIRM_NOTE } from '@/lib/centerContent';
-import { countryLabelFromRegion } from '@/lib/countryUtils';
+import { countryLabelFromRegion, districtLevelLabel } from '@/lib/countryUtils';
 import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
 
@@ -845,7 +845,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
           <div className="pt-6 border-t border-neutral-200 dark:border-neutral-700">
             <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="inline-flex items-center gap-2 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium text-sm transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              Back to {center.district} District
+              Back to {center.district} {districtLevelLabel(center.region || actualRegion)}
             </Link>
           </div>
         </div>
