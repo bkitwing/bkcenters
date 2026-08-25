@@ -10,7 +10,7 @@ import CallNowButton from "@/components/CallNowButton";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
-import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, Navigation, Compass, ArrowRight, SlidersHorizontal, Phone } from 'lucide-react';
+import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, ExternalLink, Navigation, Compass, ArrowRight, SlidersHorizontal, Phone } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
 import { districtLevelLabel } from '@/lib/countryUtils';
 
@@ -72,8 +72,6 @@ export default function HomePageClient({
   initialRegionDetails,
   initialRegionToStates,
   totalCenters,
-  totalStates,
-  totalDistricts,
   retreatCentersCount,
 }: HomePageClientProps) {
   const searchParams = useSearchParams();
@@ -563,34 +561,45 @@ export default function HomePageClient({
               </button>
             </div>
 
-            {/* Stats + Description */}
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-4 sm:gap-6 mb-2 text-xs text-neutral-500 dark:text-neutral-400">
-                <span className="flex items-center gap-1.5">
-                  <Building2 className="w-3.5 h-3.5 text-spirit-purple-500 dark:text-spirit-purple-400" />
-                  <strong className="text-neutral-700 dark:text-neutral-200">{totalCenters.toLocaleString()}</strong> Centers
-                </span>
-                <span className="w-px h-3.5 bg-neutral-300 dark:bg-neutral-600" />
-                <span className="flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5 text-spirit-purple-500 dark:text-spirit-purple-400" />
-                  <strong className="text-neutral-700 dark:text-neutral-200">36</strong> States &amp; UTs
-                </span>
-              </div>
-              <p className="text-[11px] sm:text-xs text-neutral-400 dark:text-neutral-500 max-w-lg mx-auto leading-relaxed">
-                Find your nearest center in India &amp; Nepal for free meditation classes and 7-day Rajyoga courses.
-                <span className="block mt-1 text-neutral-400/80 dark:text-neutral-500/80">
-                  For other countries, kindly visit the{" "}
-                  <a
-                    href="https://www.brahmakumaris.org/centre-locator/centres"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline underline-offset-2 decoration-neutral-300 dark:decoration-neutral-600 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 hover:decoration-spirit-purple-400 transition-colors"
+            {/* This locator covers India & Nepal; International chip is the worldwide locator */}
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+              <span className="inline-flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-spirit-purple-500 dark:text-spirit-purple-400 shrink-0" />
+                <span>
+                  <strong className="text-neutral-700 dark:text-neutral-200 tabular-nums">
+                    {totalCenters.toLocaleString()}
+                  </strong>
+                  {" "}centers across{" "}
+                  <Link
+                    href={formatCenterUrl("INDIA")}
+                    className="font-medium text-neutral-700 dark:text-neutral-200 underline-offset-2 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 hover:underline"
                   >
-                    international centre locator
-                  </a>
-                  .
+                    India
+                  </Link>
+                  {" "}and{" "}
+                  <Link
+                    href={formatCenterUrl("NEPAL")}
+                    className="font-medium text-neutral-700 dark:text-neutral-200 underline-offset-2 hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 hover:underline"
+                  >
+                    Nepal
+                  </Link>
                 </span>
-              </p>
+              </span>
+              <span
+                className="hidden sm:block w-px h-4 bg-neutral-300 dark:bg-neutral-600"
+                aria-hidden
+              />
+              <a
+                href="https://www.brahmakumaris.org/centre-locator/centres"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Find centers in other countries"
+                className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3.5 py-1.5 text-xs font-semibold text-neutral-800 dark:text-neutral-100 shadow-sm hover:border-spirit-purple-400 dark:hover:border-spirit-purple-500 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300 transition-colors"
+              >
+                <Globe className="w-3.5 h-3.5 text-spirit-purple-500 dark:text-spirit-purple-400" />
+                International
+                <ExternalLink className="w-3 h-3 text-neutral-400 dark:text-neutral-500" />
+              </a>
             </div>
           </div>
         </section>
