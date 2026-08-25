@@ -311,16 +311,24 @@ function resolveNepalProvince(state, district) {
   if (NEPAL_PROVINCES.some((p) => p.toUpperCase() === s)) {
     return NEPAL_PROVINCES.find((p) => p.toUpperCase() === s);
   }
-  if (STATE_ALIASES_TO_PROVINCE[s]) return STATE_ALIASES_TO_PROVINCE[s];
 
-  // Locality first — handles split districts (Nawalparasi / Rukum)
+  // Split districts: locality decides province before the broad Nawalparasi/Rukum default
+  if ((s === 'NAWALPARASI' || s === 'RUKUM') && LOCALITY_TO_PROVINCE[d]) {
+    return LOCALITY_TO_PROVINCE[d];
+  }
+
+  // If PAD "state" is already an admin district name, trust it over locality names
+  // that collide with other districts (e.g. Saptari / Kanchanpur locality).
+  if (DISTRICT_TO_PROVINCE[s]) return DISTRICT_TO_PROVINCE[s];
+
+  // Locality hints (cities/towns) and district-field admin names
   if (LOCALITY_TO_PROVINCE[d]) return LOCALITY_TO_PROVINCE[d];
+  if (DISTRICT_TO_PROVINCE[d]) return DISTRICT_TO_PROVINCE[d];
   if (LOCALITY_TO_PROVINCE[s]) return LOCALITY_TO_PROVINCE[s];
 
-  if (DISTRICT_TO_PROVINCE[s]) return DISTRICT_TO_PROVINCE[s];
-  if (DISTRICT_TO_PROVINCE[d]) return DISTRICT_TO_PROVINCE[d];
+  // Old zones / province labels (broad — use last)
+  if (STATE_ALIASES_TO_PROVINCE[s]) return STATE_ALIASES_TO_PROVINCE[s];
 
-  // Soft contains match for district keys inside longer locality strings
   for (const [key, province] of Object.entries(DISTRICT_TO_PROVINCE)) {
     if (key.length >= 5 && (s.includes(key) || d.includes(key))) return province;
   }

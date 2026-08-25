@@ -127,7 +127,7 @@ Nepal mode is **create/update only** — it never deletes India (or any) centers
 
 India mode also **never deletes** centers with `country=Nepal`, so a later India sync cannot wipe Nepal imports.
 
-**Nepal state spelling aliases** (conservative only): `Dhanusa→Dhanusha`, `MECHI→Mechi`, `Makawanpur→Makwanpur`. Trailing spaces are trimmed. No fuzzy merges.
+**Nepal provinces:** PAD often stores districts/old zones as “state”. Nepal sync maps every center to one of the official 7 provinces (`Koshi`, `Madhesh`, `Bagmati`, `Gandaki`, `Lumbini`, `Karnali`, `Sudurpashchim`) via [`scripts/nepal-provinces.js`](scripts/nepal-provinces.js).
 
 **Portal / webapp:** After importing to webapp, verify portal with:
 
