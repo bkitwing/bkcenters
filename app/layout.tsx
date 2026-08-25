@@ -1,6 +1,5 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { UnifiedHeader } from "../components/unified-header";
 import { GoogleAnalytics } from "../components/GoogleAnalytics";
 import GlobalStickyBottomNav from "../components/GlobalStickyBottomNav";
@@ -10,8 +9,8 @@ import { fetchCenterCount, fetchStatAndDistrictCounts } from "@/lib/strapiClient
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Footer } from "@/components/Footer";
 import { CentersChrome } from "@/components/CentersChrome";
+import { notoSans } from "@/lib/fonts";
 
-const inter = Inter({ subsets: ["latin"] });
 const GA_ID = "G-CSYYGVHXN0";
 
 async function getHomeMetadata() {
@@ -102,7 +101,7 @@ export default async function RootLayout({
         <WebSiteSchema />
         <DatasetSchema totalCenters={totalCenters} />
       </head>
-      <body className={`${inter.className} bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300`}>
+      <body className={`${notoSans.className} ${notoSans.variable} bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="bk-centers-theme">
           <CentersChrome
             header={<UnifiedHeader />}

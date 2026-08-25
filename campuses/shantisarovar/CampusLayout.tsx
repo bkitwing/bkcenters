@@ -1,4 +1,4 @@
-import { Noto_Sans } from 'next/font/google';
+import { notoSans } from '@/lib/fonts';
 import { CampusBodyScope } from './CampusBodyScope';
 import { SsHeader } from './SsHeader';
 import { RetreatCampusFooter } from '../_components/RetreatCampusFooter';
@@ -14,13 +14,6 @@ import {
   SS_NEWS_HREF,
 } from './nav';
 import './shantisarovar.css';
-
-const notoSans = Noto_Sans({
-  subsets: ['latin'],
-  variable: '--font-ss-sans',
-  display: 'swap',
-  weight: ['400', '500', '600', '700'],
-});
 
 /**
  * Campus micro-site shell (NMBA pattern): own header, scoped tokens, Noto Sans.

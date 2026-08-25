@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 /**
  * Resets root body chrome while a campus micro-site is mounted —
- * avoids Inter/neutral-50 bleeding at edges outside `.ss-oasis`.
+ * avoids root body font/neutral-50 bleeding at edges outside `.ss-oasis`.
  */
 export function CampusBodyScope() {
   useEffect(() => {
