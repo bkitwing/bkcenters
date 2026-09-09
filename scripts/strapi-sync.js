@@ -4,6 +4,8 @@
  * India mode (default):
  *   Reads Centers_Raw.json, excludes NEPAL region rows, syncs add/update/delete.
  *   Never deletes centers with country=Nepal (protected after Nepal import).
+ *   Orphan cleanup ignores Nepal region/state/district hierarchy (including leftover
+ *   PAD district/zone entries after Nepal was remapped to the 7 provinces).
  *
  * Nepal mode (--nepal):
  *   Reads Centers_Nepal_Raw.json, create/update only — deletes and orphan cleanup disabled.
@@ -55,7 +57,12 @@ const DETAILED = process.argv.includes('--detailed') || process.argv.includes('-
 const AUTO_YES = process.argv.includes('--yes') || process.argv.includes('-y');
 const DRY_RUN = process.argv.includes('--dry-run');
 
-const { resolveNepalProvince, NEPAL_PROVINCES } = require('./nepal-provinces');
+const {
+  resolveNepalProvince,
+  NEPAL_PROVINCES,
+  isNepalRegionName,
+  isNepalHierarchyName,
+} = require('./nepal-provinces');
 
 /** Normalize PAD Nepal region variants to a single Strapi region name. */
 function normalizeNepalRegion(region) {
@@ -84,6 +91,36 @@ function resolveNepalStateForSync(state, district) {
 
 function isNepalCountry(country) {
   return (country || '').toUpperCase().trim() === 'NEPAL';
+}
+
+/**
+ * India sync must never delete Nepal hierarchy. After Nepal remapped PAD
+ * district/zone "states" onto the 7 provinces, leftover Nepal entries have
+ * no centers and would otherwise look like orphans.
+ */
+function collectNepalHierarchyIds(regions, states, districts) {
+  const nepalRegionIds = new Set();
+  for (const r of regions) {
+    if (isNepalRegionName(r.attributes?.name)) nepalRegionIds.add(r.id);
+  }
+
+  const nepalStateIds = new Set();
+  for (const s of states) {
+    const regionId = s.attributes?.region_center?.data?.id;
+    if ((regionId && nepalRegionIds.has(regionId)) || isNepalHierarchyName(s.attributes?.name)) {
+      nepalStateIds.add(s.id);
+    }
+  }
+
+  const nepalDistrictIds = new Set();
+  for (const d of districts) {
+    const stateId = d.attributes?.state_center?.data?.id;
+    if ((stateId && nepalStateIds.has(stateId)) || isNepalHierarchyName(d.attributes?.name)) {
+      nepalDistrictIds.add(d.id);
+    }
+  }
+
+  return { nepalRegionIds, nepalStateIds, nepalDistrictIds };
 }
 
 // --- Helpers ---
@@ -796,6 +833,12 @@ async function sync() {
       fetchAll('region-centers'),
     ]);
 
+    const { nepalRegionIds, nepalStateIds, nepalDistrictIds } = collectNepalHierarchyIds(
+      currentRegions,
+      currentStates,
+      currentDistricts
+    );
+
     // Build sets of district/state/region IDs that are still referenced by centers
     const usedDistrictIds = new Set();
     for (const c of currentCenters) {
@@ -803,7 +846,12 @@ async function sync() {
       if (distId) usedDistrictIds.add(distId);
     }
 
-    const orphanedDistricts = currentDistricts.filter(d => !usedDistrictIds.has(d.id));
+    const unusedNepalDistricts = currentDistricts.filter(
+      d => !usedDistrictIds.has(d.id) && nepalDistrictIds.has(d.id)
+    );
+    const orphanedDistricts = currentDistricts.filter(
+      d => !usedDistrictIds.has(d.id) && !nepalDistrictIds.has(d.id)
+    );
 
     // Build set of state IDs still referenced by remaining districts
     const remainingDistricts = currentDistricts.filter(d => usedDistrictIds.has(d.id));
@@ -813,7 +861,12 @@ async function sync() {
       if (stateId) usedStateIds.add(stateId);
     }
 
-    const orphanedStates = currentStates.filter(s => !usedStateIds.has(s.id));
+    const unusedNepalStates = currentStates.filter(
+      s => !usedStateIds.has(s.id) && nepalStateIds.has(s.id)
+    );
+    const orphanedStates = currentStates.filter(
+      s => !usedStateIds.has(s.id) && !nepalStateIds.has(s.id)
+    );
 
     // Build set of region IDs still referenced by remaining states
     const remainingStates = currentStates.filter(s => usedStateIds.has(s.id));
@@ -823,7 +876,22 @@ async function sync() {
       if (regionId) usedRegionIds.add(regionId);
     }
 
-    const orphanedRegions = currentRegions.filter(r => !usedRegionIds.has(r.id));
+    const unusedNepalRegions = currentRegions.filter(
+      r => !usedRegionIds.has(r.id) && nepalRegionIds.has(r.id)
+    );
+    const orphanedRegions = currentRegions.filter(
+      r => !usedRegionIds.has(r.id) && !nepalRegionIds.has(r.id)
+    );
+
+    const skippedNepalOrphans =
+      unusedNepalDistricts.length + unusedNepalStates.length + unusedNepalRegions.length;
+    if (skippedNepalOrphans > 0) {
+      console.log(
+        `  Skipping ${skippedNepalOrphans} Nepal hierarchy entries ` +
+        `(${unusedNepalDistricts.length} districts, ${unusedNepalStates.length} states, ` +
+        `${unusedNepalRegions.length} regions) — India sync does not clean Nepal.\n`
+      );
+    }
 
     const totalOrphans = orphanedDistricts.length + orphanedStates.length + orphanedRegions.length;
 

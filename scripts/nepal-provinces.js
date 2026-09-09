@@ -300,6 +300,25 @@ function normKey(value) {
     .replace(/\s+/g, ' ');
 }
 
+function isNepalRegionName(name) {
+  return normKey(name).startsWith('NEPAL');
+}
+
+/**
+ * True for official provinces, PAD district/zone labels, and "Nepal" itself.
+ * Used so India sync never treats leftover Nepal hierarchy as orphans.
+ * Does not use locality/city maps (Rampur, etc.) to avoid India name collisions.
+ */
+function isNepalHierarchyName(name) {
+  const key = normKey(name);
+  if (!key) return false;
+  if (isNepalRegionName(key)) return true;
+  if (NEPAL_PROVINCES.some((p) => p.toUpperCase() === key)) return true;
+  if (DISTRICT_TO_PROVINCE[key]) return true;
+  if (STATE_ALIASES_TO_PROVINCE[key]) return true;
+  return false;
+}
+
 /**
  * Resolve official province for a PAD Nepal center.
  * Order: existing province label → state-as-district → district field → locality hints.
@@ -339,4 +358,6 @@ function resolveNepalProvince(state, district) {
 module.exports = {
   NEPAL_PROVINCES,
   resolveNepalProvince,
+  isNepalRegionName,
+  isNepalHierarchyName,
 };

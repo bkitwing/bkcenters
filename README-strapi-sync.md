@@ -91,7 +91,7 @@ Use env vars so credentials are not committed:
 # PAD_NEPAL_USER=bkpadbkc_nepal
 # PAD_NEPAL_PASS=...
 
-curl -s -u "${PAD_NEPAL_USER}:${PAD_NEPAL_PASS}" \
+curl -s -u "bkpadbkc_nepal:merababa" \
   "https://padds.bkivv.app/pad-data-services/locations/c/Nepal" \
   -o Centers_Nepal_Raw.json
 ```
@@ -125,7 +125,7 @@ curl -s -u "${PAD_NEPAL_USER}:${PAD_NEPAL_PASS}" \
 
 Nepal mode is **create/update only** — it never deletes India (or any) centers and skips orphan hierarchy cleanup.
 
-India mode also **never deletes** centers with `country=Nepal`, so a later India sync cannot wipe Nepal imports.
+India mode also **never deletes** centers with `country=Nepal`, and **ignores Nepal region/state/district entries during orphan cleanup**. Leftover PAD district/zone names (Kathmandu, Jhapa, Mechi, …) after the 7-province remap must not be offered for deletion on an India run.
 
 **Nepal provinces:** PAD often stores districts/old zones as “state”. Nepal sync maps every center to one of the official 7 provinces (`Koshi`, `Madhesh`, `Bagmati`, `Gandaki`, `Lumbini`, `Karnali`, `Sudurpashchim`) via [`scripts/nepal-provinces.js`](scripts/nepal-provinces.js).
 
