@@ -30,10 +30,9 @@ export async function GET(
 
     let batch;
     if (params.slug === 'shantisarovar') {
-      // Always fresh — newly published upcoming events should appear immediately.
-      batch = await fetchSsEventsPage(safePage, safePageSize, { fresh: true });
+      batch = await fetchSsEventsPage(safePage, safePageSize);
     } else if (params.slug === 'jagdamba-bhawan') {
-      batch = await fetchJbEventsPage(safePage, safePageSize, { fresh: true });
+      batch = await fetchJbEventsPage(safePage, safePageSize);
     } else {
       return NextResponse.json({ error: 'Events API not configured' }, { status: 404 });
     }
@@ -42,7 +41,7 @@ export async function GET(
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-store',
+        'Cache-Control': 'public, max-age=60, s-maxage=300',
       },
     });
   } catch (error) {

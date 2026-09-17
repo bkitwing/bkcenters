@@ -90,17 +90,14 @@ function unwrap(item: unknown): Record<string, unknown> {
 
 async function portalGet<T>(
   path: string,
-  options?: { revalidate?: number | false; tags?: string[] }
+  options?: { revalidate?: number; tags?: string[] }
 ): Promise<T | null> {
   const revalidate = options?.revalidate ?? ISR;
   const tags = options?.tags ?? ['jb-media'];
   try {
-    const init: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } } =
-      revalidate === false
-        ? { cache: 'no-store', next: { revalidate: 0, tags } }
-        : { next: { revalidate, tags } };
-
-    const res = await fetch(`${PORTAL}${path}`, init);
+    const res = await fetch(`${PORTAL}${path}`, {
+      next: { revalidate, tags },
+    });
     if (!res.ok) {
       console.error(`JB media API ${res.status} for ${path}`);
       return null;
@@ -407,8 +404,7 @@ function eventsListPath(page: number, pageSize: number) {
 
 export async function fetchJbEventsPage(
   page = 1,
-  pageSize = EVENTS_INITIAL_PAGE_SIZE,
-  options?: { fresh?: boolean }
+  pageSize = EVENTS_INITIAL_PAGE_SIZE
 ): Promise<{
   events: JbEventPost[];
   total: number;
@@ -416,12 +412,11 @@ export async function fetchJbEventsPage(
   pageSize: number;
   hasMore: boolean;
 }> {
-  // Default fresh — avoid stale Data Cache hiding newly published events.
   const eventsRes = await portalGet<{
     data: unknown[];
     meta?: { pagination?: { total?: number; page?: number; pageCount?: number } };
   }>(eventsListPath(page, pageSize), {
-    revalidate: options?.fresh === false ? EVENTS_REVALIDATE : false,
+    revalidate: EVENTS_REVALIDATE,
     tags: ['jb-media', 'jb-events'],
   });
 
