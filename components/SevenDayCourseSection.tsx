@@ -111,7 +111,7 @@ export default function SevenDayCourseSection({ centerName, contact, mobile, dir
         {[
           { icon: Calendar, label: 'Monday to Sunday', sub: 'Start any day' },
           { icon: Clock, label: 'Morning & Evening', sub: '7–9 AM · 5–8 PM' },
-          { icon: Sparkles, label: '100% Free', sub: 'No fees ever' },
+          { icon: Sparkles, label: 'No Fees', sub: 'Offered free of charge' },
           { icon: Users, label: 'Open to All', sub: 'No experience needed' },
         ].map((item, i) => (
           <div key={i} className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 text-center hover:shadow-md hover:border-spirit-purple-200 dark:hover:border-spirit-purple-700 transition-all duration-300 group">
