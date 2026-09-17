@@ -4,7 +4,7 @@ import { JB_CANONICAL, JB_OG_IMAGES, JB_RETREAT_NAME, JB_SEO } from '../content'
 import { getJbEvents } from '../jb-media-data';
 import EventsClient from '../events/EventsClient';
 
-export const revalidate = 14400;
+export const revalidate = 300;
 
 const pageUrl = `${JB_CANONICAL}/events`;
 const { title, description, keywords, ogAlt } = JB_SEO.events;

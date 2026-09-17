@@ -4,7 +4,7 @@ import { SS_CANONICAL, SS_OG_IMAGES, SS_SEO } from '../content';
 import { getSsEvents } from '../ss-media-data';
 import EventsClient from '../events/EventsClient';
 
-export const revalidate = 14400;
+export const revalidate = 300;
 
 const pageUrl = `${SS_CANONICAL}/events`;
 const { title, description, keywords, ogAlt } = SS_SEO.events;

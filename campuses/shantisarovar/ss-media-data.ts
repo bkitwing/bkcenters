@@ -18,6 +18,8 @@ export const EVENT_POST_BASE = 'https://www.brahmakumaris.com/events';
 
 const PORTAL = 'https://portal.brahmakumaris.com/api';
 const ISR = 14400;
+/** Events publish often — keep list fresher than news (4h). */
+export const EVENTS_REVALIDATE = 300;
 const NEWS_PAGE_SIZE = 100;
 export const EVENTS_SSR_PAGE_SIZE = 50;
 export const EVENTS_INITIAL_PAGE_SIZE = EVENTS_SSR_PAGE_SIZE;
@@ -86,12 +88,19 @@ function unwrap(item: unknown): Record<string, unknown> {
   return o;
 }
 
-async function portalGet<T>(path: string): Promise<T | null> {
+async function portalGet<T>(
+  path: string,
+  options?: { revalidate?: number | false; tags?: string[] }
+): Promise<T | null> {
+  const revalidate = options?.revalidate ?? ISR;
+  const tags = options?.tags ?? ['ss-media'];
   try {
-    const res = await fetch(`${PORTAL}${path}`, {
-      // Public endpoints — do not send broken/invalid Bearer tokens.
-      next: { revalidate: ISR, tags: ['ss-media'] },
-    } as RequestInit);
+    const init: RequestInit & { next?: { revalidate?: number | false; tags?: string[] } } =
+      revalidate === false
+        ? { cache: 'no-store', next: { revalidate: 0, tags } }
+        : { next: { revalidate, tags } };
+
+    const res = await fetch(`${PORTAL}${path}`, init);
     if (!res.ok) {
       console.error(`SS media API ${res.status} for ${path}`);
       return null;
@@ -387,6 +396,8 @@ function eventsListPath(page: number, pageSize: number) {
       'fields[4]=more_infor',
       'fields[5]=registration_link',
       'fields[6]=centeremail',
+      // publishedAt also busts any stale Next Data Cache keyed on the old field set
+      'fields[7]=publishedAt',
       'populate[featured_image][fields][0]=url',
       'populate[featured_image][fields][1]=formats',
       'populate[featured_image][fields][2]=alternativeText',
@@ -397,7 +408,8 @@ function eventsListPath(page: number, pageSize: number) {
 
 export async function fetchSsEventsPage(
   page = 1,
-  pageSize = EVENTS_INITIAL_PAGE_SIZE
+  pageSize = EVENTS_INITIAL_PAGE_SIZE,
+  options?: { fresh?: boolean }
 ): Promise<{
   events: SsEventPost[];
   total: number;
@@ -405,10 +417,15 @@ export async function fetchSsEventsPage(
   pageSize: number;
   hasMore: boolean;
 }> {
+  // Default fresh: Next Data Cache keys by URL only, so a prior 4h cache entry
+  // would keep hiding newly published upcoming events.
   const eventsRes = await portalGet<{
     data: unknown[];
     meta?: { pagination?: { total?: number; page?: number; pageCount?: number } };
-  }>(eventsListPath(page, pageSize));
+  }>(eventsListPath(page, pageSize), {
+    revalidate: options?.fresh === false ? EVENTS_REVALIDATE : false,
+    tags: ['ss-media', 'ss-events'],
+  });
 
   const events = (eventsRes?.data || [])
     .map((item) => mapEventPost(unwrap(item)))
@@ -446,7 +463,8 @@ export const getSsEvents = cache(async (): Promise<SsEventsPageData> => {
 
   const [orgRes, eventsBatch] = await Promise.all([
     portalGet<{ data: unknown }>(
-      `/event-organizors/${SS_EVENT_ORGANIZER_ID}?populate[featured_image]=*`
+      `/event-organizors/${SS_EVENT_ORGANIZER_ID}?populate[featured_image]=*`,
+      { revalidate: EVENTS_REVALIDATE, tags: ['ss-media', 'ss-events'] }
     ),
     fetchSsEventsPage(1, EVENTS_INITIAL_PAGE_SIZE),
   ]);
