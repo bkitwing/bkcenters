@@ -69,7 +69,7 @@ export default function FAQSection({
     answer: (
       <div className="space-y-3">
         <p className="text-gray-700 dark:text-neutral-300">
-          You can visit our center located at:
+          Kindly call to confirm class hours, then visit. The center is at:
         </p>
         <div className="bg-gray-50 dark:bg-neutral-700/50 p-3 rounded-lg border-l-4 border-spirit-purple-400">
            <p className="font-medium text-gray-800 dark:text-neutral-200 mb-2">{formatAddress()}</p>
@@ -125,7 +125,7 @@ export default function FAQSection({
            </div>
          </div>
         <p className="text-gray-600 dark:text-neutral-400 text-sm">
-          Feel free to contact us if you need any assistance or have questions about visiting our center.
+          Timings are approximate. A short call before you come helps you arrive at the right time.
         </p>
       </div>
     )

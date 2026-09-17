@@ -157,6 +157,10 @@ const POPULATE = 'populate=district_center.state_center.region_center';
 // Lightweight populate: only hierarchy names + coords (for homepage aggregation)
 const POPULATE_LIGHT = 'fields[0]=branch_code&fields[1]=latitude&fields[2]=longitude&populate[district_center][fields][0]=name&populate[district_center][populate][state_center][fields][0]=name&populate[district_center][populate][state_center][populate][region_center][fields][0]=name';
 
+/** Slug + hierarchy only — used by the dynamic sitemap (~6k rows, tiny payload). */
+const POPULATE_SITEMAP =
+  'fields[0]=name&fields[1]=slug&populate[district_center][fields][0]=name&populate[district_center][populate][state_center][fields][0]=name&populate[district_center][populate][state_center][populate][region_center][fields][0]=name';
+
 /**
  * Helper to paginate through a Strapi query and collect all results.
  */
@@ -204,6 +208,30 @@ export async function loadCentersFromStrapi(): Promise<Center[]> {
 export async function loadCentersLightweight(): Promise<Center[]> {
   logger.debug(`strapiClient: Loading lightweight centers for homepage`);
   return fetchAllPages(`centers?${POPULATE_LIGHT}`, 3000, ['centers-light']);
+}
+
+export type SitemapCenter = {
+  slug: string;
+  name: string;
+  region: string;
+  state: string;
+  district: string;
+};
+
+/**
+ * All centers with only name/slug + region/state/district for sitemap.xml.
+ * Cached 24h via Next fetch (tag: sitemap).
+ */
+export async function fetchSitemapCenters(): Promise<SitemapCenter[]> {
+  logger.debug(`strapiClient: Loading sitemap center slugs from ${STRAPI_URL}`);
+  const centers = await fetchAllPages(`centers?${POPULATE_SITEMAP}`, 1000, ['sitemap']);
+  return centers.map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    region: c.region,
+    state: c.state,
+    district: c.district,
+  }));
 }
 
 /**

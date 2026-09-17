@@ -24,7 +24,8 @@ import NewsSection from '@/components/NewsSection';
 import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
-import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel, TIMING_CONFIRM_NOTE } from '@/lib/centerContent';
+import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel } from '@/lib/centerContent';
+import JoinCourseGuide from '@/components/JoinCourseGuide';
 import { countryLabelFromRegion, districtLevelLabel } from '@/lib/countryUtils';
 import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
 import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
@@ -90,7 +91,7 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
     const title = `${center.name} - Brahma Kumaris Rajyog Meditation Center - ${center.state}${country ? `, ${country}` : ''}`;
     // Unique, localized description (name + locality + timings) so each of the
     // 5,600+ pages has a differentiated snippet rather than duplicate boilerplate.
-    const description = `Learn Rajyoga meditation for free at Brahma Kumaris ${center.name}${localityLabel ? ` in ${localityLabel}, ` : ' in '}${center.state}${country ? `, ${country}` : ''}. Free 7-day course and daily morning (7–9 AM) & evening (5–8 PM) classes. Address, contact numbers, timings & directions.`;
+    const description = `Learn Rajyoga meditation for free at Brahma Kumaris ${center.name}${localityLabel ? ` in ${localityLabel}, ` : ' in '}${center.state}${country ? `, ${country}` : ''}. Kindly call to confirm timings, then visit for the free 7-day course. Approximate daily hours: morning (7–9 AM) & evening (5–8 PM). Address, contact numbers, timings & directions.`;
     
     // Format complete address
     const getCompleteAddress = () => {
@@ -372,7 +373,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
       },
       {
         question: `How to Visit Meditation Center - ${center.name}?`,
-        answer: `You can visit our center located at: ${formattedAddress}. ${center.contact || center.mobile ? `Contact: ${center.contact || center.mobile}` : ''}`
+        answer: `Kindly call to confirm class hours, then visit. Address: ${formattedAddress}. ${center.contact || center.mobile ? `Phone: ${center.contact || center.mobile}` : ''}`
       },
       {
         question: "Can anyone visit a Brahma Kumaris center and try Rajyoga meditation?",
@@ -445,6 +446,12 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   ) : null}
                 </div>
 
+                <JoinCourseGuide
+                  morning={timings.morning}
+                  evening={timings.evening}
+                  custom={timings.custom}
+                />
+
                 <div className="bk-center-hero__facts">
                   <div className="bk-center-hero__fact">
                     <span className="bk-center-hero__fact-label">Address</span>
@@ -507,32 +514,6 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     </div>
                   )}
 
-                  <div className="bk-center-hero__fact">
-                    <span className="bk-center-hero__fact-label">Timings</span>
-                    <div className="bk-center-hero__fact-body">
-                      {timings.custom ? (
-                        <p className="flex items-start gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-[color:var(--bk-hero-gold)] mt-0.5 shrink-0" />
-                          {timings.custom}
-                        </p>
-                      ) : (
-                        <div className="flex flex-wrap gap-x-4 gap-y-1">
-                          <span className="inline-flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-[color:var(--bk-hero-gold)]" />
-                            <span className="text-[color:var(--bk-hero-muted)]">Morning</span> {timings.morning}
-                          </span>
-                          <span className="inline-flex items-center gap-1.5">
-                            <Clock className="w-3.5 h-3.5 text-[color:var(--bk-hero-gold)]" />
-                            <span className="text-[color:var(--bk-hero-muted)]">Evening</span> {timings.evening}
-                          </span>
-                        </div>
-                      )}
-                      <p className="text-[11px] text-[color:var(--bk-hero-muted)] mt-1.5 italic leading-relaxed">
-                        {TIMING_CONFIRM_NOTE}
-                      </p>
-                    </div>
-                  </div>
-
                   {center.services && center.services.length > 0 && (
                     <div className="bk-center-hero__fact">
                       <span className="bk-center-hero__fact-label">Services</span>
@@ -550,7 +531,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   )}
                 </div>
 
-                {/* One quiet action rail — four actions, one visual unit */}
+                {/* Call first to confirm hours, then directions */}
                 <div
                   className="bk-center-hero__actions"
                   role="group"
@@ -560,7 +541,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     <CallNowButton
                       mobile={center.mobile}
                       contact={center.contact}
-                      className="bk-center-hero__action bk-center-hero__action--call cursor-pointer"
+                      className="bk-center-hero__action bk-center-hero__action--primary cursor-pointer"
                     >
                       <Phone className="w-4 h-4" />
                       <span>Call</span>
@@ -575,15 +556,12 @@ export default async function CenterPage({ params }: CenterPageProps) {
                     <Navigation className="w-4 h-4" />
                     <span>Directions</span>
                   </a>
-                  <a
-                    href="#contact"
-                    className="bk-center-hero__action"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>Query</span>
-                  </a>
                   <ShareCenter center={center} pageUrl={absoluteUrl} variant="hero" />
                 </div>
+                <p className="bk-center-hero__query-hint">
+                  Kindly call to confirm timings. For technical help with this page,{' '}
+                  <a href="#contact">ask a question</a>.
+                </p>
 
                 {/* Desktop: search sits with actions in the left column */}
                 <div className="hidden lg:block">
@@ -640,7 +618,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
             ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', iconName: 'Newspaper' }] : []),
             ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', iconName: 'Map' }] : []),
             { id: 'faq', label: 'FAQ', iconName: 'HelpCircle' },
-            { id: 'contact', label: 'Contact', iconName: 'MessageCircle' },
+            { id: 'contact', label: 'Questions', iconName: 'MessageCircle' },
           ]}
         />
 
@@ -652,6 +630,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
             centerName={center.name}
             contact={center.contact}
             mobile={center.mobile}
+            directionsUrl={getGoogleMapsUrl()}
           />
 
           {/* ===== EVENTS SECTION ===== */}
@@ -717,12 +696,16 @@ export default async function CenterPage({ params }: CenterPageProps) {
               sectionId="faq"
               faqPreviewData={[
                 {
+                  question: "Do I need an appointment to join the course?",
+                  answer: "No appointment is required. You may visit during class hours. Timings are approximate, so kindly call the center to confirm before you come."
+                },
+                {
                   question: "What is the Brahma Kumaris?",
                   answer: "Brahma Kumaris is a worldwide spiritual movement led by women, dedicated to personal transformation and world renewal through Rajyoga Meditation. Founded in India in 1937, Brahma Kumaris has spread to over 110 countries on all continents and has had an extensive impact in many sectors as an international NGO."
                 },
                 {
                   question: `How to Visit Meditation Center - ${center.name}?`,
-                  answer: `You can visit our center located at: ${formatAddress()}`
+                  answer: `Kindly call to confirm class hours, then visit. Address: ${formatAddress()}`
                 },
                 {
                   question: "Can anyone visit a Brahma Kumaris center and try Rajyoga meditation?",
@@ -776,8 +759,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
           {(
             <section id="contact" className="scroll-mt-bk">
               <CollapsibleSection 
-                title="Contact Us" 
-                defaultExpanded={true}
+                title="Other questions" 
+                defaultExpanded={false}
                 sectionId="contact"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
@@ -789,7 +772,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
                         Get in Touch
                       </h3>
                       <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-5 leading-relaxed">
-                        Send a message to {center.name}. Whether you have a query, want to provide feedback, or are interested in learning Rajyoga Meditation — we are here to help.
+                        To join the free meditation course at {center.name}, kindly call to confirm timings and then visit during class hours. Use this form only if you need technical help with this page, or have another question.
                       </p>
                       
                       <div className="space-y-4">
@@ -816,11 +799,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
                         <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
-                              <Phone className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                              <Clock className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
                             </div>
-                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Prefer Calling?</p>
+                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Want to learn meditation?</p>
                           </div>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">We recommend calling the center first for the quickest response.</p>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">Kindly call to confirm class hours, then visit during that time.</p>
                         </div>
                       </div>
                     </div>
@@ -830,7 +813,15 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   <div className="lg:col-span-3 lg:order-1">
                     <ContactForm 
                       center={center} 
-                      pageUrl={absoluteUrl} 
+                      pageUrl={absoluteUrl}
+                      walkIn={{
+                        morning: timings.morning,
+                        evening: timings.evening,
+                        custom: timings.custom,
+                        directionsUrl: getGoogleMapsUrl(),
+                        contact: center.contact,
+                        mobile: center.mobile,
+                      }}
                     />
                   </div>
                 </div>

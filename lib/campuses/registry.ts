@@ -53,7 +53,7 @@ export const CAMPUS_REGISTRY: Record<string, CampusDefinition> = {
   },
 };
 
-/** When adding a campus, also update lib/campuses/sitemap-data.js for sitemap generation. */
+/** When adding a campus, also update campus page lists in lib/sitemap.ts. */
 
 export function listCampusSlugs(): string[] {
   return Object.keys(CAMPUS_REGISTRY);

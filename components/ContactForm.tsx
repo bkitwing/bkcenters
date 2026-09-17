@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Center } from '@/lib/types';
 import { CenterLocatorAnalytics } from './GoogleAnalytics';
+import CallNowButton from './CallNowButton';
+import { Clock, Navigation } from 'lucide-react';
 
 interface ContactFormProps {
   center: Center;
@@ -12,6 +14,15 @@ interface ContactFormProps {
   defaultMessage?: string;
   /** Plain form without nested card / heavy intro (for campus enquire panels). */
   embedded?: boolean;
+  /** When set, Learn Meditation is a walk-in path — not a form to fill. */
+  walkIn?: {
+    morning: string;
+    evening: string;
+    custom?: string;
+    directionsUrl: string;
+    contact?: string;
+    mobile?: string;
+  };
 }
 
 type ContactType = 'LearnMeditation' | 'Query' | 'AttendEvent' | 'Feedback' | 'Others';
@@ -37,13 +48,14 @@ const ContactForm: React.FC<ContactFormProps> = ({
   hidePreferredTime = false,
   defaultMessage = DEFAULT_MESSAGE,
   embedded = false,
+  walkIn,
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [message, setMessage] = useState(defaultMessage);
+  const [message, setMessage] = useState(walkIn ? '' : defaultMessage);
   const [preferredTime, setPreferredTime] = useState('');
-  const [contactType, setContactType] = useState<ContactType>('LearnMeditation');
+  const [contactType, setContactType] = useState<ContactType>(walkIn ? 'Query' : 'LearnMeditation');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -152,9 +164,11 @@ const ContactForm: React.FC<ContactFormProps> = ({
     // Set default message templates based on contact type
     if (type === 'LearnMeditation') {
       setMessage(
-        hidePreferredTime
-          ? defaultMessage
-          : "I'm interested in learning meditation. Please provide information about your classes and timings."
+        walkIn
+          ? ''
+          : hidePreferredTime
+            ? defaultMessage
+            : "I'm interested in learning meditation. Please provide information about your classes and timings."
       );
     } else if (type === 'AttendEvent') {
       setMessage("I would like to attend an event. Please provide more information about upcoming events.");
@@ -164,6 +178,9 @@ const ContactForm: React.FC<ContactFormProps> = ({
       setMessage('');
     }
   };
+
+  const showWalkInInsteadOfForm =
+    Boolean(walkIn) && contactType === 'LearnMeditation';
 
   // If the message was successfully submitted, show a success message
   if (isSubmitted) {
@@ -204,7 +221,9 @@ const ContactForm: React.FC<ContactFormProps> = ({
         <>
           <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Send a Message</h2>
           <p className="text-neutral-600 dark:text-neutral-400 mb-4">
-            Have a question, want to join the free 7-day course, or need help finding timings? Share your details and we&apos;ll get back to you.
+            {walkIn
+              ? 'To join the free course, kindly call the center to confirm timings and then visit. Use this form only for technical help with this page, or for a question, event, or feedback.'
+              : "Have a question, want to join the free 7-day course, or need help finding timings? Share your details and we'll get back to you."}
           </p>
         </>
       ) : null}
@@ -241,7 +260,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
               }`}
               onClick={() => handleContactTypeChange('Query')}
             >
-              Query
+              Question
             </button>
             <button
               type="button"
@@ -279,6 +298,55 @@ const ContactForm: React.FC<ContactFormProps> = ({
           </div>
         </div>
 
+        {showWalkInInsteadOfForm && walkIn ? (
+          <div className="mb-4 rounded-xl border border-spirit-gold-200 dark:border-spirit-gold-800 bg-spirit-gold-50/70 dark:bg-spirit-gold-900/15 p-5">
+            <p className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
+              Kindly call the center first
+            </p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 leading-relaxed">
+              Class hours are approximate. Please call to confirm today's timing, then visit. This form is only if you need technical help or have another query.
+            </p>
+            {walkIn.custom ? (
+              <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-4 flex items-start gap-2">
+                <Clock className="w-4 h-4 mt-0.5 shrink-0 text-spirit-gold-600" />
+                {walkIn.custom}
+              </p>
+            ) : (
+              <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-4 flex items-start gap-2">
+                <Clock className="w-4 h-4 mt-0.5 shrink-0 text-spirit-gold-600" />
+                Morning {walkIn.morning} · Evening {walkIn.evening} · daily
+              </p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2">
+              {(walkIn.contact || walkIn.mobile) && (
+                <CallNowButton
+                  contact={walkIn.contact}
+                  mobile={walkIn.mobile}
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  Call to confirm
+                </CallNowButton>
+              )}
+              <a
+                href={walkIn.directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-white dark:hover:bg-neutral-700 transition-colors"
+              >
+                <Navigation className="w-4 h-4" />
+                Get Directions
+              </a>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleContactTypeChange('Query')}
+              className="mt-4 text-xs text-neutral-500 dark:text-neutral-400 underline underline-offset-2 hover:text-neutral-700 dark:hover:text-neutral-200"
+            >
+              I need technical help or another question
+            </button>
+          </div>
+        ) : (
+          <>
         <div className={embedded ? 'mb-3' : 'mb-4'}>
           <label
             htmlFor="name"
@@ -400,6 +468,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
             'Send Message'
           )}
         </button>
+          </>
+        )}
       </form>
     </div>
   );

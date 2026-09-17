@@ -132,7 +132,7 @@ export function LocalBusinessSchema({
               opens: '07:00',
               closes: '09:00',
               description:
-                'Morning Session — timings may vary; kindly call to confirm before visiting',
+                'Morning Session — timings are approximate; kindly call to confirm before visiting',
             },
             {
               '@type': 'OpeningHoursSpecification',
@@ -148,7 +148,7 @@ export function LocalBusinessSchema({
               opens: '17:00',
               closes: '20:00',
               description:
-                'Evening Session — timings may vary; kindly call to confirm before visiting',
+                'Evening Session — timings are approximate; kindly call to confirm before visiting',
             },
           ],
         }),
@@ -449,7 +449,7 @@ export function EventSchema({ center, centerUrl }: EventSchemaProps) {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: `Rajyoga Meditation Class at ${center.name}`,
-    description: `Free Rajyoga meditation class at ${center.name}, a Brahma Kumaris center in ${center.district}, ${center.state}. Open to all, no prior experience required. Classes held daily — morning (7:00–9:00 AM) and evening (5:00–8:00 PM) sessions. Please call to confirm timings.`,
+    description: `Free Rajyoga meditation class at ${center.name}, a Brahma Kumaris center in ${center.district}, ${center.state}. Open to all, no prior experience required. Classes typically held daily — morning (7:00–9:00 AM) and evening (5:00–8:00 PM). Kindly call to confirm timings before visiting.`,
     startDate: startDateStr,
     endDate: endDateStr,
     eventSchedule: {
@@ -542,30 +542,21 @@ export function HowToSchema({ center, centerUrl }: HowToSchemaProps) {
       name: 'Find the Center Location',
       text: `The center is located at: ${address}.`,
     },
-  ];
-
-  if (contact) {
-    steps.push({
+    {
       '@type': 'HowToStep',
       position: '2',
-      name: 'Contact Before Visiting',
-      text: `Call ${contact} to confirm class timings and get directions if needed.`,
-    });
-  }
-
-  steps.push({
-    '@type': 'HowToStep',
-    position: String(steps.length + 1),
-    name: 'Get Directions',
-    text: `Use Google Maps or any navigation app to reach ${address}.`,
-  });
-
-  steps.push({
-    '@type': 'HowToStep',
-    position: String(steps.length + 1),
-    name: 'Attend the Meditation Class',
-    text: 'Morning classes: 7:00\u20139:00 AM. Evening classes: 5:00\u20138:00 PM. All are welcome. Classes are free. No registration or membership required.',
-  });
+      name: 'Get Directions',
+      text: `Use Google Maps or any navigation app to reach ${address}.`,
+    },
+    {
+      '@type': 'HowToStep',
+      position: '3',
+      name: 'Call to confirm, then visit',
+      text: contact
+        ? `Class hours are approximate — morning 7:00–9:00 AM and evening 5:00–8:00 PM. Kindly call ${contact} to confirm today's timing, then visit. Classes are free and open to all.`
+        : `Class hours are approximate — morning 7:00–9:00 AM and evening 5:00–8:00 PM. Kindly call the center to confirm today's timing, then visit. Classes are free and open to all.`,
+    },
+  ];
 
   const schema = {
     '@context': 'https://schema.org',

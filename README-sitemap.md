@@ -1,33 +1,29 @@
 # Sitemap & Robots.txt
 
-Generates `public/sitemap.xml` and `public/robots.txt` from Strapi center data plus campus routes in `lib/campuses/sitemap-data.js`.
+Sitemap is generated dynamically by `app/sitemap.ts` at:
 
-## When it runs
+`https://www.brahmakumaris.com/centers/sitemap.xml`
+
+It reads center slugs from Strapi and caches the result for 24 hours. Google always gets a fresh list after that window. There is no static `public/sitemap.xml`.
+
+`public/robots.txt` points crawlers at that URL.
+
+## When it refreshes
 
 | Trigger | Behavior |
 |---|---|
-| `./build.sh` (default) | **Skipped** — deploy keeps the last `public/sitemap.xml` so builds don’t wait on a full Strapi crawl |
-| `GENERATE_SITEMAP=1 ./build.sh` | Runs crawl during deploy (fail soft if Strapi is down) |
-| `npm run strapi-sync` | Regenerates sitemap at the end of a successful (non–dry-run) sync |
-| `npm run generate-sitemap` | Manual refresh anytime |
-
-## Manual generation
-
-```bash
-npm run generate-sitemap
-```
-
-Requires `STRAPI_BASE_URL` and `STRAPI_TOKEN` in `.env`.
+| First request after deploy / cache expiry | Loads slugs from Strapi, then caches 24h |
+| `npm run strapi-sync` | Updates Strapi only — sitemap refreshes on the next cache miss (within 24h) |
+| `./build.sh` | Removes any leftover `public/sitemap.xml` so the dynamic route is served |
 
 ## URL structure
 
 - Homepage: `https://www.brahmakumaris.com/centers`
 - Retreat: `…/centers/retreat`
-- Campus microsites: from `lib/campuses/sitemap-data.js`
-- Region / state / district / center pages: from Strapi centers
+- Campus microsites: listed in `lib/sitemap.ts` (keep in sync with `lib/campuses/registry.ts`)
+- Region / state / district / center pages: from Strapi
 
 ## Notes
 
-- Skipping the crawl on deploy does **not** break the app; search engines keep using the existing sitemap until you regenerate.
-- After adding/removing centers, run `npm run strapi-sync` or `npm run generate-sitemap` so Google sees new URLs.
-- If Strapi is unreachable, keep the previous `public/sitemap.xml` rather than failing deploy.
+- Do not put a file at `public/sitemap.xml` — Next.js would serve it instead of the dynamic route.
+- If Strapi is unreachable, the sitemap falls back to the homepage URL only (HTTP 200).

@@ -70,6 +70,11 @@ export default function SectionNav({ items }: SectionNavProps) {
 
     const section = document.getElementById(id);
     section?.scrollIntoView({ behavior: 'smooth' });
+    const nextHash = `#${id}`;
+    if (window.location.hash !== nextHash) {
+      history.replaceState(null, '', nextHash);
+    }
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
 
     const navItem = e.currentTarget;
     const container = scrollRef.current;

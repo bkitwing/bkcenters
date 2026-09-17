@@ -168,7 +168,7 @@ cp Center-Processed.json public/
 | `npm run lint` | Run ESLint |
 | `npm run test-seo` | Test SEO meta tags on running server |
 | `npm run process-centers` | Process center data from raw JSON |
-| `npm run generate-sitemap` | Generate sitemap.xml |
+| `npm run generate-sitemap` | No-op note — sitemap is dynamic at /centers/sitemap.xml |
 
 ### Local Development
 

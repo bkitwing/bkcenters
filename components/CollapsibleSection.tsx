@@ -27,6 +27,21 @@ export default function CollapsibleSection({
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
+
+  // Open this section when the URL hash points at it (e.g. #contact)
+  useEffect(() => {
+    if (!sectionId) return;
+    const hashId = sectionId === 'nearby-centers' ? 'nearby' : sectionId;
+    const openIfMatchingHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === hashId || hash === sectionId) {
+        setIsExpanded(true);
+      }
+    };
+    openIfMatchingHash();
+    window.addEventListener('hashchange', openIfMatchingHash);
+    return () => window.removeEventListener('hashchange', openIfMatchingHash);
+  }, [sectionId]);
   
   // Auto-expand when a center card is highlighted (for nearby centers section)
   useEffect(() => {

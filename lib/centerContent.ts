@@ -17,9 +17,9 @@ export const DEFAULT_TIMINGS = {
   evening: '5:00 – 8:00 PM',
 };
 
-/** Respectful note shown under class timings on every center detail page. */
+/** Note shown under class timings. */
 export const TIMING_CONFIRM_NOTE =
-  'Timings may vary — kindly call to confirm before you visit.';
+  'Timings are approximate — kindly call the center to confirm before you visit.';
 
 /** Short location line for hero (city, district, state) — full street address lives in Center Details only. */
 export function getShortLocationLine(
@@ -109,10 +109,10 @@ export function generateCenterIntro(
   ).slice(0, 3);
 
   if (city && uniqueNearby.length > 0) {
-    return `Brahma Kumaris ${name} offers a free 7-day Rajyoga meditation course and daily classes${placeClause ? ` in ${placeClause}` : ''}, open to everyone. Visitors from ${city} and nearby areas such as ${uniqueNearby.join(', ')} are warmly welcome.`;
+    return `Brahma Kumaris ${name} offers a free 7-day Rajyoga meditation course and daily classes${placeClause ? ` in ${placeClause}` : ''}, open to everyone. Class hours are approximate — kindly call to confirm before visiting. Visitors from ${city} and nearby areas such as ${uniqueNearby.join(', ')} are warmly welcome.`;
   }
 
-  return `Brahma Kumaris ${name} offers a free 7-day Rajyoga meditation course and daily meditation classes${placeClause ? ` in ${placeClause}` : ''}. All are welcome — whether you are new to meditation or continuing your spiritual journey.`;
+  return `Brahma Kumaris ${name} offers a free 7-day Rajyoga meditation course and daily meditation classes${placeClause ? ` in ${placeClause}` : ''}. All are welcome. Kindly call the center to confirm class hours before you visit.`;
 }
 
 /**
@@ -129,16 +129,19 @@ export function getLocalizedFaqs(
   const locality =
     getLocalityLabel(center) || titleCase(center.district) || titleCase(center.state);
   const phone = firstPhone(center);
-  const callClause = phone
-    ? ` Call ${phone} to confirm before visiting.`
-    : ' Please call the center to confirm before visiting.';
 
   const faqs: { question: string; answer: string }[] = [
     {
+      question: `Do I need an appointment to learn meditation at ${name}?`,
+      answer: omitTimings
+        ? `No. You can visit Brahma Kumaris ${name} in ${locality} to join the free 7-day Rajyoga course. Kindly call the center to confirm visiting details.`
+        : `No appointment is required. You may visit during class hours — morning ${DEFAULT_TIMINGS.morning} or evening ${DEFAULT_TIMINGS.evening} (approximate). Kindly call the center to confirm today's timing before you come.`,
+    },
+    {
       question: `Where can I learn meditation in ${locality}?`,
       answer: omitTimings
-        ? `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and regular classes, open to everyone.${callClause}`
-        : `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and daily morning and evening classes, open to everyone.${callClause}`,
+        ? `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and regular classes, open to everyone.`
+        : `You can learn Rajyoga meditation for free at Brahma Kumaris ${name} in ${locality}. The center offers a free 7-day course and daily morning (${DEFAULT_TIMINGS.morning}) and evening (${DEFAULT_TIMINGS.evening}) classes. Kindly call to confirm hours, then visit.`,
     },
   ];
 

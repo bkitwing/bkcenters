@@ -13,16 +13,11 @@ echo "===== Starting production deployment ====="
 echo "Installing dependencies..."
 npm i
 
-# Step 3: Sitemap (optional — skipped by default so deploys don't wait on Strapi crawl)
-# Keeps the existing public/sitemap.xml from the last successful generate.
-# Regenerate separately: npm run generate-sitemap
-# Or after data sync: npm run strapi-sync (runs sitemap at the end)
-# Force during deploy: GENERATE_SITEMAP=1 ./build.sh
-if [ "${GENERATE_SITEMAP:-0}" = "1" ]; then
-  echo "Generating sitemap (GENERATE_SITEMAP=1)..."
-  npm run generate-sitemap || echo "WARNING: sitemap generation failed — keeping existing public/sitemap.xml"
-else
-  echo "Skipping Strapi sitemap crawl (use GENERATE_SITEMAP=1 to run, or npm run generate-sitemap)."
+# Step 3: Sitemap is generated dynamically (app/sitemap.ts → /centers/sitemap.xml)
+# from Strapi, cached 24h. A leftover static public/sitemap.xml would hide that route.
+if [ -f public/sitemap.xml ]; then
+  echo "Removing static public/sitemap.xml so the dynamic sitemap can be served..."
+  rm -f public/sitemap.xml
 fi
 
 # Step 4: Build the application
@@ -47,4 +42,4 @@ echo "===== Deployment completed successfully ====="
 echo "Application is running on port 5400"
 echo ""
 echo "To update data without rebuilding, run: npm run strapi-sync"
-echo "To refresh sitemap.xml, run: npm run generate-sitemap"
+echo "Sitemap is dynamic: https://www.brahmakumaris.com/centers/sitemap.xml"

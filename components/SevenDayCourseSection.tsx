@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BookOpen, Clock, Users, Sparkles, ChevronRight, Calendar, Sun, Circle, Hexagon, Triangle, Diamond, Octagon, Pentagon, Square } from 'lucide-react';
+import { BookOpen, Clock, Users, Sparkles, ChevronRight, Calendar, Navigation, Circle, Hexagon, Triangle, Diamond, Octagon, Pentagon, Square } from 'lucide-react';
 import CallNowButton from './CallNowButton';
 
 interface SevenDayCourseSectionProps {
   centerName: string;
   contact?: string;
   mobile?: string;
+  directionsUrl?: string;
 }
 
 const courseDays = [
@@ -83,7 +84,7 @@ const courseDays = [
   },
 ];
 
-export default function SevenDayCourseSection({ centerName, contact, mobile }: SevenDayCourseSectionProps) {
+export default function SevenDayCourseSection({ centerName, contact, mobile, directionsUrl }: SevenDayCourseSectionProps) {
   const [activeDay, setActiveDay] = useState(0);
   const activeItem = courseDays[activeDay];
   const ActiveIcon = activeItem.icon;
@@ -101,7 +102,7 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
         </h2>
         <p className="text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto text-lg">
           Begin your spiritual journey with our complimentary introductory course.
-          Walk in any day, no registration needed.
+          Kindly call to confirm hours, then visit any day.
         </p>
       </div>
 
@@ -187,7 +188,7 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
         <div className="border-t border-neutral-100 dark:border-neutral-700 bg-gradient-to-r from-spirit-purple-50/50 via-spirit-blue-50/50 to-spirit-gold-50/50 dark:from-spirit-purple-900/10 dark:via-spirit-blue-900/10 dark:to-spirit-gold-900/10 px-6 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              <span className="font-semibold text-neutral-800 dark:text-neutral-200">Walk in anytime</span> — Classes run daily at {centerName}, morning 7–9 AM &amp; evening 5–8 PM. No registration required.
+              <span className="font-semibold text-neutral-800 dark:text-neutral-200">Classes typically run daily</span> at {centerName}, morning 7–9 AM &amp; evening 5–8 PM (approximate). Kindly call to confirm hours before you visit.
             </p>
             <div className="flex items-center gap-1.5 text-sm text-spirit-purple-600 dark:text-spirit-purple-400 font-medium">
               <Sparkles className="w-4 h-4" />
@@ -203,7 +204,7 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
           <div className="text-center mb-6">
             <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Ready to Begin?</h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm max-w-xl mx-auto">
-              The best way to experience Rajyoga is to visit your nearest center and learn in person from experienced teachers. For a quick introduction, explore our online courses.
+              Kindly call the center to confirm today's hours, then visit during class time. The course is free.
             </p>
           </div>
 
@@ -212,19 +213,22 @@ export default function SevenDayCourseSection({ centerName, contact, mobile }: S
               <CallNowButton 
                 contact={contact}
                 mobile={mobile}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-spirit-purple-600 to-spirit-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-spirit-purple-600 to-spirit-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
               >
-                <Sun className="w-4 h-4" />
-                Visit Center &amp; Start Learning
+                Call to confirm
               </CallNowButton>
             )}
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 bg-spirit-gold-400/90 text-spirit-purple-900 px-6 py-3 rounded-xl font-semibold text-sm hover:bg-spirit-gold-400 hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
-            >
-              <Users className="w-4 h-4" />
-              Register Your Interest
-            </a>
+            {directionsUrl && (
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 border border-neutral-200 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 px-6 py-3 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all duration-200"
+              >
+                <Navigation className="w-4 h-4" />
+                Get Directions
+              </a>
+            )}
           </div>
 
           {/* Online Course Links */}
