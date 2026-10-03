@@ -8,7 +8,6 @@ import Link from 'next/link';
 import {
   Facebook,
   Instagram,
-  Youtube,
   ExternalLink,
   MapPin,
   Flower2,
@@ -23,6 +22,19 @@ import './retreat-footer.css';
 const BK_LOGO =
   'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/BK_Logo_c6ca9ac104.png';
 
+/** Official YouTube mark — red rounded tile and white play, not an outline glyph. */
+function YouTubeMark({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden>
+      <path
+        fill="#FF0000"
+        d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.38.45A3.02 3.02 0 0 0 .5 6.19 31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14C4.5 20.4 12 20.4 12 20.4s7.5 0 9.38-.45a3.02 3.02 0 0 0 2.12-2.14A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.5-5.81z"
+      />
+      <path fill="#FFFFFF" d="M9.75 15.57V8.43L15.84 12l-6.09 3.57z" />
+    </svg>
+  );
+}
+
 /** Official X (formerly Twitter) mark — Lucide still ships the bird as Twitter. */
 function XIcon({ className }: { className?: string }) {
   return (
@@ -36,7 +48,7 @@ const BK_SOCIAL = [
   { href: 'https://www.facebook.com/BrahmaKumaris', label: 'Facebook', icon: Facebook },
   { href: 'https://x.com/BrahmaKumaris', label: 'X', icon: XIcon },
   { href: 'https://www.instagram.com/brahmakumaris/', label: 'Instagram', icon: Instagram },
-  { href: 'https://www.youtube.com/brahmakumaris', label: 'YouTube', icon: Youtube },
+  { href: 'https://www.youtube.com/brahmakumaris', label: 'YouTube', icon: YouTubeMark },
 ] as const;
 
 const BK_ABOUT_LINKS = [
@@ -125,7 +137,7 @@ const SOCIAL_ICONS = {
   facebook: Facebook,
   twitter: XIcon,
   instagram: Instagram,
-  youtube: Youtube,
+  youtube: YouTubeMark,
 } as const;
 
 export function RetreatCampusFooter({
@@ -169,18 +181,21 @@ export function RetreatCampusFooter({
             className="ss-ft__social"
             aria-label={socialLinks?.length ? `${campusName} on social media` : 'Brahma Kumaris on social media'}
           >
-            {socials.map((s) => (
-              <a
-                key={s.href}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ss-ft__social-btn"
-                aria-label={s.label}
-              >
-                <s.icon className="h-3.5 w-3.5" />
-              </a>
-            ))}
+            {socials.map((s) => {
+              const youtube = /youtube/i.test(s.label);
+              return (
+                <a
+                  key={s.href}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={youtube ? 'ss-ft__social-btn ss-ft__social-btn--youtube' : 'ss-ft__social-btn'}
+                  aria-label={s.label}
+                >
+                  <s.icon className={youtube ? 'h-5 w-5' : 'h-3.5 w-3.5'} />
+                </a>
+              );
+            })}
           </div>
         </div>
 

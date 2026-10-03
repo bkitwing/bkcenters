@@ -102,6 +102,19 @@
   border-color: color-mix(in srgb, var(--ss-gold) 45%, var(--border));
 }
 
+.ss-ft__social-btn--youtube {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-color: transparent;
+  background: transparent;
+}
+
+.ss-ft__social-btn--youtube:hover {
+  border-color: transparent;
+  background: transparent;
+  filter: brightness(1.06);
+}
+
 .ss-ft__nav {
   display: grid;
   gap: 1.5rem;

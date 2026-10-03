@@ -51,6 +51,13 @@ export const CAMPUS_REGISTRY: Record<string, CampusDefinition> = {
     canonical: 'https://www.brahmakumaris.com/centers/jagdamba-bhawan',
     branchCode: '04543',
   },
+  'sonipat-retreat-center': {
+    slug: 'sonipat-retreat-center',
+    name: 'Sonipat Retreat Center',
+    basePath: '/sonipat-retreat-center',
+    canonical: 'https://www.brahmakumaris.com/centers/sonipat-retreat-center',
+    branchCode: '04159',
+  },
 };
 
 /** When adding a campus, also update campus page lists in lib/sitemap.ts. */

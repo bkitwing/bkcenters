@@ -35,11 +35,19 @@ const PAGE_LOADERS: Record<
     events: () => import('@/campuses/jagdamba-bhawan/routes/EventsPage'),
     galleries: () => import('@/campuses/jagdamba-bhawan/routes/GalleriesPage'),
   },
+  'sonipat-retreat-center': {
+    home: () => import('@/campuses/sonipat-retreat-center/routes/HomePage'),
+    about: () => import('@/campuses/sonipat-retreat-center/routes/AboutPage'),
+    contact: () => import('@/campuses/sonipat-retreat-center/routes/ContactPage'),
+    news: () => import('@/campuses/sonipat-retreat-center/routes/NewsPage'),
+    galleries: () => import('@/campuses/sonipat-retreat-center/routes/GalleriesPage'),
+  },
 };
 
 const LAYOUT_LOADERS: Record<string, () => Promise<CampusLayoutModule>> = {
   shantisarovar: () => import('@/campuses/shantisarovar/CampusLayout'),
   'jagdamba-bhawan': () => import('@/campuses/jagdamba-bhawan/CampusLayout'),
+  'sonipat-retreat-center': () => import('@/campuses/sonipat-retreat-center/CampusLayout'),
 };
 
 export async function loadCampusLayout(slug: string) {
