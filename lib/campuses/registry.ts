@@ -58,6 +58,13 @@ export const CAMPUS_REGISTRY: Record<string, CampusDefinition> = {
     canonical: 'https://www.brahmakumaris.com/centers/sonipat-retreat-center',
     branchCode: '04159',
   },
+  'shanti-shikhar': {
+    slug: 'shanti-shikhar',
+    name: 'Shanti Shikhar Retreat Center',
+    basePath: '/shanti-shikhar',
+    canonical: 'https://www.brahmakumaris.com/centers/shanti-shikhar',
+    branchCode: '04376',
+  },
 };
 
 /** When adding a campus, also update campus page lists in lib/sitemap.ts. */

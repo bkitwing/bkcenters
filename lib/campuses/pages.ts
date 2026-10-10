@@ -42,12 +42,19 @@ const PAGE_LOADERS: Record<
     news: () => import('@/campuses/sonipat-retreat-center/routes/NewsPage'),
     galleries: () => import('@/campuses/sonipat-retreat-center/routes/GalleriesPage'),
   },
+  'shanti-shikhar': {
+    home: () => import('@/campuses/shanti-shikhar/routes/HomePage'),
+    contact: () => import('@/campuses/shanti-shikhar/routes/ContactPage'),
+    news: () => import('@/campuses/shanti-shikhar/routes/NewsPage'),
+    galleries: () => import('@/campuses/shanti-shikhar/routes/GalleriesPage'),
+  },
 };
 
 const LAYOUT_LOADERS: Record<string, () => Promise<CampusLayoutModule>> = {
   shantisarovar: () => import('@/campuses/shantisarovar/CampusLayout'),
   'jagdamba-bhawan': () => import('@/campuses/jagdamba-bhawan/CampusLayout'),
   'sonipat-retreat-center': () => import('@/campuses/sonipat-retreat-center/CampusLayout'),
+  'shanti-shikhar': () => import('@/campuses/shanti-shikhar/CampusLayout'),
 };
 
 export async function loadCampusLayout(slug: string) {
