@@ -249,18 +249,48 @@ export const SHK_CONTENT = {
   },
   services: {
     eyebrow: 'Join in service',
-    title: 'Service offered here',
+    title: 'Services offered',
     intro:
       'This academy shares spiritual knowledge and Rajyoga with every section of society, and guides souls towards a more aware, empowered and balanced life.',
+    /** Card titles for the "Services offered Section" images, keyed by filename. */
+    labels: {
+      'self-managing-skills': {
+        title: 'Meditational retreat',
+        blurb:
+          'Retreats for every section of society — for a positive life, a finer personality and the art of managing stress.',
+      },
+      'living-values': {
+        title: 'Value based education',
+        blurb:
+          'Residential and non-residential values-education programmes for government and private institutions.',
+      },
+      'empowerment-services': {
+        title: 'Empowerment',
+        blurb: 'Programmes of empowerment for farmers, women, youth and children.',
+      },
+      'community-services': {
+        title: 'Community service',
+        blurb: 'Community service and village outreach, to encourage spirituality and inner strength.',
+      },
+      'environmental-awareness': {
+        title: 'Care for nature',
+        blurb: 'Programmes that awaken care for the environment.',
+      },
+      'health-camp': {
+        title: 'Health camps',
+        blurb:
+          'Holistic health camps for those living with diabetes, heart conditions and other illnesses, and support for freedom from addiction.',
+      },
+    },
     items: [
       {
         id: 'retreat',
-        title: 'Meditation retreats',
+        title: 'Meditational retreat',
         text: 'Retreats for every section of society — for a positive life, a finer personality and the art of managing stress.',
       },
       {
         id: 'values',
-        title: 'Values education',
+        title: 'Value based education',
         text: 'Residential and non-residential values-education programmes for government and private institutions.',
       },
       {

@@ -14,9 +14,14 @@ import { SHK_CONTACT_HREF, SHK_GALLERIES_HREF } from './nav';
 import { HomeAmbientVideo } from './HomeAmbientVideo';
 import { HomeCoursesCarousel } from './HomeCoursesCarousel';
 import { HomeHeroParticles } from './HomeHeroParticles';
+import { HomeHeroSlideshow, type ShkHomeImage } from './HomeHeroSlideshow';
+import type { ShkGalleryThumb, ShkService } from './logo-data';
 
 const c = SHK_CONTENT;
 const INAUGURATION_EMBED = 'https://www.youtube.com/embed/ND8twQVtplw';
+
+/** Home facilities carousel. Turn this on when the section should show again. */
+const SHOW_HOME_FACILITIES = false;
 
 function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -73,8 +78,17 @@ const CHAPTERS = [
 
 export default function ShantiShikharClient({
   newsTeaser,
+  heroSlides = [],
+  services = [],
+  gallery = [],
 }: {
   newsTeaser?: React.ReactNode;
+  /** Web carousel from Strapi "Hero Section". */
+  heroSlides?: ShkHomeImage[];
+  /** Cards from Strapi "Services offered Section". */
+  services?: ShkService[];
+  /** Campus pictures from Strapi "Photo Gallery Section". */
+  gallery?: ShkGalleryThumb[];
 }) {
   const reduce = useReducedMotion();
   const heroRef = useRef<HTMLElement>(null);
@@ -84,18 +98,25 @@ export default function ShantiShikharClient({
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.9], [1, reduce ? 1 : 0.35]);
 
-  const galleryThumbs = [
-    c.hero.media,
-    c.about.media,
-    ...c.inauguration.slides,
-    ...c.facilities.items.map((item) => item.media),
-  ];
+  const galleryThumbs =
+    gallery.length > 0
+      ? gallery
+      : [
+          c.hero.media,
+          c.about.media,
+          ...c.inauguration.slides,
+          ...c.facilities.items.map((item) => item.media),
+        ];
 
   return (
     <div>
       <section ref={heroRef} className="shk-hero shk-hero--cinema">
         <motion.div style={{ opacity: heroOpacity }} className="shk-hero__media">
-          <div className="shk-hero__fallback" aria-hidden />
+          {heroSlides.length > 0 ? (
+            <HomeHeroSlideshow slides={heroSlides} />
+          ) : (
+            <div className="shk-hero__fallback" aria-hidden />
+          )}
         </motion.div>
         <div className="shk-hero__wash" />
         <HomeHeroParticles />
@@ -143,7 +164,7 @@ export default function ShantiShikharClient({
               Contact us
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <button type="button" onClick={() => scrollToId('courses')} className="shk-btn shk-btn--ghost">
+            <button type="button" onClick={() => scrollToId('services')} className="shk-btn shk-btn--ghost">
               {c.hero.ctaSecondary}
             </button>
           </motion.div>
@@ -226,7 +247,7 @@ export default function ShantiShikharClient({
         lede={c.inauguration.subtitle}
       />
 
-      <section id="courses" className="shk-section shk-section--alt shk-home-courses">
+      <section id="services" className="shk-section shk-section--alt shk-home-courses">
         <div className="shk-container">
           <Reveal>
             <div className="shk-home-courses__head">
@@ -236,25 +257,36 @@ export default function ShantiShikharClient({
                 <span className="shk-rule" />
               </div>
               <Link href={SHK_CONTACT_HREF} className="shk-home-courses__all">
-                Enquire about a course
+                Enquire about a service
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </Reveal>
           <p className="shk-lede !max-w-3xl">{c.services.intro}</p>
           <HomeCoursesCarousel
-            ariaLabel="Services"
-            items={c.services.items.map((item) => ({
-              id: item.id,
-              title: item.title,
-              blurb: item.text,
-              src: null,
-              alt: item.title,
-            }))}
+            ariaLabel="Services offered"
+            items={
+              services.length > 0
+                ? services.map((item) => ({
+                    id: item.id,
+                    title: item.title,
+                    blurb: item.blurb,
+                    src: item.src,
+                    alt: item.alt,
+                  }))
+                : c.services.items.map((item) => ({
+                    id: item.id,
+                    title: item.title,
+                    blurb: item.text,
+                    src: null,
+                    alt: item.title,
+                  }))
+            }
           />
         </div>
       </section>
 
+      {SHOW_HOME_FACILITIES ? (
       <section id="facilities" className="shk-section shk-home-courses">
         <div className="shk-container">
           <Reveal>
@@ -282,6 +314,7 @@ export default function ShantiShikharClient({
           />
         </div>
       </section>
+      ) : null}
 
       {newsTeaser}
 
@@ -305,7 +338,7 @@ export default function ShantiShikharClient({
             peek="roomy"
             items={galleryThumbs.map((thumb) => ({
               id: thumb.id,
-              title: thumb.label,
+              title: 'title' in thumb ? thumb.title : thumb.label,
               src: thumb.src,
               alt: thumb.alt,
               href: SHK_GALLERIES_HREF,

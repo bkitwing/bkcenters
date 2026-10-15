@@ -59,8 +59,8 @@ export function ShkCourseStory() {
             <ChevronRight className="w-3.5 h-3.5" />
           </a>
         </div>
-        <Link href="/shanti-shikhar#courses" className="shk-course-journey__more">
-          All campus courses <ArrowRight className="w-3.5 h-3.5" />
+        <Link href="/shanti-shikhar#services" className="shk-course-journey__more">
+          Services offered <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
     </div>

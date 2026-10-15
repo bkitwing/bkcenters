@@ -2,26 +2,29 @@ import { notoSans } from '@/lib/fonts';
 import { RetreatCampusFooter } from '../_components/RetreatCampusFooter';
 import { CampusBodyScope } from './CampusBodyScope';
 import { SHK_CONTENT } from './content';
+import { getShkLogo } from './logo-data';
 import { ShkHeader } from './ShkHeader';
 import {
   SHK_ABOUT_HREF,
   SHK_CONTACT_HREF,
-  SHK_COURSES_HREF,
+  SHK_SERVICES_HREF,
   SHK_GALLERIES_HREF,
   SHK_HOME_HREF,
   SHK_NEWS_HREF,
 } from './nav';
 import './shanti-shikhar.css';
 
-export default function ShantiShikharLayout({
+export default async function ShantiShikharLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const logo = await getShkLogo();
+
   return (
     <div className={`shk-oasis ${notoSans.variable}`}>
       <CampusBodyScope />
-      <ShkHeader />
+      <ShkHeader logoSrc={logo?.src} logoAlt={logo?.alt} />
       {children}
       <RetreatCampusFooter
         campusName="Shanti Shikhar"
@@ -38,7 +41,7 @@ export default function ShantiShikharLayout({
         campusLinks={[
           { label: 'Home', href: SHK_HOME_HREF },
           { label: 'About', href: SHK_ABOUT_HREF },
-          { label: 'Courses', href: SHK_COURSES_HREF },
+          { label: 'Services', href: SHK_SERVICES_HREF },
           { label: 'Galleries', href: SHK_GALLERIES_HREF },
           { label: 'News', href: SHK_NEWS_HREF },
           { label: 'Visit & Enquire', href: SHK_CONTACT_HREF },

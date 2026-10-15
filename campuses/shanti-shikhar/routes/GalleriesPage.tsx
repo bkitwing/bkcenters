@@ -28,8 +28,8 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function ShantiShikharGalleriesPage() {
-  const data = getShkGalleries();
+export default async function ShantiShikharGalleriesPage() {
+  const data = await getShkGalleries();
 
   return (
     <>

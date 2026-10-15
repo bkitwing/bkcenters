@@ -2188,6 +2188,14 @@ html.dark body.shk-campus-body {
   box-shadow: 0 24px 56px -28px rgba(42, 18, 56, 0.38);
 }
 
+/* Gallery “Campus in pictures” — keep the panel purple; the gold wash fought the heading. */
+.shk-gal .shk-media-hero {
+  background:
+    radial-gradient(120% 120% at 88% 8%, rgba(255, 255, 255, 0.16), transparent 52%),
+    radial-gradient(110% 120% at 0% 100%, rgba(127, 91, 213, 0.34), transparent 58%),
+    linear-gradient(135deg, #4a3488 0%, #7f5bd5 52%, #5a3d96 100%);
+}
+
 .shk-media-hero-wrap--embedded {
   margin-top: 2.25rem;
   margin-bottom: 0.35rem;
@@ -2346,7 +2354,7 @@ html.dark body.shk-campus-body {
 }
 
 .shk-media-hero__title-accent {
-  background: linear-gradient(100deg, #f2c66d 0%, #9b7ae0 55%, #fbecff 100%);
+  background: linear-gradient(100deg, #ffffff 0%, #f7f2ff 55%, #efe6ff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

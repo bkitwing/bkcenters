@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { BreadcrumbSchema, LocalBusinessSchema } from '@/components/StructuredData';
 import { HomeNewsTeaser } from '../HomeMediaTeasers';
 import ShantiShikharClient from '../ShantiShikharClient';
+import { getShkGallery, getShkHeroSlides, getShkServices } from '../logo-data';
 import { getShkNews } from '../news-data';
 import {
   SHK_CANONICAL,
@@ -41,8 +42,13 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function ShantiShikharHomePage() {
-  const news = getShkNews();
+export default async function ShantiShikharHomePage() {
+  const [news, heroSlides, services, gallery] = await Promise.all([
+    getShkNews(),
+    getShkHeroSlides(),
+    getShkServices(),
+    getShkGallery(),
+  ]);
 
   return (
     <>
@@ -60,7 +66,12 @@ export default function ShantiShikharHomePage() {
           { name: SHK_RETREAT_NAME, url: SHK_CANONICAL },
         ]}
       />
-      <ShantiShikharClient newsTeaser={<HomeNewsTeaser news={news.latest} />} />
+      <ShantiShikharClient
+        heroSlides={heroSlides}
+        services={services}
+        gallery={gallery}
+        newsTeaser={<HomeNewsTeaser news={news.latest} />}
+      />
     </>
   );
 }
