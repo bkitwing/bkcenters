@@ -1,19 +1,428 @@
 {
-  "timestamp": "2026-09-17T05:02:37.528Z",
+  "timestamp": "2026-10-16T00:39:24.098Z",
   "summary": {
-    "created": 1,
-    "updated": 0,
+    "created": 7,
+    "updated": 21,
     "deleted": 0
   },
   "created": [
     {
-      "branch_code": "05959",
-      "name": "Loni Balram Nagar",
-      "district": "Ghaziabad",
-      "state": "Uttar Pradesh",
+      "branch_code": "05960",
+      "name": "Pachpadra",
+      "district": "Balotra",
+      "state": "Rajasthan",
+      "region": "India"
+    },
+    {
+      "branch_code": "05961",
+      "name": "Chaukhutiya",
+      "district": "Almora",
+      "state": "Uttarakhand",
+      "region": "India"
+    },
+    {
+      "branch_code": "05962",
+      "name": "Karanprayag",
+      "district": "Chamoli",
+      "state": "Uttarakhand",
+      "region": "India"
+    },
+    {
+      "branch_code": "05963",
+      "name": "Thane Balkum",
+      "district": "Thane",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05964",
+      "name": "Jalkot",
+      "district": "Latur",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05965",
+      "name": "Rajkot Mavdi",
+      "district": "Rajkot",
+      "state": "Gujarat",
+      "region": "India"
+    },
+    {
+      "branch_code": "05966",
+      "name": "Rajpura Baba Deep Singh Colony",
+      "district": "Patiala",
+      "state": "Punjab",
       "region": "India"
     }
   ],
-  "updated": [],
+  "updated": [
+    {
+      "branch_code": "00233",
+      "name": "Bavla (ahmedabad)",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Plot No: 22/1,40, Prapti Bhawan",
+          "to": "Plot No: 22/1, 40, Prapti Bhawan"
+        },
+        {
+          "field": "mobile",
+          "from": "9426708448, 8734994607",
+          "to": "9879387013, 9979610411"
+        }
+      ]
+    },
+    {
+      "branch_code": "00458",
+      "name": "Belur (hassan)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "6360057252",
+          "to": "9591491536"
+        }
+      ]
+    },
+    {
+      "branch_code": "00481",
+      "name": "Maddur",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9480182981",
+          "to": "9739552973"
+        }
+      ]
+    },
+    {
+      "branch_code": "00654",
+      "name": "New Mumbai Nerul",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9322804955",
+          "to": "9322804955, 8108829562"
+        }
+      ]
+    },
+    {
+      "branch_code": "00777",
+      "name": "Rajpura Patel Colony",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Rajpura Town",
+          "to": "Rajpura Patel Colony"
+        },
+        {
+          "field": "slug",
+          "from": "rajpura-town",
+          "to": "rajpura-patel-colony"
+        },
+        {
+          "field": "city",
+          "from": "Rajpura Town",
+          "to": "Rajpura"
+        }
+      ]
+    },
+    {
+      "branch_code": "00863",
+      "name": "Thoothukudi",
+      "changes": [
+        {
+          "field": "latitude",
+          "from": 8.7968024,
+          "to": 8.796257
+        },
+        {
+          "field": "longitude",
+          "from": 78.1130861,
+          "to": 78.113328
+        }
+      ]
+    },
+    {
+      "branch_code": "01507",
+      "name": "Dehra (kangra)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "7018513569, 9805691498",
+          "to": "9805691498, 7018513569"
+        }
+      ]
+    },
+    {
+      "branch_code": "01632",
+      "name": "Dhampur",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9456872355",
+          "to": "8868034117, 9456872355"
+        }
+      ]
+    },
+    {
+      "branch_code": "01799",
+      "name": "Indore Sudama Nagar Sector D",
+      "changes": [
+        {
+          "field": "contact",
+          "from": "",
+          "to": "0731-2798534"
+        }
+      ]
+    },
+    {
+      "branch_code": "02731",
+      "name": "Gadarwara",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 192/3779",
+          "to": "H No: 369, Prabhu Upvan Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Pratibha Colony",
+          "to": "Lakshmi Township"
+        },
+        {
+          "field": "address_line3",
+          "from": "Ward No: 4",
+          "to": "Ward No: 5"
+        },
+        {
+          "field": "latitude",
+          "from": 22.90674,
+          "to": 22.909581
+        },
+        {
+          "field": "longitude",
+          "from": 78.79063,
+          "to": 78.7845
+        }
+      ]
+    },
+    {
+      "branch_code": "03213",
+      "name": "Mohammadabad Gohna",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9454601749",
+          "to": "9305546616"
+        }
+      ]
+    },
+    {
+      "branch_code": "03871",
+      "name": "Bengaluru Kodigehalli",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9886234331",
+          "to": "9381295670"
+        }
+      ]
+    },
+    {
+      "branch_code": "03906",
+      "name": "Konanur",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9036504545",
+          "to": "9686951197"
+        }
+      ]
+    },
+    {
+      "branch_code": "04017",
+      "name": "Shahkot",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "8054602570, 9779622260",
+          "to": "8054602570, 6284740044"
+        }
+      ]
+    },
+    {
+      "branch_code": "04031",
+      "name": "Alur (hassan)",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9739552973",
+          "to": "6360057252"
+        }
+      ]
+    },
+    {
+      "branch_code": "04187",
+      "name": "Bengaluru R T Nagar",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 193, First Floor",
+          "to": "H No: 13, 7th Main Road"
+        },
+        {
+          "field": "address_line2",
+          "from": "9th Cross, Hmt Layout",
+          "to": "Khm Block, Near Gem School"
+        },
+        {
+          "field": "address_line3",
+          "from": "Opp: Poornima Hospital, R.T. Nagar",
+          "to": "R.T. Nagar"
+        },
+        {
+          "field": "latitude",
+          "from": 13.026168,
+          "to": 13.021542
+        },
+        {
+          "field": "longitude",
+          "from": 77.594982,
+          "to": 77.591659
+        }
+      ]
+    },
+    {
+      "branch_code": "04513",
+      "name": "Rajpura Defence Colony",
+      "changes": [
+        {
+          "field": "name",
+          "from": "Rajpura Dharampura Colony",
+          "to": "Rajpura Defence Colony"
+        },
+        {
+          "field": "slug",
+          "from": "rajpura-dharampura-colony",
+          "to": "rajpura-defence-colony"
+        }
+      ]
+    },
+    {
+      "branch_code": "05310",
+      "name": "New Delhi Ashok Nagar",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 6/2, Sadbhawna Bhawan, Ground Floor",
+          "to": "H No: 1/28, Sadbhawna Bhawan, Ground Floor"
+        },
+        {
+          "field": "address_line2",
+          "from": "Block 6, Inner Road Cross",
+          "to": "Block 1, Monday Market Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Ramlila Maindan, Ashok Nagar",
+          "to": "Near Community Center, Ashok Nagar"
+        },
+        {
+          "field": "latitude",
+          "from": 28.6353091,
+          "to": 28.635981
+        },
+        {
+          "field": "longitude",
+          "from": 77.1031041,
+          "to": 77.106204
+        }
+      ]
+    },
+    {
+      "branch_code": "05642",
+      "name": "Vadodara Bhayli Canal Road",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "A Tower, H No: 502, Everest Trinity",
+          "to": "C Tower, H No: 201, Everest Trinity"
+        },
+        {
+          "field": "address_line2",
+          "from": "Sun Pharma Bhayli Canal Road",
+          "to": "Sun Pharma Bhayli Canal Road, Tp-4"
+        },
+        {
+          "field": "address_line3",
+          "from": "",
+          "to": "Opp Iira School"
+        },
+        {
+          "field": "mobile",
+          "from": "6354458519, 9727004567",
+          "to": "9981545601"
+        },
+        {
+          "field": "latitude",
+          "from": 22.275522,
+          "to": 22.275274
+        },
+        {
+          "field": "longitude",
+          "from": 73.133234,
+          "to": 73.133597
+        }
+      ]
+    },
+    {
+      "branch_code": "05863",
+      "name": "Dhaula Kuan",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Khasra No: 433/403/53",
+          "to": "Hadbast No: 158, Sukh Shanti Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Girinagar Road",
+          "to": "Dehradun Road, Near Sanjay Hardware"
+        },
+        {
+          "field": "pincode",
+          "from": "173001",
+          "to": "173031"
+        },
+        {
+          "field": "email",
+          "from": null,
+          "to": "dhaulakuan@bkivv.org"
+        },
+        {
+          "field": "latitude",
+          "from": 30.502899,
+          "to": 30.502226
+        },
+        {
+          "field": "longitude",
+          "from": 77.473888,
+          "to": 77.473805
+        }
+      ]
+    },
+    {
+      "branch_code": "05946",
+      "name": "Nangal Kalan",
+      "changes": [
+        {
+          "field": "pincode",
+          "from": "131029",
+          "to": "131023"
+        }
+      ]
+    }
+  ],
   "deleted": []
 }
