@@ -13,8 +13,15 @@ export const SHK_SLUG = 'shanti-shikhar';
 export const SHK_CANONICAL = 'https://www.brahmakumaris.com/centers/shanti-shikhar';
 export const SHK_RETREAT_NAME = 'Shanti Shikhar Retreat Center';
 
-export const SHK_OG_IMAGE =
-  'https://www.brahmakumaris.com/centers/brahma-kumaris-logo.webp';
+/** Featured / Open Graph images (Strapi CDN). */
+export const SHK_OG_IMAGES = {
+  home: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Home_page_abeef16d7a.png',
+  contact:
+    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Contact_page_53600dd277.png',
+  galleries:
+    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Gallery_e55dc7134e.png',
+  news: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_News_page_ad6441f009.png',
+} as const;
 
 export const SHK_SEO = {
   home: {
@@ -105,6 +112,7 @@ export const SHK_MAPS_URL =
 export const SHK_MAP_EMBED_URL =
   'https://maps.google.com/maps?q=21.1680018,81.7865411&z=16&hl=en&output=embed';
 
+export const SHK_YOUTUBE_HREF = 'https://www.youtube.com/@shantisarovarbrahmakumaris8283';
 export const SHK_MEDITATION_HREF = 'https://www.brahmakumaris.com/meditation/';
 export const SHK_INAUGURATION_HREF =
   'https://www.youtube.com/live/ND8twQVtplw?si=g7IfTa6zXRYEriIk';

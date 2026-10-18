@@ -1,7 +1,7 @@
 import { notoSans } from '@/lib/fonts';
 import { RetreatCampusFooter } from '../_components/RetreatCampusFooter';
 import { CampusBodyScope } from './CampusBodyScope';
-import { SHK_CONTENT } from './content';
+import { SHK_YOUTUBE_HREF } from './content';
 import { getShkLogo } from './logo-data';
 import { ShkHeader } from './ShkHeader';
 import {
@@ -33,8 +33,8 @@ export default async function ShantiShikharLayout({
         enquireHref={SHK_CONTACT_HREF}
         socialLinks={[
           {
-            label: 'Inauguration on YouTube',
-            href: SHK_CONTENT.inauguration.href,
+            label: 'YouTube',
+            href: SHK_YOUTUBE_HREF,
             icon: 'youtube',
           },
         ]}

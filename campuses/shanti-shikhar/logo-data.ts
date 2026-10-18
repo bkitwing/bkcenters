@@ -1,6 +1,6 @@
 /**
  * Shanti Shikhar — Strapi website-section #76.
- * logo | Hero Section (web carousel) | Services offered Section | Photo Gallery Section
+ * logo | Hero Section (web carousel) | About Section | Services offered Section | Photo Gallery Section
  *
  * https://webapp.brahmakumaris.com/admin/content-manager/collection-types/api::website-section.website-section/76
  */
@@ -64,6 +64,7 @@ export type ShkGalleryThumb = {
 type ShkSection = {
   logo: ShkLogo | null;
   heroSlides: ShkHeroSlide[];
+  aboutImage: ShkHeroSlide | null;
   services: ShkService[];
   gallery: ShkGalleryThumb[];
 };
@@ -265,7 +266,13 @@ async function strapiGet(path: string): Promise<unknown | null> {
   }
 }
 
-const EMPTY_SECTION: ShkSection = { logo: null, heroSlides: [], services: [], gallery: [] };
+const EMPTY_SECTION: ShkSection = {
+  logo: null,
+  heroSlides: [],
+  aboutImage: null,
+  services: [],
+  gallery: [],
+};
 
 /** One fetch of website-section 76, shared by the header logo and the home hero. */
 const getShkSection = cache(async (): Promise<ShkSection> => {
@@ -291,6 +298,11 @@ const getShkSection = cache(async (): Promise<ShkSection> => {
     .map((file, index) => mapHeroSlide(file, index))
     .filter((slide): slide is ShkHeroSlide => Boolean(slide));
 
+  const aboutImage =
+    findGallery(sectionType, /^about section$/i)
+      .map((file, index) => mapHeroSlide(file, index))
+      .filter((slide): slide is ShkHeroSlide => Boolean(slide))[0] ?? null;
+
   const services = findGallery(sectionType, /^services offered section$/i)
     .map((file, index) => mapService(file, index))
     .filter((service): service is ShkService => Boolean(service));
@@ -299,12 +311,18 @@ const getShkSection = cache(async (): Promise<ShkSection> => {
     .map((file, index) => mapGalleryThumb(file, index))
     .filter((thumb): thumb is ShkGalleryThumb => Boolean(thumb));
 
-  return { logo: findLogo(sectionType), heroSlides, services, gallery };
+  return { logo: findLogo(sectionType), heroSlides, aboutImage, services, gallery };
 });
 
 export const getShkLogo = cache(async (): Promise<ShkLogo | null> => {
   const section = await getShkSection();
   return section.logo;
+});
+
+/** Portrait beside the home story, from the component titled "About Section". */
+export const getShkAboutImage = cache(async (): Promise<ShkHeroSlide | null> => {
+  const section = await getShkSection();
+  return section.aboutImage;
 });
 
 /** Desktop / web carousel from the component titled "Hero Section". */

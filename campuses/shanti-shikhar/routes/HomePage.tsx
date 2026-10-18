@@ -2,13 +2,13 @@ import { Metadata } from 'next';
 import { BreadcrumbSchema, LocalBusinessSchema } from '@/components/StructuredData';
 import { HomeNewsTeaser } from '../HomeMediaTeasers';
 import ShantiShikharClient from '../ShantiShikharClient';
-import { getShkGallery, getShkHeroSlides, getShkServices } from '../logo-data';
+import { getShkAboutImage, getShkGallery, getShkHeroSlides, getShkServices } from '../logo-data';
 import { getShkNews } from '../news-data';
 import {
   SHK_CANONICAL,
   SHK_CENTER,
   SHK_CONTENT,
-  SHK_OG_IMAGE,
+  SHK_OG_IMAGES,
   SHK_RETREAT_NAME,
   SHK_SEO,
 } from '../content';
@@ -16,6 +16,7 @@ import {
 export const revalidate = 14400;
 
 const { title, description, keywords, ogAlt } = SHK_SEO.home;
+const ogImage = SHK_OG_IMAGES.home;
 
 export function generateMetadata(): Metadata {
   return {
@@ -31,21 +32,22 @@ export function generateMetadata(): Metadata {
       url: SHK_CANONICAL,
       siteName: 'Brahma Kumaris Centers',
       locale: 'en_IN',
-      images: [{ url: SHK_OG_IMAGE, width: 1200, height: 630, alt: ogAlt }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: [SHK_OG_IMAGE],
+      images: [ogImage],
     },
   };
 }
 
 export default async function ShantiShikharHomePage() {
-  const [news, heroSlides, services, gallery] = await Promise.all([
+  const [news, heroSlides, aboutImage, services, gallery] = await Promise.all([
     getShkNews(),
     getShkHeroSlides(),
+    getShkAboutImage(),
     getShkServices(),
     getShkGallery(),
   ]);
@@ -56,7 +58,7 @@ export default async function ShantiShikharHomePage() {
         center={SHK_CENTER}
         pageUrl={SHK_CANONICAL}
         description={SHK_CONTENT.about.paragraphs[0]}
-        image={SHK_OG_IMAGE}
+        image={ogImage}
         omitOpeningHours
       />
       <BreadcrumbSchema
@@ -68,6 +70,7 @@ export default async function ShantiShikharHomePage() {
       />
       <ShantiShikharClient
         heroSlides={heroSlides}
+        aboutImage={aboutImage}
         services={services}
         gallery={gallery}
         newsTeaser={<HomeNewsTeaser news={news.latest} />}

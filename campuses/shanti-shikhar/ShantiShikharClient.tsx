@@ -15,7 +15,7 @@ import { HomeAmbientVideo } from './HomeAmbientVideo';
 import { HomeCoursesCarousel } from './HomeCoursesCarousel';
 import { HomeHeroParticles } from './HomeHeroParticles';
 import { HomeHeroSlideshow, type ShkHomeImage } from './HomeHeroSlideshow';
-import type { ShkGalleryThumb, ShkService } from './logo-data';
+import type { ShkGalleryThumb, ShkHeroSlide, ShkService } from './logo-data';
 
 const c = SHK_CONTENT;
 const INAUGURATION_EMBED = 'https://www.youtube.com/embed/ND8twQVtplw';
@@ -30,12 +30,23 @@ function scrollToId(id: string) {
 function MediaPlaceholder({
   alt,
   label,
+  src,
   className = '',
 }: {
   alt: string;
   label: string;
+  src?: string | null;
   className?: string;
 }) {
+  if (src) {
+    return (
+      <div className={`shk-media ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={alt} />
+      </div>
+    );
+  }
+
   return (
     <div className={`shk-media ${className}`} role="img" aria-label={alt}>
       <div className="absolute inset-0 shk-placeholder-bg" />
@@ -79,12 +90,15 @@ const CHAPTERS = [
 export default function ShantiShikharClient({
   newsTeaser,
   heroSlides = [],
+  aboutImage = null,
   services = [],
   gallery = [],
 }: {
   newsTeaser?: React.ReactNode;
   /** Web carousel from Strapi "Hero Section". */
   heroSlides?: ShkHomeImage[];
+  /** Photo beside the story, from Strapi "About Section". */
+  aboutImage?: ShkHeroSlide | null;
   /** Cards from Strapi "Services offered Section". */
   services?: ShkService[];
   /** Campus pictures from Strapi "Photo Gallery Section". */
@@ -187,7 +201,8 @@ export default function ShantiShikharClient({
             <Reveal className="shk-campus__visual">
               <div className="shk-campus__sticky">
                 <MediaPlaceholder
-                  alt={c.about.media.alt}
+                  src={aboutImage?.srcDesktop || aboutImage?.src}
+                  alt={aboutImage?.alt || c.about.media.alt}
                   label={c.about.media.label}
                   className="shk-campus__photo"
                 />

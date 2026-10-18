@@ -34,9 +34,9 @@ const MODES: {
     icon: Plane,
     stops: [
       {
-        title: 'Nava Raipur Atal Nagar',
-        meta: 'Then a cab to the campus',
-        tip: 'Ask for Shanti Shikhar, Kaya Bandha, Sector 20, Nava Raipur Atal Nagar. The map pin is the campus.',
+        title: 'Swami Vivekananda Airport, Raipur',
+        meta: 'RPR · about 10 km east of Nava Raipur',
+        tip: 'This is the airport for Raipur and Nava Raipur. It was formerly called Mana Airport. A cab from the terminal reaches Kaya Bandha, Sector 20. Ask for Brahma Kumaris Shanti Shikhar.',
       },
     ],
   },
@@ -46,9 +46,14 @@ const MODES: {
     icon: TrainFront,
     stops: [
       {
-        title: 'Raipur',
-        meta: 'Then a cab to Sector 20',
-        tip: 'From Raipur, continue to Kaya Bandha, Sector 20, Nava Raipur Atal Nagar. Tell the driver: Brahma Kumaris Shanti Shikhar.',
+        title: 'Raipur Junction',
+        meta: 'About 25 km from Nava Raipur',
+        tip: 'Most long-distance trains stop here, on the Howrah–Nagpur–Mumbai line. From the station, a cab along the Raipur–Nava Raipur road continues to Sector 20.',
+      },
+      {
+        title: 'CBD Naya Raipur',
+        meta: 'Nava Raipur–Atal Nagar station · Sector 22',
+        tip: 'The local station for Nava Raipur is in nearby Sector 22. Passenger trains have been running since 2025. A short cab from there reaches Kaya Bandha, Sector 20.',
       },
     ],
   },
@@ -58,9 +63,14 @@ const MODES: {
     icon: Bus,
     stops: [
       {
-        title: 'Nava Raipur',
-        meta: 'Local transport',
-        tip: 'Ask to be dropped at Sector 20, Kaya Bandha, Nava Raipur Atal Nagar, pin 492002.',
+        title: 'Bhatagaon bus stand',
+        meta: 'Main stand for Raipur · about 30 km from Sector 19–20',
+        tip: 'Inter-state and intra-state buses use the stand at Bhatagaon. From there, take a cab or the Tatpar bus towards Nava Raipur, then continue to Sector 20.',
+      },
+      {
+        title: 'Tatpar · Ekatm Path',
+        meta: 'Bus link between Raipur and Nava Raipur',
+        tip: 'Tatpar BRTS connects Raipur city with Nava Raipur. The nearest listed stop for Sector 20 is on Ekatm Path, within a kilometre of Kaya Bandha.',
       },
     ],
   },
@@ -71,8 +81,13 @@ const MODES: {
     stops: [
       {
         title: 'Sector 20 · Kaya Bandha',
-        meta: 'Nava Raipur Atal Nagar',
-        tip: 'The campus is at Kaya Bandha, Sector 20. Use the map pin if the driver needs the exact point.',
+        meta: 'Nava Raipur Atal Nagar · 492002',
+        tip: 'The campus is in Kaya Bandha, Sector 20. Capitol Square, the garden in the same sector, is a nearby landmark. Use the map pin for the exact gate.',
+      },
+      {
+        title: 'Sector 19',
+        meta: 'Capital offices, beside Sector 20',
+        tip: 'The capital complex and public offices of Sector 19 sit next to Sector 20. From there, Kaya Bandha is a short local ride.',
       },
     ],
   },

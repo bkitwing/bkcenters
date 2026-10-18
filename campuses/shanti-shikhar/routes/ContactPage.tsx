@@ -30,7 +30,7 @@ import {
   SHK_CONTENT,
   SHK_MAP_EMBED_URL,
   SHK_MAPS_URL,
-  SHK_OG_IMAGE,
+  SHK_OG_IMAGES,
   SHK_RETREAT_NAME,
   SHK_SEO,
 } from '../content';
@@ -40,6 +40,7 @@ export const revalidate = 86400;
 
 const pageUrl = `${SHK_CANONICAL}/contact`;
 const { title, description, keywords, ogAlt } = SHK_SEO.contact;
+const ogImage = SHK_OG_IMAGES.contact;
 
 function mergeCenter(live: Center | null): Center {
   if (!live) return SHK_CENTER;
@@ -75,13 +76,13 @@ export function generateMetadata(): Metadata {
       url: pageUrl,
       siteName: 'Brahma Kumaris Centers',
       locale: 'en_IN',
-      images: [{ url: SHK_OG_IMAGE, width: 1200, height: 630, alt: ogAlt }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: [SHK_OG_IMAGE],
+      images: [ogImage],
     },
   };
 }
