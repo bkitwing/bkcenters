@@ -343,22 +343,37 @@ const POPULATE_NEARBY = [
 
 /**
  * Load all centers with CenterCard-essential fields only.
- * ~5x smaller payload than full populate, uses page size 2000 (~3 API calls instead of 12).
- * Used by the /api/centers/nearby endpoint as fallback.
+ * ~5x smaller payload than full populate, uses page size 2000 (~4 API calls instead of 12).
+ * First page tells us the page count; the rest are fetched in parallel.
+ * Used to build the in-memory nearby index (lib/nearbyIndex.ts).
  */
 export async function loadCentersForNearby(): Promise<Center[]> {
-  let all: StrapiCenterEntry[] = [];
-  let page = 1;
-  while (true) {
-    const res = await strapiGet<StrapiCenterEntry[]>(
-      `centers?${POPULATE_NEARBY}&pagination[page]=${page}&pagination[pageSize]=2000`,
-      { revalidate: 86400, tags: ['centers-nearby'] }
-    );
-    all = all.concat(res.data || []);
-    if (page >= res.meta.pagination.pageCount) break;
-    page++;
-  }
+  const pagePath = (page: number) =>
+    `centers?${POPULATE_NEARBY}&pagination[page]=${page}&pagination[pageSize]=2000`;
+  const cacheOptions = { revalidate: 3600, tags: ['centers-nearby'] };
+
+  const first = await strapiGet<StrapiCenterEntry[]>(pagePath(1), cacheOptions);
+  const pageCount = first.meta.pagination.pageCount;
+  const rest = await Promise.all(
+    Array.from({ length: Math.max(0, pageCount - 1) }, (_, i) =>
+      strapiGet<StrapiCenterEntry[]>(pagePath(i + 2), cacheOptions)
+    )
+  );
+
+  const all = [first, ...rest].flatMap((res) => res.data || []);
   return all.map(transformStrapiCenter);
+}
+
+/**
+ * Centers whose name contains the text (case-insensitive). Used by
+ * /api/centers/search only while the in-memory index is still loading.
+ */
+export async function searchCentersByName(query: string, limit = 20): Promise<Center[]> {
+  const res = await strapiGet<StrapiCenterEntry[]>(
+    `centers?${POPULATE_NEARBY}&filters[name][$containsi]=${encodeURIComponent(query)}&pagination[pageSize]=${limit}`,
+    { revalidate: 3600, tags: ['centers-nearby'] }
+  );
+  return (res.data || []).map(transformStrapiCenter);
 }
 
 /**

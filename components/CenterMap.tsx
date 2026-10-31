@@ -43,7 +43,25 @@ interface CenterMapProps {
   showInfoWindowOnLoad?: boolean;
   selectedCenter?: Center | null;
   userLocation?: { lat: number; lng: number; };
+  /** Tooltip for the user-location marker (default "Your Location") */
+  userLocationLabel?: string;
+  /** Label each center pin with its 1-based position, matching a numbered list */
+  numbered?: boolean;
+  /** branch_code of the list card under the pointer — its pin is enlarged */
+  hoveredCenterCode?: string | null;
+  /** Scroll the page to the matching `center-card-*` element on marker click (default true) */
+  scrollToCardOnSelect?: boolean;
+  /**
+   * When set, auto-zoom runs only when this key changes (e.g. a new search),
+   * not every time more centers are appended; bounds include userLocation.
+   */
+  fitKey?: string;
+  /** Fit bounds to only the first N centers (the closest ones) */
+  fitCount?: number;
+  gestureHandling?: 'cooperative' | 'greedy' | 'auto';
 }
+
+const PIN_PATH = 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z';
 
 const CenterMap: React.FC<CenterMapProps> = ({
   centers,
@@ -58,7 +76,14 @@ const CenterMap: React.FC<CenterMapProps> = ({
   defaultZoom = 5,
   showInfoWindowOnLoad = false,
   selectedCenter: externalSelectedCenter = null,
-  userLocation
+  userLocation,
+  userLocationLabel,
+  numbered = false,
+  hoveredCenterCode = null,
+  scrollToCardOnSelect = true,
+  fitKey,
+  fitCount,
+  gestureHandling,
 }) => {
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
@@ -175,7 +200,12 @@ const CenterMap: React.FC<CenterMapProps> = ({
     let hasValidCoords = false;
     let validCenterCount = 0;
 
-    centers.forEach(center => {
+    // Keyed fits (nearby search) frame the searched point plus the closest centers
+    if (fitKey !== undefined && userLocation) {
+      bounds.extend(userLocation);
+    }
+
+    (fitCount ? centers.slice(0, fitCount) : centers).forEach(center => {
       // Get coordinates using our helper function
       const coords = getValidCoordinates(center);
       
@@ -226,19 +256,23 @@ const CenterMap: React.FC<CenterMapProps> = ({
         }
       }, 100);
     }
-  }, [mapRef, centers, defaultZoom, getValidCoordinates]);
+  }, [mapRef, centers, defaultZoom, getValidCoordinates, fitKey, fitCount, userLocation]);
 
-  // Apply auto-zoom when map and centers are available
+  // Apply auto-zoom when map and centers are available.
+  // With fitKey, only refit when the key changes (appending results keeps the view).
+  const lastFitKeyRef = useRef<string | null>(null);
   useEffect(() => {
     if (autoZoom && mapRef && centers.length > 0 && markersReady) {
+      if (fitKey !== undefined && lastFitKeyRef.current === fitKey) return;
       // Add a slight delay to allow markers to fully render
       const timeout = setTimeout(() => {
         fitBounds();
+        if (fitKey !== undefined) lastFitKeyRef.current = fitKey;
       }, 200);
-      
+
       return () => clearTimeout(timeout);
     }
-  }, [autoZoom, mapRef, centers, fitBounds, markersReady]);
+  }, [autoZoom, mapRef, centers, fitBounds, markersReady, fitKey]);
 
   // Recover from container size changes (e.g. window resize, orientation change,
   // or being revealed after a show/hide toggle). Without this, a map that was
@@ -249,7 +283,8 @@ const CenterMap: React.FC<CenterMapProps> = ({
     const handleResize = () => {
       const currentCenter = mapRef.getCenter();
       google.maps.event.trigger(mapRef, 'resize');
-      if (autoZoom && centers.length > 0) {
+      // Keyed fits keep the user's pan/zoom (mobile URL-bar resizes fire constantly)
+      if (autoZoom && centers.length > 0 && fitKey === undefined) {
         fitBounds();
       } else if (currentCenter) {
         mapRef.setCenter(currentCenter);
@@ -258,7 +293,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [mapRef, autoZoom, centers, fitBounds]);
+  }, [mapRef, autoZoom, centers, fitBounds, fitKey]);
 
   // Auto-select center if we're in highlight mode and showInfoWindowOnLoad is true
   useEffect(() => {
@@ -358,7 +393,9 @@ const CenterMap: React.FC<CenterMapProps> = ({
     CenterLocatorAnalytics.mapInteraction('marker_click', center.name);
     
     // Find and highlight the corresponding card
-    const centerElement = document.getElementById(`center-card-${center.branch_code}`);
+    const centerElement = scrollToCardOnSelect
+      ? document.getElementById(`center-card-${center.branch_code}`)
+      : null;
     if (centerElement) {
       // First, check if the Nearby Centers section is collapsed and expand it
       const nearbyCentersButton = document.querySelector('[aria-controls="nearby-centers-content"]') as HTMLButtonElement;
@@ -501,6 +538,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
     map.addListener('dragend', () => {
       CenterLocatorAnalytics.mapInteraction('pan');
     });
+
     
     // Force redraw after map loads
     setTimeout(() => {
@@ -514,6 +552,23 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
   // Customize marker icons for district view or highlighted center
   const getMarkerIcon = (center: Center) => {
+    // Numbered result pins (nearby search) — the label sits in the pin head
+    if (numbered && !distanceMeasurementMode && !center.is_state_summary && !center.is_district_summary) {
+      const isActive =
+        selectedCenter?.branch_code === center.branch_code ||
+        hoveredCenterCode === center.branch_code;
+      return {
+        path: PIN_PATH,
+        fillColor: isActive ? '#6B4F0E' : '#B8860B',
+        fillOpacity: 1,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2,
+        scale: isActive ? 1.35 : 1.1,
+        labelOrigin: new google.maps.Point(0, -30),
+      };
+    }
+
+
     // For distance measurement mode
     if (distanceMeasurementMode) {
       if (startPoint?.branch_code === center.branch_code) {
@@ -620,7 +675,16 @@ const CenterMap: React.FC<CenterMapProps> = ({
   };
 
   // Custom label for district markers
-  const getMarkerLabel = (center: Center) => {
+  const getMarkerLabel = (center: Center, index: number) => {
+    if (numbered && !center.is_state_summary && !center.is_district_summary) {
+      return {
+        text: String(index + 1),
+        color: 'white',
+        fontSize: index >= 99 ? '9px' : '11px',
+        fontWeight: 'bold'
+      };
+    }
+
     if (isDistrictView) {
       return {
         text: `${center.district_total || ''}`,
@@ -736,10 +800,11 @@ const CenterMap: React.FC<CenterMapProps> = ({
               maxZoom: 18,
               minZoom: 5,
               styles: isDark ? darkMapStyles : [],
+              ...(gestureHandling ? { gestureHandling } : {}),
             }}
             onLoad={onMapLoad}
           >
-            {markersReady && centers.map((center) => {
+            {markersReady && centers.map((center, index) => {
               // Get coordinates (either original or geocoded)
               const coords = getValidCoordinates(center);
               
@@ -750,18 +815,21 @@ const CenterMap: React.FC<CenterMapProps> = ({
               if (isNaN(lat) || isNaN(lng)) return null;
               
               const isSelected = selectedCenter?.branch_code === center.branch_code;
-              
+              const isHovered = hoveredCenterCode === center.branch_code;
+
               return (
                 <Marker
                   key={center.branch_code}
                   position={{ lat, lng }}
                   onClick={() => handleMarkerClick(center)}
                   icon={getMarkerIcon(center)}
-                  label={getMarkerLabel(center)}
-                  title={center.name}
+                  label={getMarkerLabel(center, index)}
+                  title={numbered ? `${index + 1}. ${center.name}` : center.name}
                   animation={isSelected ? google.maps.Animation.BOUNCE : null}
                   onLoad={(marker: google.maps.Marker) => registerMarker(center.branch_code, marker)}
-                  zIndex={isSelected ? 1000 : undefined}
+                  zIndex={
+                    isSelected ? 1000 : isHovered ? 999 : numbered ? centers.length - index : undefined
+                  }
                 >
                   {/* InfoWindow disabled as per requirements */}
                 </Marker>
@@ -780,7 +848,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
                   strokeWeight: 2,
                   scale: 8
                 }}
-                title="Your Location"
+                title={userLocationLabel || "Your Location"}
                 zIndex={2000} // Higher than other markers
               />
             )}

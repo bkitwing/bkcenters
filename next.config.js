@@ -15,6 +15,8 @@ const nextConfig = {
   assetPrefix: isProd ? "https://www.brahmakumaris.com/centers" : "",
   experimental: {
     strictNextHead: true,
+    // Enables instrumentation.ts (preloads the center index at server start)
+    instrumentationHook: true,
   },
   webpack(config) {
     config.module.rules.push({

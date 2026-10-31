@@ -154,6 +154,20 @@ body {
   display: none;
 }
 
+/* Location/center search box is type="search": hide the browser's own clear (x)
+   and decoration — SearchBar draws its own clear button */
+.bk-search-input::-webkit-search-cancel-button,
+.bk-search-input::-webkit-search-decoration,
+.bk-search-input::-webkit-search-results-button,
+.bk-search-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+.bk-search-input::-ms-clear {
+  display: none;
+}
+
 /* ─── Safe area padding for iOS/Android (notch, home indicator, side insets) ─── */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);

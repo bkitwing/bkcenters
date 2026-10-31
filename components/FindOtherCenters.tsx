@@ -19,7 +19,7 @@ export default function FindOtherCenters() {
         <span>Find another center</span>
       </div>
       <SearchBar
-        placeholder="Search city, area, or pincode…"
+        placeholder="City, area, pincode or center name…"
         disableVoiceInput
         onSearchResult={(lat, lng, address) => {
           router.push(

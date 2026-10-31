@@ -1,22 +1,22 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
 import SearchBar from "@/components/SearchBar";
-import CenterCard from "@/components/CenterCard";
-import CallNowButton from "@/components/CallNowButton";
+import NearbyResultCard, { NearbyCenter, formatDistanceLabel } from "@/components/NearbyResultCard";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
+import { useGoogleMaps } from "@/lib/useGoogleMaps";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
-import { MapPin, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, ExternalLink, Navigation, Compass, ArrowRight, SlidersHorizontal, Phone } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, ExternalLink, Navigation, Compass, ArrowRight, Share2, Map as MapIcon, List, Check, RotateCw, Loader2 } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
 import { districtLevelLabel } from '@/lib/countryUtils';
 
 const CenterMap = dynamic(() => import('@/components/CenterMap'), {
   ssr: false,
-  loading: () => <div className="h-full w-full bg-neutral-100 rounded-lg animate-pulse" />,
+  loading: () => <div className="h-full w-full bg-neutral-100 dark:bg-neutral-800 rounded-lg animate-pulse" />,
 });
 
 // Declare the google namespace globally
@@ -33,14 +33,6 @@ type StateSummary = {
 };
 
 type SortOption = "alpha" | "centers";
-type ViewMode = "list" | "map";
-
-interface MapRef extends HTMLDivElement {
-  map?: google.maps.Map;
-}
-
-const defaultZoom = 12;
-const markers = new Map<string, google.maps.Marker>();
 
 // Type for pre-computed state map markers (lightweight, one per state)
 type StateMapMarker = {
@@ -66,287 +58,325 @@ interface HomePageClientProps {
   retreatCentersCount: number;
 }
 
+type NearbyPage = { data: NearbyCenter[]; total: number; nearest: NearbyCenter | null };
+type ResultsStatus = "idle" | "loading" | "ready" | "error";
+
+const PAGE_SIZE = 20;
+// Results load automatically while scrolling up to this many; after that a
+// "Show more" button keeps the footer reachable.
+const AUTO_LOAD_MAX = 60;
+const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
+const DEFAULT_RADIUS = 50;
+const CURRENT_LOCATION_LABEL = "Your Current Location";
+function getBasePath(): string {
+  return typeof window !== 'undefined' && window.location.pathname.startsWith('/centers')
+    ? '/centers'
+    : '';
+}
+
+function parseCoord(value: string | null): number | null {
+  if (value === null || value.trim() === '') return null;
+  const n = parseFloat(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** "Koramangala, Bengaluru, Karnataka, India" → "Koramangala, Bengaluru" */
+function shortPlaceName(address: string): string {
+  return address.split(',').map((part) => part.trim()).filter(Boolean).slice(0, 2).join(', ');
+}
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const update = () => setMatches(mql.matches);
+    update();
+    mql.addEventListener('change', update);
+    return () => mql.removeEventListener('change', update);
+  }, [query]);
+  return matches;
+}
+
+/**
+ * Reports the URL query string to the parent.
+ * Isolated in its own Suspense boundary: useSearchParams() on a statically
+ * rendered page client-renders everything up to the nearest Suspense, which
+ * previously left the production HTML with only a loading skeleton (no h1,
+ * no region/state links for search engines).
+ */
+function SearchParamsListener({ onChange }: { onChange: (queryString: string) => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    onChange(searchParams.toString());
+  }, [searchParams, onChange]);
+  return null;
+}
+
+function ResultSkeleton() {
+  return (
+    <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-4 animate-pulse">
+      <div className="flex gap-3">
+        <div className="h-7 w-7 rounded-full bg-neutral-200 dark:bg-neutral-700" />
+        <div className="flex-1 space-y-2">
+          <div className="flex justify-between gap-4">
+            <div className="h-4 w-1/2 rounded bg-neutral-200 dark:bg-neutral-700" />
+            <div className="h-4 w-12 rounded bg-neutral-200 dark:bg-neutral-700" />
+          </div>
+          <div className="h-3 w-5/6 rounded bg-neutral-100 dark:bg-neutral-700/60" />
+          <div className="flex gap-2 pt-2">
+            <div className="h-10 flex-1 rounded-xl bg-neutral-100 dark:bg-neutral-700/60" />
+            <div className="h-10 flex-1 rounded-xl bg-neutral-100 dark:bg-neutral-700/60" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HomePageClient({
   initialStatesSummary,
   initialStateMapMarkers,
   initialRegionDetails,
   initialRegionToStates,
   totalCenters,
-  retreatCentersCount,
 }: HomePageClientProps) {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
-  const [address, setAddress] = useState<string>("");
-  const [userLocation, setUserLocation] = useState<
-    { lat: number; lng: number } | undefined
-  >(undefined);
-  const [nearestCenters, setNearestCenters] = useState<
-    (Center & { distance?: number })[]
-  >([]);
-  const [allNearestCenters, setAllNearestCenters] = useState<
-    (Center & { distance?: number })[]
-  >([]);
-  
+  const { isLoaded: mapsLoaded } = useGoogleMaps();
+
   // Use initial data from server (lightweight - no full centers array)
-  const [statesSummary] = useState<StateSummary[]>(initialStatesSummary);
-  const [stateMapMarkers] = useState<StateMapMarker[]>(initialStateMapMarkers);
-  const [regionDetails] = useState<{ name: string; stateCount: number; centerCount: number }[]>(initialRegionDetails);
-  const [regionToStates] = useState<RegionStateMapping>(initialRegionToStates);
-  
-  // Nearby fetch abort controller ref
-  const nearbyAbortRef = useRef<AbortController | null>(null);
-  
+  const statesSummary = initialStatesSummary;
+  const stateMapMarkers = initialStateMapMarkers;
+  const regionDetails = initialRegionDetails;
+  const regionToStates = initialRegionToStates;
+
   const [sortBy, setSortBy] = useState<SortOption>("centers");
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
-  // Collapsible distance control (kept out of the way until tapped)
-  const [showDistanceControl, setShowDistanceControl] = useState(false);
-  const [regionViewMode, setRegionViewMode] = useState<ViewMode>("list");
-  const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [showAllRegions, setShowAllRegions] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [maxDistance, setMaxDistance] = useState<number>(50);
-  const [displayLimit, setDisplayLimit] = useState<number>(10);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const resultsContainerRef = useRef<HTMLDivElement>(null);
-  const searchResultsRef = useRef<HTMLDivElement>(null);
-  const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
-  const mapRef = useRef<MapRef>(null);
   const regionMapRef = useRef<HTMLDivElement>(null);
 
-  // Convert pre-computed state map markers to Center-like objects for the CenterMap component
-  // These are lightweight markers (one per state) pre-computed on the server
-  const stateMapMarkersForMap = stateMapMarkers.map((marker) => ({
-    name: marker.name,
-    slug: '',
-    state: marker.state,
-    region: marker.region,
-    coords: marker.coords,
-    description: marker.description,
-    summary: marker.summary,
-    district_total: marker.centerCount,
-    is_district_summary: true,
-    is_state_summary: true,
-    branch_code: `state-${marker.state.toLowerCase().replace(/\s+/g, '-')}`,
-  })) as Center[];
+  // ----- Search state lives in the URL (shareable, back/forward work) -----
+  const [queryString, setQueryString] = useState<string | null>(null);
+  const params = useMemo(() => new URLSearchParams(queryString ?? ''), [queryString]);
+  const lat = parseCoord(params.get('lat'));
+  const lng = parseCoord(params.get('lng'));
+  const hasSearch = lat !== null && lng !== null;
+  const address = params.get('address') ?? '';
+  const textQuery = params.get('search');
+  const radiusParam = Number(params.get('r'));
+  const radius = RADIUS_OPTIONS.includes(radiusParam) ? radiusParam : DEFAULT_RADIUS;
+  const isCurrentLocation = address === CURRENT_LOCATION_LABEL || params.get('src') === 'gps';
+  const placeLabel = isCurrentLocation ? 'you' : shortPlaceName(address) || 'this location';
+  // Distances are from the user only when we used their real location
+  const closestLabel = isCurrentLocation ? 'Closest to you' : 'Nearest';
 
-  // Handle URL params on mount
-  useEffect(() => {
-    const latParam = searchParams.get("lat");
-    const lngParam = searchParams.get("lng");
-    const addressParam = searchParams.get("address");
+  const userLocation = useMemo(
+    () => (lat !== null && lng !== null ? { lat, lng } : undefined),
+    [lat, lng]
+  );
 
-    if (latParam && lngParam) {
-      setLat(parseFloat(latParam));
-      setLng(parseFloat(lngParam));
-    }
+  // ----- Results -----
+  const [results, setResults] = useState<NearbyCenter[]>([]);
+  const [total, setTotal] = useState(0);
+  const [nearestOutside, setNearestOutside] = useState<NearbyCenter | null>(null);
+  const [status, setStatus] = useState<ResultsStatus>("idle");
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [selectedCenter, setSelectedCenter] = useState<NearbyCenter | null>(null);
+  const [hoveredCode, setHoveredCode] = useState<string | null>(null);
+  const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
+  const [locating, setLocating] = useState(false);
+  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
+  const [searchError, setSearchError] = useState<string | null>(null);
 
-    if (addressParam) {
-      setAddress(addressParam);
-    }
-  }, [searchParams]);
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const responseCache = useRef(new Map<string, NearbyPage>());
+  const searchKey = hasSearch ? `${lat},${lng},${radius}` : '';
+  const searchKeyRef = useRef(searchKey);
+  searchKeyRef.current = searchKey;
+  const locationKeyRef = useRef('');
+  const mapSectionRef = useRef<HTMLDivElement>(null);
 
-  // Fetch nearest centers from server-side API (no client-side distance calc)
-  useEffect(() => {
-    if (!lat || !lng) return;
-
-    // Abort any in-flight request
-    nearbyAbortRef.current?.abort();
-    const controller = new AbortController();
-    nearbyAbortRef.current = controller;
-
-    async function fetchNearby() {
-      setLoading(true);
-      try {
-        const basePath = typeof window !== 'undefined' && window.location.pathname.startsWith('/centers')
-          ? '/centers'
-          : '';
-        const res = await fetch(
-          `${basePath}/api/centers/nearby?lat=${lat}&lng=${lng}&maxDistance=150&limit=50`,
-          { signal: controller.signal }
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        const results: (Center & { distance?: number })[] = json.data || [];
-
-        setAllNearestCenters(results);
-
-        const filtered = results.filter(
-          (c) => typeof c.distance === "number" && c.distance <= maxDistance
-        );
-        setNearestCenters(filtered.slice(0, 10));
-        setDisplayLimit(10);
-      } catch (error: any) {
-        if (error.name !== 'AbortError') {
-          console.error("Error fetching nearby centers:", error);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+  const updateUrl = useCallback(
+    (changes: Record<string, string | null>, mode: 'push' | 'replace' = 'push') => {
+      const next = new URLSearchParams(window.location.search);
+      for (const [key, value] of Object.entries(changes)) {
+        if (value === null) next.delete(key);
+        else next.set(key, value);
       }
+      const qs = next.toString();
+      // Native history API: Next.js (14.1+) keeps useSearchParams in sync, and
+      // unlike router.push this skips a server round trip for the page payload.
+      window.history[mode === 'push' ? 'pushState' : 'replaceState'](
+        null,
+        '',
+        `${window.location.pathname}${qs ? `?${qs}` : ''}`
+      );
+      setQueryString(qs);
+    },
+    []
+  );
+
+  const nearbyUrl = useCallback(
+    (offset: number) =>
+      `${getBasePath()}/api/centers/nearby?lat=${lat}&lng=${lng}&radius=${radius}&offset=${offset}&limit=${PAGE_SIZE}`,
+    [lat, lng, radius]
+  );
+
+  const fetchNearby = useCallback(async (url: string, signal?: AbortSignal): Promise<NearbyPage> => {
+    const cached = responseCache.current.get(url);
+    if (cached) return cached;
+    const res = await fetch(url, { signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    const data: NearbyCenter[] = json.data || [];
+    const page: NearbyPage = {
+      data,
+      total: typeof json.total === 'number' ? json.total : data.length,
+      nearest: json.nearest ?? null,
+    };
+    responseCache.current.set(url, page);
+    return page;
+  }, []);
+
+  // First page whenever the location or radius changes
+  useEffect(() => {
+    if (!hasSearch) {
+      setResults([]);
+      setTotal(0);
+      setNearestOutside(null);
+      setStatus("idle");
+      return;
     }
 
-    fetchNearby();
+    // New place → clear the old list; radius change → keep it visible while loading
+    const locationKey = `${lat},${lng}`;
+    if (locationKeyRef.current !== locationKey) {
+      locationKeyRef.current = locationKey;
+      setResults([]);
+      setSelectedCenter(null);
+    }
+
+    const controller = new AbortController();
+    setStatus("loading");
+    fetchNearby(nearbyUrl(0), controller.signal)
+      .then((page) => {
+        if (controller.signal.aborted) return;
+        setResults(page.data);
+        setTotal(page.total);
+        setNearestOutside(page.nearest);
+        setStatus("ready");
+      })
+      .catch((error) => {
+        if (error?.name === 'AbortError') return;
+        console.error("Error fetching nearby centers:", error);
+        setStatus("error");
+      });
 
     return () => controller.abort();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lat, lng]);
+  }, [hasSearch, lat, lng, nearbyUrl, fetchNearby, retryCount]);
 
-  // Re-filter when maxDistance slider changes (no new API call)
+  const hasMore = status === "ready" && results.length < total;
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    const keyAtStart = searchKeyRef.current;
+    setLoadingMore(true);
+    try {
+      const page = await fetchNearby(nearbyUrl(results.length));
+      if (searchKeyRef.current !== keyAtStart) return; // a new search started meanwhile
+      setResults((prev) => {
+        const seen = new Set(prev.map((c) => c.branch_code));
+        return [...prev, ...page.data.filter((c) => !seen.has(c.branch_code))];
+      });
+    } catch (error) {
+      console.error("Error loading more centers:", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, fetchNearby, nearbyUrl, results.length]);
+
+  // Auto-load while scrolling (first AUTO_LOAD_MAX results)
   useEffect(() => {
-    if (allNearestCenters.length === 0) return;
-    const filtered = allNearestCenters.filter(
-      (c) => typeof c.distance === "number" && c.distance <= maxDistance
+    if (!hasMore || results.length >= AUTO_LOAD_MAX) return;
+    const sentinel = document.getElementById("lazy-load-sentinel");
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMore();
+      },
+      { root: null, rootMargin: "400px", threshold: 0 }
     );
-    setNearestCenters(filtered.slice(0, 10));
-    setDisplayLimit(10);
-  }, [maxDistance, allNearestCenters]);
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, results.length, loadMore, mobileView]);
 
-  // Intersection observer for lazy loading (viewport scroll, not inner box)
+  // ?search=<text> (WebSite SearchAction / deep links): geocode the text once Maps is ready
   useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: "200px",
-      threshold: 0.1,
-    };
-
-    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && !loadingMore) {
-        const filteredCenters = allNearestCenters.filter(
-          (c) => typeof c.distance === "number" && c.distance <= maxDistance
-        );
-
-        if (nearestCenters.length < filteredCenters.length) {
-          setLoadingMore(true);
-
-          const nextBatchSize = 10;
-          const nextCenters = [
-            ...nearestCenters,
-            ...filteredCenters.slice(
-              nearestCenters.length,
-              nearestCenters.length + nextBatchSize
-            ),
-          ];
-
-          setNearestCenters(nextCenters);
-          setLoadingMore(false);
+    if (!textQuery || hasSearch || !mapsLoaded || !window.google?.maps?.Geocoder) return;
+    setSearchError(null);
+    new window.google.maps.Geocoder().geocode(
+      { address: textQuery, region: 'in' },
+      (geoResults: any[] | null, geoStatus: string) => {
+        if (geoStatus === 'OK' && geoResults?.[0]?.geometry?.location) {
+          const loc = geoResults[0].geometry.location;
+          CenterLocatorAnalytics.searchCenters(textQuery, 0, 'text');
+          updateUrl(
+            { lat: String(loc.lat()), lng: String(loc.lng()), address: geoResults[0].formatted_address, search: null, src: null },
+            'replace'
+          );
+        } else {
+          setSearchError(`We couldn't find “${textQuery}”. Try a nearby city, area or pincode.`);
         }
       }
-    };
-
-    const observer = new IntersectionObserver(handleIntersect, options);
-
-    const sentinel = document.getElementById("lazy-load-sentinel");
-    if (sentinel) {
-      observer.observe(sentinel);
-    }
-
-    return () => {
-      if (sentinel) {
-        observer.unobserve(sentinel);
-      }
-      observer.disconnect();
-    };
-  }, [nearestCenters, allNearestCenters, maxDistance, loadingMore]);
-
-  // Handle sort change
-  const handleSortChange = (option: SortOption) => {
-    setSortBy(option);
-    CenterLocatorAnalytics.useFilter('sort', option);
-  };
-
-  // Handle view mode change
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-  };
-
-  // Handle region view mode change
-  const handleRegionViewModeChange = (mode: ViewMode) => {
-    setRegionViewMode(mode);
-  };
-
-  // Handle region selection
-  const handleRegionSelect = (regionName: string) => {
-    const newActiveRegion = activeRegion === regionName ? null : regionName;
-    setActiveRegion(newActiveRegion);
-    
-    if (newActiveRegion) {
-      CenterLocatorAnalytics.useFilter('region', regionName);
-    }
-  };
-
-  // Get sorted states based on sort option
-  const getSortedStates = (): StateSummary[] => {
-    if (sortBy === "alpha") {
-      return [...statesSummary].sort((a, b) => a.state.localeCompare(b.state));
-    } else {
-      return [...statesSummary].sort((a, b) => b.centerCount - a.centerCount);
-    }
-  };
-
-  // Function to scroll to search results
-  const scrollToSearchResults = useCallback(() => {
-    if (searchResultsRef.current) {
-      searchResultsRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, []);
+    );
+  }, [textQuery, hasSearch, mapsLoaded, updateUrl]);
 
   // Handle search result from SearchBar component
   const handleSearchResult = (
     latitude: number,
     longitude: number,
-    searchedAddress: string
+    searchedAddress: string,
+    options?: { fromGps?: boolean }
   ) => {
-    setLat(latitude);
-    setLng(longitude);
-    setAddress(searchedAddress);
-
-    if (searchedAddress === "Your Current Location") {
-      setUserLocation({ lat: latitude, lng: longitude });
-    } else {
-      setUserLocation(undefined);
-    }
-
-    router.push(
-      `/?lat=${latitude}&lng=${longitude}&address=${encodeURIComponent(
-        searchedAddress
-      )}`
-    );
-
-    setTimeout(scrollToSearchResults, 100);
+    setSearchError(null);
+    updateUrl({
+      lat: String(latitude),
+      lng: String(longitude),
+      address: searchedAddress,
+      search: null,
+      src: options?.fromGps ? 'gps' : null,
+    });
+    window.scrollTo({ top: 0 });
   };
 
   // Handle location button click
   const handleCurrentLocationClick = () => {
     if (navigator.geolocation) {
+      setLocating(true);
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          
+
           try {
             const response = await fetch(
               `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
             );
             const data = await response.json();
-            
+
             if (data.results && data.results[0]) {
               const locationName = data.results[0].formatted_address;
-              handleSearchResult(latitude, longitude, locationName);
+              handleSearchResult(latitude, longitude, locationName, { fromGps: true });
             } else {
-              handleSearchResult(latitude, longitude, "Your Current Location");
+              handleSearchResult(latitude, longitude, CURRENT_LOCATION_LABEL, { fromGps: true });
             }
           } catch (error) {
             console.error('Error getting location name:', error);
-            handleSearchResult(latitude, longitude, "Your Current Location");
+            handleSearchResult(latitude, longitude, CURRENT_LOCATION_LABEL, { fromGps: true });
+          } finally {
+            setLocating(false);
           }
         },
         (error) => {
+          setLocating(false);
           console.error("Error getting location:", error);
           alert(
             "Could not get your current location. Please try the search box instead."
@@ -367,144 +397,87 @@ export default function HomePageClient({
 
   // Handle clear search
   const handleClearSearch = () => {
-    setLat(null);
-    setLng(null);
-    setAddress("");
-    setUserLocation(undefined);
-    setNearestCenters([]);
-    setAllNearestCenters([]);
-    router.push("/");
+    setSearchError(null);
+    updateUrl({ lat: null, lng: null, address: null, r: null, src: null, search: null });
   };
 
-  // Scroll the page to a center card and highlight it (map marker → list sync)
-  const scrollToCenterCard = useCallback((branchCode: string) => {
-    const centerElement = document.getElementById(`center-card-${branchCode}`);
-    if (centerElement) {
-      centerElement.scrollIntoView({ behavior: "smooth", block: "center" });
-      centerElement.classList.add("highlight-card");
-      setTimeout(() => centerElement.classList.remove("highlight-card"), 2000);
-    }
-  }, []);
+  const handleRadiusChange = (value: number) => {
+    if (value === radius) return;
+    CenterLocatorAnalytics.useFilter('distance', `${value}km`);
+    updateUrl({ r: value === DEFAULT_RADIUS ? null : String(value) }, 'replace');
+  };
 
-  const getCenterMapsUrl = useCallback((center: Center) => {
-    const addr = center.address
-      ? [center.address.line1, center.address.city, center.address.pincode].filter(Boolean).join(", ")
-      : "";
-    if (center.coords && center.coords.length === 2 && center.coords[0] && center.coords[1]) {
-      return `https://www.google.com/maps/dir/?api=1&destination=${center.coords[0]},${center.coords[1]}`;
-    }
-    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`;
-  }, []);
+  // City page for the nearest result — "see every center in this city"
+  const cityPage = results[0]?.district && results[0]?.state
+    ? {
+        name: results[0].district,
+        href: formatCenterUrl(results[0].region || 'INDIA', results[0].state, results[0].district),
+      }
+    : null;
 
-  // Handle center selection on map — always scroll list to the matching card
+  const handleShareResults = async () => {
+    const url = window.location.href;
+    const title = `Brahma Kumaris meditation centers near ${placeLabel === 'you' ? 'me' : placeLabel}`;
+    try {
+      if (typeof navigator.share === 'function') {
+        await navigator.share({ title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setShareState('copied');
+        setTimeout(() => setShareState('idle'), 2000);
+      }
+    } catch {
+      // Share sheet dismissed — nothing to do
+    }
+  };
+
+  // Handle center selection on the map
   const handleCenterSelect = (center: Center) => {
-    setSelectedCenter(center);
-    CenterLocatorAnalytics.viewCenter(center);
-
-    if (nearestCenters.some((c) => c.branch_code === center.branch_code)) {
-      scrollToCenterCard(center.branch_code);
-    }
-
     if (center.is_state_summary && center.name) {
+      CenterLocatorAnalytics.viewCenter(center);
       const region = center.region || "INDIA";
       router.push(formatCenterUrl(region, center.name));
+      return;
     }
-  };
-
-  // Handle card click — highlight on map
-  const handleCardClick = (center: Center) => {
-    setSelectedCenter(center);
+    setSelectedCenter(center as NearbyCenter);
     CenterLocatorAnalytics.viewCenter(center);
+  };
 
-    if (center.coords && center.coords.length === 2) {
-      const [lat, lng] = center.coords.map(parseFloat);
+  // Card click (desktop) — highlight its pin and pan the map to it
+  const handleCardSelect = (center: NearbyCenter) => {
+    setSelectedCenter(center);
+  };
 
-      if (!isNaN(lat) && !isNaN(lng) && mapRef.current) {
-        const centerElement = document.getElementById(`center-card-${center.branch_code}`);
-        if (centerElement) {
-          centerElement.classList.add("highlight-card");
-          setTimeout(() => centerElement.classList.remove("highlight-card"), 1500);
-        }
-
-        const marker = markers.get(center.branch_code);
-        if (marker) {
-          marker.setAnimation(google.maps.Animation.BOUNCE);
-          setTimeout(() => marker.setAnimation(null), 1500);
-          mapRef.current.map?.panTo({ lat, lng });
-          const currentZoom = mapRef.current.map?.getZoom() || defaultZoom;
-          if (currentZoom < 14) {
-            mapRef.current.map?.setZoom(14);
-          }
-        }
+  const switchMobileView = (view: 'list' | 'map') => {
+    setMobileView(view);
+    if (view === 'map' && !selectedCenter && results[0]) {
+      setSelectedCenter(results[0]);
+    }
+    requestAnimationFrame(() => {
+      if (view === 'map') {
+        mapSectionRef.current?.scrollIntoView({ block: 'start' });
+      } else {
+        const card = selectedCenter && document.getElementById(`center-card-${selectedCenter.branch_code}`);
+        if (card) card.scrollIntoView({ block: 'center' });
+        else window.scrollTo({ top: 0 });
       }
-    }
+    });
   };
 
-  // Helper function to get region for a state from loaded data
-  const getRegionForStateLocal = (stateName: string): string => {
-    // First check the region to states mapping (most reliable)
-    for (const [region, data] of Object.entries(regionToStates)) {
-      if (data.states[stateName]) {
-        return region;
-      }
-    }
-
-    // Fallback: check state map markers (pre-computed on server)
-    const stateMarker = stateMapMarkers.find((m) => m.state === stateName);
-    if (stateMarker?.region) {
-      return stateMarker.region;
-    }
-
-    return "INDIA";
+  const selectedIndex = selectedCenter
+    ? results.findIndex((c) => c.branch_code === selectedCenter.branch_code)
+    : -1;
+  const floatingCenter = selectedIndex >= 0 ? results[selectedIndex] : results[0];
+  const floatingIndex = selectedIndex >= 0 ? selectedIndex : 0;
+  const stepFloating = (delta: number) => {
+    const next = results[floatingIndex + delta];
+    if (next) setSelectedCenter(next);
   };
 
-  // Component for displaying statistics summary
-  const StatsSummary = () => {
-    return (
-      <div className="stats-bar bg-white p-4 rounded-lg shadow-md mb-6">
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
-          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
-            <div className="stat-value text-primary text-lg sm:text-xl font-bold">
-              {totalCenters.toLocaleString()}
-            </div>
-            <div className="stat-label text-neutral-600 text-xs sm:text-sm">
-              Meditation Centers
-            </div>
-          </div>
-          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
-            <div className="stat-value text-accent text-lg sm:text-xl font-bold">
-              36
-            </div>
-            <div className="stat-label text-neutral-600 text-xs sm:text-sm">
-              In States & UTs
-            </div>
-          </div>
-          <div className="stat bg-neutral-50 p-3 rounded-lg text-center flex flex-col justify-center items-center min-h-[80px]">
-            <Link
-              href="/retreat"
-              className="hover:opacity-90 transition-opacity"
-            >
-              <div className="stat-value text-spirit-gold-500 text-lg sm:text-xl font-bold">
-                {retreatCentersCount}
-              </div>
-              <div className="stat-label text-neutral-600 text-xs sm:text-sm hover:text-primary-focus">
-                HQ Campuses
-              </div>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Handle distance slider change
-  const handleDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value)) {
-      setMaxDistance(value);
-      CenterLocatorAnalytics.useFilter('distance', `${value}km`);
-    }
-  };
+  // Smallest radius option that would include the nearest center outside the current radius
+  const expandRadius = nearestOutside?.distance !== undefined
+    ? RADIUS_OPTIONS.find((r) => r >= nearestOutside.distance! && r > radius)
+    : undefined;
 
   // Get sorted regions: India (and other non-Nepal) first; Nepal always at the end
   const getSortedRegions = (): {
@@ -524,11 +497,64 @@ export default function HomePageClient({
     return [...primary, ...nepal];
   };
 
+  // Convert pre-computed state map markers to Center-like objects for the CenterMap component
+  // These are lightweight markers (one per state) pre-computed on the server
+  const stateMapMarkersForMap = useMemo(
+    () =>
+      stateMapMarkers.map((marker) => ({
+        name: marker.name,
+        slug: '',
+        state: marker.state,
+        region: marker.region,
+        coords: marker.coords,
+        description: marker.description,
+        summary: marker.summary,
+        district_total: marker.centerCount,
+        is_district_summary: true,
+        is_state_summary: true,
+        branch_code: `state-${marker.state.toLowerCase().replace(/\s+/g, '-')}`,
+      })) as Center[],
+    [stateMapMarkers]
+  );
+
+  const showMap = isDesktop || mobileView === 'map';
+  // Nothing within the radius → still show where the nearest center is
+  const mapCenters = useMemo(
+    () => (results.length > 0 ? results : nearestOutside ? [nearestOutside] : []),
+    [results, nearestOutside]
+  );
+  const resultsSummary =
+    status === 'loading' && results.length === 0
+      ? 'Finding centers…'
+      : status === 'error'
+        ? ''
+        : total > 0
+          ? `${total.toLocaleString()} ${total === 1 ? 'center' : 'centers'} within ${radius} km · nearest first`
+          : status === 'ready'
+            ? `No centers within ${radius} km`
+            : '';
+
+  const nearMeButtonContent = (label: string) =>
+    locating ? (
+      <>
+        <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
+        <span>Locating…</span>
+      </>
+    ) : (
+      <>
+        <Navigation className="w-4 h-4" aria-hidden />
+        <span>{label}</span>
+      </>
+    );
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
+      <Suspense fallback={null}>
+        <SearchParamsListener onChange={setQueryString} />
+      </Suspense>
 
       {/* ===== HERO SECTION ===== */}
-      {!lat && !lng && (
+      {!hasSearch && (
         <section className="relative overflow-hidden bg-gradient-to-b from-neutral-50 via-spirit-purple-50/20 to-neutral-50 dark:from-neutral-900 dark:via-spirit-purple-950/10 dark:to-neutral-900 py-8 md:py-14">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(184,134,11,0.05),transparent_50%)]" />
           <div className="container mx-auto max-w-3xl px-4 relative">
@@ -547,19 +573,26 @@ export default function HomePageClient({
               <div className="flex-1">
                 <SearchBar
                   onSearchResult={handleSearchResult}
-                  value={address}
+                  value={address || textQuery || ''}
                   onClear={handleClearSearch}
-                  showClearButton={!!lat && !!lng}
+                  showClearButton={!!textQuery}
                 />
               </div>
               <button
                 onClick={handleCurrentLocationClick}
-                className="flex items-center justify-center gap-2 bg-spirit-purple-600 hover:bg-spirit-purple-700 text-white font-semibold px-5 py-3 rounded-lg text-sm transition-colors shrink-0"
+                disabled={locating}
+                aria-busy={locating}
+                className="flex items-center justify-center gap-2 bg-spirit-purple-600 hover:bg-spirit-purple-700 disabled:opacity-80 text-white font-semibold px-5 py-3 rounded-lg text-sm transition-colors shrink-0"
               >
-                <Navigation className="w-4 h-4" />
-                Near Me
+                {nearMeButtonContent("Near Me")}
               </button>
             </div>
+
+            {searchError && (
+              <p role="alert" className="max-w-xl mx-auto -mt-1 mb-4 text-sm text-center text-red-600 dark:text-red-400">
+                {searchError}
+              </p>
+            )}
 
             {/* This locator covers India & Nepal; International chip is the worldwide locator */}
             <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
@@ -606,276 +639,306 @@ export default function HomePageClient({
       )}
 
       {/* ===== SEARCH RESULTS VIEW ===== */}
-      {lat && lng ? (
-        <div className="min-h-screen">
-          {/* Golden gradient search header */}
-          <div className="bg-gradient-to-b from-spirit-purple-700 via-spirit-purple-600 to-transparent dark:from-spirit-purple-900 dark:via-spirit-purple-900/50 dark:to-transparent pb-16 sm:pb-20 pt-4 sm:pt-6">
-            <div className="container mx-auto px-4">
-              <div className="max-w-2xl mx-auto">
-                <p className="hidden sm:block text-center text-white/70 text-xs font-medium uppercase tracking-wider mb-3">Find Your Center</p>
-                <div className="bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-4">
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1">
-                      <SearchBar
-                        onSearchResult={handleSearchResult}
-                        value={address}
-                        onClear={handleClearSearch}
-                        showClearButton={!!lat && !!lng}
+      {hasSearch ? (
+        <section className="container mx-auto max-w-7xl px-4 pt-3 sm:pt-5 pb-28 lg:pb-12" aria-labelledby="results-heading">
+          {/* Breadcrumb — the way back to the locator home */}
+          <nav aria-label="Breadcrumb" className="mb-3">
+            <ol className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400">
+              <li className="flex items-center">
+                <Link
+                  href="/"
+                  onClick={(e) => {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                    e.preventDefault();
+                    handleClearSearch();
+                    window.scrollTo({ top: 0 });
+                  }}
+                  className="inline-flex items-center gap-1 font-medium hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" aria-hidden />
+                  All centers
+                </Link>
+              </li>
+              <li aria-hidden className="text-neutral-300 dark:text-neutral-600">/</li>
+              <li aria-current="page" className="truncate">Near {placeLabel === 'you' ? 'you' : placeLabel}</li>
+            </ol>
+          </nav>
+
+          {/* Compact search row */}
+          <div className="flex gap-2 sm:gap-3 max-w-3xl">
+            <div className="flex-1 min-w-0">
+              <SearchBar
+                onSearchResult={handleSearchResult}
+                value={address === CURRENT_LOCATION_LABEL ? '' : address}
+                onClear={handleClearSearch}
+                showClearButton={true}
+                placeholder="City, area or center"
+              />
+            </div>
+            <button
+              onClick={handleCurrentLocationClick}
+              disabled={locating}
+              aria-busy={locating}
+              aria-label="Find centers near my current location"
+              className="flex items-center justify-center gap-2 bg-spirit-purple-600 hover:bg-spirit-purple-700 disabled:opacity-80 text-white font-semibold px-4 sm:px-5 rounded-lg text-sm transition-colors shrink-0 [&>span]:hidden sm:[&>span]:inline"
+            >
+              {nearMeButtonContent("Near Me")}
+            </button>
+          </div>
+
+          {/* Summary + share */}
+          <div className="mt-5 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 id="results-heading" className="text-xl sm:text-2xl font-bold leading-tight text-neutral-900 dark:text-neutral-100">
+                Meditation centers near {placeLabel}
+              </h1>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400 min-h-[1.25rem]" aria-live="polite">
+                {resultsSummary}
+                {cityPage && total > 0 && (
+                  <>
+                    {' · '}
+                    <Link
+                      href={cityPage.href}
+                      className="font-medium text-spirit-purple-700 dark:text-spirit-purple-300 hover:underline underline-offset-2"
+                    >
+                      All centers in {cityPage.name}
+                    </Link>
+                  </>
+                )}
+              </p>
+            </div>
+            {total > 0 && (
+              <button
+                onClick={handleShareResults}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300 dark:hover:border-spirit-purple-600 transition-colors"
+              >
+                {shareState === 'copied' ? <Check className="w-4 h-4 text-green-600" aria-hidden /> : <Share2 className="w-4 h-4" aria-hidden />}
+                <span className="hidden sm:inline">{shareState === 'copied' ? 'Link copied' : 'Share'}</span>
+                <span className="sr-only sm:hidden">{shareState === 'copied' ? 'Link copied' : 'Share these results'}</span>
+              </button>
+            )}
+          </div>
+
+          {/* Radius chips */}
+          <div className="mt-3 flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4 sm:mx-0 sm:px-0" role="group" aria-label="Search radius">
+            <span className="shrink-0 text-xs font-medium text-neutral-500 dark:text-neutral-400">Within</span>
+            {RADIUS_OPTIONS.map((option) => (
+              <button
+                key={option}
+                onClick={() => handleRadiusChange(option)}
+                aria-pressed={option === radius}
+                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold tabular-nums transition-colors ${
+                  option === radius
+                    ? 'border-spirit-purple-600 bg-spirit-purple-600 text-white'
+                    : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:border-spirit-purple-300 dark:hover:border-spirit-purple-600'
+                }`}
+              >
+                {option} km
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-5">
+            {/* ----- List ----- */}
+            <div className={!isDesktop && mobileView === 'map' ? 'hidden' : ''}>
+              {status === 'error' ? (
+                <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-6 py-12 text-center">
+                  <h2 className="text-base font-semibold text-neutral-800 dark:text-neutral-100">Couldn&apos;t load centers</h2>
+                  <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Check your connection and try again.</p>
+                  <button
+                    onClick={() => setRetryCount((n) => n + 1)}
+                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-spirit-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-spirit-purple-700"
+                  >
+                    <RotateCw className="w-4 h-4" aria-hidden /> Try again
+                  </button>
+                </div>
+              ) : status === 'loading' && results.length === 0 ? (
+                <div className="space-y-3" aria-hidden>
+                  {Array.from({ length: 4 }, (_, i) => <ResultSkeleton key={i} />)}
+                </div>
+              ) : status === 'ready' && total === 0 ? (
+                <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-5 py-8 sm:px-8">
+                  <div className="text-center">
+                    <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
+                      <Search className="w-6 h-6 text-neutral-400 dark:text-neutral-500" aria-hidden />
+                    </div>
+                    <h2 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100">
+                      No centers within {radius} km
+                    </h2>
+                    {nearestOutside && typeof nearestOutside.distance === 'number' && (
+                      <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                        The nearest center is {formatDistanceLabel(nearestOutside.distance)} away.
+                      </p>
+                    )}
+                  </div>
+                  {nearestOutside && (
+                    <div className="mt-5 text-left">
+                      <NearbyResultCard center={nearestOutside} index={0} closestLabel={closestLabel} />
+                    </div>
+                  )}
+                  <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    {expandRadius && (
+                      <button
+                        onClick={() => handleRadiusChange(expandRadius)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-spirit-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-spirit-purple-700"
+                      >
+                        Show centers within {expandRadius} km
+                        <ChevronRight className="w-4 h-4" aria-hidden />
+                      </button>
+                    )}
+                    {nearestOutside?.state && (
+                      <Link
+                        href={formatCenterUrl(nearestOutside.region || 'INDIA', nearestOutside.state)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 dark:border-neutral-600 px-5 py-2.5 text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300"
+                      >
+                        All centers in {nearestOutside.state}
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h2 className="sr-only">Results, nearest first</h2>
+                  <ol
+                    className={`space-y-3 transition-opacity ${status === 'loading' ? 'opacity-60' : ''}`}
+                    aria-busy={status === 'loading'}
+                  >
+                    {results.map((center, index) => (
+                      <li key={center.branch_code}>
+                        <NearbyResultCard
+                          center={center}
+                          index={index}
+                          closestLabel={closestLabel}
+                          isActive={selectedCenter?.branch_code === center.branch_code}
+                          onSelect={isDesktop ? handleCardSelect : undefined}
+                          onHoverChange={isDesktop ? setHoveredCode : undefined}
+                        />
+                      </li>
+                    ))}
+                  </ol>
+                  <div id="lazy-load-sentinel" className="h-4" />
+                  {loadingMore && (
+                    <div className="flex items-center justify-center gap-2 py-4 text-sm text-neutral-500 dark:text-neutral-400">
+                      <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> Loading more centers…
+                    </div>
+                  )}
+                  {hasMore && !loadingMore && results.length >= AUTO_LOAD_MAX && (
+                    <div className="pt-2 text-center">
+                      <button
+                        onClick={loadMore}
+                        className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-5 py-2.5 text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300"
+                      >
+                        Show more centers
+                        <span className="text-neutral-400 font-normal">({(total - results.length).toLocaleString()} more)</span>
+                      </button>
+                    </div>
+                  )}
+                  {!hasMore && results.length > 0 && status === 'ready' && (
+                    <p className="pt-4 text-center text-xs text-neutral-400 dark:text-neutral-500">
+                      Showing all {total.toLocaleString()} centers within {radius} km
+                    </p>
+                  )}
+                  {cityPage && status === 'ready' && results.length > 0 && (
+                    <div className="pt-4 text-center">
+                      <Link
+                        href={cityPage.href}
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-spirit-purple-700 dark:text-spirit-purple-300 hover:underline underline-offset-2"
+                      >
+                        Browse all centers in {cityPage.name}
+                        <ArrowRight className="w-4 h-4" aria-hidden />
+                      </Link>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* ----- Map: sticky beside the list on desktop, full view on mobile ----- */}
+            {showMap && (
+              <div
+                ref={mapSectionRef}
+                // Mobile: fills the screen below the floating header (the bottom nav is hidden here)
+                className="scroll-mt-24 lg:sticky lg:self-start bk-map-sticky h-[calc(100dvh-7.5rem)] min-h-[380px] lg:min-h-0 lg:h-[calc(100vh-var(--bk-header-h,4.75rem)-1.5rem)]"
+              >
+                <div className="relative h-full bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+                  <CenterMap
+                    centers={mapCenters}
+                    autoZoom={mapCenters.length > 0}
+                    onCenterSelect={handleCenterSelect}
+                    highlightCenter={true}
+                    showInfoWindowOnLoad={false}
+                    height="100%"
+                    selectedCenter={selectedCenter}
+                    userLocation={userLocation}
+                    userLocationLabel={isCurrentLocation ? 'Your location' : address || 'Searched location'}
+                    numbered
+                    hoveredCenterCode={hoveredCode}
+                    scrollToCardOnSelect={isDesktop}
+                    fitKey={searchKey}
+                    fitCount={8}
+                    gestureHandling={isDesktop ? 'cooperative' : 'greedy'}
+                  />
+
+                  {/* Mobile: card for the selected pin, with previous / next */}
+                  {!isDesktop && floatingCenter && (
+                    // Sits above the floating List/Map toggle
+                    <div className="absolute inset-x-3 bottom-14 z-10">
+                      {results.length > 1 && (
+                        <div className="mb-2 flex items-center justify-between">
+                          <button
+                            onClick={() => stepFloating(-1)}
+                            disabled={floatingIndex === 0}
+                            aria-label="Previous center"
+                            className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow-md text-neutral-700 dark:text-neutral-200 disabled:opacity-40"
+                          >
+                            <ChevronLeft className="w-5 h-5" aria-hidden />
+                          </button>
+                          <span className="rounded-full bg-white/95 dark:bg-neutral-800/95 px-3 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shadow-sm tabular-nums">
+                            {floatingIndex + 1} of {total.toLocaleString()}
+                          </span>
+                          <button
+                            onClick={() => stepFloating(1)}
+                            disabled={floatingIndex >= results.length - 1}
+                            aria-label="Next center"
+                            className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow-md text-neutral-700 dark:text-neutral-200 disabled:opacity-40"
+                          >
+                            <ChevronRight className="w-5 h-5" aria-hidden />
+                          </button>
+                        </div>
+                      )}
+                      <NearbyResultCard
+                        center={floatingCenter}
+                        index={floatingIndex}
+                        closestLabel={closestLabel}
+                        isActive
+                        variant="floating"
                       />
                     </div>
-                    <button
-                      onClick={handleCurrentLocationClick}
-                      className="flex items-center justify-center gap-2 bg-white text-spirit-purple-700 dark:bg-spirit-purple-400 dark:text-white font-semibold px-5 py-3 rounded-xl text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
-                    >
-                      <Navigation className="w-4 h-4" />
-                      Near Me
-                    </button>
-                  </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
-          <div className="container mx-auto px-4 -mt-14">
-            <div ref={searchResultsRef}>
-              {/* Results header: title + compact distance chip + mobile List/Map toggle */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between gap-2 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm px-4 sm:px-5 py-3">
-                  <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center shrink-0">
-                      <MapPin className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
-                    </div>
-                    <span className="truncate">Centers Near You{nearestCenters.length > 0 ? ` (${nearestCenters.length})` : ''}</span>
-                  </h2>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {/* Distance filter chip — expands on tap to keep header compact */}
-                    <button
-                      onClick={() => setShowDistanceControl((v) => !v)}
-                      className="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-700/50 border border-neutral-200 dark:border-neutral-600 rounded-xl px-3 py-2 text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:border-spirit-purple-300 dark:hover:border-spirit-purple-500 transition-colors"
-                      aria-expanded={showDistanceControl}
-                      aria-controls="distance-control-panel"
-                    >
-                      <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
-                      <span className="whitespace-nowrap">{maxDistance} km</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Expandable distance slider */}
-                {showDistanceControl && (
-                  <div id="distance-control-panel" className="mt-2 flex items-center gap-3 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm px-4 py-3">
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400 whitespace-nowrap">Within</span>
-                    <input
-                      id="distance-filter"
-                      type="range"
-                      min="5"
-                      max="100"
-                      step="5"
-                      value={maxDistance}
-                      onChange={handleDistanceChange}
-                      className="flex-1 accent-spirit-purple-600"
-                    />
-                    <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 whitespace-nowrap">{maxDistance} km</span>
-                  </div>
+          {/* Mobile: List / Map toggle */}
+          {results.length > 0 && (
+            <div
+              className="lg:hidden fixed left-1/2 -translate-x-1/2 z-40"
+              style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.25rem)' }}
+            >
+              <button
+                onClick={() => switchMobileView(mobileView === 'list' ? 'map' : 'list')}
+                className="inline-flex items-center gap-2 rounded-full bg-neutral-900 dark:bg-white px-5 py-3 text-sm font-semibold text-white dark:text-neutral-900 shadow-xl active:scale-95 transition-transform"
+              >
+                {mobileView === 'list' ? (
+                  <><MapIcon className="w-4 h-4" aria-hidden /> Map</>
+                ) : (
+                  <><List className="w-4 h-4" aria-hidden /> List</>
                 )}
-              </div>
-
-              {/* Nearest 3 centers — quick actions (all screen sizes) */}
-              {!loading && nearestCenters.length > 0 && (
-                <div className="mb-5">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-3">
-                    Nearest centers
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {nearestCenters.slice(0, 3).map((top, index) => {
-                      const addr = top.address
-                        ? [top.address.line1, top.address.city, top.address.pincode].filter(Boolean).join(", ")
-                        : "";
-                      const rankLabel = index === 0 ? "Closest" : index === 1 ? "2nd nearest" : "3rd nearest";
-                      return (
-                        <div
-                          key={`quick-${top.branch_code}`}
-                          className="bg-white dark:bg-neutral-800 rounded-2xl border border-spirit-purple-200 dark:border-spirit-purple-700 shadow-sm p-4"
-                        >
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-spirit-purple-600 dark:text-spirit-purple-400 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 px-2 py-0.5 rounded-full">
-                              {rankLabel}
-                            </span>
-                            {typeof top.distance === "number" && (
-                              <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-300">
-                                {top.distance.toFixed(1)} km
-                              </span>
-                            )}
-                          </div>
-                          <Link
-                            href={formatCenterUrl(top.region || "INDIA", top.state, top.district, top.name)}
-                            className="block"
-                            onClick={() => CenterLocatorAnalytics.viewCenter(top)}
-                          >
-                            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 leading-tight hover:text-spirit-purple-600 dark:hover:text-spirit-purple-400 transition-colors">
-                              {top.name}
-                            </h3>
-                          </Link>
-                          {addr && <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2">{addr}</p>}
-                          <div className="flex gap-2 mt-3">
-                            {(top.mobile || top.contact) && (
-                              <CallNowButton
-                                mobile={top.mobile}
-                                contact={top.contact}
-                                className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-gold-500 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-600 transition-colors"
-                              >
-                                <Phone className="w-4 h-4" /> Call
-                              </CallNowButton>
-                            )}
-                            <a
-                              href={getCenterMapsUrl(top)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-purple-600 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-purple-700 transition-colors"
-                            >
-                              <Navigation className="w-4 h-4" /> Directions
-                            </a>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Map + list — always visible together; page scrolls naturally */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
-                {/* Map — compact on mobile, sticky on desktop */}
-                <div className="lg:sticky lg:self-start bk-map-sticky h-[42vh] sm:h-[45vh] lg:h-[min(560px,70vh)]">
-                  <div ref={mapRef} className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden h-full">
-                    <CenterMap
-                      centers={nearestCenters}
-                      autoZoom={nearestCenters.length > 0}
-                      onCenterSelect={handleCenterSelect}
-                      highlightCenter={true}
-                      showInfoWindowOnLoad={false}
-                      height="100%"
-                      selectedCenter={selectedCenter}
-                      userLocation={userLocation}
-                    />
-                  </div>
-                  <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-2 text-center lg:text-left">
-                    Tap a marker to jump to that center in the list below
-                  </p>
-                </div>
-
-                {/* Centers list — normal page scroll (no inner scroll box) */}
-                <div ref={resultsContainerRef} className="space-y-3">
-                    {loading ? (
-                      <div className="flex flex-col items-center justify-center py-16 px-6">
-                        {/* Peaceful loading animation */}
-                        <div className="relative w-20 h-20 mb-6">
-                          <div className="absolute inset-0 rounded-full border-2 border-spirit-purple-100 dark:border-spirit-purple-800" />
-                          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-spirit-purple-500 dark:border-t-spirit-purple-400 animate-spin" />
-                          <div className="absolute inset-3 rounded-full border-2 border-transparent border-b-spirit-gold-400 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Sparkles className="w-5 h-5 text-spirit-purple-500 dark:text-spirit-purple-400 animate-pulse" />
-                          </div>
-                        </div>
-                        <h3 className="text-base font-semibold text-neutral-700 dark:text-neutral-200 mb-2">Finding Centers Near You</h3>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400 text-center max-w-xs leading-relaxed">
-                          &ldquo;Patience is the companion of wisdom.&rdquo;
-                        </p>
-                        <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-3 italic">
-                          Searching within {maxDistance} km of your location...
-                        </p>
-                      </div>
-                    ) : nearestCenters.length > 0 ? (
-                      <>
-                        <div className="flex items-center justify-between mb-4 pb-3 border-b border-neutral-100 dark:border-neutral-700">
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                            Found <strong className="text-neutral-700 dark:text-neutral-200">{nearestCenters.length}</strong> centers within {maxDistance} km
-                          </p>
-                          <div className="text-[10px] text-spirit-purple-600 dark:text-spirit-purple-400 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 px-2 py-0.5 rounded-full font-medium">
-                            Sorted by distance
-                          </div>
-                        </div>
-                        <div className="space-y-3">
-                          {nearestCenters.map((center) => (
-                            <div
-                              key={center.branch_code}
-                              id={`center-card-${center.branch_code}`}
-                              className={`rounded-xl border transition-all duration-200 bg-white dark:bg-neutral-800 overflow-hidden ${
-                                selectedCenter?.branch_code === center.branch_code
-                                  ? "border-spirit-purple-300 dark:border-spirit-purple-600 ring-1 ring-spirit-purple-200 dark:ring-spirit-purple-700 shadow-md"
-                                  : "border-neutral-200 dark:border-neutral-700 hover:border-spirit-purple-200 dark:hover:border-spirit-purple-700"
-                              }`}
-                            >
-                              <div
-                                className="cursor-pointer"
-                                onClick={() => handleCardClick(center)}
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => e.key === 'Enter' && handleCardClick(center)}
-                              >
-                                <CenterCard
-                                  center={center}
-                                  distance={center.distance}
-                                  showDistance={true}
-                                  variant="nearby"
-                                />
-                              </div>
-                              <div
-                                className="flex gap-2 px-3 pb-3"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {(center.mobile || center.contact) && (
-                                  <CallNowButton
-                                    mobile={center.mobile}
-                                    contact={center.contact}
-                                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-gold-500 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-gold-600 transition-colors"
-                                  >
-                                    <Phone className="w-4 h-4" /> Call
-                                  </CallNowButton>
-                                )}
-                                <a
-                                  href={getCenterMapsUrl(center)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex-1 inline-flex items-center justify-center gap-1.5 bg-spirit-purple-600 text-white px-3 py-2.5 rounded-xl font-semibold text-sm hover:bg-spirit-purple-700 transition-colors"
-                                >
-                                  <Navigation className="w-4 h-4" /> Directions
-                                </a>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div id="lazy-load-sentinel" className="h-4"></div>
-                        {loadingMore && (
-                          <div className="flex items-center justify-center gap-2 py-4">
-                            <div className="w-4 h-4 border-2 border-spirit-purple-200 border-t-spirit-purple-500 rounded-full animate-spin" />
-                            <span className="text-neutral-400 dark:text-neutral-500 text-sm">Loading more centers...</span>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-center py-16 px-6">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
-                          <Search className="w-7 h-7 text-neutral-400 dark:text-neutral-500" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-neutral-700 dark:text-neutral-200 mb-2">No Centers Found Nearby</h3>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6 max-w-xs mx-auto">
-                          No meditation centers within {maxDistance} km of your location. Try expanding the search radius.
-                        </p>
-                        <button
-                          onClick={() => setMaxDistance((prev) => Math.min(prev + 20, 100))}
-                          className="inline-flex items-center gap-2 text-sm bg-spirit-purple-50 dark:bg-spirit-purple-900/20 text-spirit-purple-700 dark:text-spirit-purple-400 hover:bg-spirit-purple-100 dark:hover:bg-spirit-purple-900/30 px-5 py-2.5 rounded-xl font-medium transition-colors"
-                        >
-                          Expand to {Math.min(maxDistance + 20, 100)} km
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    )}
-                </div>
-              </div>
+              </button>
             </div>
-          </div>
-        </div>
+          )}
+        </section>
       ) : (
         /* ===== EXPLORE VIEW (no search active) ===== */
         <div className="container mx-auto px-4 py-8 space-y-10">
@@ -913,7 +976,7 @@ export default function HomePageClient({
               </h2>
               <div className="flex bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1 border border-neutral-200 dark:border-neutral-700">
                 <button
-                  onClick={() => handleSortChange("centers")}
+                  onClick={() => { setSortBy("centers"); CenterLocatorAnalytics.useFilter('sort', 'centers'); }}
                   className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-all ${
                     sortBy === "centers"
                       ? "bg-white dark:bg-neutral-700 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
@@ -923,7 +986,7 @@ export default function HomePageClient({
                   By Count
                 </button>
                 <button
-                  onClick={() => handleSortChange("alpha")}
+                  onClick={() => { setSortBy("alpha"); CenterLocatorAnalytics.useFilter('sort', 'alpha'); }}
                   className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-all ${
                     sortBy === "alpha"
                       ? "bg-white dark:bg-neutral-700 text-spirit-purple-700 dark:text-spirit-purple-300 shadow-sm"
@@ -1101,4 +1164,3 @@ export default function HomePageClient({
     </div>
   );
 }
-

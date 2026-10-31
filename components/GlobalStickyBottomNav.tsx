@@ -1,34 +1,56 @@
 'use client';
 
-import React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import React, { Suspense, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 interface GlobalStickyBottomNavProps {}
 
 export default function GlobalStickyBottomNav({}: GlobalStickyBottomNavProps) {
+  // useSearchParams needs its own Suspense boundary so static pages keep
+  // server-rendering; the fallback is the same bar without the results check.
+  return (
+    <Suspense fallback={<BottomNavBar hideOnResults={false} />}>
+      <BottomNavWithSearchParams />
+    </Suspense>
+  );
+}
+
+function BottomNavWithSearchParams() {
+  const searchParams = useSearchParams();
+  // The home results view has its own Near Me button and List/Map toggle;
+  // a second bar there only covers the map.
+  const isResultsView = searchParams.has('lat') && searchParams.has('lng');
+  return <BottomNavBar hideOnResults={isResultsView} />;
+}
+
+function BottomNavBar({ hideOnResults }: { hideOnResults: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [locating, setLocating] = useState(false);
 
   // Don't show on center detail pages (pages with 5 path segments like /region/state/district/branchCode)
   // Campus micro-sites are gated by CentersChrome (bottomNav not rendered).
   const pathSegments = pathname.split('/').filter(segment => segment !== '');
   const isCenterDetailPage = pathSegments.length === 4;
 
-  if (isCenterDetailPage) {
+  if (isCenterDetailPage || (hideOnResults && pathname === '/')) {
     return null;
   }
 
   const handleNearbyClick = () => {
     // Get location first, then navigate with coordinates
     if (navigator.geolocation) {
+      setLocating(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          setLocating(false);
           // Navigate directly with coordinates - no delay needed
           router.push(`/?lat=${latitude}&lng=${longitude}&address=Your Current Location`);
         },
         (error) => {
           console.error('Error getting location:', error);
+          setLocating(false);
           // Fallback to just going to home page
           router.push('/');
         },
@@ -52,19 +74,26 @@ export default function GlobalStickyBottomNav({}: GlobalStickyBottomNavProps) {
           {/* Nearby Centers Button */}
           <button
             onClick={handleNearbyClick}
-            className="flex-1 flex items-center justify-center py-4 px-4 bg-gradient-to-r from-spirit-blue-600 to-spirit-purple-600 text-white font-semibold transition-all duration-200 hover:from-spirit-blue-700 hover:to-spirit-purple-700 active:scale-95"
+            disabled={locating}
+            aria-busy={locating}
+            className="flex-1 flex items-center justify-center py-4 px-4 bg-gradient-to-r from-spirit-blue-600 to-spirit-purple-600 text-white font-semibold transition-all duration-200 hover:from-spirit-blue-700 hover:to-spirit-purple-700 active:scale-95 disabled:opacity-90"
           >
-            <svg 
-              className="w-5 h-5 mr-2" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span>Nearby Centers</span>
+            {locating ? (
+              <span className="w-5 h-5 mr-2 rounded-full border-2 border-white/40 border-t-white animate-spin" aria-hidden />
+            ) : (
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            )}
+            <span>{locating ? 'Finding your location…' : 'Nearby Centers'}</span>
           </button>
         </div>
       </div>

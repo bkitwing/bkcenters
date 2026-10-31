@@ -1,31 +1,42 @@
 import { NextResponse } from "next/server";
 import { Center } from "@/lib/types";
 import { loadCentersForNearby, loadCentersNearbyBBox } from "@/lib/strapiClient";
+import { distanceKm, getNearbyIndex } from "@/lib/nearbyIndex";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Server-side nearby center search.
- * 
- * FAST PATH: Uses bounding box pre-filter at the Strapi query level.
- * Instead of fetching all 5600+ centers, filters by lat/lng range
- * to fetch only ~50-300 centers within the geographic area.
- * Reduces response time from ~15s to ~1-2s on first load.
  *
- * FALLBACK: If bbox returns too few results, falls back to full scan.
+ * FAST PATH: in-memory index of all centers (lib/nearbyIndex.ts) — a few ms per
+ * lookup, and an exact count of centers within the radius.
+ *
+ * COLD START: while the index is loading (first request after a restart), uses
+ * the Strapi bounding-box query, then the full scan if that fails.
  *
  * Query params:
  *   lat, lng — user coordinates (required)
- *   maxDistance — max radius in km (default 150)
- *   limit — max results (default 50)
+ *   radius   — max radius in km (alias: maxDistance; default 150)
+ *   offset   — results to skip, for "show more" paging (default 0)
+ *   limit    — max results per page (default 50, max 100)
+ *
+ * Response:
+ *   data    — centers sorted by distance (km, 1 decimal) for this page
+ *   total   — number of centers within the radius (all pages)
+ *   nearest — closest center outside the radius when total is 0, else null
  */
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const lat = parseFloat(url.searchParams.get("lat") || "");
     const lng = parseFloat(url.searchParams.get("lng") || "");
-    const maxDistance = parseInt(url.searchParams.get("maxDistance") || "150", 10);
-    const limit = parseInt(url.searchParams.get("limit") || "50", 10);
+    const radius = clamp(
+      parseFloat(url.searchParams.get("radius") || url.searchParams.get("maxDistance") || "150"),
+      1,
+      500
+    );
+    const offset = Math.max(0, parseInt(url.searchParams.get("offset") || "0", 10) || 0);
+    const limit = clamp(parseInt(url.searchParams.get("limit") || "50", 10) || 50, 1, 100);
 
     if (isNaN(lat) || isNaN(lng)) {
       return NextResponse.json(
@@ -34,40 +45,51 @@ export async function GET(request: Request) {
       );
     }
 
-    // FAST PATH: Bounding box pre-filter — fetch only nearby centers from Strapi
-    let allCenters: Center[];
-    try {
-      allCenters = await loadCentersNearbyBBox(lat, lng, maxDistance);
-    } catch (bboxError) {
-      // Fallback to full scan if bbox query fails
-      console.warn("BBox query failed, falling back to full scan:", bboxError);
-      allCenters = await loadCentersForNearby();
+    const index = getNearbyIndex();
+    let candidates: { center: Center; distance: number }[];
+
+    if (index) {
+      candidates = index.map((entry) => ({
+        center: entry.center,
+        distance: distanceKm(lat, lng, entry.lat, entry.lng),
+      }));
+    } else {
+      // Cold start: bbox pre-filter at the Strapi query level (searches at least
+      // 150 km so we can still suggest the nearest center outside a small radius)
+      let allCenters: Center[];
+      try {
+        allCenters = await loadCentersNearbyBBox(lat, lng, Math.max(radius, 150));
+      } catch (bboxError) {
+        console.warn("BBox query failed, falling back to full scan:", bboxError);
+        allCenters = await loadCentersForNearby();
+      }
+      candidates = allCenters
+        .map((center) => ({ center, distance: haversine(lat, lng, center.coords) }))
+        .filter((item): item is { center: Center; distance: number } => item.distance !== null);
     }
 
-    // Calculate distance for each center and filter/sort
-    const centersWithDistance: { center: Center; distance: number }[] = allCenters
-      .map((center: Center) => {
-        const dist = haversine(lat, lng, center.coords);
-        return { center, distance: dist };
-      })
-      .filter((item): item is { center: Center; distance: number } =>
-        item.distance !== null && item.distance <= maxDistance
-      )
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, limit);
+    const withinRadius = candidates
+      .filter((item) => item.distance <= radius)
+      .sort((a, b) => a.distance - b.distance);
 
-    const data = centersWithDistance.map(({ center, distance }: { center: Center; distance: number }) => ({
-      ...optimizeForNearby(center),
-      distance: Math.round(distance! * 10) / 10, // 1 decimal place km
-    }));
+    let nearest: ReturnType<typeof toResult> | null = null;
+    if (withinRadius.length === 0 && candidates.length > 0) {
+      const closest = candidates.reduce((best, item) => (item.distance < best.distance ? item : best));
+      nearest = toResult(closest);
+    }
 
-    return new NextResponse(JSON.stringify({ data, total: data.length }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=300, s-maxage=300", // 5 min cache (location-specific)
-      },
-    });
+    const data = withinRadius.slice(offset, offset + limit).map(toResult);
+
+    return new NextResponse(
+      JSON.stringify({ data, total: withinRadius.length, offset, limit, radius, nearest }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "public, max-age=300, s-maxage=300", // 5 min cache (location-specific)
+        },
+      }
+    );
   } catch (error) {
     console.error("Error in nearby API:", error);
     return NextResponse.json(
@@ -75,6 +97,18 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(Math.max(value, min), max);
+}
+
+function toResult({ center, distance }: { center: Center; distance: number }) {
+  return {
+    ...optimizeForNearby(center),
+    distance: Math.round(distance * 10) / 10, // 1 decimal place km
+  };
 }
 
 /** Haversine distance in km. Returns null if coords are invalid. */
@@ -87,18 +121,7 @@ function haversine(
   const lat2 = parseFloat(coords[0]);
   const lng2 = parseFloat(coords[1]);
   if (isNaN(lat2) || isNaN(lng2)) return null;
-
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  return distanceKm(lat1, lng1, lat2, lng2);
 }
 
 /** Return only fields needed for CenterCard + map display */
