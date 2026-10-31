@@ -14,7 +14,14 @@ export function getAbsoluteUrl(path: string = '') {
 
 interface OgImageParams {
   title: string;
-  description: string;
+  /** Older free-text line; prefer subtitle + stats */
+  description?: string;
+  /** Small label above the title, e.g. "Rajyoga meditation centers in" */
+  eyebrow?: string;
+  /** Location line under the title, e.g. "Gujarat, India" */
+  subtitle?: string;
+  /** Big numbers, e.g. [{ value: 469, label: 'centers' }, { value: 31, label: 'districts' }] */
+  stats?: { value: string | number; label: string }[];
   type: 'region' | 'center' | 'state' | 'district' | 'home' | 'retreat' | 'search' | 'current-location';
   location?: string;
   centerCount?: string | number;
@@ -30,7 +37,10 @@ function decodeParam(param: string): string {
 
 export function generateOgImageUrl({
   title,
-  description,
+  description = '',
+  eyebrow,
+  subtitle,
+  stats,
   type = 'center',
   location,
   centerCount,
@@ -51,8 +61,14 @@ export function generateOgImageUrl({
 
   const params = new URLSearchParams();
   params.append('title', cleanTitle);
-  params.append('description', cleanDescription);
+  if (cleanDescription) params.append('description', cleanDescription);
   params.append('type', type);
+  if (eyebrow) params.append('eyebrow', eyebrow);
+  if (subtitle) params.append('subtitle', decodeParam(subtitle));
+  if (stats && stats.length > 0) {
+    const fmt = (v: string | number) => (typeof v === 'number' ? v.toLocaleString('en-US') : v);
+    params.append('stats', stats.map((s) => `${fmt(s.value)}:${s.label}`).join('|'));
+  }
 
   if (location) {
     params.append('location', decodeParam(location));

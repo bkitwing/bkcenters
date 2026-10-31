@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, Navigation, Phone } from 'lucide-react';
+import { Eye, Navigation, Phone } from 'lucide-react';
 import CallNowButton from '@/components/CallNowButton';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
@@ -133,40 +133,45 @@ export default function NearbyResultCard({
               {address}
             </p>
           )}
-
-          <div className="mt-3 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-            {hasPhone && (
-              <span className="flex-1" onClickCapture={() => CenterLocatorAnalytics.contactCenter(center)}>
-                <CallNowButton
-                  mobile={center.mobile}
-                  contact={center.contact}
-                  region={center.region}
-                  className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-spirit-gold-500 px-3 text-sm font-semibold text-white transition-colors hover:bg-spirit-gold-600"
-                >
-                  <Phone className="h-4 w-4" aria-hidden /> Call
-                </CallNowButton>
-              </span>
-            )}
-            <a
-              href={getDirectionsUrl(center)}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => CenterLocatorAnalytics.getDirections(center)}
-              className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl bg-spirit-purple-600 px-3 text-sm font-semibold text-white transition-colors hover:bg-spirit-purple-700"
-            >
-              <Navigation className="h-4 w-4" aria-hidden /> Directions
-            </a>
-            <Link
-              href={detailUrl}
-              onClick={() => CenterLocatorAnalytics.viewCenter(center)}
-              aria-label={`View details for ${center.name}`}
-              title="View details"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200 dark:border-neutral-600 text-neutral-500 dark:text-neutral-300 transition-colors hover:border-spirit-purple-300 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300"
-            >
-              <ChevronRight className="h-5 w-5" aria-hidden />
-            </Link>
-          </div>
         </div>
+      </div>
+
+      {/* Actions use the card's full width (not indented under the number).
+          Buttons size to their text (flex-auto, not equal halves) and may shrink;
+          on very narrow phones the icons drop so the labels still fit */}
+      <div className="mt-3 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        {hasPhone && (
+          <span className="min-w-0 flex-auto" onClickCapture={() => CenterLocatorAnalytics.contactCenter(center)}>
+            <CallNowButton
+              mobile={center.mobile}
+              contact={center.contact}
+              region={center.region}
+              className="inline-flex h-10 w-full min-w-0 items-center justify-center gap-1.5 rounded-xl bg-spirit-gold-500 px-2 text-sm font-semibold text-white transition-colors hover:bg-spirit-gold-600"
+            >
+              <Phone className="h-4 w-4 shrink-0 max-[359px]:hidden" aria-hidden /> <span className="truncate">Call</span>
+            </CallNowButton>
+          </span>
+        )}
+        <a
+          href={getDirectionsUrl(center)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => CenterLocatorAnalytics.getDirections(center)}
+          className="inline-flex h-10 min-w-0 flex-auto items-center justify-center gap-1.5 rounded-xl bg-spirit-purple-600 px-2 text-sm font-semibold text-white transition-colors hover:bg-spirit-purple-700"
+        >
+          <Navigation className="h-4 w-4 shrink-0 max-[359px]:hidden" aria-hidden /> <span className="truncate">Directions</span>
+        </a>
+        <Link
+          href={detailUrl}
+          onClick={() => CenterLocatorAnalytics.viewCenter(center)}
+          aria-label={`View details for ${center.name}`}
+          title="View details"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-200 dark:border-neutral-600 text-neutral-500 dark:text-neutral-300 transition-colors hover:border-spirit-purple-300 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300"
+        >
+          {/* Eye, as on the site's other center cards: a chevron here read as
+              "next" beside the map's previous / next arrows */}
+          <Eye className="h-5 w-5" aria-hidden />
+        </Link>
       </div>
     </article>
   );

@@ -65,10 +65,9 @@ export async function generateMetadata({ params }: DistrictPageProps): Promise<M
 
   const ogImage = generateOgImageUrl({
     title: actualDistrict,
-    description: `${centers.length} Meditation Centers`,
     type: 'district',
-    state: actualState,
-    region: actualRegion,
+    subtitle: [actualState, country].filter(Boolean).join(', '),
+    stats: [{ value: centers.length, label: centers.length === 1 ? 'center' : 'centers' }],
   });
 
   const canonicalRegionSlug = actualRegion.toLowerCase().replace(/\s+/g, '-');

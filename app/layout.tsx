@@ -60,9 +60,13 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [
         {
           url: generateOgImageUrl({
-            title: "Brahma Kumaris Centers",
-            description: `${stats.totalCenters} Centers across India and Nepal`,
+            title: "Find a meditation center near you",
             type: "home",
+            subtitle: "India and Nepal",
+            stats: [
+              { value: stats.totalCenters, label: "centers" },
+              { value: stats.totalDistricts, label: "districts" },
+            ],
           }),
           width: 1200,
           height: 630,

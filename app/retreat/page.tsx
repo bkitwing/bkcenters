@@ -53,8 +53,11 @@ export async function generateMetadata(): Promise<Metadata> {
         {
           url: generateOgImageUrl({
             title: 'Retreat Centers',
-            description: `${retreatCenters.length} Retreat Centers in ${stateCount} States`,
-            type: 'retreat'
+            type: 'retreat',
+            stats: [
+              { value: retreatCenters.length, label: 'retreat centers' },
+              { value: stateCount, label: 'states' },
+            ],
           }),
           width: 1200,
           height: 630,

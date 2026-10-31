@@ -65,9 +65,12 @@ export async function generateMetadata({ params }: RegionPageProps): Promise<Met
 
   const ogImage = generateOgImageUrl({
     title: actualRegion,
-    description: `${totalCenters} Centers in ( ${states.length} ${stateLevelLabel(actualRegion, { plural: true, short: true })} & ${districts} ${placesLabel})`,
     type: 'region',
-    region: actualRegion,
+    stats: [
+      { value: totalCenters, label: 'centers' },
+      { value: states.length, label: stateLevelLabel(actualRegion, { plural: true, short: true }) },
+      { value: districts, label: placesLabel.toLowerCase() },
+    ],
   });
 
   const canonicalUrl = `https://www.brahmakumaris.com/centers/${actualRegion.toLowerCase().replace(/\s+/g, '-')}`;

@@ -7,347 +7,276 @@ export const runtime = 'edge';
 export const preferredRegion = 'auto';
 export const dynamic = 'force-dynamic';
 
-// Function to truncate text with ellipsis if too long
-function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + '...';
-}
+/**
+ * Link-preview image (1200×630) for every page: WhatsApp, Facebook, X, etc.
+ *
+ * Params: title, type, eyebrow, subtitle, stats ("469:centers|31:districts").
+ * Older links that only carry `description` still render (as the subtitle, or
+ * as stats when it reads like "469 Centers in 31 Districts").
+ */
 
-// Function to format location breadcrumb
-function formatLocationBreadcrumb(district?: string, state?: string, region?: string): string {
-  const parts = [];
-  if (district) parts.push(district);
-  if (state) parts.push(state);
-  if (region) parts.push(region);
-  return parts.join(' > ');
-}
+// Site palette (app/globals.css: --bk-hero-ink, --uh-ink-gold-deep, …)
+const INK = '#5C3340';
+const INK_SOFT = '#7A4A56';
+const GOLD = '#B8860B';
+const GOLD_DEEP = '#8A6512';
+const MAROON = '#6F2F38';
 
-// Function to get base URL
-const getBaseUrl = () => {
-  if (process.env.NODE_ENV === "development") {
-    return 'http://localhost:5400/centers';
-  }
-  return 'https://www.brahmakumaris.com/centers';
+const DEFAULT_EYEBROW: Record<string, string> = {
+  center: 'Rajyoga Meditation Center',
+  district: 'Rajyoga meditation centers in',
+  state: 'Rajyoga meditation centers in',
+  region: 'Rajyoga meditation centers in',
+  retreat: 'Brahma Kumaris',
+  home: 'Rajyoga meditation center locator',
+  search: 'Rajyoga meditation centers',
+  'current-location': 'Rajyoga meditation centers',
 };
+
+function truncate(text: string, max: number): string {
+  return text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`;
+}
+
+type Stat = { value: string; label: string };
+
+function parseStats(raw: string): Stat[] {
+  return raw
+    .split('|')
+    .map((part) => {
+      const [value, ...label] = part.split(':');
+      return { value: value.trim(), label: label.join(':').trim() };
+    })
+    .filter((stat) => stat.value && stat.label)
+    .slice(0, 3);
+}
+
+/** Old-style description "469 Centers in 31 Districts" → stats */
+function statsFromDescription(description: string): Stat[] {
+  const match = description.match(
+    /(\d[\d,]*)\s*Centers?\s*in\s*(?:\(\s*)?(\d[\d,]*)\s*(Districts?|States?(?:\s*&\s*UTs?)?|Localities|Provinces|States-Uts)/i
+  );
+  if (!match) return [];
+  return [
+    { value: match[1], label: 'centers' },
+    { value: match[2], label: match[3].toLowerCase() },
+  ];
+}
+
+/**
+ * Noto Sans (the site's font) at the given weight, only the glyphs needed.
+ * Google Fonts returns a TTF for this request; on any failure the image falls
+ * back to the bundled regular font rather than failing.
+ */
+async function loadFont(weight: number, text: string): Promise<ArrayBuffer | null> {
+  try {
+    const css = await (
+      await fetch(`https://fonts.googleapis.com/css2?family=Noto+Sans:wght@${weight}&text=${encodeURIComponent(text)}`)
+    ).text();
+    const url = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/)?.[1];
+    if (!url) return null;
+    const res = await fetch(url);
+    return res.ok ? await res.arrayBuffer() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Radiating lines like the Brahma Kumaris logo, drawn faintly on the right */
+function Sunburst() {
+  const size = 720;
+  const c = size / 2;
+  const rays = Array.from({ length: 48 }, (_, i) => {
+    const angle = (i / 48) * Math.PI * 2;
+    const inner = 96;
+    const outer = i % 2 === 0 ? 340 : 270;
+    return (
+      <line
+        key={i}
+        x1={c + inner * Math.cos(angle)}
+        y1={c + inner * Math.sin(angle)}
+        x2={c + outer * Math.cos(angle)}
+        y2={c + outer * Math.sin(angle)}
+        stroke={GOLD}
+        strokeWidth={i % 2 === 0 ? 5 : 3}
+        strokeLinecap="round"
+        strokeOpacity={i % 2 === 0 ? 0.2 : 0.12}
+      />
+    );
+  });
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ position: 'absolute', left: 760, top: -45 }}>
+      <circle cx={c} cy={c} r={70} fill={GOLD} fillOpacity={0.12} />
+      <circle cx={c} cy={c} r={70} fill="none" stroke={GOLD} strokeOpacity={0.3} strokeWidth={3} />
+      {rays}
+    </svg>
+  );
+}
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    
-    // Get dynamic params
-    const title = searchParams.get('title') || 'Brahma Kumaris Centers';
-    const description = searchParams.get('description') || 'Find meditation centers near you';
     const type = searchParams.get('type') || 'center';
-    const location = searchParams.get('location') || '';
-    const centerCount = searchParams.get('centerCount') || '';
-    const district = searchParams.get('district') || '';
-    const state = searchParams.get('state') || '';
-    const region = searchParams.get('region') || '';
+    const title = truncate(searchParams.get('title') || 'Brahma Kumaris Centers', 70);
+    const eyebrow = (searchParams.get('eyebrow') || DEFAULT_EYEBROW[type] || DEFAULT_EYEBROW.center).toUpperCase();
+    const description = searchParams.get('description') || '';
 
-    // Format location breadcrumb
-    const locationText = formatLocationBreadcrumb(district, state, region);
-    
-    // Truncate title if too long
-    const truncatedTitle = truncateText(title, 50);
-    
-    // Add CORS headers
+    let stats = parseStats(searchParams.get('stats') || '');
+    if (stats.length === 0) stats = statsFromDescription(description);
+
+    // Location line: explicit subtitle, else older params
+    const subtitle = truncate(
+      searchParams.get('subtitle') ||
+        searchParams.get('location') ||
+        [searchParams.get('district'), searchParams.get('state')].filter(Boolean).join(', ') ||
+        (stats.length === 0 ? description.split('\n')[0] : ''),
+      60
+    );
+
+    // Shorter titles get bigger type; a long title with stats under it gets
+    // less, so both fit between the brand line and the footer
+    // (bold Noto Sans averages ~0.58em per letter in an 800px column)
+    const titleSize =
+      title.length <= 12 ? 92 : title.length <= 17 ? 78 : stats.length > 0 ? 60 : title.length <= 40 ? 66 : 56;
+    const footerText = 'Free classes · Everyone welcome';
+    const urlText = 'brahmakumaris.com/centers';
+
+    const glyphs = ['BRAHMA KUMARIS', title, eyebrow, subtitle, footerText, urlText, ...stats.flatMap((s) => [s.value, s.label])].join(' ');
+    const [regular, bold] = await Promise.all([loadFont(400, glyphs), loadFont(700, glyphs)]);
+    const fonts = [
+      ...(regular ? [{ name: 'Noto Sans', data: regular, weight: 400 as const, style: 'normal' as const }] : []),
+      ...(bold ? [{ name: 'Noto Sans', data: bold, weight: 700 as const, style: 'normal' as const }] : []),
+    ];
+
     const headers = new Headers();
     headers.set('Access-Control-Allow-Origin', '*');
     headers.set('Access-Control-Allow-Methods', 'GET,OPTIONS');
     headers.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
     headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    
-    // Parse stats from description if available (e.g., "611 Centers in 31 Districts")
-    const statsMatch = description.match(
-      /(\d+)\s*Centers?\s*in\s*(?:\(\s*)?(\d+)\s*(Districts?|States?(?:\s*&\s*UTs?)?|Localities|Provinces|States-Uts)/i
-    );
-    const centersNum = statsMatch ? statsMatch[1] : '';
-    const locationsNum = statsMatch ? statsMatch[2] : '';
-    const locationType = statsMatch ? statsMatch[3] : '';
 
     return new ImageResponse(
       (
         <div
           style={{
-            height: '100%',
             width: '100%',
+            height: '100%',
             display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: '#FFFBF0',
-            backgroundImage: `
-              linear-gradient(135deg, #FFFBF0 0%, #FEF3C7 30%, #FDE68A40 60%, #F5F0E0 100%)
-            `,
-            padding: '0',
             position: 'relative',
+            fontFamily: 'Noto Sans',
+            backgroundColor: '#FFFBF4',
+            backgroundImage: 'linear-gradient(135deg, #FFFCF7 0%, #FBF3E4 55%, #F3E3C6 100%)',
           }}
         >
-          {/* Decorative gradient overlay */}
+          {/* Warm glow behind the sunburst */}
           <div
             style={{
               position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `
-                radial-gradient(ellipse at top right, rgba(184, 134, 11, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom left, rgba(139, 105, 20, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(212, 168, 75, 0.06) 0%, transparent 30%)
-              `,
+              inset: 0,
               display: 'flex',
+              backgroundImage: 'radial-gradient(circle at 1120px 315px, rgba(232, 190, 100, 0.38) 0%, rgba(232, 190, 100, 0) 42%)',
             }}
           />
+          <Sunburst />
 
-          {/* Golden accent line at top */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '5px',
-              backgroundImage: 'linear-gradient(90deg, #8B6914, #DAA520, #B8860B)',
-              display: 'flex',
-            }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', padding: '52px 64px 48px' }}>
+            {/* Brand (text, no logo image) */}
+            <div style={{ display: 'flex', fontSize: 24, letterSpacing: 7, color: MAROON }}>BRAHMA KUMARIS</div>
 
-          {/* Main Content Container */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100%',
-              width: '100%',
-              padding: '48px 60px',
-              position: 'relative',
-            }}
-          >
-            {/* Top Section - Brand */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '24px',
-              }}
-            >
+            {/* Who / where */}
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center', maxWidth: 800 }}>
+              <div style={{ display: 'flex' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    padding: '8px 18px',
+                    borderRadius: 999,
+                    backgroundColor: 'rgba(184, 134, 11, 0.12)',
+                    border: '1.5px solid rgba(168, 122, 42, 0.3)',
+                    color: GOLD_DEEP,
+                    fontSize: 21,
+                    fontWeight: 700,
+                    letterSpacing: 2.5,
+                  }}
+                >
+                  {eyebrow}
+                </div>
+              </div>
+
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  padding: '12px 28px',
-                  borderRadius: '50px',
-                  backgroundImage: 'linear-gradient(135deg, #8B6914, #B8860B)',
-                  border: 'none',
+                  marginTop: 22,
+                  fontSize: titleSize,
+                  fontWeight: 700,
+                  lineHeight: 1.08,
+                  letterSpacing: -1.5,
+                  color: INK,
                 }}
               >
-                {/* Om symbol as brand icon */}
-                <span
-                  style={{
-                    fontSize: '28px',
-                    fontWeight: '700',
-                    color: '#FFFFFF',
-                    letterSpacing: '-0.5px',
-                  }}
-                >
-                  Brahma Kumaris
-                </span>
+                {title}
               </div>
-              
-              {/* Location badge */}
-              {(region || location) && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    marginLeft: '20px',
-                    padding: '12px 24px',
-                    borderRadius: '50px',
-                    backgroundColor: '#92400E',
-                    border: 'none',
-                  }}
-                >
-                  <span style={{ fontSize: '24px', color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    {region || location}
-                  </span>
+
+              {subtitle && (
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 18, fontSize: 30, color: INK_SOFT }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 10 }}>
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  {subtitle}
+                </div>
+              )}
+
+              {stats.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: 26 }}>
+                  {stats.map((stat, index) => (
+                    <div key={stat.label} style={{ display: 'flex', alignItems: 'center' }}>
+                      {index > 0 && (
+                        <div style={{ display: 'flex', width: 2, height: 46, margin: '0 28px', backgroundColor: 'rgba(168, 122, 42, 0.35)' }} />
+                      )}
+                      {/* Bottom-aligned with a small lift so the label sits on the number's baseline */}
+                      <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                        <span style={{ fontSize: 58, fontWeight: 700, lineHeight: 1, color: GOLD_DEEP, letterSpacing: -1 }}>{stat.value}</span>
+                        <span style={{ marginLeft: 10, marginBottom: 3, fontSize: 26, lineHeight: 1, color: INK_SOFT }}>{stat.label}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Middle Section - Main Title */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                flex: 1,
-                justifyContent: 'center',
-              }}
-            >
-              <h1
-                style={{
-                  fontSize: type === 'home' ? '72px' : '80px',
-                  fontWeight: '900',
-                  color: '#1C1917',
-                  margin: '0 0 20px 0',
-                  lineHeight: '1.05',
-                  letterSpacing: '-2px',
-                  textShadow: 'none',
-                  maxWidth: '1000px',
-                }}
-              >
-                {truncatedTitle}
-              </h1>
-
-              {/* Stats Row - Large Numbers */}
-              {centersNum && locationsNum && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '40px',
-                    marginTop: '16px',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'baseline',
-                      gap: '12px',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: '64px',
-                        fontWeight: '900',
-                        color: '#92400E',
-                        letterSpacing: '-2px',
-                      }}
-                    >
-                      {centersNum}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '32px',
-                        fontWeight: '700',
-                        color: '#44403C',
-                      }}
-                    >
-                      Centers
-                    </span>
-                  </div>
-                  
-                  <div
-                    style={{
-                      width: '4px',
-                      height: '50px',
-                      backgroundImage: 'linear-gradient(180deg, #DAA520, #8B6914)',
-                      borderRadius: '2px',
-                      display: 'flex',
-                    }}
-                  />
-                  
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'baseline',
-                      gap: '12px',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: '64px',
-                        fontWeight: '900',
-                        color: '#92400E',
-                        letterSpacing: '-2px',
-                      }}
-                    >
-                      {locationsNum}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '32px',
-                        fontWeight: '700',
-                        color: '#44403C',
-                      }}
-                    >
-                      {locationType}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Description for non-stats pages */}
-              {!centersNum && description && (
-                <p
-                  style={{
-                    fontSize: '36px',
-                    fontWeight: '600',
-                    color: '#44403C',
-                    margin: '16px 0 0 0',
-                    lineHeight: '1.4',
-                    maxWidth: '900px',
-                  }}
-                >
-                  {description.length > 100 ? description.substring(0, 100) + '...' : description}
-                </p>
-              )}
-            </div>
-
-            {/* Bottom Section - CTA & URL */}
+            {/* Footer */}
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginTop: 'auto',
+                paddingTop: 22,
+                borderTop: '2px solid rgba(168, 122, 42, 0.22)',
               }}
             >
-              {/* Free Classes Badge */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
-                  padding: '14px 28px',
-                  borderRadius: '16px',
-                  backgroundColor: '#065F46',
-                  border: 'none',
+                  padding: '12px 22px',
+                  borderRadius: 999,
+                  backgroundImage: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_DEEP} 100%)`,
+                  color: '#FFFFFF',
+                  fontSize: 23,
+                  fontWeight: 700,
                 }}
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                <span
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: '700',
-                    color: '#FFFFFF',
-                  }}
-                >
-                  Free Meditation Classes
-                </span>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF" style={{ marginRight: 10 }}>
+                  <path d="M12 2.5l2.1 6.4a2 2 0 0 0 1.3 1.3l6.1 1.8-6.1 1.8a2 2 0 0 0-1.3 1.3L12 21.5l-2.1-6.4a2 2 0 0 0-1.3-1.3L2.5 12l6.1-1.8a2 2 0 0 0 1.3-1.3L12 2.5z" />
+                </svg>
+                {footerText}
               </div>
-
-              {/* Website URL */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '14px 28px',
-                  borderRadius: '16px',
-                  backgroundImage: 'linear-gradient(135deg, #8B6914, #B8860B)',
-                  border: 'none',
-                }}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-                <span
-                  style={{
-                    fontSize: '22px',
-                    fontWeight: '600',
-                    color: '#FFFFFF',
-                  }}
-                >
-                  brahmakumaris.com/centers
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: 24, fontWeight: 700, color: INK }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 10 }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                  <path d="M2 12h20" />
+                </svg>
+                {urlText}
               </div>
             </div>
           </div>
@@ -357,10 +286,11 @@ export async function GET(req: NextRequest) {
         width: 1200,
         height: 630,
         headers,
+        ...(fonts.length > 0 ? { fonts } : {}),
       }
     );
   } catch (e) {
     console.error('Error generating OG image:', e);
     return new Response('Failed to generate image', { status: 500 });
   }
-} 
+}

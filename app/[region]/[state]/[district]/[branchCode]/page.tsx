@@ -89,37 +89,12 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
     // 5,600+ pages has a differentiated snippet rather than duplicate boilerplate.
     const description = `Learn Rajyoga meditation for free at Brahma Kumaris ${center.name}${localityLabel ? ` in ${localityLabel}, ` : ' in '}${center.state}${country ? `, ${country}` : ''}. Kindly call to confirm timings, then visit for the free 7-day course. Approximate daily hours: morning (7–9 AM) & evening (5–8 PM). Address, contact numbers, timings & directions.`;
     
-    // Format complete address
-    const getCompleteAddress = () => {
-      const { line1, line2, line3, city, pincode } = center.address || {};
-      let parts = [];
-      
-      if (line1) parts.push(line1);
-      if (line2) parts.push(line2);
-      if (line3) parts.push(line3);
-      if (city) parts.push(city);
-      if (pincode) parts.push(pincode);
-      
-      return parts.join(', ');
-    };
-
-    const completeAddress = getCompleteAddress();
-    
-    // Format contact info for OG image with clean text labels
-    const contactLines = [
-      completeAddress,
-      [
-        center.contact ? `Tel: ${center.contact}` : null,
-        center.mobile ? `Mob: ${center.mobile}` : null,
-        center.email ? `Email: ${center.email}` : null
-      ].filter(Boolean).join(' | ')
-    ].filter(Boolean).join('\n');
-
+    // Link-preview image: name and where it is (address and phones are in the
+    // preview text and the page itself)
     const ogImage = generateOgImageUrl({
-      title: center.name, // Shorter title for OG image
-      description: contactLines,
+      title: center.name,
       type: 'center',
-      location: `${center.address?.city || ''}, ${center.state}${country ? `, ${country}` : ''}`,
+      subtitle: [center.address?.city?.trim() || center.district, center.state, country].filter(Boolean).join(', '),
     });
 
     // Build canonical URL

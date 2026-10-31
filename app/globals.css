@@ -386,6 +386,23 @@ html {
   background: var(--uh-wash-gold) !important;
 }
 
+/* Very narrow phones (320–360px): a slightly smaller logo and buttons keep
+   the menu button inside the pill */
+@media (max-width: 360px) {
+  .uh-pill-header__row {
+    gap: 0.4rem;
+    padding-right: 0.45rem;
+  }
+  .uh-pill-header__logo {
+    height: 1.85rem;
+    min-width: 0;
+  }
+  .uh-pill-controls button {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
 .uh-pill-menu-panel {
   left: 0.625rem;
   right: 0.625rem;

@@ -44,6 +44,15 @@ function isPlainClick(event: MouseEvent) {
   return event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
 }
 
+/** Phone or tablet (iPadOS reports itself as a Mac, so touch points tell) */
+function isMobileDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return (
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+  );
+}
+
 const primaryActionClass =
   'inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-spirit-purple-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-spirit-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spirit-purple-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-800 transition-colors';
 const secondaryActionClass =
@@ -244,22 +253,35 @@ export function EmailOptions({
   analyticsType?: ContactAnalyticsType;
 }) {
   const track = () => trackContact(center, analyticsType);
+  // Phones open their mail app (often Gmail) from mailto:, while the Gmail
+  // website asks them to sign in again in the browser. Desktops often have no
+  // mail app set up, so they get Gmail on the web instead.
+  const [mobile] = useState(isMobileDevice);
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
   return (
     <div className="space-y-3">
       <p className="select-all break-all rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700/40 p-3 text-base font-semibold text-neutral-900 dark:text-neutral-100">
         {email}
       </p>
-      <div className="grid grid-cols-3 gap-2">
-        <a href={`mailto:${email}`} onClick={track} className={`${primaryActionClass} px-2`}>
-          <Mail className="h-4 w-4" aria-hidden />
-          Email app
-        </a>
-        <a href={gmailUrl} target="_blank" rel="noopener noreferrer" onClick={track} className={`${secondaryActionClass} px-2`}>
-          Gmail
-        </a>
+      <div className="grid grid-cols-2 gap-2">
+        {mobile ? (
+          <a href={`mailto:${email}`} onClick={track} className={`${primaryActionClass} whitespace-nowrap`}>
+            <Mail className="h-4 w-4" aria-hidden />
+            Email app
+          </a>
+        ) : (
+          <a href={gmailUrl} target="_blank" rel="noopener noreferrer" onClick={track} className={`${primaryActionClass} whitespace-nowrap`}>
+            <Mail className="h-4 w-4" aria-hidden />
+            Open Gmail
+          </a>
+        )}
         <CopyButton value={email} what="email address" onCopied={track} />
       </div>
+      <p className="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
+        {mobile
+          ? "If your email app doesn't open, copy the address."
+          : 'Gmail opens in a new tab. Using another email service? Copy the address.'}
+      </p>
       {formHref && (
         <a
           href={formHref}
@@ -421,7 +443,6 @@ export function EmailLink({ email, formHref, center, analyticsType, className, c
           title="Email the center"
           subtitle={center?.name}
           icon={<Mail className="h-5 w-5" />}
-          hint="If your email app doesn't open, use Gmail or copy the address."
           onClose={() => setOpen(false)}
         >
           <EmailOptions

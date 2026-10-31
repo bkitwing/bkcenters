@@ -59,9 +59,12 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
 
   const ogImage = generateOgImageUrl({
     title: actualState,
-    description: `${lightCenters.length} Centers in ${districts.length} ${districtLevelLabel(actualRegion, { plural: true })}`,
     type: 'state',
-    region: actualRegion,
+    subtitle: country || actualRegion,
+    stats: [
+      { value: lightCenters.length, label: 'centers' },
+      { value: districts.length, label: districtLevelLabel(actualRegion, { plural: true }).toLowerCase() },
+    ],
   });
 
   const canonicalRegionSlug = actualRegion.toLowerCase().replace(/\s+/g, '-');
