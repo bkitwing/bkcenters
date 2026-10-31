@@ -1,16 +1,19 @@
 import React from 'react';
 import Link from 'next/link';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
+import CanonicalRedirect from '@/components/CanonicalRedirect';
 import dynamic from 'next/dynamic';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
-import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmail, getEventsByEmail } from '@/lib/serverCenterData';
-import CenterCard from '@/components/CenterCard';
+import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmail, getEventsByEmail, getCentersNearCenter } from '@/lib/serverCenterData';
+import NearbyResultCard from '@/components/NearbyResultCard';
+import CenterPageSection, { type SectionTone } from '@/components/CenterPageSection';
+import ExpandableBlock from '@/components/ExpandableBlock';
+import { directionsUrl } from '@/lib/phone';
+import { EmailLink, PhoneLink } from '@/components/ContactSheet';
 import ContactForm from '@/components/ContactForm';
 import ShareCenter from '@/components/ShareCenter';
 import FindOtherCenters from '@/components/FindOtherCenters';
-import ContactLink from '@/components/ContactLink';
 import FAQSection from '@/components/FAQSection';
-import CollapsibleSection from '@/components/CollapsibleSection';
 import StickyBottomNav from '@/components/StickyBottomNav';
 import SectionNav from '@/components/SectionNav';
 import SevenDayCourseSection from '@/components/SevenDayCourseSection';
@@ -25,21 +28,9 @@ import EventsSection from '@/components/EventsSection';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel } from '@/lib/centerContent';
-import JoinCourseGuide from '@/components/JoinCourseGuide';
 import { countryLabelFromRegion, districtLevelLabel } from '@/lib/countryUtils';
-import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones } from 'lucide-react';
+import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones, BookOpen } from 'lucide-react';
 import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
-
-/** Next throws this for redirect()/permanentRedirect(); catch blocks must rethrow it. */
-function isNextRedirectError(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'digest' in error &&
-    typeof (error as { digest?: unknown }).digest === 'string' &&
-    (error as { digest: string }).digest.startsWith('NEXT_REDIRECT')
-  );
-}
 
 const EXCLUSIVE_CAMPUS_CONTACT = exclusiveCampusContactByBranch();
 
@@ -77,9 +68,14 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       };
     }
 
+    // Exclusive retreat campuses: their micro-site contact page is canonical
     const campusContact = EXCLUSIVE_CAMPUS_CONTACT[center.branch_code];
     if (campusContact) {
-      permanentRedirect(campusContact);
+      return {
+        title: center.name,
+        alternates: { canonical: `https://www.brahmakumaris.com/centers${campusContact}` },
+        robots: { index: false, follow: true },
+      };
     }
     
     const address = center.address ? 
@@ -172,8 +168,6 @@ export async function generateMetadata({ params }: CenterPageProps): Promise<Met
       },
     };
   } catch (error) {
-    // permanentRedirect() throws — must rethrow or campus redirects never fire
-    if (isNextRedirectError(error)) throw error;
     console.error('Error generating metadata:', error);
     return {
       title: 'Brahma Kumaris Meditation Center',
@@ -263,10 +257,11 @@ export default async function CenterPage({ params }: CenterPageProps) {
       );
     }
 
-    // Exclusive retreat campuses use their micro-site contact as the canonical detail URL
+    // Exclusive retreat campuses use their micro-site contact as the canonical
+    // detail URL (see CanonicalRedirect for why it isn't permanentRedirect)
     const campusContact = EXCLUSIVE_CAMPUS_CONTACT[center.branch_code];
     if (campusContact) {
-      permanentRedirect(campusContact);
+      return <CanonicalRedirect href={campusContact} />;
     }
     
     const formatAddress = () => {
@@ -286,18 +281,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
     
     const formattedAddress = formatAddress();
     
-    const getGoogleMapsUrl = () => {
-      if (center?.coords && Array.isArray(center.coords) && center.coords.length === 2) {
-        const [lat, lng] = center.coords;
-        const address = encodeURIComponent(formattedAddress);
-        
-        return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${address}`;
-      } else {
-        // If no coordinates, just use the address
-        const address = encodeURIComponent(formattedAddress);
-        return `https://www.google.com/maps/dir/?api=1&destination=${address}`;
-      }
-    };
+    // By coordinates when known (destination_place_id would need a Google place ID)
+    const getGoogleMapsUrl = () => directionsUrl(center?.coords, formattedAddress);
     
     const hasMobileOrContact = center.mobile || center.contact;
 
@@ -308,18 +293,26 @@ export default async function CenterPage({ params }: CenterPageProps) {
       description: formattedAddress
     };
 
-    // Get nearby centers from same district (targeted query, no bulk fetch)
-    // Fetch news posts in parallel with nearby centers for performance
-    const [districtCenters, newsData, eventsData] = await Promise.all([
-      getCentersByDistrict(center.state, center.district),
+    // Nearest centers by distance (any district) from the in-memory index, in
+    // parallel with news/events; same-district centers if the index isn't ready
+    const [nearestCenters, newsData, eventsData] = await Promise.all([
+      getCentersNearCenter(center, 6),
       getNewsByEmail(center.email, 6),
       getEventsByEmail(center.email, 20),
     ]);
     const { posts: newsPosts, total: newsTotalCount } = newsData;
     const { events: eventPosts, total: eventsTotalCount } = eventsData;
-    const nearbyCenters = districtCenters
-      .filter(c => c.branch_code !== center.branch_code)
-      .slice(0, 6);
+    const nearbyCenters: (Center & { distance?: number })[] =
+      nearestCenters ??
+      (await getCentersByDistrict(center.state, center.district))
+        .filter(c => c.branch_code !== center.branch_code)
+        .slice(0, 6);
+    const centerLat = parseFloat(center.coords?.[0] ?? '');
+    const centerLng = parseFloat(center.coords?.[1] ?? '');
+    // "See all on the map" → nearby search around this center
+    const nearbySearchUrl = Number.isFinite(centerLat) && Number.isFinite(centerLng)
+      ? `/?lat=${centerLat}&lng=${centerLng}&address=${encodeURIComponent(`${center.name}, ${center.district}`)}`
+      : formatCenterUrl(center.region || actualRegion, center.state, center.district, "");
 
     // Localized, unique-per-center content (intro paragraph, timings, FAQs)
     const nearbyLocalities = nearbyCenters
@@ -363,6 +356,18 @@ export default async function CenterPage({ params }: CenterPageProps) {
       { name: center.name, url: absoluteUrl },
     ];
 
+    // Hero visit cards (timings / address / contact) share one look
+    const heroCardClass =
+      'rounded-2xl border border-[rgba(168,122,42,0.18)] dark:border-[rgba(226,197,106,0.18)] bg-white/75 dark:bg-neutral-900/50 p-4 text-[color:var(--bk-hero-ink)]';
+    const heroCardLabelClass =
+      'inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[color:var(--bk-hero-gold)]';
+    const heroChipClass =
+      'inline-flex items-center gap-1.5 rounded-full border border-[rgba(168,122,42,0.22)] bg-white/80 dark:bg-neutral-800/70 px-3 py-1.5 text-sm font-medium text-[color:var(--bk-hero-gold)] hover:border-[color:var(--bk-hero-gold)] transition-colors';
+    // "Om Shanti. A peaceful space in Raviwar Peth…" — the center's own locality
+    const locality = getLocalityLabel(center);
+    // Sheet subtitle + contact analytics (only what's needed crosses to the client)
+    const contactInfo = { name: center.name, state: center.state, district: center.district };
+
     // Prepare FAQ data for structured data (plain text versions).
     // Localized FAQs are prepended so each page's FAQPage schema is unique.
     const faqData = [
@@ -390,7 +395,9 @@ export default async function CenterPage({ params }: CenterPageProps) {
     ];
 
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300">
+      // Page background = the first band's (white), so the sticky section menu
+      // sits on the same surface as the section under it, not its own grey strip
+      <div className="min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-300">
         {/* Structured Data for SEO */}
         <LocalBusinessSchema center={center} pageUrl={absoluteUrl} description={centerIntro} />
         <BreadcrumbSchema items={breadcrumbItems} />
@@ -401,15 +408,15 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <NewsArticleListSchema posts={newsPosts} centerName={center.name} centerUrl={absoluteUrl} />
         <EventListSchema events={eventPosts} center={center} centerUrl={absoluteUrl} />
 
-        {/* ===== UNIFIED HERO: identity + contact (left) · map (right) ===== */}
+        {/* ===== HERO: who + what to do (left) · compact map (right), one screen ===== */}
         <section
           id="info"
-          className="bk-center-hero bk-hero-underlap relative scroll-mt-bk overflow-hidden min-h-[100svh] flex flex-col"
+          className="bk-center-hero bk-hero-underlap relative scroll-mt-bk overflow-hidden"
         >
           <div className="bk-center-hero__glow" aria-hidden />
 
-          <div className="container mx-auto px-4 pt-4 pb-6 md:pb-8 relative z-10 flex-1 flex flex-col min-h-0">
-            <nav className="mb-4 shrink-0" aria-label="Breadcrumb">
+          <div className="container mx-auto px-4 pt-4 pb-8 md:pb-10 relative z-10">
+            <nav className="mb-4" aria-label="Breadcrumb">
               <ol className="flex items-center text-sm flex-wrap gap-1">
                 <li className="flex items-center">
                   <Link href="/" className="text-[color:var(--bk-hero-muted)] hover:text-[color:var(--bk-hero-ink)] text-xs transition-colors">Home</Link>
@@ -429,118 +436,43 @@ export default async function CenterPage({ params }: CenterPageProps) {
               </ol>
             </nav>
 
-            <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 flex-1 items-center min-h-0">
-              {/* Left — one place for identity + contact (no duplicate card below) */}
-              <div className="lg:col-span-5 xl:col-span-5 space-y-5 lg:self-center">
+            {/* Columns stretch to the same height, so the map lines up with the
+                left column's top and bottom edges on desktop */}
+            <div className="grid lg:grid-cols-12 gap-6 lg:gap-8">
+              {/* Left — who this is and what to do */}
+              <div className="lg:col-span-7 space-y-5">
                 <div>
                   <div className="bk-center-hero__badge mb-3">
                     <Sparkles className="w-3.5 h-3.5" />
                     Brahma Kumaris Rajyoga Meditation Center
                   </div>
-                  <h1 className="text-3xl md:text-4xl lg:text-[2.75rem] font-bold text-[color:var(--bk-hero-ink)] mb-1 leading-tight tracking-tight">
+                  <h1 className="text-3xl md:text-4xl lg:text-[2.6rem] font-bold text-[color:var(--bk-hero-ink)] leading-tight tracking-tight">
                     {center.name}
                   </h1>
+                  <p className="mt-2 max-w-xl text-[15px] md:text-base leading-relaxed text-[color:var(--bk-hero-ink-soft)]">
+                    Om Shanti. A peaceful space{locality ? ` in ${locality}` : ''} to know yourself and feel
+                    God&apos;s love — everyone is welcome, every class is free.
+                  </p>
                   {/* Intro kept for SEO only — not shown in the visual UI */}
                   {centerIntro ? (
                     <p className="sr-only">{centerIntro}</p>
                   ) : null}
                 </div>
 
-                <JoinCourseGuide
-                  morning={timings.morning}
-                  evening={timings.evening}
-                  custom={timings.custom}
-                />
-
-                <div className="bk-center-hero__facts">
-                  <div className="bk-center-hero__fact">
-                    <span className="bk-center-hero__fact-label">Address</span>
-                    <div className="bk-center-hero__fact-body flex items-start gap-2">
-                      <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-[color:var(--bk-hero-gold)]" />
-                      <p>{formattedAddress}</p>
-                    </div>
-                  </div>
-
-                  {hasMobileOrContact && (
-                    <div className="bk-center-hero__fact">
-                      <span className="bk-center-hero__fact-label">Phone</span>
-                      <div className="bk-center-hero__fact-body flex flex-wrap gap-x-4 gap-y-1.5">
-                        {center.contact &&
-                          center.contact.split(',').map((number, index) => {
-                            const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
-                            return (
-                              <ContactLink
-                                key={`contact-${index}`}
-                                href={`tel:${cleanNumber}`}
-                                className="inline-flex items-center gap-1.5 text-[color:var(--bk-hero-gold)] font-medium hover:text-[color:var(--bk-hero-gold-soft)] transition-colors"
-                                center={center}
-                              >
-                                <Phone className="w-3.5 h-3.5 opacity-70" />
-                                {number.trim()}
-                              </ContactLink>
-                            );
-                          })}
-                        {center.mobile &&
-                          center.mobile.split(',').map((number, index) => {
-                            const cleanNumber = number.trim();
-                            return (
-                              <a
-                                key={`mobile-${index}`}
-                                href={`tel:${cleanNumber}`}
-                                className="inline-flex items-center gap-1.5 text-[color:var(--bk-hero-gold)] font-medium hover:text-[color:var(--bk-hero-gold-soft)] transition-colors"
-                              >
-                                <Smartphone className="w-3.5 h-3.5 opacity-70" />
-                                {number.trim()}
-                              </a>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  )}
-
-                  {center.email && (
-                    <div className="bk-center-hero__fact">
-                      <span className="bk-center-hero__fact-label">Email</span>
-                      <div className="bk-center-hero__fact-body">
-                        <ContactLink
-                          href={`mailto:${center.email}`}
-                          className="inline-flex items-center gap-1.5 text-[color:var(--bk-hero-gold)] font-medium hover:text-[color:var(--bk-hero-gold-soft)] transition-colors break-all"
-                          center={center}
-                        >
-                          <Mail className="w-3.5 h-3.5 opacity-70 shrink-0" />
-                          {center.email}
-                        </ContactLink>
-                      </div>
-                    </div>
-                  )}
-
-                  {center.services && center.services.length > 0 && (
-                    <div className="bk-center-hero__fact">
-                      <span className="bk-center-hero__fact-label">Services</span>
-                      <div className="bk-center-hero__fact-body flex flex-wrap gap-1.5">
-                        {center.services.map((service: string, idx: number) => (
-                          <span
-                            key={idx}
-                            className="inline-flex items-center text-[11px] bg-[rgba(184,134,11,0.1)] text-[color:var(--bk-hero-ink-soft)] px-2.5 py-1 rounded-full font-medium border border-[rgba(168,122,42,0.14)]"
-                          >
-                            {service}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Call first to confirm hours, then directions */}
+                {/* What visitors came for — Call, Directions, Share — right under the
+                    name, so they're on the first screen on phones too */}
                 <div
-                  className="bk-center-hero__actions"
+                  className="bk-center-hero__actions max-w-xl"
                   role="group"
                   aria-label="Center actions"
+                  data-center-actions
                 >
                   {hasMobileOrContact && (
                     <CallNowButton
                       mobile={center.mobile}
                       contact={center.contact}
+                      region={center.region}
+                      center={contactInfo}
                       className="bk-center-hero__action bk-center-hero__action--primary cursor-pointer"
                     >
                       <Phone className="w-4 h-4" />
@@ -558,53 +490,146 @@ export default async function CenterPage({ params }: CenterPageProps) {
                   </a>
                   <ShareCenter center={center} pageUrl={absoluteUrl} variant="hero" />
                 </div>
-                <p className="bk-center-hero__query-hint">
-                  Kindly call to confirm timings. For technical help with this page,{' '}
-                  <a href="#contact">ask a question</a>.
-                </p>
 
-                {/* Desktop: search sits with actions in the left column */}
-                <div className="hidden lg:block">
-                  <FindOtherCenters />
+                {/* Visit details: three small labelled cards instead of one long list */}
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className={heroCardClass}>
+                    <p className={heroCardLabelClass}>
+                      <Clock className="w-3.5 h-3.5" aria-hidden />
+                      Class timings
+                    </p>
+                    {timings.custom ? (
+                      <p className="mt-2 text-[15px] font-semibold">{timings.custom}</p>
+                    ) : (
+                      <div className="mt-2 space-y-1 text-[15px]">
+                        <p><span className="font-semibold">Morning</span> {timings.morning}</p>
+                        <p><span className="font-semibold">Evening</span> {timings.evening}</p>
+                      </div>
+                    )}
+                    <p className="mt-2 text-xs text-[color:var(--bk-hero-muted)]">Open daily · times are approximate, please call ahead</p>
+                  </div>
+
+                  <div className={heroCardClass}>
+                    <p className={heroCardLabelClass}>
+                      <MapPin className="w-3.5 h-3.5" aria-hidden />
+                      Address
+                    </p>
+                    <p className="mt-2 text-[15px] leading-snug">{formattedAddress}</p>
+                    <a
+                      href={getGoogleMapsUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--bk-hero-gold)] hover:text-[color:var(--bk-hero-gold-soft)]"
+                    >
+                      Get directions
+                      <ChevronRight className="w-4 h-4" aria-hidden />
+                    </a>
+                  </div>
+
+                  {(hasMobileOrContact || center.email) && (
+                    <div className={`${heroCardClass} sm:col-span-2`}>
+                      <p className={heroCardLabelClass}>
+                        <Phone className="w-3.5 h-3.5" aria-hidden />
+                        Contact
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {/* Each opens a small sheet: Call / Email plus Copy, so it
+                            also works in in-app browsers that block tel:/mailto: */}
+                        {center.contact &&
+                          center.contact.split(',').map((number, index) => {
+                            const shown = number.trim();
+                            if (!shown.replace(/[^0-9+]/g, '')) return null;
+                            return (
+                              <PhoneLink
+                                key={`contact-${index}`}
+                                number={shown}
+                                region={center.region}
+                                center={contactInfo}
+                                className={heroChipClass}
+                              >
+                                <Phone className="w-3.5 h-3.5 opacity-70" aria-hidden />
+                                {shown}
+                              </PhoneLink>
+                            );
+                          })}
+                        {center.mobile &&
+                          center.mobile.split(',').map((number, index) => {
+                            const shown = number.trim();
+                            if (!shown) return null;
+                            return (
+                              <PhoneLink
+                                key={`mobile-${index}`}
+                                number={shown}
+                                region={center.region}
+                                center={contactInfo}
+                                className={heroChipClass}
+                              >
+                                <Smartphone className="w-3.5 h-3.5 opacity-70" aria-hidden />
+                                {shown}
+                              </PhoneLink>
+                            );
+                          })}
+                        {center.email && (
+                          <EmailLink
+                            email={center.email}
+                            formHref="#contact"
+                            center={contactInfo}
+                            className={`${heroChipClass} break-all`}
+                          >
+                            <Mail className="w-3.5 h-3.5 opacity-70 shrink-0" aria-hidden />
+                            {center.email}
+                          </EmailLink>
+                        )}
+                      </div>
+                      {center.services && center.services.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {center.services.map((service: string, idx: number) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center text-[11px] bg-[rgba(184,134,11,0.1)] text-[color:var(--bk-hero-ink-soft)] px-2.5 py-1 rounded-full font-medium border border-[rgba(168,122,42,0.14)]"
+                            >
+                              {service}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Right — map (moderately tall on desktop) */}
-              <div className="lg:col-span-7 xl:col-span-7 h-full min-h-0 flex">
-                <div className="w-full lg:sticky bk-hero-map-sticky rounded-2xl overflow-hidden border border-[rgba(168,122,42,0.2)] shadow-[0_18px_40px_-24px_rgba(74,42,28,0.35)] bg-white dark:bg-neutral-900 dark:border-[rgba(226,197,106,0.22)] flex flex-col lg:h-[min(520px,calc(100svh-var(--bk-header-h,4.75rem)-10rem))]">
-                  <div className="h-[260px] sm:h-[320px] lg:h-auto lg:flex-1 min-h-0">
-                    <CenterMap
-                      centers={mapCenters}
-                      height="100%"
-                      autoZoom={true}
-                      defaultZoom={13}
-                      highlightCenter={true}
-                      showInfoWindowOnLoad={true}
-                    />
+              {/* Right — compact map: this center and the nearest ones */}
+              <div className="lg:col-span-5 flex flex-col">
+                <div className="flex flex-1 flex-col rounded-2xl overflow-hidden border border-[rgba(168,122,42,0.2)] shadow-[0_18px_40px_-24px_rgba(74,42,28,0.35)] bg-white dark:bg-neutral-900 dark:border-[rgba(226,197,106,0.22)]">
+                  <div className="relative h-[240px] sm:h-[300px] lg:h-auto lg:flex-1 lg:min-h-[340px]">
+                    <div className="absolute inset-0">
+                      <CenterMap
+                        centers={mapCenters}
+                        height="100%"
+                        autoZoom={true}
+                        defaultZoom={13}
+                        highlightCenter={true}
+                        showInfoWindowOnLoad={true}
+                      />
+                    </div>
                   </div>
-                  <div className="px-3.5 py-2.5 shrink-0 bg-[#fffdf9]/95 dark:bg-neutral-900/95 border-t border-[rgba(168,122,42,0.12)] dark:border-neutral-800">
-                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
-                      <span className="font-semibold text-spirit-purple-600">Purple</span>: this center
-                      <span className="mx-1.5">·</span>
-                      <span className="font-semibold text-emerald-600">Green</span>: nearby — tap markers for details
+                  <div className="px-3.5 py-2.5 bg-[#fffdf9]/95 dark:bg-neutral-900/95 border-t border-[rgba(168,122,42,0.12)] dark:border-neutral-800">
+                    <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#B8860B]" aria-hidden />
+                        This center
+                      </span>
+                      {nearbyCenters.length > 0 && (
+                        <a href="#nearby" className="inline-flex items-center gap-1.5 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300">
+                          <span className="h-2.5 w-2.5 rounded-full bg-[#4CAF50]" aria-hidden />
+                          Other centers nearby ({nearbyCenters.length})
+                        </a>
+                      )}
                     </p>
                   </div>
                 </div>
               </div>
-
-              {/* Mobile: search after the map so info → actions → map stay first */}
-              <div className="lg:hidden col-span-full">
-                <FindOtherCenters />
-              </div>
             </div>
-
-            <a
-              href="#seven-day-course"
-              className="bk-center-hero__explore hidden lg:inline-flex mt-auto pt-6"
-            >
-              <span>Explore more</span>
-              <ChevronDown className="w-4 h-4" aria-hidden />
-            </a>
           </div>
         </section>
 
@@ -612,242 +637,222 @@ export default async function CenterPage({ params }: CenterPageProps) {
         <SectionNav
           items={[
             { id: 'info', label: 'Info', iconName: 'MapPin' },
+            ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', iconName: 'Map' }] : []),
             { id: 'seven-day-course', label: '7-Day Course', iconName: 'BookOpen' },
             { id: 'guided-meditation', label: 'Meditation', iconName: 'Headphones' },
             ...(eventPosts.length > 0 ? [{ id: 'events', label: 'Events', iconName: 'CalendarDays' }] : []),
             ...(newsPosts.length > 0 ? [{ id: 'news', label: 'News', iconName: 'Newspaper' }] : []),
-            ...(nearbyCenters.length > 0 ? [{ id: 'nearby', label: 'Nearby', iconName: 'Map' }] : []),
             { id: 'faq', label: 'FAQ', iconName: 'HelpCircle' },
             { id: 'contact', label: 'Questions', iconName: 'MessageCircle' },
           ]}
         />
 
-        {/* ===== MAIN CONTENT ===== */}
-        <div className="container mx-auto px-4 py-6 space-y-8 md:space-y-10">
-
-          {/* ===== 7-DAY COURSE SECTION ===== */}
-          <SevenDayCourseSection 
-            centerName={center.name}
-            contact={center.contact}
-            mobile={center.mobile}
-            directionsUrl={getGoogleMapsUrl()}
-          />
-
-          {/* ===== EVENTS SECTION ===== */}
-          {eventPosts.length > 0 && (
-            <div id="events" className="scroll-mt-bk">
-              <EventsSection
-                initialEvents={eventPosts}
-                totalCount={eventsTotalCount}
-                email={center.email}
-              />
-            </div>
-          )}
-
-          {/* ===== NEWS SECTION ===== */}
-          {newsPosts.length > 0 && (
-            <div id="news" className="scroll-mt-bk">
-              <NewsSection
-                initialPosts={newsPosts}
-                totalCount={newsTotalCount}
-                email={center.email}
-              />
-            </div>
-          )}
-
-          {/* ===== GUIDED MEDITATION SECTION ===== */}
-          <section id="guided-meditation" className="scroll-mt-bk">
-            <GuidedMeditationSection />
-          </section>
-
-          {/* ===== NEARBY CENTERS SECTION ===== */}
-          {nearbyCenters.length > 0 && (
-            <section id="nearby" className="scroll-mt-bk">
-              <CollapsibleSection 
-                title="Nearby Centers" 
-                defaultExpanded={false}
-                sectionId="nearby-centers"
-                previewData={nearbyCenters}
+        {/* ===== SECTIONS: full-width bands, alternating backgrounds, one header style ===== */}
+        {(() => {
+          // Alternate band backgrounds in display order so neighbours never match
+          let band = 0;
+          const nextTone = (): SectionTone => (band++ % 2 === 0 ? 'white' : 'tint');
+          return (
+            <>
+              <CenterPageSection
+                id="nearby"
+                eyebrow="Nearby"
+                icon={Map}
+                title={nearbyCenters.length > 0 ? 'Other centers nearby' : 'Find another center'}
+                intent={nearbyCenters.length > 0
+                  ? 'Every center offers the same free classes — choose the one easiest for you to reach.'
+                  : 'Every center offers the same free classes — search for one near you.'}
+                divider={false}
+                action={nearbyCenters.length > 0 ? (
+                  <Link
+                    href={nearbySearchUrl}
+                    className="inline-flex items-center gap-1 text-sm font-semibold text-spirit-purple-700 dark:text-spirit-purple-300 hover:underline underline-offset-2"
+                  >
+                    See all on the map
+                    <ChevronRight className="w-4 h-4" aria-hidden />
+                  </Link>
+                ) : undefined}
+                tone={nextTone()}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {nearbyCenters.map((nearbyCenter) => (
-                    <div 
-                      key={nearbyCenter.branch_code} 
-                      id={`center-card-${nearbyCenter.branch_code}`}
-                      className="block h-full transition-all duration-200 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:shadow-md"
-                    >
-                      <CenterCard 
-                        center={nearbyCenter} 
-                        distance={nearbyCenter.distance} 
-                        showDistance={true} 
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CollapsibleSection>
-            </section>
-          )}
+                {nearbyCenters.length > 0 && (
+                  // Phones: one swipeable row (next card peeks in); larger screens: grid
+                  <ol className="mb-3 flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 overflow-x-auto md:overflow-visible snap-x snap-mandatory scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-1">
+                    {nearbyCenters.map((nearbyCenter, index) => (
+                      <li key={nearbyCenter.branch_code} className="w-[85%] shrink-0 snap-start md:w-auto">
+                        <NearbyResultCard center={nearbyCenter} index={index} />
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                <FindOtherCenters variant="inline" />
+              </CenterPageSection>
 
-          {/* ===== FAQ SECTION ===== */}
-          <section id="faq" className="scroll-mt-bk">
-            <CollapsibleSection 
-              title="Frequently Asked Questions" 
-              defaultExpanded={false}
-              sectionId="faq"
-              faqPreviewData={[
-                {
-                  question: "Do I need an appointment to join the course?",
-                  answer: "No appointment is required. You may visit during class hours. Timings are approximate, so kindly call the center to confirm before you come."
-                },
-                {
-                  question: "What is the Brahma Kumaris?",
-                  answer: "Brahma Kumaris is a worldwide spiritual movement led by women, dedicated to personal transformation and world renewal through Rajyoga Meditation. Founded in India in 1937, Brahma Kumaris has spread to over 110 countries on all continents and has had an extensive impact in many sectors as an international NGO."
-                },
-                {
-                  question: `How to Visit Meditation Center - ${center.name}?`,
-                  answer: `Kindly call to confirm class hours, then visit. Address: ${formatAddress()}`
-                },
-                {
-                  question: "Can anyone visit a Brahma Kumaris center and try Rajyoga meditation?",
-                  answer: "Yes. Every soul is welcome. Whether young or old, student, professional, or homemaker — the doors are open for all. You can sit in silence, experience God's love, and learn meditation in a pure and peaceful atmosphere."
-                },
-                {
-                  question: "What do you teach in the meditation course?",
-                  answer: "In the introductory 7-day Rajyoga course, you learn about the soul, the Supreme Soul, the law of karma, the cycle of time, and the power of purity. Along with knowledge, you also practice connecting with God through meditation, which fills you with peace and strength."
-                },
-                {
-                  question: "Do I need to wear any special dress when I come?",
-                  answer: "There is no special dress required. We lovingly suggest wearing clean, simple, and modest clothing that reflects purity and helps maintain the peaceful atmosphere of the center. What matters most is your intention to connect with God."
-                },
-                {
-                  question: "Do I have to become a full member to attend classes?",
-                  answer: "Not at all. At the Brahma Kumaris, every soul is welcome to attend classes freely, without any formal joining or commitment. This is a spiritual university of God, where you may come, listen, reflect, and take benefit as much as you wish, in your own time and comfort. Everything is offered with love and humility."
-                },
-                {
-                  question: "Do you ask for any money or donation?",
-                  answer: "No, there are no fees for any of the courses or services. As a voluntary organization, everything is offered as a service to the community. If someone wishes, they may contribute voluntarily to support the continuation of this spiritual work."
-                },
-                {
-                  question: "Is Brahma Kumaris connected to any one religion?",
-                  answer: "No. This is a spiritual path. God belongs to everyone, and all souls are His children. People of every background and faith come together here to experience peace, purity, and God's love."
-                },
-                {
-                  question: "What will I feel in the meditation class?",
-                  answer: "You may feel deep peace, lightness, or a sweet connection with God. Some feel God's love, others find clarity or strength to face challenges. Each soul's experience is unique, but always uplifting."
-                },
-                {
-                  question: "In which languages is the knowledge available?",
-                  answer: "Spiritual knowledge is available in many languages — Hindi, English, Tamil, Telugu, Gujarati, Marathi, Bengali, and more. Centers usually teach in the local language so that everyone can understand with ease."
-                },
-                {
-                  question: "If I visit the center, do I have to change my life?",
-                  answer: "There is no compulsion. You can practice at your own pace. Many souls naturally feel inspired to live peacefully, wake up early, speak sweetly, or adopt pure vegetarian food."
-                },
-                {
-                  question: "Is the Brahma Kumaris only for women?",
-                  answer: "No. The Brahma Kumaris is open to all — men, women, youth, and elders. Both brothers and sisters walk this spiritual path together, as equal souls and children of the one Supreme Father."
-                }
-              ]}
-            >
-              <FAQSection center={center} />
-            </CollapsibleSection>
-          </section>
-
-          {/* ===== CONTACT SECTION ===== */}
-          {/* Always shown — inquiries route to a central inbox, so centers
-              without their own email still receive enquiries via the team. */}
-          {(
-            <section id="contact" className="scroll-mt-bk">
-              <CollapsibleSection 
-                title="Other questions" 
-                defaultExpanded={false}
-                sectionId="contact"
+              <CenterPageSection
+                id="seven-day-course"
+                eyebrow="Free course"
+                icon={BookOpen}
+                title="7-Day Rajyoga Meditation Course"
+                intent="Seven short sessions to rediscover the soul, the Supreme and the peace that is already within you."
+                tone={nextTone()}
               >
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                  {/* Contact Info Card */}
-                  <div className="lg:col-span-2 lg:order-2">
-                    <div className="bg-gradient-to-br from-spirit-purple-50 to-spirit-blue-50 dark:from-spirit-purple-900/20 dark:to-spirit-blue-900/20 rounded-2xl p-6 border border-spirit-purple-100 dark:border-spirit-purple-800">
-                      <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-4 flex items-center gap-2">
-                        <MessageCircle className="w-5 h-5 text-spirit-purple-600 dark:text-spirit-purple-400" />
-                        Get in Touch
-                      </h3>
-                      <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-5 leading-relaxed">
-                        To join the free meditation course at {center.name}, kindly call to confirm timings and then visit during class hours. Use this form only if you need technical help with this page, or have another question.
-                      </p>
-                      
-                      <div className="space-y-4">
-                        <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                              <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
-                            </div>
-                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Free for Everyone</p>
-                          </div>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">All meditation sessions and courses are completely free of charge.</p>
-                        </div>
-                        
-                        <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-spirit-blue-100 dark:bg-spirit-blue-900/30 flex items-center justify-center">
-                              <Users className="w-4 h-4 text-spirit-blue-600 dark:text-spirit-blue-400" />
-                            </div>
-                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Open to All</p>
-                          </div>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">No prior experience needed. Everyone is welcome, regardless of background.</p>
-                        </div>
+                <SevenDayCourseSection
+                  centerName={center.name}
+                  contact={center.contact}
+                  mobile={center.mobile}
+                  directionsUrl={getGoogleMapsUrl()}
+                  region={center.region}
+                />
+              </CenterPageSection>
 
-                        <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
-                              <Clock className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
+              {eventPosts.length > 0 && (
+                <CenterPageSection
+                  id="events"
+                  eyebrow="At this center"
+                  icon={CalendarDays}
+                  title="Events"
+                  intent="Come and experience peace together — programs and gatherings at this center."
+                  tone={nextTone()}
+                >
+                  <EventsSection
+                    initialEvents={eventPosts}
+                    totalCount={eventsTotalCount}
+                    email={center.email}
+                    showHeader={false}
+                  />
+                </CenterPageSection>
+              )}
+
+              {newsPosts.length > 0 && (
+                <CenterPageSection
+                  id="news"
+                  eyebrow="At this center"
+                  icon={Newspaper}
+                  title="News & updates"
+                  intent="Recent moments of service and celebration from this center."
+                  tone={nextTone()}
+                >
+                  <NewsSection
+                    initialPosts={newsPosts}
+                    totalCount={newsTotalCount}
+                    email={center.email}
+                    showHeader={false}
+                  />
+                </CenterPageSection>
+              )}
+
+              <CenterPageSection
+                id="guided-meditation"
+                eyebrow="Meditate anywhere"
+                icon={Headphones}
+                title="Guided meditation"
+                intent="Carry the silence home — short guided meditations for peace, rest and focus."
+                tone={nextTone()}
+              >
+                <GuidedMeditationSection />
+              </CenterPageSection>
+
+              <CenterPageSection
+                id="faq"
+                eyebrow="Before you visit"
+                icon={HelpCircle}
+                title="Frequently asked questions"
+                intent="Simple answers for your first visit."
+                tone={nextTone()}
+              >
+                <FAQSection center={center} initialVisible={5} />
+              </CenterPageSection>
+
+              {/* Always shown — inquiries route to a central inbox, so centers
+                  without their own email still receive enquiries via the team. */}
+              <CenterPageSection
+                id="contact"
+                eyebrow="We're here to help"
+                icon={MessageCircle}
+                title="Ask a question"
+                intent="Write to us about anything not answered above. To join a class, simply call and come."
+                tone={nextTone()}
+              >
+                <ExpandableBlock id="contact" openLabel="Write your question" closeLabel="Hide the form">
+                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    {/* Contact Info Card */}
+                    <div className="lg:col-span-2 lg:order-2">
+                      <div className="bg-gradient-to-br from-spirit-purple-50 to-spirit-blue-50 dark:from-spirit-purple-900/20 dark:to-spirit-blue-900/20 rounded-2xl p-6 border border-spirit-purple-100 dark:border-spirit-purple-800">
+                        <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-4 flex items-center gap-2">
+                          <MessageCircle className="w-5 h-5 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                          Good to know
+                        </h3>
+                        <div className="space-y-4">
+                          <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
+                              </div>
+                              <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Free for Everyone</p>
                             </div>
-                            <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Want to learn meditation?</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">All meditation sessions and courses are completely free of charge.</p>
                           </div>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">Kindly call to confirm class hours, then visit during that time.</p>
+
+                          <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="w-8 h-8 rounded-lg bg-spirit-blue-100 dark:bg-spirit-blue-900/30 flex items-center justify-center">
+                                <Users className="w-4 h-4 text-spirit-blue-600 dark:text-spirit-blue-400" />
+                              </div>
+                              <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Open to All</p>
+                            </div>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">No prior experience needed. Everyone is welcome, regardless of background.</p>
+                          </div>
+
+                          <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
+                                <Clock className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
+                              </div>
+                              <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Want to learn meditation?</p>
+                            </div>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">No form needed — call the center to confirm class hours and walk in.</p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Contact Form */}
-                  <div className="lg:col-span-3 lg:order-1">
-                    <ContactForm 
-                      center={center} 
-                      pageUrl={absoluteUrl}
-                      walkIn={{
-                        morning: timings.morning,
-                        evening: timings.evening,
-                        custom: timings.custom,
-                        directionsUrl: getGoogleMapsUrl(),
-                        contact: center.contact,
-                        mobile: center.mobile,
-                      }}
-                    />
+                    {/* Contact Form */}
+                    <div className="lg:col-span-3 lg:order-1">
+                      <ContactForm
+                        center={center}
+                        pageUrl={absoluteUrl}
+                        walkIn={{
+                          morning: timings.morning,
+                          evening: timings.evening,
+                          custom: timings.custom,
+                          directionsUrl: getGoogleMapsUrl(),
+                          contact: center.contact,
+                          mobile: center.mobile,
+                        }}
+                      />
+                    </div>
                   </div>
+                </ExpandableBlock>
+              </CenterPageSection>
+
+              {/* ===== STAY CONNECTED ===== */}
+              <CenterPageSection id="stay-connected" tone={nextTone()}>
+                <SoulSustenance />
+                <div className="mt-8">
+                  <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="inline-flex items-center gap-2 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium text-sm transition-colors">
+                    <ArrowLeft className="w-4 h-4" />
+                    All centers in {center.district} {districtLevelLabel(center.region || actualRegion)}
+                  </Link>
                 </div>
-              </CollapsibleSection>
-            </section>
-          )}
+              </CenterPageSection>
+            </>
+          );
+        })()}
 
-          {/* ===== SOUL SUSTENANCE ===== */}
-          <SoulSustenance />
-
-          {/* ===== BACK LINK ===== */}
-          <div className="pt-6 border-t border-neutral-200 dark:border-neutral-700">
-            <Link href={formatCenterUrl(center.region || actualRegion, center.state, center.district, "")} className="inline-flex items-center gap-2 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium text-sm transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              Back to {center.district} {districtLevelLabel(center.region || actualRegion)}
-            </Link>
-          </div>
-        </div>
-        
         {/* Sticky Bottom Navigation for Mobile */}
         <StickyBottomNav center={center} pageUrl={absoluteUrl} />
       </div>
     );
   } catch (error) {
-    // permanentRedirect() throws — must rethrow or campus redirects never fire
-    if (isNextRedirectError(error)) throw error;
     console.error('Error rendering center page:', error);
     return <EmptyCenterView region={actualRegion} state={state} district={district} branchCode={branchCode} />;
   }

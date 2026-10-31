@@ -8,6 +8,8 @@ interface NewsSectionProps {
   totalCount: number;
   email: string;
   pageSize?: number;
+  /** Own divider heading; off when the page's section frame provides the title */
+  showHeader?: boolean;
 }
 
 function NewsCard({ post }: { post: NewsPost }) {
@@ -76,7 +78,7 @@ function NewsCard({ post }: { post: NewsPost }) {
   );
 }
 
-export default function NewsSection({ initialPosts, totalCount, email, pageSize = 6 }: NewsSectionProps) {
+export default function NewsSection({ initialPosts, totalCount, email, pageSize = 6, showHeader = true }: NewsSectionProps) {
   const [posts, setPosts] = useState<NewsPost[]>(initialPosts);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,15 +109,17 @@ export default function NewsSection({ initialPosts, totalCount, email, pageSize 
   if (posts.length === 0) return null;
 
   return (
-    <div className="mt-10 pt-10">
+    <div className={showHeader ? 'mt-10 pt-10' : ''}>
       {/* Section Divider */}
-      <div className="flex items-center mb-8">
-        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
-        <div className="px-4">
-          <h2 className="text-2xl font-bold text-spirit-purple-700 dark:text-spirit-purple-400 bg-white dark:bg-neutral-900 px-2">News &amp; Updates</h2>
+      {showHeader && (
+        <div className="flex items-center mb-8">
+          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
+          <div className="px-4">
+            <h2 className="text-2xl font-bold text-spirit-purple-700 dark:text-spirit-purple-400 bg-white dark:bg-neutral-900 px-2">News &amp; Updates</h2>
+          </div>
+          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
         </div>
-        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
-      </div>
+      )}
 
       {/* News Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

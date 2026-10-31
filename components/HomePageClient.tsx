@@ -6,11 +6,12 @@ import Link from "next/link";
 import dynamic from 'next/dynamic';
 import SearchBar from "@/components/SearchBar";
 import NearbyResultCard, { NearbyCenter, formatDistanceLabel } from "@/components/NearbyResultCard";
+import CentersListMapView from "@/components/CentersListMapView";
 import { Center, RegionStateMapping } from "@/lib/types";
 import { formatCenterUrl } from "@/lib/urlUtils";
 import { useGoogleMaps } from "@/lib/useGoogleMaps";
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
-import { ChevronLeft, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, ExternalLink, Navigation, Compass, ArrowRight, Share2, Map as MapIcon, List, Check, RotateCw, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Building2, Sparkles, BookOpen, Users, Globe, ExternalLink, Navigation, Compass, ArrowRight, Share2, Check, RotateCw, Loader2 } from 'lucide-react';
 import SoulSustenance from '@/components/SoulSustenance';
 import { districtLevelLabel } from '@/lib/countryUtils';
 
@@ -83,18 +84,6 @@ function parseCoord(value: string | null): number | null {
 /** "Koramangala, Bengaluru, Karnataka, India" → "Koramangala, Bengaluru" */
 function shortPlaceName(address: string): string {
   return address.split(',').map((part) => part.trim()).filter(Boolean).slice(0, 2).join(', ');
-}
-
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    const update = () => setMatches(mql.matches);
-    update();
-    mql.addEventListener('change', update);
-    return () => mql.removeEventListener('change', update);
-  }, [query]);
-  return matches;
 }
 
 /**
@@ -180,20 +169,15 @@ export default function HomePageClient({
   const [status, setStatus] = useState<ResultsStatus>("idle");
   const [loadingMore, setLoadingMore] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [selectedCenter, setSelectedCenter] = useState<NearbyCenter | null>(null);
-  const [hoveredCode, setHoveredCode] = useState<string | null>(null);
-  const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   const [locating, setLocating] = useState(false);
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
   const responseCache = useRef(new Map<string, NearbyPage>());
   const searchKey = hasSearch ? `${lat},${lng},${radius}` : '';
   const searchKeyRef = useRef(searchKey);
   searchKeyRef.current = searchKey;
   const locationKeyRef = useRef('');
-  const mapSectionRef = useRef<HTMLDivElement>(null);
 
   const updateUrl = useCallback(
     (changes: Record<string, string | null>, mode: 'push' | 'replace' = 'push') => {
@@ -252,7 +236,6 @@ export default function HomePageClient({
     if (locationKeyRef.current !== locationKey) {
       locationKeyRef.current = locationKey;
       setResults([]);
-      setSelectedCenter(null);
     }
 
     const controller = new AbortController();
@@ -307,7 +290,7 @@ export default function HomePageClient({
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasMore, results.length, loadMore, mobileView]);
+  }, [hasMore, results.length, loadMore]);
 
   // ?search=<text> (WebSite SearchAction / deep links): geocode the text once Maps is ready
   useEffect(() => {
@@ -431,47 +414,13 @@ export default function HomePageClient({
     }
   };
 
-  // Handle center selection on the map
+  // State marker on the explore map → that state's page
   const handleCenterSelect = (center: Center) => {
     if (center.is_state_summary && center.name) {
       CenterLocatorAnalytics.viewCenter(center);
       const region = center.region || "INDIA";
       router.push(formatCenterUrl(region, center.name));
-      return;
     }
-    setSelectedCenter(center as NearbyCenter);
-    CenterLocatorAnalytics.viewCenter(center);
-  };
-
-  // Card click (desktop) — highlight its pin and pan the map to it
-  const handleCardSelect = (center: NearbyCenter) => {
-    setSelectedCenter(center);
-  };
-
-  const switchMobileView = (view: 'list' | 'map') => {
-    setMobileView(view);
-    if (view === 'map' && !selectedCenter && results[0]) {
-      setSelectedCenter(results[0]);
-    }
-    requestAnimationFrame(() => {
-      if (view === 'map') {
-        mapSectionRef.current?.scrollIntoView({ block: 'start' });
-      } else {
-        const card = selectedCenter && document.getElementById(`center-card-${selectedCenter.branch_code}`);
-        if (card) card.scrollIntoView({ block: 'center' });
-        else window.scrollTo({ top: 0 });
-      }
-    });
-  };
-
-  const selectedIndex = selectedCenter
-    ? results.findIndex((c) => c.branch_code === selectedCenter.branch_code)
-    : -1;
-  const floatingCenter = selectedIndex >= 0 ? results[selectedIndex] : results[0];
-  const floatingIndex = selectedIndex >= 0 ? selectedIndex : 0;
-  const stepFloating = (delta: number) => {
-    const next = results[floatingIndex + delta];
-    if (next) setSelectedCenter(next);
   };
 
   // Smallest radius option that would include the nearest center outside the current radius
@@ -517,7 +466,6 @@ export default function HomePageClient({
     [stateMapMarkers]
   );
 
-  const showMap = isDesktop || mobileView === 'map';
   // Nothing within the radius → still show where the nearest center is
   const mapCenters = useMemo(
     () => (results.length > 0 ? results : nearestOutside ? [nearestOutside] : []),
@@ -738,206 +686,131 @@ export default function HomePageClient({
             ))}
           </div>
 
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-5">
-            {/* ----- List ----- */}
-            <div className={!isDesktop && mobileView === 'map' ? 'hidden' : ''}>
-              {status === 'error' ? (
-                <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-6 py-12 text-center">
-                  <h2 className="text-base font-semibold text-neutral-800 dark:text-neutral-100">Couldn&apos;t load centers</h2>
-                  <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Check your connection and try again.</p>
-                  <button
-                    onClick={() => setRetryCount((n) => n + 1)}
-                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-spirit-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-spirit-purple-700"
-                  >
-                    <RotateCw className="w-4 h-4" aria-hidden /> Try again
-                  </button>
-                </div>
-              ) : status === 'loading' && results.length === 0 ? (
-                <div className="space-y-3" aria-hidden>
-                  {Array.from({ length: 4 }, (_, i) => <ResultSkeleton key={i} />)}
-                </div>
-              ) : status === 'ready' && total === 0 ? (
-                <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-5 py-8 sm:px-8">
-                  <div className="text-center">
-                    <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
-                      <Search className="w-6 h-6 text-neutral-400 dark:text-neutral-500" aria-hidden />
+          <div className="mt-4">
+            <CentersListMapView
+              centers={results}
+              mapCenters={mapCenters}
+              total={total}
+              closestLabel={closestLabel}
+              userLocation={userLocation}
+              userLocationLabel={isCurrentLocation ? 'Your location' : address || 'Searched location'}
+              fitKey={searchKey}
+              fitCount={8}
+            >
+              {({ selectedCode, onCardSelect, onHoverChange }) =>
+                status === 'error' ? (
+                  <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-6 py-12 text-center">
+                    <h2 className="text-base font-semibold text-neutral-800 dark:text-neutral-100">Couldn&apos;t load centers</h2>
+                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Check your connection and try again.</p>
+                    <button
+                      onClick={() => setRetryCount((n) => n + 1)}
+                      className="mt-5 inline-flex items-center gap-2 rounded-xl bg-spirit-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-spirit-purple-700"
+                    >
+                      <RotateCw className="w-4 h-4" aria-hidden /> Try again
+                    </button>
+                  </div>
+                ) : status === 'loading' && results.length === 0 ? (
+                  <div className="space-y-3" aria-hidden>
+                    {Array.from({ length: 4 }, (_, i) => <ResultSkeleton key={i} />)}
+                  </div>
+                ) : status === 'ready' && total === 0 ? (
+                  <div className="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-5 py-8 sm:px-8">
+                    <div className="text-center">
+                      <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
+                        <Search className="w-6 h-6 text-neutral-400 dark:text-neutral-500" aria-hidden />
+                      </div>
+                      <h2 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100">
+                        No centers within {radius} km
+                      </h2>
+                      {nearestOutside && typeof nearestOutside.distance === 'number' && (
+                        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                          The nearest center is {formatDistanceLabel(nearestOutside.distance)} away.
+                        </p>
+                      )}
                     </div>
-                    <h2 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100">
-                      No centers within {radius} km
-                    </h2>
-                    {nearestOutside && typeof nearestOutside.distance === 'number' && (
-                      <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-                        The nearest center is {formatDistanceLabel(nearestOutside.distance)} away.
+                    {nearestOutside && (
+                      <div className="mt-5 text-left">
+                        <NearbyResultCard center={nearestOutside} index={0} closestLabel={closestLabel} />
+                      </div>
+                    )}
+                    <div className="mt-5 flex flex-wrap justify-center gap-2">
+                      {expandRadius && (
+                        <button
+                          onClick={() => handleRadiusChange(expandRadius)}
+                          className="inline-flex items-center gap-2 rounded-xl bg-spirit-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-spirit-purple-700"
+                        >
+                          Show centers within {expandRadius} km
+                          <ChevronRight className="w-4 h-4" aria-hidden />
+                        </button>
+                      )}
+                      {nearestOutside?.state && (
+                        <Link
+                          href={formatCenterUrl(nearestOutside.region || 'INDIA', nearestOutside.state)}
+                          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 dark:border-neutral-600 px-5 py-2.5 text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300"
+                        >
+                          All centers in {nearestOutside.state}
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="sr-only">Results, nearest first</h2>
+                    <ol
+                      className={`space-y-3 transition-opacity ${status === 'loading' ? 'opacity-60' : ''}`}
+                      aria-busy={status === 'loading'}
+                    >
+                      {results.map((center, index) => (
+                        <li key={center.branch_code}>
+                          <NearbyResultCard
+                            center={center}
+                            index={index}
+                            closestLabel={closestLabel}
+                            isActive={selectedCode === center.branch_code}
+                            onSelect={onCardSelect}
+                            onHoverChange={onHoverChange}
+                          />
+                        </li>
+                      ))}
+                    </ol>
+                    <div id="lazy-load-sentinel" className="h-4" />
+                    {loadingMore && (
+                      <div className="flex items-center justify-center gap-2 py-4 text-sm text-neutral-500 dark:text-neutral-400">
+                        <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> Loading more centers…
+                      </div>
+                    )}
+                    {hasMore && !loadingMore && results.length >= AUTO_LOAD_MAX && (
+                      <div className="pt-2 text-center">
+                        <button
+                          onClick={loadMore}
+                          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-5 py-2.5 text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300"
+                        >
+                          Show more centers
+                          <span className="text-neutral-400 font-normal">({(total - results.length).toLocaleString()} more)</span>
+                        </button>
+                      </div>
+                    )}
+                    {!hasMore && results.length > 0 && status === 'ready' && (
+                      <p className="pt-4 text-center text-xs text-neutral-400 dark:text-neutral-500">
+                        Showing all {total.toLocaleString()} centers within {radius} km
                       </p>
                     )}
-                  </div>
-                  {nearestOutside && (
-                    <div className="mt-5 text-left">
-                      <NearbyResultCard center={nearestOutside} index={0} closestLabel={closestLabel} />
-                    </div>
-                  )}
-                  <div className="mt-5 flex flex-wrap justify-center gap-2">
-                    {expandRadius && (
-                      <button
-                        onClick={() => handleRadiusChange(expandRadius)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-spirit-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-spirit-purple-700"
-                      >
-                        Show centers within {expandRadius} km
-                        <ChevronRight className="w-4 h-4" aria-hidden />
-                      </button>
+                    {cityPage && status === 'ready' && results.length > 0 && (
+                      <div className="pt-4 text-center">
+                        <Link
+                          href={cityPage.href}
+                          className="inline-flex items-center gap-1.5 text-sm font-semibold text-spirit-purple-700 dark:text-spirit-purple-300 hover:underline underline-offset-2"
+                        >
+                          Browse all centers in {cityPage.name}
+                          <ArrowRight className="w-4 h-4" aria-hidden />
+                        </Link>
+                      </div>
                     )}
-                    {nearestOutside?.state && (
-                      <Link
-                        href={formatCenterUrl(nearestOutside.region || 'INDIA', nearestOutside.state)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 dark:border-neutral-600 px-5 py-2.5 text-sm font-medium text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300"
-                      >
-                        All centers in {nearestOutside.state}
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <h2 className="sr-only">Results, nearest first</h2>
-                  <ol
-                    className={`space-y-3 transition-opacity ${status === 'loading' ? 'opacity-60' : ''}`}
-                    aria-busy={status === 'loading'}
-                  >
-                    {results.map((center, index) => (
-                      <li key={center.branch_code}>
-                        <NearbyResultCard
-                          center={center}
-                          index={index}
-                          closestLabel={closestLabel}
-                          isActive={selectedCenter?.branch_code === center.branch_code}
-                          onSelect={isDesktop ? handleCardSelect : undefined}
-                          onHoverChange={isDesktop ? setHoveredCode : undefined}
-                        />
-                      </li>
-                    ))}
-                  </ol>
-                  <div id="lazy-load-sentinel" className="h-4" />
-                  {loadingMore && (
-                    <div className="flex items-center justify-center gap-2 py-4 text-sm text-neutral-500 dark:text-neutral-400">
-                      <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> Loading more centers…
-                    </div>
-                  )}
-                  {hasMore && !loadingMore && results.length >= AUTO_LOAD_MAX && (
-                    <div className="pt-2 text-center">
-                      <button
-                        onClick={loadMore}
-                        className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-5 py-2.5 text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300"
-                      >
-                        Show more centers
-                        <span className="text-neutral-400 font-normal">({(total - results.length).toLocaleString()} more)</span>
-                      </button>
-                    </div>
-                  )}
-                  {!hasMore && results.length > 0 && status === 'ready' && (
-                    <p className="pt-4 text-center text-xs text-neutral-400 dark:text-neutral-500">
-                      Showing all {total.toLocaleString()} centers within {radius} km
-                    </p>
-                  )}
-                  {cityPage && status === 'ready' && results.length > 0 && (
-                    <div className="pt-4 text-center">
-                      <Link
-                        href={cityPage.href}
-                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-spirit-purple-700 dark:text-spirit-purple-300 hover:underline underline-offset-2"
-                      >
-                        Browse all centers in {cityPage.name}
-                        <ArrowRight className="w-4 h-4" aria-hidden />
-                      </Link>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* ----- Map: sticky beside the list on desktop, full view on mobile ----- */}
-            {showMap && (
-              <div
-                ref={mapSectionRef}
-                // Mobile: fills the screen below the floating header (the bottom nav is hidden here)
-                className="scroll-mt-24 lg:sticky lg:self-start bk-map-sticky h-[calc(100dvh-7.5rem)] min-h-[380px] lg:min-h-0 lg:h-[calc(100vh-var(--bk-header-h,4.75rem)-1.5rem)]"
-              >
-                <div className="relative h-full bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-                  <CenterMap
-                    centers={mapCenters}
-                    autoZoom={mapCenters.length > 0}
-                    onCenterSelect={handleCenterSelect}
-                    highlightCenter={true}
-                    showInfoWindowOnLoad={false}
-                    height="100%"
-                    selectedCenter={selectedCenter}
-                    userLocation={userLocation}
-                    userLocationLabel={isCurrentLocation ? 'Your location' : address || 'Searched location'}
-                    numbered
-                    hoveredCenterCode={hoveredCode}
-                    scrollToCardOnSelect={isDesktop}
-                    fitKey={searchKey}
-                    fitCount={8}
-                    gestureHandling={isDesktop ? 'cooperative' : 'greedy'}
-                  />
-
-                  {/* Mobile: card for the selected pin, with previous / next */}
-                  {!isDesktop && floatingCenter && (
-                    // Sits above the floating List/Map toggle
-                    <div className="absolute inset-x-3 bottom-14 z-10">
-                      {results.length > 1 && (
-                        <div className="mb-2 flex items-center justify-between">
-                          <button
-                            onClick={() => stepFloating(-1)}
-                            disabled={floatingIndex === 0}
-                            aria-label="Previous center"
-                            className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow-md text-neutral-700 dark:text-neutral-200 disabled:opacity-40"
-                          >
-                            <ChevronLeft className="w-5 h-5" aria-hidden />
-                          </button>
-                          <span className="rounded-full bg-white/95 dark:bg-neutral-800/95 px-3 py-1 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shadow-sm tabular-nums">
-                            {floatingIndex + 1} of {total.toLocaleString()}
-                          </span>
-                          <button
-                            onClick={() => stepFloating(1)}
-                            disabled={floatingIndex >= results.length - 1}
-                            aria-label="Next center"
-                            className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-neutral-800 shadow-md text-neutral-700 dark:text-neutral-200 disabled:opacity-40"
-                          >
-                            <ChevronRight className="w-5 h-5" aria-hidden />
-                          </button>
-                        </div>
-                      )}
-                      <NearbyResultCard
-                        center={floatingCenter}
-                        index={floatingIndex}
-                        closestLabel={closestLabel}
-                        isActive
-                        variant="floating"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+                  </>
+                )
+              }
+            </CentersListMapView>
           </div>
-
-          {/* Mobile: List / Map toggle */}
-          {results.length > 0 && (
-            <div
-              className="lg:hidden fixed left-1/2 -translate-x-1/2 z-40"
-              style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.25rem)' }}
-            >
-              <button
-                onClick={() => switchMobileView(mobileView === 'list' ? 'map' : 'list')}
-                className="inline-flex items-center gap-2 rounded-full bg-neutral-900 dark:bg-white px-5 py-3 text-sm font-semibold text-white dark:text-neutral-900 shadow-xl active:scale-95 transition-transform"
-              >
-                {mobileView === 'list' ? (
-                  <><MapIcon className="w-4 h-4" aria-hidden /> Map</>
-                ) : (
-                  <><List className="w-4 h-4" aria-hidden /> List</>
-                )}
-              </button>
-            </div>
-          )}
         </section>
       ) : (
         /* ===== EXPLORE VIEW (no search active) ===== */

@@ -10,6 +10,8 @@ interface EventsSectionProps {
   initialEvents: EventPost[];
   totalCount: number;
   email: string;
+  /** Own divider heading; off when the page's section frame provides the title */
+  showHeader?: boolean;
 }
 
 function getEventStatus(event: EventPost): EventTab {
@@ -137,7 +139,7 @@ const TABS: { key: EventTab; label: string }[] = [
   { key: 'past', label: 'Past' },
 ];
 
-export default function EventsSection({ initialEvents, totalCount, email }: EventsSectionProps) {
+export default function EventsSection({ initialEvents, totalCount, email, showHeader = true }: EventsSectionProps) {
   const categorized = useMemo(() => {
     const groups: Record<EventTab, EventPost[]> = { ongoing: [], upcoming: [], past: [] };
     for (const event of initialEvents) {
@@ -164,18 +166,20 @@ export default function EventsSection({ initialEvents, totalCount, email }: Even
   if (initialEvents.length === 0) return null;
 
   return (
-    <div className="mt-10 pt-10">
+    <div className={showHeader ? 'mt-10 pt-10' : ''}>
       {/* Section Divider */}
-      <div className="flex items-center mb-8">
-        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
-        <div className="px-4">
-          <h2 className="text-2xl font-bold text-spirit-purple-700 dark:text-spirit-purple-400 bg-white dark:bg-neutral-900 px-2">Events</h2>
+      {showHeader && (
+        <div className="flex items-center mb-8">
+          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
+          <div className="px-4">
+            <h2 className="text-2xl font-bold text-spirit-purple-700 dark:text-spirit-purple-400 bg-white dark:bg-neutral-900 px-2">Events</h2>
+          </div>
+          <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
         </div>
-        <div className="flex-grow h-px bg-gradient-to-r from-transparent via-spirit-purple-300 dark:via-spirit-purple-700 to-transparent"></div>
-      </div>
+      )}
 
-      {/* Tabs */}
-      <div className="flex items-center justify-center gap-1 mb-8">
+      {/* Tabs — left-aligned under a section header, centered under the old one */}
+      <div className={`flex flex-wrap items-center gap-2 mb-6 ${showHeader ? 'justify-center' : 'justify-start'}`}>
         {TABS.map((tab) => {
           const count = categorized[tab.key].length;
           const isActive = activeTab === tab.key;

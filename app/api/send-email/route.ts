@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
+import { phoneToTel } from '@/lib/phone';
 
 // Add this export to tell Next.js that this route is dynamic and should be server-rendered
 export const dynamic = 'force-dynamic';
@@ -31,7 +32,7 @@ function formatCenterAddress(addr?: EmailRequestBody['centerAddress'], state?: s
 }
 
 // Parse phone string with multiple numbers into array of {display, tel} objects
-function parsePhoneNumbers(raw?: string): { display: string; tel: string }[] {
+function parsePhoneNumbers(raw?: string, region?: string): { display: string; tel: string }[] {
   if (!raw) return [];
   // Split on comma, slash, pipe, or semicolon
   return raw.split(/[,\/|;]+/)
@@ -39,7 +40,7 @@ function parsePhoneNumbers(raw?: string): { display: string; tel: string }[] {
     .filter(Boolean)
     .map(num => ({
       display: num,
-      tel: num.replace(/[^0-9+]/g, ''),
+      tel: phoneToTel(num, region).replace(/^tel:/, ''), // same audited rules as the site
     }));
 }
 
@@ -241,7 +242,7 @@ const getCenterEmailTemplate = (data: EmailRequestBody) => `
 // Acknowledgment email template for the sender
 const getAcknowledgmentTemplate = (data: EmailRequestBody) => {
   const centerAddress = formatCenterAddress(data.centerAddress, data.centerState);
-  const phoneNumbers = parsePhoneNumbers(data.centerMobile || data.centerContact);
+  const phoneNumbers = parsePhoneNumbers(data.centerMobile || data.centerContact, data.centerRegion);
   const hasPhone = phoneNumbers.length > 0;
   // Google Maps directions link
   const mapsUrl = centerAddress

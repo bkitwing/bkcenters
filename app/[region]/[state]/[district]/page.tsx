@@ -1,15 +1,17 @@
 import React from 'react';
-import Link from 'next/link';
 // Use server-side data functions that read directly from JSON file (ISR-compatible)
-import { 
-  getCentersByDistrict, 
-  getDistrictsByState, 
+import {
+  getCentersByDistrict,
+  getDistrictsByState,
+  getStateCentersLightweight,
   getRegionForState,
   getRegionBySlug,
   getStateBySlug,
   getDistrictBySlug
 } from '@/lib/serverCenterData';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import CanonicalRedirect from '@/components/CanonicalRedirect';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import DistrictPageClient from './DistrictPageClient';
 import { generateOgImageUrl } from '@/lib/ogUtils';
@@ -18,6 +20,17 @@ import { countryLabelFromRegion } from '@/lib/countryUtils';
 
 // Fallback revalidation: 1 day. Sync script triggers on-demand revalidation via /api/revalidate.
 export const revalidate = 86400;
+
+// ISR: no pages are built at build time; each is rendered on its first request,
+// then served from the cache and refreshed every `revalidate` seconds (or on
+// demand via /api/revalidate). Without this, Next renders the route on every request.
+export async function generateStaticParams() {
+  return [];
+}
+
+// Any slug may be requested (rendered on demand, then cached). Slugs with no
+// centers return a real 404 (also cached), never an empty page with status 200.
+export const dynamicParams = true;
 
 interface DistrictPageProps {
   params: {
@@ -31,14 +44,20 @@ export async function generateMetadata({ params }: DistrictPageProps): Promise<M
   const stateSlug = decodeURIComponent(params.state);
   const districtSlug = decodeURIComponent(params.district);
   
-  const actualState = await getStateBySlug(stateSlug) || stateSlug;
-  const actualDistrict = await getDistrictBySlug(stateSlug, districtSlug) || districtSlug;
+  const [stateFromSlug, districtFromSlug] = await Promise.all([
+    getStateBySlug(stateSlug),
+    getDistrictBySlug(stateSlug, districtSlug),
+  ]);
+  const actualState = stateFromSlug || stateSlug;
+  const actualDistrict = districtFromSlug || districtSlug;
   
   // Parallel: fetch centers + region (lightweight state→region relation)
   const [centers, actualRegion] = await Promise.all([
     getCentersByDistrict(actualState, actualDistrict),
     getRegionForState(actualState),
   ]);
+  // Unknown city: 404 here too, so the not-found page carries only noindex
+  if (centers.length === 0) notFound();
   
   const country = countryLabelFromRegion(actualRegion);
   const title = `${actualDistrict} - Brahma Kumaris Rajyog Meditation Centers - ${actualState}`;
@@ -103,31 +122,47 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
   const stateSlug = decodeURIComponent(params.state);
   const districtSlug = decodeURIComponent(params.district);
   
-  // Get actual names from slugs
-  const actualRegion = await getRegionBySlug(regionSlug) || regionSlug;
-  const actualState = await getStateBySlug(stateSlug) || stateSlug;
-  const actualDistrict = await getDistrictBySlug(stateSlug, districtSlug) || districtSlug;
+  // Get actual names from slugs (independent lookups, run together)
+  const [regionFromSlug, stateFromSlug, districtFromSlug] = await Promise.all([
+    getRegionBySlug(regionSlug),
+    getStateBySlug(stateSlug),
+    getDistrictBySlug(stateSlug, districtSlug),
+  ]);
+  const actualRegion = regionFromSlug || regionSlug;
+  const actualState = stateFromSlug || stateSlug;
+  const actualDistrict = districtFromSlug || districtSlug;
   
   // Get the actual region for this state from our data
   const stateRegion = await getRegionForState(actualState);
   
-  const centers = await getCentersByDistrict(actualState, actualDistrict);
-  
-  // Check if the URL region matches the actual region
+  // State centers (lightweight, same cached call the state page uses) give the
+  // "Other cities in <state>" links with their center counts
+  const [centers, stateCenters] = await Promise.all([
+    getCentersByDistrict(actualState, actualDistrict),
+    getStateCentersLightweight(actualState).catch(() => []),
+  ]);
+
+  const districtCounts = new Map<string, number>();
+  stateCenters.forEach((center) => {
+    if (center.district && center.district !== actualDistrict) {
+      districtCounts.set(center.district, (districtCounts.get(center.district) || 0) + 1);
+    }
+  });
+  const otherDistricts = Array.from(districtCounts.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name, count]) => ({
+      name,
+      count,
+      href: formatCenterUrl(stateRegion, actualState, name),
+    }));
+
+  // Unknown city (typo, old link): 404 instead of an empty page
+  if (centers.length === 0) notFound();
+
+  // Right city under the wrong region in the URL: send visitors on to the
+  // canonical URL (see CanonicalRedirect for why it isn't permanentRedirect)
   if (actualRegion !== stateRegion && stateRegion !== 'INDIA') {
-    // Redirect to the correct URL
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl mb-4">Redirecting to correct region...</h1>
-        <p>The state {actualState} belongs to region {stateRegion}, not {actualRegion}.</p>
-        <p className="mt-4">
-          <Link href={formatCenterUrl(stateRegion, actualState, actualDistrict)} className="text-primary">
-            Click here if you are not redirected automatically.
-          </Link>
-        </p>
-        <script dangerouslySetInnerHTML={{ __html: `window.location.href = "${formatCenterUrl(stateRegion, actualState, actualDistrict)}";` }} />
-      </div>
-    );
+    return <CanonicalRedirect href={formatCenterUrl(stateRegion, actualState, actualDistrict)} />;
   }
   
   // Base URL for structured data
@@ -177,6 +212,7 @@ export default async function DistrictPage({ params }: DistrictPageProps) {
         actualDistrict={actualDistrict}
         stateRegion={stateRegion}
         centers={centers}
+        otherDistricts={otherDistricts}
       />
     </>
   );

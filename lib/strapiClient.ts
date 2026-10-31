@@ -429,19 +429,18 @@ export async function loadCentersNearbyBBox(
 export async function fetchRegionStats(
   region: string
 ): Promise<{ name: string; centerCount: number; districtCount: number }[]> {
-  // Fetch all centers for the region with MINIMAL fields
-  let all: any[] = [];
-  let page = 1;
+  // Fetch all centers for the region with MINIMAL fields — first page tells us
+  // the page count, the rest are fetched in parallel (India: 3 pages of ~370 KB)
   const filter = `centers?filters[district_center][state_center][region_center][name][$eq]=${encodeURIComponent(region)}&${POPULATE_STATS}`;
-  while (true) {
-    const res = await strapiGet<any[]>(
-      `${filter}&pagination[page]=${page}&pagination[pageSize]=2000`,
-      { revalidate: 86400, tags: [`region-stats-${region}`] }
-    );
-    all = all.concat(res.data || []);
-    if (page >= res.meta.pagination.pageCount) break;
-    page++;
-  }
+  const cacheOptions = { revalidate: 86400, tags: [`region-stats-${region}`] };
+  const pagePath = (page: number) => `${filter}&pagination[page]=${page}&pagination[pageSize]=2000`;
+  const first = await strapiGet<any[]>(pagePath(1), cacheOptions);
+  const rest = await Promise.all(
+    Array.from({ length: Math.max(0, first.meta.pagination.pageCount - 1) }, (_, i) =>
+      strapiGet<any[]>(pagePath(i + 2), cacheOptions)
+    )
+  );
+  const all: any[] = [first, ...rest].flatMap((res) => res.data || []);
 
   // Group by state → count centers and unique districts
   const stateMap = new Map<string, { centerCount: number; districts: Set<string> }>();

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { Center } from '@/lib/types';
 import MapSection from '@/components/MapSection';
-import ContactLink from '@/components/ContactLink';
+import { EmailLink, PhoneLink } from '@/components/ContactSheet';
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
 
 interface RetreatPageClientProps {
@@ -146,12 +146,11 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
                     </svg>
                     <div>
                       {center.contact.split(',').map((number, index) => {
-                        const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
                         return (
                           <span key={index}>
-                            <a href={`tel:${cleanNumber}`} className="hover:underline">
+                            <PhoneLink number={number.trim()} region={center.region} center={center} analyticsType="retreat" className="hover:underline">
                               {number.trim()}
-                            </a>
+                            </PhoneLink>
                             {index < center.contact.split(',').length - 1 && <span className="mx-1">,</span>}
                           </span>
                         );
@@ -170,14 +169,9 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
                         const cleanNumber = number.trim();
                         return (
                           <span key={index}>
-                            <ContactLink 
-                              href={`tel:${cleanNumber}`} 
-                              className="hover:underline"
-                              center={center}
-                              analyticsType="retreat"
-                            >
+                            <PhoneLink number={cleanNumber} region={center.region} center={center} analyticsType="retreat" className="hover:underline">
                               {cleanNumber}
-                            </ContactLink>
+                            </PhoneLink>
                             {index < center.mobile.split(',').length - 1 && <span className="mx-1">,</span>}
                           </span>
                         );
@@ -191,14 +185,9 @@ export default function RetreatPageClient({ centers }: RetreatPageClientProps) {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <ContactLink 
-                       href={`mailto:${center.email}`} 
-                       className="hover:underline truncate"
-                       center={center}
-                       analyticsType="retreat"
-                     >
-                       {center.email}
-                     </ContactLink>
+                    <EmailLink email={center.email} center={center} analyticsType="retreat" className="hover:underline truncate">
+                      {center.email}
+                    </EmailLink>
                   </div>
                 )}
               </div>

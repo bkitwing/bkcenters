@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { CenterLocatorAnalytics } from './GoogleAnalytics';
+import { EmailLink, PhoneLink } from './ContactSheet';
 
 interface CenterCardProps {
   center: Center;
@@ -124,16 +125,11 @@ const CenterCard: React.FC<CenterCardProps> = ({
             </svg>
             <div>
               {center.contact.split(',').map((number, index) => {
-                const cleanNumber = number.trim().replace(/[^0-9+]/g, '');
                 return (
                   <span key={index}>
-                    <a 
-                      href={`tel:${cleanNumber}`} 
-                      className="hover:underline"
-                      onClick={() => CenterLocatorAnalytics.contactCenter(center)}
-                    >
+                    <PhoneLink number={number.trim()} region={center.region} center={center} className="hover:underline">
                       {number.trim()}
-                    </a>
+                    </PhoneLink>
                     {index < center.contact.split(',').length - 1 && <span className="mx-1">,</span>}
                   </span>
                 );
@@ -152,13 +148,9 @@ const CenterCard: React.FC<CenterCardProps> = ({
                 const cleanNumber = number.trim();
                 return (
                   <span key={index}>
-                    <a 
-                      href={`tel:${cleanNumber}`} 
-                      className="hover:underline"
-                      onClick={() => CenterLocatorAnalytics.contactCenter(center)}
-                    >
+                    <PhoneLink number={cleanNumber} region={center.region} center={center} className="hover:underline">
                       {cleanNumber}
-                    </a>
+                    </PhoneLink>
                     {index < center.mobile.split(',').length - 1 && <span className="mx-1">,</span>}
                   </span>
                 );
@@ -172,13 +164,9 @@ const CenterCard: React.FC<CenterCardProps> = ({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-neutral-500 dark:text-neutral-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <a 
-              href={`mailto:${center.email}`} 
-              className="hover:underline truncate"
-              onClick={() => CenterLocatorAnalytics.contactCenter(center)}
-            >
+            <EmailLink email={center.email} center={center} className="hover:underline truncate">
               {center.email}
-            </a>
+            </EmailLink>
           </div>
         )}
       </div>

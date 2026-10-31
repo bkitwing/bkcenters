@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { reloadNearbyIndexNow } from '@/lib/nearbyIndex';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,18 @@ export async function POST(request: NextRequest) {
     const { paths, path, tags, tag, all } = body;
     const revalidatedPaths: string[] = [];
     const revalidatedTags: string[] = [];
+
+    // Pages (state/city lists, nearby centers, search) read the in-memory center
+    // index; reload it before marking pages stale so their re-render uses the
+    // new Strapi data. Data fetches are cached too, so drop that cache first.
+    revalidateTag('centers-nearby');
+    let indexReloaded = true;
+    try {
+      await reloadNearbyIndexNow();
+    } catch (error) {
+      indexReloaded = false;
+      console.error('Revalidate: center index reload failed', error);
+    }
 
     // Revalidate by tags (batch)
     if (tags && Array.isArray(tags)) {
@@ -91,6 +104,7 @@ export async function POST(request: NextRequest) {
       success: true,
       revalidated: revalidatedPaths,
       revalidatedTags,
+      indexReloaded,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

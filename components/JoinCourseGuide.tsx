@@ -15,13 +15,13 @@ export default function JoinCourseGuide({ morning, evening, custom }: JoinCourse
     <div className="bk-center-hero__join">
       <div className="bk-center-hero__join-kicker">
         <Sparkles className="w-3.5 h-3.5" aria-hidden />
-        How to Learn Rajyoga Meditation
+        Learn Rajyoga meditation · free
       </div>
-      <p className="bk-center-hero__join-title">Kindly visit during below timings</p>
-      <p className="bk-center-hero__join-lead" style={{ marginTop: '0.75rem' }}>
- 
+      <p className="bk-center-hero__join-title">Visit during class hours</p>
+      {/* A divider can't live inside <p> (invalid HTML the browser rewrites) */}
+      <div style={{ marginTop: '0.75rem' }}>
         <hr className="bk-center-hero__join-divider" />
-         </p>
+      </div>
       {custom ? (
         <p className="bk-center-hero__join-hours">
           <Clock className="w-3.5 h-3.5 shrink-0" aria-hidden />
@@ -39,7 +39,7 @@ export default function JoinCourseGuide({ morning, evening, custom }: JoinCourse
           </span>
         </div>
       )}
-      <p className="bk-center-hero__join-note">Open daily. Hours may vary — Kindly call the center to confirm before you visit.</p>
+      <p className="bk-center-hero__join-note">Open daily. Times can vary — call the center to confirm before you visit.</p>
     </div>
   );
 }

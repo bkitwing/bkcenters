@@ -27,9 +27,30 @@ import {
   fetchStateBySlug,
   fetchDistrictBySlug,
   fetchRegionStats,
+  loadCentersLightweight,
   fetchStateCentersLightweight,
   fetchRegionForState as fetchRegionForStateFromStrapi,
 } from './strapiClient';
+import { distanceKm, getIndexedCentersWithin } from './nearbyIndex';
+
+// How long a page render waits for the in-memory center index if it's still loading
+const INDEX_WAIT_MS = 6000;
+
+/**
+ * Every center from the in-memory index (lib/nearbyIndex.ts), which the running
+ * server keeps for nearby search. State and region summaries are computed from
+ * it in milliseconds instead of downloading them from Strapi on each first
+ * render. Null during `next build` (the index lives in the running server) or
+ * if it isn't ready — callers then use Strapi.
+ */
+async function getIndexedCentersForPage(): Promise<Center[] | null> {
+  if (process.env.NEXT_PHASE === 'phase-production-build') return null;
+  try {
+    return await getIndexedCentersWithin(INDEX_WAIT_MS);
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Load all centers from Strapi CMS.
@@ -93,6 +114,17 @@ export async function getCentersByDistrict(state: string, district: string): Pro
  * Returns only name, slug, district, coords — no address/email/contact.
  */
 export async function getStateCentersLightweight(state: string) {
+  const indexed = await getIndexedCentersForPage();
+  if (indexed) {
+    return indexed
+      .filter((center) => center.state === state)
+      .map((center) => ({
+        name: center.name,
+        slug: center.slug,
+        district: center.district,
+        coords: center.coords,
+      }));
+  }
   return fetchStateCentersLightweight(state);
 }
 
@@ -329,8 +361,200 @@ export async function getRegionsWithDetails(): Promise<
 }
 
 /**
- * Fast function to get states by region.
- * Uses lightweight stats query (~10x smaller payload than full center fetch).
+ * The centers closest to `center` (across district borders), nearest first,
+ * with `distance` in km — from the in-memory index. Null when the index isn't
+ * ready or the center has no coordinates; callers then use same-district centers.
+ */
+export async function getCentersNearCenter(
+  center: Center,
+  limit = 6,
+  maxKm = 50
+): Promise<(Center & { distance: number })[] | null> {
+  const lat = parseFloat(center.coords?.[0] ?? '');
+  const lng = parseFloat(center.coords?.[1] ?? '');
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  const indexed = await getIndexedCentersForPage();
+  if (!indexed) return null;
+
+  return indexed
+    .filter((other) => other.branch_code !== center.branch_code)
+    .flatMap((other) => {
+      const oLat = parseFloat(other.coords?.[0] ?? '');
+      const oLng = parseFloat(other.coords?.[1] ?? '');
+      if (!Number.isFinite(oLat) || !Number.isFinite(oLng)) return [];
+      const distance = distanceKm(lat, lng, oLat, oLng);
+      return distance <= maxKm ? [{ ...other, distance: Math.round(distance * 10) / 10 }] : [];
+    })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, limit);
+}
+
+/**
+ * Short name of a center's area for lists: drops the district (or its first
+ * word) the name starts with — "Pune Raviwar Peth" in Pune → "Raviwar Peth",
+ * "Mumbai Borivali" in Mumbai Suburban → "Borivali".
+ */
+export function centerAreaName(centerName: string, district: string): string {
+  const name = centerName.trim();
+  const lower = name.toLowerCase();
+  for (const prefix of [district.trim(), district.trim().split(/\s+/)[0]]) {
+    const p = prefix.toLowerCase();
+    if (p && lower.startsWith(`${p} `)) {
+      const rest = name.slice(prefix.length).trim();
+      // Keep "Thane (east)" whole rather than showing just "(east)"
+      return /^[A-Za-z]/.test(rest) && rest.length >= 3 ? rest : name;
+    }
+  }
+  return name;
+}
+
+/** [lat, lng] numbers for valid coordinates (4 decimals ≈ 11 m), else null */
+function toPoint(coords: [string, string] | undefined | null): [number, number] | null {
+  const lat = parseFloat(coords?.[0] ?? '');
+  const lng = parseFloat(coords?.[1] ?? '');
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return [Math.round(lat * 1e4) / 1e4, Math.round(lng * 1e4) / 1e4];
+}
+
+/**
+ * Middle of an area as map coords: the median point, which stays in the dense
+ * core (the main city) instead of being pulled out by a few far-off centers.
+ */
+function centroid(points: [number, number][]): [string, string] | null {
+  if (points.length === 0) return null;
+  const median = (values: number[]) => {
+    const sorted = [...values].sort((x, y) => x - y);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
+  return [median(points.map((p) => p[0])).toFixed(5), median(points.map((p) => p[1])).toFixed(5)];
+}
+
+export type DistrictDetail = {
+  district: string;
+  centerCount: number;
+  /** Map bubble position (middle of its centers) */
+  coords: [string, string] | null;
+  /** Every center's location — for "distance to the nearest center" */
+  points: [number, number][];
+  /** A few well-known localities: the most central centers, one per locality */
+  areas: string[];
+};
+
+/**
+ * Localities people are likely to recognise: centers closest to the middle of
+ * the district (usually the main city) first, skipping repeats of the same
+ * locality ("Andheri (east) J.B. Nagar" and "Andheri (east) Poonam Nagar").
+ */
+function centralAreas(
+  centers: { name: string; coords: [string, string] }[],
+  district: string,
+  middle: [string, string] | null,
+  count: number
+): string[] {
+  const [midLat, midLng] = middle ? [Number(middle[0]), Number(middle[1])] : [NaN, NaN];
+  const byCloseness = centers
+    .map((c) => {
+      const point = toPoint(c.coords);
+      const d = point && middle ? (point[0] - midLat) ** 2 + (point[1] - midLng) ** 2 : Infinity;
+      return { area: centerAreaName(c.name, district), d };
+    })
+    .sort((a, b) => a.d - b.d || a.area.localeCompare(b.area));
+
+  const seenLocalities = new Set<string>();
+  const areas: string[] = [];
+  for (const { area } of byCloseness) {
+    const locality = area.toLowerCase().split(/[\s(,]+/)[0];
+    if (seenLocalities.has(locality)) continue;
+    seenLocalities.add(locality);
+    areas.push(area);
+    if (areas.length === count) break;
+  }
+  return areas;
+}
+
+/** Per-district counts, locations and area names from a state's (lightweight) centers */
+export function summarizeDistricts(
+  districts: string[],
+  centers: { name: string; district: string; coords: [string, string] }[],
+  areasPerDistrict = 3
+): DistrictDetail[] {
+  return districts
+    .map((district) => {
+      const inDistrict = centers.filter((c) => c.district === district);
+      const points = inDistrict.map((c) => toPoint(c.coords)).filter((p): p is [number, number] => p !== null);
+      const middle = centroid(points);
+      return {
+        district,
+        centerCount: inDistrict.length,
+        coords: middle,
+        points,
+        areas: centralAreas(inDistrict, district, middle, areasPerDistrict),
+      };
+    })
+    .sort((a, b) => b.centerCount - a.centerCount); // Most centers first
+}
+
+export type StateDetail = {
+  name: string;
+  centerCount: number;
+  districtCount: number;
+  /** Map bubble position (middle of its centers) */
+  coords: [string, string] | null;
+  /** Middle of each district — for an approximate "distance to the nearest city" */
+  districtPoints: [number, number][];
+  /** Districts with the most centers */
+  topDistricts: string[];
+};
+
+/**
+ * Per-state counts, top cities and locations for a region (country) page.
+ * From the in-memory center index when ready; otherwise the lightweight
+ * all-centers query the home page already caches.
+ */
+export async function getRegionStateDetails(region: string, topPerState = 3): Promise<StateDetail[]> {
+  const centers = (await getIndexedCentersForPage()) ?? (await loadCentersLightweight());
+
+  const byState = new Map<string, Map<string, [number, number][]>>();
+  const countByState = new Map<string, number>();
+  for (const center of centers) {
+    if (center.region !== region || !center.state) continue;
+    countByState.set(center.state, (countByState.get(center.state) || 0) + 1);
+    const districts = byState.get(center.state) || new Map<string, [number, number][]>();
+    const district = center.district || '';
+    const points = districts.get(district) || [];
+    const point = toPoint(center.coords);
+    if (point) points.push(point);
+    districts.set(district, points);
+    byState.set(center.state, districts);
+  }
+
+  return Array.from(byState.entries())
+    .map(([name, districts]) => {
+      const named = Array.from(districts.entries()).filter(([district]) => district);
+      const allPoints = Array.from(districts.values()).flat();
+      return {
+        name,
+        centerCount: countByState.get(name) || 0,
+        districtCount: named.length,
+        coords: centroid(allPoints),
+        districtPoints: named
+          .map(([, points]) => centroid(points))
+          .filter((c): c is [string, string] => c !== null)
+          .map(([lat, lng]) => [Number(lat), Number(lng)] as [number, number]),
+        topDistricts: named
+          .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
+          .slice(0, topPerState)
+          .map(([district]) => district),
+      };
+    })
+    .sort((a, b) => b.centerCount - a.centerCount);
+}
+
+/**
+ * Fast function to get states by region (center and district counts per state).
+ * From the in-memory center index when ready; otherwise the lightweight Strapi
+ * stats query (~1 MB for India, so only as a fallback).
  */
 export async function getStatesByRegionFast(region: string): Promise<
   {
@@ -339,7 +563,25 @@ export async function getStatesByRegionFast(region: string): Promise<
     districtCount: number;
   }[]
 > {
-  return fetchRegionStats(region);
+  const indexed = await getIndexedCentersForPage();
+  if (!indexed) return fetchRegionStats(region);
+
+  // Same grouping as fetchRegionStats: per state, count centers and unique districts
+  const stateMap = new Map<string, { centerCount: number; districts: Set<string> }>();
+  for (const center of indexed) {
+    if (center.region !== region || !center.state) continue;
+    const entry = stateMap.get(center.state) || { centerCount: 0, districts: new Set<string>() };
+    entry.centerCount++;
+    if (center.district) entry.districts.add(center.district);
+    stateMap.set(center.state, entry);
+  }
+  return Array.from(stateMap.entries())
+    .map(([name, data]) => ({
+      name,
+      centerCount: data.centerCount,
+      districtCount: data.districts.size,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**

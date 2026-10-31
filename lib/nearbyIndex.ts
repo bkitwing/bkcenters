@@ -61,6 +61,15 @@ function refresh(): Promise<void> {
   return store.inflight;
 }
 
+/**
+ * Reload the index now and wait for it — used by /api/revalidate so pages
+ * re-rendered after a Strapi update read fresh data, not the 30-minute-old copy.
+ */
+export async function reloadNearbyIndexNow(): Promise<void> {
+  if (store.inflight) await store.inflight; // let a load already running finish first
+  await refresh();
+}
+
 /** The loaded index, or null while the first load is still running. */
 export function getNearbyIndex(): IndexedCenter[] | null {
   if (!store.entries || Date.now() - store.loadedAt > REFRESH_AFTER_MS) {
@@ -72,6 +81,24 @@ export function getNearbyIndex(): IndexedCenter[] | null {
 /** All centers from the index (for text search), or null while loading. */
 export function getIndexedCenters(): Center[] | null {
   getNearbyIndex();
+  return store.allCenters;
+}
+
+/**
+ * All centers from the index, waiting up to `maxWaitMs` for a load already in
+ * progress (e.g. the preload at server start). Null if it isn't ready in time.
+ */
+export async function getIndexedCentersWithin(maxWaitMs: number): Promise<Center[] | null> {
+  const ready = getIndexedCenters();
+  if (ready || !store.inflight) return ready;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  await Promise.race([
+    store.inflight,
+    new Promise<void>((resolve) => {
+      timer = setTimeout(resolve, maxWaitMs);
+    }),
+  ]);
+  clearTimeout(timer);
   return store.allCenters;
 }
 

@@ -322,6 +322,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 <CallNowButton
                   contact={walkIn.contact}
                   mobile={walkIn.mobile}
+                  region={center.region}
                   className="inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   Call to confirm

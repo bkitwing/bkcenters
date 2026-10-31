@@ -6,6 +6,7 @@ import CallNowButton from '@/components/CallNowButton';
 import { Center } from '@/lib/types';
 import { formatCenterUrl } from '@/lib/urlUtils';
 import { CenterLocatorAnalytics } from '@/components/GoogleAnalytics';
+import { callableNumbers } from '@/lib/phone';
 
 export type NearbyCenter = Center & { distance?: number };
 
@@ -42,7 +43,10 @@ interface NearbyResultCardProps {
   onHoverChange?: (branchCode: string | null) => void;
   /** Tighter layout for the floating card over the mobile map */
   variant?: 'list' | 'floating';
-  /** Badge on the first result: "Closest to you" only when searching from the user's real location */
+  /**
+   * Badge on the first result when the list is sorted by distance ("Closest to you"
+   * only for the user's real location). Omit for lists not sorted by distance.
+   */
   closestLabel?: string;
 }
 
@@ -57,17 +61,14 @@ export default function NearbyResultCard({
   onSelect,
   onHoverChange,
   variant = 'list',
-  closestLabel = 'Nearest',
+  closestLabel,
 }: NearbyResultCardProps) {
   const detailUrl = formatCenterUrl(center.region || 'INDIA', center.state, center.district, center.name);
   const address = formatAddress(center);
   const distanceLabel = formatDistanceLabel(center.distance);
-  const isClosest = index === 0;
-  // Same rule CallNowButton uses (it renders nothing without a 10+ digit number)
-  const hasPhone = [center.mobile, center.contact]
-    .join(',')
-    .split(',')
-    .some((num) => num.replace(/\D/g, '').length >= 10);
+  const isClosest = index === 0 && Boolean(closestLabel);
+  // Same rule CallNowButton uses (it renders nothing without a callable number)
+  const hasPhone = callableNumbers(center.mobile, center.contact, center.region).length > 0;
 
   return (
     <article
@@ -139,6 +140,7 @@ export default function NearbyResultCard({
                 <CallNowButton
                   mobile={center.mobile}
                   contact={center.contact}
+                  region={center.region}
                   className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-spirit-gold-500 px-3 text-sm font-semibold text-white transition-colors hover:bg-spirit-gold-600"
                 >
                   <Phone className="h-4 w-4" aria-hidden /> Call

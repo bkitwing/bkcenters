@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Center } from '@/lib/types';
 import { getLocalizedFaqs } from '@/lib/centerContent';
+import { EmailLink, PhoneLink } from '@/components/ContactSheet';
 
 interface FAQSectionProps {
   center: Center;
@@ -76,32 +77,38 @@ export default function FAQSection({
            <div className="flex flex-wrap gap-3 text-sm">
              {/* Render multiple phone numbers as individual links */}
              {parsePhoneNumbers(center.mobile).map((phone, index) => (
-               <a 
+               <PhoneLink
                  key={`mobile-${index}`}
-                 href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
+                 number={phone}
+                 region={center.region}
+                 center={center}
                  className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
                >
                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                  </svg>
                  {phone}
-               </a>
+               </PhoneLink>
              ))}
              {parsePhoneNumbers(center.contact).map((phone, index) => (
-               <a 
+               <PhoneLink
                  key={`contact-${index}`}
-                 href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
+                 number={phone}
+                 region={center.region}
+                 center={center}
                  className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
                >
                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                  </svg>
                  {phone}
-               </a>
+               </PhoneLink>
              ))}
              {center.email && center.email.includes('@') && (
-               <a 
-                 href={`mailto:${center.email}`}
+               <EmailLink
+                 email={center.email}
+                 formHref="#contact"
+                 center={center}
                  className="inline-flex items-center gap-1 text-spirit-purple-600 dark:text-spirit-purple-400 hover:text-spirit-purple-800 dark:hover:text-spirit-purple-300 font-medium transition-colors"
                >
                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -109,7 +116,7 @@ export default function FAQSection({
                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                  </svg>
                  {center.email}
-               </a>
+               </EmailLink>
              )}
              <a 
                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatAddress())}`}
@@ -242,16 +249,17 @@ export default function FAQSection({
     typeof initialVisible === 'number' && initialVisible > 0 && !showAll
       ? initialVisible
       : faqs.length;
-  const visibleFaqs = faqs.slice(0, limit);
   const hiddenCount = Math.max(0, faqs.length - limit);
 
   return (
     <div>
       <div className="space-y-2">
-        {visibleFaqs.map((faq, index) => (
+        {/* Every question stays in the HTML (it matches the FAQPage structured
+            data); the ones past `limit` are only hidden until "Show more" */}
+        {faqs.map((faq, index) => (
           <div 
             key={index} 
-            className="border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 bg-white dark:bg-neutral-800"
+            className={`border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 bg-white dark:bg-neutral-800 ${index >= limit ? 'hidden' : ''}`}
             itemScope 
             itemType="https://schema.org/Question"
           >
@@ -295,7 +303,7 @@ export default function FAQSection({
               itemType="https://schema.org/Answer"
             >
               <div className="px-5 pb-5 pt-1 bg-gradient-to-b from-white to-gray-50 dark:from-neutral-800 dark:to-neutral-800/80" itemProp="text">
-                <div className="text-gray-700 dark:text-neutral-300 leading-relaxed">
+                <div className="max-w-4xl text-gray-700 dark:text-neutral-300 leading-relaxed">
                   {faq.answer}
                 </div>
               </div>
@@ -310,7 +318,7 @@ export default function FAQSection({
             className="inline-flex items-center justify-center min-h-10 px-4 rounded-full border border-neutral-300 dark:border-neutral-600 text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             onClick={() => setShowAll(true)}
           >
-            Load more ({hiddenCount})
+            Show {hiddenCount} more {hiddenCount === 1 ? "question" : "questions"}
           </button>
         </div>
       ) : null}

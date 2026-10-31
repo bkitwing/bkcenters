@@ -3,26 +3,10 @@ import { Headphones, Globe, Smartphone, ArrowRight } from 'lucide-react';
 
 const GuidedMeditationSection: React.FC = () => {
   return (
-    <div className="bg-gradient-to-br from-spirit-purple-50 via-spirit-gold-50/30 to-spirit-purple-50 dark:from-neutral-800/80 dark:via-neutral-800/60 dark:to-neutral-800/80 rounded-2xl border border-spirit-gold-200/60 dark:border-neutral-700 overflow-hidden">
-      {/* Header */}
-      <div className="relative px-6 pt-6 pb-4 md:px-8 md:pt-8 md:pb-5">
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gradient-to-br from-spirit-purple-600 to-spirit-purple-700 dark:from-spirit-purple-500 dark:to-spirit-purple-700 flex items-center justify-center shadow-lg shadow-spirit-purple-600/20">
-            <Headphones className="w-6 h-6 md:w-7 md:h-7 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg md:text-xl font-bold text-neutral-900 dark:text-neutral-100 leading-tight">
-              Guided Meditation
-            </h3>
-            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-              Practice guided Rajyoga meditation commentaries by experienced Brahma Kumaris teachers — based on your age, mood, and life situations.
-            </p>
-          </div>
-        </div>
-      </div>
-
+    // Heading comes from the page's section frame (CenterPageSection)
+    <div>
       {/* Features */}
-      <div className="px-6 md:px-8 pb-2">
+      <div className="pb-2">
         <div className="flex flex-wrap gap-2">
           {['Inner Peace', 'Stress Relief', 'Self Awareness', 'Positive Thinking', 'Sleep', 'Focus'].map((tag) => (
             <span
@@ -36,7 +20,7 @@ const GuidedMeditationSection: React.FC = () => {
       </div>
 
       {/* CTA Cards */}
-      <div className="px-6 md:px-8 py-5 md:py-6">
+      <div className="py-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Web Portal */}
           <a
@@ -94,7 +78,7 @@ const GuidedMeditationSection: React.FC = () => {
       </div>
 
       {/* Bottom note */}
-      <div className="px-6 md:px-8 pb-5 md:pb-6">
+      <div className="pb-1">
         <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center leading-relaxed">
           Free guided meditation audio in Hindi &amp; English — curated for all ages and life situations
         </p>

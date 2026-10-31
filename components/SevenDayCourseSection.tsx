@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BookOpen, Clock, Users, Sparkles, ChevronRight, Calendar, Navigation, Circle, Hexagon, Triangle, Diamond, Octagon, Pentagon, Square } from 'lucide-react';
+import { BookOpen, Users, Sparkles, ChevronRight, Calendar, Languages, Navigation, Phone, Circle, Hexagon, Triangle, Diamond, Octagon, Pentagon, Square } from 'lucide-react';
 import CallNowButton from './CallNowButton';
 
 interface SevenDayCourseSectionProps {
@@ -9,6 +9,8 @@ interface SevenDayCourseSectionProps {
   contact?: string;
   mobile?: string;
   directionsUrl?: string;
+  /** Center's region, so Call dials the right country code */
+  region?: string;
 }
 
 const courseDays = [
@@ -84,35 +86,22 @@ const courseDays = [
   },
 ];
 
-export default function SevenDayCourseSection({ centerName, contact, mobile, directionsUrl }: SevenDayCourseSectionProps) {
+export default function SevenDayCourseSection({ centerName, contact, mobile, directionsUrl, region }: SevenDayCourseSectionProps) {
   const [activeDay, setActiveDay] = useState(0);
   const activeItem = courseDays[activeDay];
   const ActiveIcon = activeItem.icon;
 
+  // The page's section frame (CenterPageSection) provides the heading; class
+  // timings live once, in the hero, so they can't disagree with this section.
   return (
-    <section id="seven-day-course" className="scroll-mt-bk">
-      {/* Section Header */}
-      <div className="text-center mb-10">
-        <div className="inline-flex items-center gap-2 bg-spirit-purple-50 dark:bg-spirit-purple-900/20 text-spirit-purple-700 dark:text-spirit-purple-300 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-          <BookOpen className="w-4 h-4" />
-          <span>Free Foundation Course</span>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
-          7-Day Rajyoga Meditation Course
-        </h2>
-        <p className="text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto text-lg">
-          Begin your spiritual journey with our complimentary introductory course.
-          Kindly call to confirm hours, then visit any day.
-        </p>
-      </div>
-
+    <div>
       {/* Key Benefits Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
         {[
-          { icon: Calendar, label: 'Monday to Sunday', sub: 'Start any day' },
-          { icon: Clock, label: 'Morning & Evening', sub: '7–9 AM · 5–8 PM' },
-          { icon: Sparkles, label: 'No Fees', sub: 'Offered free of charge' },
-          { icon: Users, label: 'Open to All', sub: 'No experience needed' },
+          { icon: Calendar, label: 'Start any day', sub: 'Monday to Sunday' },
+          { icon: Sparkles, label: 'Free of charge', sub: 'No fees, ever' },
+          { icon: Users, label: 'Open to all', sub: 'No experience needed' },
+          { icon: Languages, label: 'Your language', sub: 'Taught in the local language' },
         ].map((item, i) => (
           <div key={i} className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 text-center hover:shadow-md hover:border-spirit-purple-200 dark:hover:border-spirit-purple-700 transition-all duration-300 group">
             <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-gradient-to-br from-spirit-purple-100 to-spirit-blue-100 dark:from-spirit-purple-900/30 dark:to-spirit-blue-900/30 flex items-center justify-center group-hover:from-spirit-purple-200 group-hover:to-spirit-blue-200 transition-colors">
@@ -183,38 +172,24 @@ export default function SevenDayCourseSection({ centerName, contact, mobile, dir
             </div>
           </div>
         </div>
-
-        {/* Bottom Info Strip */}
-        <div className="border-t border-neutral-100 dark:border-neutral-700 bg-gradient-to-r from-spirit-purple-50/50 via-spirit-blue-50/50 to-spirit-gold-50/50 dark:from-spirit-purple-900/10 dark:via-spirit-blue-900/10 dark:to-spirit-gold-900/10 px-6 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              <span className="font-semibold text-neutral-800 dark:text-neutral-200">Classes typically run daily</span> at {centerName}, morning 7–9 AM &amp; evening 5–8 PM (approximate). Kindly call to confirm hours before you visit.
-            </p>
-            <div className="flex items-center gap-1.5 text-sm text-spirit-purple-600 dark:text-spirit-purple-400 font-medium">
-              <Sparkles className="w-4 h-4" />
-              <span>Everything is offered free of charge</span>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Single CTA Section — shown once below the course card */}
-      <div className="mt-8 bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-        <div className="p-6 md:p-8">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Ready to Begin?</h3>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm max-w-xl mx-auto">
-              Kindly call the center to confirm today's hours, then visit during class time. The course is free.
-            </p>
+      {/* One call to action: confirm today's class time, then walk in */}
+      <div className="mt-6 rounded-2xl border border-spirit-purple-200/70 dark:border-spirit-purple-800/60 bg-white dark:bg-neutral-800 p-5 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <p className="text-base font-semibold text-neutral-900 dark:text-neutral-100">Ready to start at {centerName}?</p>
+            <p className="mt-0.5 text-sm text-neutral-600 dark:text-neutral-400">Call to confirm today&apos;s class time, then walk in — no registration needed.</p>
           </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 shrink-0">
             {(contact || mobile) && (
-              <CallNowButton 
+              <CallNowButton
                 contact={contact}
                 mobile={mobile}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-spirit-purple-600 to-spirit-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+                region={region}
+                className="inline-flex items-center justify-center gap-2 bg-spirit-purple-600 hover:bg-spirit-purple-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors cursor-pointer"
               >
+                <Phone className="w-4 h-4" aria-hidden />
                 Call to confirm
               </CallNowButton>
             )}
@@ -223,45 +198,42 @@ export default function SevenDayCourseSection({ centerName, contact, mobile, dir
                 href={directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border border-neutral-200 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 px-6 py-3 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 border border-neutral-200 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors"
               >
-                <Navigation className="w-4 h-4" />
-                Get Directions
+                <Navigation className="w-4 h-4" aria-hidden />
+                Directions
               </a>
             )}
           </div>
+        </div>
 
-          {/* Online Course Links */}
-          <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-700">
-            <p className="text-xs text-center text-neutral-400 dark:text-neutral-500 uppercase tracking-wider font-semibold mb-3">Quick Introduction Online</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a
-                href="https://courses.brahmakumaris.com/a-personal-journey-for-transformation"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border border-neutral-200 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 px-5 py-2.5 rounded-xl font-medium text-sm hover:border-spirit-purple-300 dark:hover:border-spirit-purple-600 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-400 hover:bg-spirit-purple-50/50 dark:hover:bg-spirit-purple-900/20 transition-all duration-200"
-              >
-                <BookOpen className="w-4 h-4" />
-                Online Course (English)
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-              <a
-                href="https://courses.brahmakumaris.com/sahaj-rajyog"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border border-neutral-200 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 px-5 py-2.5 rounded-xl font-medium text-sm hover:border-spirit-purple-300 dark:hover:border-spirit-purple-600 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-400 hover:bg-spirit-purple-50/50 dark:hover:bg-spirit-purple-900/20 transition-all duration-200"
-              >
-                <BookOpen className="w-4 h-4" />
-                ऑनलाइन कोर्स (हिन्दी)
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-            <p className="text-xs text-center text-neutral-400 dark:text-neutral-500 mt-3">
-              Online courses offer a brief overview. For the full depth of wisdom and experience, we recommend visiting the center in person.
-            </p>
+        {/* Online introduction for people who can't visit yet */}
+        <div className="mt-5 pt-4 border-t border-neutral-100 dark:border-neutral-700 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-sm">
+          <span className="text-neutral-500 dark:text-neutral-400">Can&apos;t visit yet? Try a short online introduction:</span>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="https://courses.brahmakumaris.com/a-personal-journey-for-transformation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 dark:border-neutral-600 px-3.5 py-1.5 font-medium text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300 transition-colors"
+            >
+              <BookOpen className="w-3.5 h-3.5" aria-hidden />
+              English
+              <ChevronRight className="w-3.5 h-3.5" aria-hidden />
+            </a>
+            <a
+              href="https://courses.brahmakumaris.com/sahaj-rajyog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 dark:border-neutral-600 px-3.5 py-1.5 font-medium text-neutral-700 dark:text-neutral-200 hover:border-spirit-purple-300 hover:text-spirit-purple-700 dark:hover:text-spirit-purple-300 transition-colors"
+            >
+              <BookOpen className="w-3.5 h-3.5" aria-hidden />
+              हिन्दी
+              <ChevronRight className="w-3.5 h-3.5" aria-hidden />
+            </a>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

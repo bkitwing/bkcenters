@@ -5,6 +5,9 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 interface GlobalStickyBottomNavProps {}
 
+// Top-level routes in app/ that aren't /[region] pages (campus sites have their own chrome)
+const NON_REGION_TOP_LEVEL_ROUTES = ['admin', 'privacy-policy', 'retreat', 'terms-and-conditions'];
+
 export default function GlobalStickyBottomNav({}: GlobalStickyBottomNavProps) {
   // useSearchParams needs its own Suspense boundary so static pages keep
   // server-rendering; the fallback is the same bar without the results check.
@@ -32,8 +35,13 @@ function BottomNavBar({ hideOnResults }: { hideOnResults: boolean }) {
   // Campus micro-sites are gated by CentersChrome (bottomNav not rendered).
   const pathSegments = pathname.split('/').filter(segment => segment !== '');
   const isCenterDetailPage = pathSegments.length === 4;
+  // Country (region), state and city pages have their own "near me" action and
+  // Map/List toggle. Other top-level routes in app/ are not region pages.
+  const isRegionPage =
+    pathSegments.length === 1 && !NON_REGION_TOP_LEVEL_ROUTES.includes(pathSegments[0]);
+  const isStateOrCityPage = pathSegments.length === 2 || pathSegments.length === 3;
 
-  if (isCenterDetailPage || (hideOnResults && pathname === '/')) {
+  if (isCenterDetailPage || isRegionPage || isStateOrCityPage || (hideOnResults && pathname === '/')) {
     return null;
   }
 

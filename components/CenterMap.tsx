@@ -59,6 +59,52 @@ interface CenterMapProps {
   /** Fit bounds to only the first N centers (the closest ones) */
   fitCount?: number;
   gestureHandling?: 'cooperative' | 'greedy' | 'auto';
+  /**
+   * Pixels of the map covered by overlays (e.g. cards on mobile). Used when
+   * fitting bounds and when bringing a selected pin into the visible part.
+   */
+  mapPadding?: MapPadding;
+  /** Phone layout: zoom buttons mid-right (clear of bottom cards), no Street View / fullscreen */
+  compactControls?: boolean;
+  /** Lowest zoom allowed (default 5; a whole-country map on a phone needs less) */
+  minZoom?: number;
+}
+
+export type MapPadding = { top: number; right: number; bottom: number; left: number };
+
+const DEFAULT_PADDING: MapPadding = { top: 50, right: 50, bottom: 50, left: 50 };
+
+/** Is `pos` inside the part of the map not covered by `padding`? */
+function isInVisibleArea(map: google.maps.Map, pos: google.maps.LatLng, padding: MapPadding): boolean {
+  const bounds = map.getBounds();
+  const div = map.getDiv();
+  if (!bounds || !div.clientWidth || !div.clientHeight) return false;
+  const ne = bounds.getNorthEast();
+  const sw = bounds.getSouthWest();
+  const latPerPx = (ne.lat() - sw.lat()) / div.clientHeight;
+  const lngPerPx = (ne.lng() - sw.lng()) / div.clientWidth;
+  return (
+    pos.lat() <= ne.lat() - padding.top * latPerPx &&
+    pos.lat() >= sw.lat() + padding.bottom * latPerPx &&
+    pos.lng() >= sw.lng() + padding.left * lngPerPx &&
+    pos.lng() <= ne.lng() - padding.right * lngPerPx
+  );
+}
+
+/** Pan (smoothly, without changing zoom) so `pos` sits in the middle of the visible area */
+function panIntoVisibleArea(map: google.maps.Map, pos: google.maps.LatLng, padding: MapPadding) {
+  const bounds = map.getBounds();
+  const div = map.getDiv();
+  if (!bounds || !div.clientWidth || !div.clientHeight) {
+    map.panTo(pos);
+    return;
+  }
+  const latPerPx = (bounds.getNorthEast().lat() - bounds.getSouthWest().lat()) / div.clientHeight;
+  const lngPerPx = (bounds.getNorthEast().lng() - bounds.getSouthWest().lng()) / div.clientWidth;
+  map.panTo({
+    lat: pos.lat() + ((padding.top - padding.bottom) / 2) * latPerPx,
+    lng: pos.lng() - ((padding.left - padding.right) / 2) * lngPerPx,
+  });
 }
 
 const PIN_PATH = 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z';
@@ -84,6 +130,9 @@ const CenterMap: React.FC<CenterMapProps> = ({
   fitKey,
   fitCount,
   gestureHandling,
+  mapPadding,
+  compactControls = false,
+  minZoom = 5,
 }) => {
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const [centerPosition, setCenterPosition] = useState<{lat: number, lng: number} | null>(null);
@@ -226,14 +275,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
 
     if (hasValidCoords) {
       // Add padding to the bounds
-      const padding = { 
-        top: 50, 
-        right: 50, 
-        bottom: 50, 
-        left: 50 
-      };
-      
-      mapRef.fitBounds(bounds, padding);
+      mapRef.fitBounds(bounds, mapPadding ?? DEFAULT_PADDING);
       
       // Add a slight delay before adjusting zoom
       setTimeout(() => {
@@ -256,7 +298,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
         }
       }, 100);
     }
-  }, [mapRef, centers, defaultZoom, getValidCoordinates, fitKey, fitCount, userLocation]);
+  }, [mapRef, centers, defaultZoom, getValidCoordinates, fitKey, fitCount, userLocation, mapPadding]);
 
   // Apply auto-zoom when map and centers are available.
   // With fitKey, only refit when the key changes (appending results keeps the view).
@@ -485,6 +527,18 @@ const CenterMap: React.FC<CenterMapProps> = ({
     
     // Find the marker for the selected center
     const marker = markers.get(selectedCenter.branch_code);
+
+    // Numbered result pins / district bubbles: the active marker is already
+    // enlarged, so no bounce and no forced zoom — just glide it into view if it's
+    // hidden (e.g. behind cards)
+    if ((numbered || isDistrictView) && marker) {
+      const pos = marker.getPosition();
+      if (pos && !isInVisibleArea(mapRef, pos, mapPadding ?? DEFAULT_PADDING)) {
+        panIntoVisibleArea(mapRef, pos, mapPadding ?? DEFAULT_PADDING);
+      }
+      return;
+    }
+
     if (marker) {
       // Apply bounce animation to the marker
       marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -511,7 +565,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
         }
       }, 1500);
     }
-  }, [selectedCenter, markers, mapRef, defaultZoom]);
+  }, [selectedCenter, markers, mapRef, defaultZoom, numbered, isDistrictView, mapPadding]);
 
   // Register each marker when created
   const registerMarker = useCallback((branchCode: string, marker: google.maps.Marker) => {
@@ -594,6 +648,24 @@ const CenterMap: React.FC<CenterMapProps> = ({
       }
     }
     
+    // District bubbles (count of centers); the selected or hovered one grows and darkens
+    if (isDistrictView) {
+      const count = center.district_total || 0;
+      const isActive =
+        selectedCenter?.branch_code === center.branch_code ||
+        hoveredCenterCode === center.branch_code;
+      const opacity = count <= 5 ? 0.6 : 0.6 + Math.min(count / 50, 0.4);
+      return {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: isActive ? '#6B4F0E' : '#8B6914', // Dark golden for better contrast
+        fillOpacity: isActive ? 1 : opacity,
+        scale: isActive ? 19 : 15,
+        strokeColor: '#FFFFFF',
+        strokeWeight: isActive ? 3 : 2,
+        labelOrigin: new google.maps.Point(0, 0)
+      };
+    }
+
     // For selected center (given higher priority)
     if (selectedCenter?.branch_code === center.branch_code) {
       return {
@@ -603,26 +675,6 @@ const CenterMap: React.FC<CenterMapProps> = ({
         strokeColor: '#FFFFFF',
         strokeWeight: 2.5,
         scale: 1.3
-      };
-    }
-    
-    // For district markers, show markers with intensity based on count
-    if (isDistrictView) {
-      const count = center.district_total || 0;
-      
-      // Calculate color intensity based on center count
-      const baseColor = '#8B6914'; // Dark golden for better contrast
-      let opacity = 0.6 + Math.min(count / 50, 0.4);
-      if (count <= 5) opacity = 0.6;
-      
-      return {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: baseColor,
-        fillOpacity: opacity,
-        scale: 15,
-        strokeColor: '#FFFFFF',
-        strokeWeight: 2,
-        labelOrigin: new google.maps.Point(0, 0)
       };
     }
     
@@ -793,12 +845,15 @@ const CenterMap: React.FC<CenterMapProps> = ({
             center={centerPosition}
             zoom={initialLat && initialLng ? 14 : defaultZoom}
             options={{
-              fullscreenControl: true,
+              fullscreenControl: !compactControls,
               mapTypeControl: true,
-              streetViewControl: true,
+              streetViewControl: !compactControls,
               zoomControl: true,
+              ...(compactControls
+                ? { zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER } }
+                : {}),
               maxZoom: 18,
-              minZoom: 5,
+              minZoom,
               styles: isDark ? darkMapStyles : [],
               ...(gestureHandling ? { gestureHandling } : {}),
             }}
@@ -825,7 +880,7 @@ const CenterMap: React.FC<CenterMapProps> = ({
                   icon={getMarkerIcon(center)}
                   label={getMarkerLabel(center, index)}
                   title={numbered ? `${index + 1}. ${center.name}` : center.name}
-                  animation={isSelected ? google.maps.Animation.BOUNCE : null}
+                  animation={isSelected && !numbered && !isDistrictView ? google.maps.Animation.BOUNCE : null}
                   onLoad={(marker: google.maps.Marker) => registerMarker(center.branch_code, marker)}
                   zIndex={
                     isSelected ? 1000 : isHovered ? 999 : numbered ? centers.length - index : undefined
