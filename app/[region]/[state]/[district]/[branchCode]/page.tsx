@@ -29,7 +29,7 @@ import { formatCenterUrl } from '@/lib/urlUtils';
 import { generateOgImageUrl } from '@/lib/ogUtils';
 import { getCenterTimings, generateCenterIntro, getLocalizedFaqs, getLocalityLabel } from '@/lib/centerContent';
 import { countryLabelFromRegion, districtLevelLabel } from '@/lib/countryUtils';
-import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, Users, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones, BookOpen } from 'lucide-react';
+import { MapPin, Phone, Smartphone, Mail, Navigation, ChevronRight, ChevronDown, ArrowLeft, Clock, Sparkles, MessageCircle, HelpCircle, Newspaper, Map, CalendarDays, Headphones, BookOpen } from 'lucide-react';
 import { exclusiveCampusContactByBranch } from '@/lib/campuses/registry';
 
 const EXCLUSIVE_CAMPUS_CONTACT = exclusiveCampusContactByBranch();
@@ -748,63 +748,20 @@ export default async function CenterPage({ params }: CenterPageProps) {
                 tone={nextTone()}
               >
                 <ExpandableBlock id="contact" openLabel="Write your question" closeLabel="Hide the form">
-                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-                    {/* Contact Info Card */}
-                    <div className="lg:col-span-2 lg:order-2">
-                      <div className="bg-gradient-to-br from-spirit-purple-50 to-spirit-blue-50 dark:from-spirit-purple-900/20 dark:to-spirit-blue-900/20 rounded-2xl p-6 border border-spirit-purple-100 dark:border-spirit-purple-800">
-                        <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-4 flex items-center gap-2">
-                          <MessageCircle className="w-5 h-5 text-spirit-purple-600 dark:text-spirit-purple-400" />
-                          Good to know
-                        </h3>
-                        <div className="space-y-4">
-                          <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
-                              </div>
-                              <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Free for Everyone</p>
-                            </div>
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">All meditation sessions and courses are completely free of charge.</p>
-                          </div>
-
-                          <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-8 h-8 rounded-lg bg-spirit-blue-100 dark:bg-spirit-blue-900/30 flex items-center justify-center">
-                                <Users className="w-4 h-4 text-spirit-blue-600 dark:text-spirit-blue-400" />
-                              </div>
-                              <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Open to All</p>
-                            </div>
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">No prior experience needed. Everyone is welcome, regardless of background.</p>
-                          </div>
-
-                          <div className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-white dark:border-neutral-700 shadow-sm">
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-8 h-8 rounded-lg bg-spirit-purple-100 dark:bg-spirit-purple-900/30 flex items-center justify-center">
-                                <Clock className="w-4 h-4 text-spirit-purple-600 dark:text-spirit-purple-400" />
-                              </div>
-                              <p className="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Want to learn meditation?</p>
-                            </div>
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400 ml-11">No form needed — call the center to confirm class hours and walk in.</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Contact Form */}
-                    <div className="lg:col-span-3 lg:order-1">
-                      <ContactForm
-                        center={center}
-                        pageUrl={absoluteUrl}
-                        walkIn={{
-                          morning: timings.morning,
-                          evening: timings.evening,
-                          custom: timings.custom,
-                          directionsUrl: getGoogleMapsUrl(),
-                          contact: center.contact,
-                          mobile: center.mobile,
-                        }}
-                      />
-                    </div>
+                  {/* Full section width on desktop (fields share rows), like the other sections */}
+                  <div>
+                    <ContactForm
+                      center={center}
+                      pageUrl={absoluteUrl}
+                      walkIn={{
+                        morning: timings.morning,
+                        evening: timings.evening,
+                        custom: timings.custom,
+                        directionsUrl: getGoogleMapsUrl(),
+                        contact: center.contact,
+                        mobile: center.mobile,
+                      }}
+                    />
                   </div>
                 </ExpandableBlock>
               </CenterPageSection>

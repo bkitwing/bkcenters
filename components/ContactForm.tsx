@@ -209,121 +209,86 @@ const ContactForm: React.FC<ContactFormProps> = ({
     );
   }
 
+  const topics: { type: ContactType; label: string }[] = [
+    { type: 'LearnMeditation', label: 'Learn Meditation' },
+    { type: 'Query', label: 'Question' },
+    { type: 'AttendEvent', label: 'Attend Event' },
+    { type: 'Feedback', label: 'Feedback' },
+    { type: 'Others', label: 'Others' },
+  ];
+  // With walk-in classes, a preferred class time no longer fits any topic
+  const showPreferredTime = !hidePreferredTime && !walkIn;
+  const fieldClass =
+    'w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-neutral-50/70 dark:bg-neutral-700 px-3.5 py-2.5 text-base text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 transition-colors hover:border-neutral-300 focus:bg-white dark:focus:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent';
+  const labelClass = embedded ? 'sr-only' : 'block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5';
+
   return (
     <div
       className={
         embedded
           ? ''
-          : 'bg-light dark:bg-neutral-800 rounded-lg shadow-md p-6 border border-neutral-200 dark:border-neutral-700'
+          : 'rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm p-4 sm:p-6 lg:p-8'
       }
     >
-      {!embedded ? (
+      {/* With walkIn the page section already introduces the form */}
+      {!embedded && !walkIn ? (
         <>
           <h2 className="text-2xl font-bold mb-4 spiritual-text-gradient">Send a Message</h2>
           <p className="text-neutral-600 dark:text-neutral-400 mb-4">
-            {walkIn
-              ? 'To join the free course, kindly call the center to confirm timings and then visit. Use this form only for technical help with this page, or for a question, event, or feedback.'
-              : "Have a question, want to join the free 7-day course, or need help finding timings? Share your details and we'll get back to you."}
+            Have a question, want to join the free 7-day course, or need help finding timings? Share your details and we&apos;ll get back to you.
           </p>
         </>
       ) : null}
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md mb-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl mb-4">
           <p>{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className={embedded ? 'mb-3' : 'mb-4'}>
-          <label htmlFor="contactType" className="sr-only">
-            How can we help you?
-          </label>
+        <fieldset className={embedded ? 'mb-3' : 'mb-5'}>
+          <legend className={embedded ? 'sr-only' : 'mb-2 text-sm font-medium text-neutral-700 dark:text-neutral-300'}>
+            What is it about?
+          </legend>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              className={`py-2 px-4 rounded-md transition-colors ${
-                contactType === 'LearnMeditation'
-                  ? 'bg-primary text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-              }`}
-              onClick={() => handleContactTypeChange('LearnMeditation')}
-            >
-              Learn Meditation
-            </button>
-            <button
-              type="button"
-              className={`py-2 px-4 rounded-md transition-colors ${
-                contactType === 'Query'
-                  ? 'bg-primary text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-              }`}
-              onClick={() => handleContactTypeChange('Query')}
-            >
-              Question
-            </button>
-            <button
-              type="button"
-              className={`py-2 px-4 rounded-md transition-colors ${
-                contactType === 'AttendEvent'
-                  ? 'bg-primary text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-              }`}
-              onClick={() => handleContactTypeChange('AttendEvent')}
-            >
-              Attend Event
-            </button>
-            <button
-              type="button"
-              className={`py-2 px-4 rounded-md transition-colors ${
-                contactType === 'Feedback'
-                  ? 'bg-primary text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-              }`}
-              onClick={() => handleContactTypeChange('Feedback')}
-            >
-              Feedback
-            </button>
-            <button
-              type="button"
-              className={`py-2 px-4 rounded-md transition-colors ${
-                contactType === 'Others'
-                  ? 'bg-primary text-white'
-                  : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600'
-              }`}
-              onClick={() => handleContactTypeChange('Others')}
-            >
-              Others
-            </button>
+            {topics.map((topic) => (
+              <button
+                key={topic.type}
+                type="button"
+                aria-pressed={contactType === topic.type}
+                onClick={() => handleContactTypeChange(topic.type)}
+                className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  contactType === topic.type
+                    ? 'border-transparent bg-primary text-white'
+                    : 'border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-spirit-purple-300 dark:hover:border-spirit-purple-600'
+                }`}
+              >
+                {topic.label}
+              </button>
+            ))}
           </div>
-        </div>
+        </fieldset>
 
         {showWalkInInsteadOfForm && walkIn ? (
-          <div className="mb-4 rounded-xl border border-spirit-gold-200 dark:border-spirit-gold-800 bg-spirit-gold-50/70 dark:bg-spirit-gold-900/15 p-5">
+          <div className="rounded-xl border border-spirit-gold-200 dark:border-spirit-gold-800 bg-spirit-gold-50/70 dark:bg-spirit-gold-900/15 p-4 sm:p-5">
             <p className="font-semibold text-neutral-900 dark:text-neutral-100 mb-1">
               Kindly call the center first
             </p>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 leading-relaxed">
-              Class hours are approximate. Please call to confirm today's timing, then visit. This form is only if you need technical help or have another query.
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3 leading-relaxed">
+              Class hours are approximate. Please call to confirm today&apos;s timing, then visit — no form needed.
             </p>
-            {walkIn.custom ? (
-              <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-4 flex items-start gap-2">
-                <Clock className="w-4 h-4 mt-0.5 shrink-0 text-spirit-gold-600" />
-                {walkIn.custom}
-              </p>
-            ) : (
-              <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-4 flex items-start gap-2">
-                <Clock className="w-4 h-4 mt-0.5 shrink-0 text-spirit-gold-600" />
-                Morning {walkIn.morning} · Evening {walkIn.evening} · daily
-              </p>
-            )}
+            <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-4 flex items-start gap-2">
+              <Clock className="w-4 h-4 mt-0.5 shrink-0 text-spirit-gold-600" />
+              {walkIn.custom || `Morning ${walkIn.morning} · Evening ${walkIn.evening} · daily`}
+            </p>
             <div className="flex flex-col sm:flex-row gap-2">
               {(walkIn.contact || walkIn.mobile) && (
                 <CallNowButton
                   contact={walkIn.contact}
                   mobile={walkIn.mobile}
                   region={center.region}
-                  className="inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   Call to confirm
                 </CallNowButton>
@@ -332,7 +297,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
                 href={walkIn.directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 px-4 py-2.5 rounded-lg font-medium text-sm hover:bg-white dark:hover:bg-neutral-700 transition-colors"
+                className="inline-flex items-center justify-center gap-2 border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-white dark:hover:bg-neutral-700 transition-colors"
               >
                 <Navigation className="w-4 h-4" />
                 Get Directions
@@ -348,127 +313,103 @@ const ContactForm: React.FC<ContactFormProps> = ({
           </div>
         ) : (
           <>
-        <div className={embedded ? 'mb-3' : 'mb-4'}>
-          <label
-            htmlFor="name"
-            className={
-              embedded
-                ? 'sr-only'
-                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
-            }
-          >
-            Name <span className="text-primary">*</span>
-          </label>
-          <input
-            type="text"
-            id="name"
-            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder={embedded ? 'Name *' : 'Your name'}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
+            {/* Name, phone and email share a row on desktop (two on tablets) */}
+            <div className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 ${embedded ? 'mb-3' : 'mb-4 sm:gap-4'}`}>
+              <div>
+                <label htmlFor="name" className={labelClass}>
+                  Name <span className="text-primary">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  autoComplete="name"
+                  className={fieldClass}
+                  placeholder={embedded ? 'Name *' : 'Your name'}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className={labelClass}>
+                  Phone Number <span className="text-primary">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  autoComplete="tel"
+                  className={fieldClass}
+                  placeholder={embedded ? 'Phone *' : 'Your phone number'}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2 lg:col-span-1">
+                <label htmlFor="email" className={labelClass}>
+                  Email <span className="text-neutral-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  autoComplete="email"
+                  className={fieldClass}
+                  placeholder={embedded ? 'Email (optional)' : 'Your email address'}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
 
-        <div className={embedded ? 'mb-3' : 'mb-4'}>
-          <label
-            htmlFor="phone"
-            className={
-              embedded
-                ? 'sr-only'
-                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
-            }
-          >
-            Phone Number <span className="text-primary">*</span>
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder={embedded ? 'Phone *' : 'Your phone number'}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
-        </div>
+            {showPreferredTime ? (
+              <div className="mb-4">
+                <label htmlFor="preferredTime" className={labelClass}>
+                  Preferred time to attend
+                </label>
+                <select
+                  id="preferredTime"
+                  className={fieldClass}
+                  value={preferredTime}
+                  onChange={(e) => setPreferredTime(e.target.value)}
+                >
+                  <option value="">No preference</option>
+                  <option value="Morning (7:00 – 9:00 AM)">Morning (7:00 – 9:00 AM)</option>
+                  <option value="Evening (5:00 – 8:00 PM)">Evening (5:00 – 8:00 PM)</option>
+                  <option value="Either morning or evening">Either morning or evening</option>
+                  <option value="Weekends only">Weekends only</option>
+                </select>
+              </div>
+            ) : null}
 
-        <div className={embedded ? 'mb-3' : 'mb-4'}>
-          <label
-            htmlFor="email"
-            className={
-              embedded
-                ? 'sr-only'
-                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
-            }
-          >
-            Email <span className="text-neutral-400 text-sm font-normal">(optional)</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder={embedded ? 'Email (optional)' : 'Your email address (optional)'}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+            <div className={embedded ? 'mb-4' : 'mb-5'}>
+              <label htmlFor="message" className={labelClass}>
+                Message <span className="text-primary">*</span>
+              </label>
+              <textarea
+                id="message"
+                className={fieldClass}
+                placeholder={embedded ? 'Message *' : 'How can we help?'}
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+              ></textarea>
+            </div>
 
-        {!hidePreferredTime ? (
-          <div className="mb-4">
-            <label htmlFor="preferredTime" className="block text-neutral-700 dark:text-neutral-300 font-medium mb-2">
-              Preferred time to attend
-            </label>
-            <select
-              id="preferredTime"
-              className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              value={preferredTime}
-              onChange={(e) => setPreferredTime(e.target.value)}
+            <button
+              type="submit"
+              className={`btn-primary py-3 flex justify-center items-center ${embedded ? 'w-full' : 'w-full sm:w-auto sm:px-10'}`}
+              disabled={isSubmitting}
             >
-              <option value="">No preference</option>
-              <option value="Morning (7:00 – 9:00 AM)">Morning (7:00 – 9:00 AM)</option>
-              <option value="Evening (5:00 – 8:00 PM)">Evening (5:00 – 8:00 PM)</option>
-              <option value="Either morning or evening">Either morning or evening</option>
-              <option value="Weekends only">Weekends only</option>
-            </select>
-          </div>
-        ) : null}
-
-        <div className={embedded ? 'mb-4' : 'mb-6'}>
-          <label
-            htmlFor="message"
-            className={
-              embedded
-                ? 'sr-only'
-                : 'block text-neutral-700 dark:text-neutral-300 font-medium mb-2'
-            }
-          >
-            Message <span className="text-primary">*</span>
-          </label>
-          <textarea
-            id="message"
-            className="w-full p-3 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder={embedded ? 'Message *' : 'Your message'}
-            rows={embedded ? 4 : 5}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            required
-          ></textarea>
-        </div>
-
-        <button
-          type="submit"
-          className="btn-primary w-full py-3 flex justify-center items-center"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <>
-              <span className="mr-2">Sending...</span>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            </>
-          ) : (
-            'Send Message'
-          )}
-        </button>
+              {isSubmitting ? (
+                <>
+                  <span className="mr-2">Sending...</span>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                </>
+              ) : (
+                'Send Message'
+              )}
+            </button>
           </>
         )}
       </form>
