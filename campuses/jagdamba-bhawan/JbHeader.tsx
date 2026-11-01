@@ -35,7 +35,7 @@ import {
 } from './nav';
 
 const JB_LOGO_URL =
-  'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Jagdamba_Bhawan_White_Logo_Bold_500x130_2c81a38e66.webp';
+  'https://media.brahmakumaris.com/assets/Jagdamba_Bhawan_White_Logo_Bold_500x130_2c81a38e66.webp';
 
 const SOCIAL_ICONS: Record<'facebook' | 'instagram' | 'youtube', LucideIcon> = {
   facebook: Facebook,

@@ -20,7 +20,7 @@ import {
 } from './nav';
 
 const SS_LOGO_URL =
-  'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Brahma_Kumaris_Logo_Shanti_Sarovar2_b7be975114_f3d57fd5a0.png';
+  'https://media.brahmakumaris.com/assets/Brahma_Kumaris_Logo_Shanti_Sarovar2_b7be975114_f3d57fd5a0.png';
 
 /** Match UnifiedHeader hover feel. */
 const HOVER_DELAY_IN = 80;

@@ -12,16 +12,16 @@ export const JB_RETREAT_NAME = 'Jagdamba Bhawan Retreat Center';
 
 /** Featured / Open Graph images (Strapi CDN). */
 export const JB_OG_IMAGES = {
-  home: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Featured_Image_Home_page_11a9b7016b.webp',
+  home: 'https://media.brahmakumaris.com/assets/Featured_Image_Home_page_11a9b7016b.webp',
   contact:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Contact_us_Jabdamba_Bhawan_Retreat_Center_afcf6b3213.jpg',
-  news: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Featured_Image_Service_news_Jagdamba_Bhawan_974ea42b5a.webp',
+    'https://media.brahmakumaris.com/assets/Contact_us_Jabdamba_Bhawan_Retreat_Center_afcf6b3213.jpg',
+  news: 'https://media.brahmakumaris.com/assets/Featured_Image_Service_news_Jagdamba_Bhawan_974ea42b5a.webp',
   events:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Events_At_Jagdamba_Bhawan_Reterat_Center_9842fa3744.webp',
+    'https://media.brahmakumaris.com/assets/Events_At_Jagdamba_Bhawan_Reterat_Center_9842fa3744.webp',
   galleries:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Galleries_Jagdamba_Bhawan_Retreat_Center_Images_f96cc92709.webp',
+    'https://media.brahmakumaris.com/assets/Galleries_Jagdamba_Bhawan_Retreat_Center_Images_f96cc92709.webp',
   about:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/About_us_Jagdamaba_Bhawan_Retreat_Center_f982133d0e.webp',
+    'https://media.brahmakumaris.com/assets/About_us_Jagdamaba_Bhawan_Retreat_Center_f982133d0e.webp',
 } as const;
 
 /**

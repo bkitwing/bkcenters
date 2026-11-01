@@ -50,10 +50,10 @@ export const CSR_PUBLICATIONS: CsrPublication[] = [
       'Explore partnership-ready initiatives across renewable energy, circular waste management, water restoration, inclusive mobility, rural sustainability and human-values empowerment.',
     pageCount: 34,
     pdfUrl:
-      'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/brahma_kumaris_shanti_sarovar_csr_partnership_portfolio_2026_076b600b03.pdf',
+      'https://media.brahmakumaris.com/assets/brahma_kumaris_shanti_sarovar_csr_partnership_portfolio_2026_076b600b03.pdf',
     downloadFilename: 'brahma-kumaris-shanti-sarovar-csr-partnership-portfolio-2026.pdf',
     coverImage:
-      'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/brahma_kumaris_shanti_sarovar_csr_partnership_portfolio_2026_cf24664a3a.webp',
+      'https://media.brahmakumaris.com/assets/brahma_kumaris_shanti_sarovar_csr_partnership_portfolio_2026_cf24664a3a.webp',
     coverAlt: 'Cover of the Brahma Kumaris CSR Partnership Portfolio 2026',
     statistics: [
       { value: '6', label: 'CSR Partnership Initiatives', icon: 'layers' },
@@ -89,10 +89,10 @@ export const CSR_PUBLICATIONS: CsrPublication[] = [
       'Discover how Shanti Sarovar combines inner wellbeing with practical community action across mental wellbeing, values-based education, healthcare, environmental sustainability and rural development.',
     pageCount: 4,
     pdfUrl:
-      'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/shanti_sarovar_hyderabad_csr_impact_overview_2027_575ff80326.pdf',
+      'https://media.brahmakumaris.com/assets/shanti_sarovar_hyderabad_csr_impact_overview_2027_575ff80326.pdf',
     downloadFilename: 'shanti-sarovar-hyderabad-csr-impact-overview-2027.pdf',
     coverImage:
-      'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/shanti_sarovar_csr_impact_overview_2027_cover_a1e983d445.webp',
+      'https://media.brahmakumaris.com/assets/shanti_sarovar_csr_impact_overview_2027_cover_a1e983d445.webp',
     coverAlt: 'Cover of the Shanti Sarovar CSR Impact Overview and 2027 Vision',
     statistics: [
       { value: '120+', label: 'Workshops Every Month', icon: 'presentation' },
@@ -175,7 +175,7 @@ export const CSR_IMPACT_THEMES = [
 
 /** Ambient MP4 hero — replace URL later when a final cut is ready. */
 export const CSR_HERO_VIDEO_MP4 =
-  'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Short_Video_Solar_lq_14caf99502.mp4';
+  'https://media.brahmakumaris.com/assets/Short_Video_Solar_lq_14caf99502.mp4';
 
 export const CSR_INITIATIVES = [
   {

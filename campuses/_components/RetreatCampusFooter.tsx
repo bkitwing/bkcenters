@@ -20,7 +20,7 @@ import './retreat-footer.css';
 /* eslint-disable @next/next/no-html-link-for-pages */
 
 const BK_LOGO =
-  'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/BK_Logo_c6ca9ac104.png';
+  'https://media.brahmakumaris.com/assets/BK_Logo_c6ca9ac104.png';
 
 /** Official YouTube mark — red rounded tile and white play, not an outline glyph. */
 function YouTubeMark({ className }: { className?: string }) {

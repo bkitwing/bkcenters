@@ -80,7 +80,7 @@ export function Footer() {
           <div className="space-y-5">
             <a href="https://www.brahmakumaris.com" target="_blank" rel="noopener noreferrer" className="inline-block">
               <img
-                src="https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/BK_Logo_c6ca9ac104.png"
+                src="https://media.brahmakumaris.com/assets/BK_Logo_c6ca9ac104.png"
                 alt="Brahma Kumaris"
                 width={200}
                 height={50}

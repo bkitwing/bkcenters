@@ -295,7 +295,7 @@ export const NAVIGATION: NavSection[] = [
 ];
 
 export const BK_LOGO_URL =
-  "https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/BK_Logo_c6ca9ac104.png";
+  "https://media.brahmakumaris.com/assets/BK_Logo_c6ca9ac104.png";
 
 export const ACCENT_COLORS: Record<string, { bg: string; text: string; border: string; bgSubtle: string }> = {
   sky: {

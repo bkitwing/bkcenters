@@ -11,15 +11,15 @@ export const SS_CANONICAL = 'https://www.brahmakumaris.com/centers/shantisarovar
 
 /** Featured / Open Graph images (Strapi CDN) — one per campus page. */
 export const SS_OG_IMAGES = {
-  home: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Retreat_center_Fetured_Image_188f4da1c5.jpg',
+  home: 'https://media.brahmakumaris.com/assets/Shanti_Sarovar_Retreat_center_Fetured_Image_188f4da1c5.jpg',
   events:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Retreat_Center_Events_page_featured_image_213df8b407.jpg',
-  news: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Service_news_Shanti_Sarovar_Retreat_Center_84cf2e8720.jpg',
+    'https://media.brahmakumaris.com/assets/Shanti_Sarovar_Retreat_Center_Events_page_featured_image_213df8b407.jpg',
+  news: 'https://media.brahmakumaris.com/assets/Service_news_Shanti_Sarovar_Retreat_Center_84cf2e8720.jpg',
   galleries:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Galleries_Featured_Image_442c6070d8.jpg',
+    'https://media.brahmakumaris.com/assets/Shanti_Sarovar_Galleries_Featured_Image_442c6070d8.jpg',
   contact:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Contact_Us_Shanti_sarovar_Retreat_Center_98575aafb6.jpg',
-  csr: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Sarovar_Retreat_center_Fetured_Image_188f4da1c5.jpg',
+    'https://media.brahmakumaris.com/assets/Contact_Us_Shanti_sarovar_Retreat_Center_98575aafb6.jpg',
+  csr: 'https://media.brahmakumaris.com/assets/Shanti_Sarovar_Retreat_center_Fetured_Image_188f4da1c5.jpg',
 } as const;
 
 /**
