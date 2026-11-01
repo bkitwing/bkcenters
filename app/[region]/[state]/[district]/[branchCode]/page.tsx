@@ -8,7 +8,7 @@ import { getCenterByCode, getCentersByDistrict, getRegionForState, getNewsByEmai
 import NearbyResultCard from '@/components/NearbyResultCard';
 import CenterPageSection, { type SectionTone } from '@/components/CenterPageSection';
 import ExpandableBlock from '@/components/ExpandableBlock';
-import { directionsUrl } from '@/lib/phone';
+import { directionsUrl, splitPhoneField } from '@/lib/phone';
 import { EmailLink, PhoneLink } from '@/components/ContactSheet';
 import ContactForm from '@/components/ContactForm';
 import ShareCenter from '@/components/ShareCenter';
@@ -353,7 +353,7 @@ export default async function CenterPage({ params }: CenterPageProps) {
       },
       {
         question: `How to Visit Meditation Center - ${center.name}?`,
-        answer: `Kindly call to confirm class hours, then visit. Address: ${formattedAddress}. ${center.contact || center.mobile ? `Phone: ${center.contact || center.mobile}` : ''}`
+        answer: `Kindly call to confirm class hours, then visit. Address: ${formattedAddress}. ${center.mobile || center.contact ? `Phone: ${center.mobile || center.contact}` : ''}`
       },
       {
         question: "Can anyone visit a Brahma Kumaris center and try Rajyoga meditation?",
@@ -510,25 +510,8 @@ export default async function CenterPage({ params }: CenterPageProps) {
                       <div className="mt-2 flex flex-wrap gap-2">
                         {/* Each opens a small sheet: Call / Email plus Copy, so it
                             also works in in-app browsers that block tel:/mailto: */}
-                        {center.contact &&
-                          center.contact.split(',').map((number, index) => {
-                            const shown = number.trim();
-                            if (!shown.replace(/[^0-9+]/g, '')) return null;
-                            return (
-                              <PhoneLink
-                                key={`contact-${index}`}
-                                number={shown}
-                                region={center.region}
-                                center={contactInfo}
-                                className={heroChipClass}
-                              >
-                                <Phone className="w-3.5 h-3.5 opacity-70" aria-hidden />
-                                {shown}
-                              </PhoneLink>
-                            );
-                          })}
                         {center.mobile &&
-                          center.mobile.split(',').map((number, index) => {
+                          splitPhoneField(center.mobile, center.region).map((number, index) => {
                             const shown = number.trim();
                             if (!shown) return null;
                             return (
@@ -540,6 +523,23 @@ export default async function CenterPage({ params }: CenterPageProps) {
                                 className={heroChipClass}
                               >
                                 <Smartphone className="w-3.5 h-3.5 opacity-70" aria-hidden />
+                                {shown}
+                              </PhoneLink>
+                            );
+                          })}
+                        {center.contact &&
+                          splitPhoneField(center.contact, center.region).map((number, index) => {
+                            const shown = number.trim();
+                            if (!shown.replace(/[^0-9+]/g, '')) return null;
+                            return (
+                              <PhoneLink
+                                key={`contact-${index}`}
+                                number={shown}
+                                region={center.region}
+                                center={contactInfo}
+                                className={heroChipClass}
+                              >
+                                <Phone className="w-3.5 h-3.5 opacity-70" aria-hidden />
                                 {shown}
                               </PhoneLink>
                             );

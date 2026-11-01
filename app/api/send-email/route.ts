@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
-import { phoneToTel } from '@/lib/phone';
+import { phoneToTel, splitPhoneField } from '@/lib/phone';
 
 // Add this export to tell Next.js that this route is dynamic and should be server-rendered
 export const dynamic = 'force-dynamic';
@@ -33,11 +33,8 @@ function formatCenterAddress(addr?: EmailRequestBody['centerAddress'], state?: s
 
 // Parse phone string with multiple numbers into array of {display, tel} objects
 function parsePhoneNumbers(raw?: string, region?: string): { display: string; tel: string }[] {
-  if (!raw) return [];
-  // Split on comma, slash, pipe, or semicolon
-  return raw.split(/[,\/|;]+/)
-    .map(s => s.trim())
-    .filter(Boolean)
+  // Same split as the site, incl. a shared STD code ("079-23290533, 23294850")
+  return splitPhoneField(raw, region)
     .map(num => ({
       display: num,
       tel: phoneToTel(num, region).replace(/^tel:/, ''), // same audited rules as the site

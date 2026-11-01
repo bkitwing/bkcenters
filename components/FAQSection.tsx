@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Center } from '@/lib/types';
 import { getLocalizedFaqs } from '@/lib/centerContent';
 import { EmailLink, PhoneLink } from '@/components/ContactSheet';
+import { splitPhoneField } from '@/lib/phone';
 
 interface FAQSectionProps {
   center: Center;
@@ -41,12 +42,7 @@ export default function FAQSection({
   };
 
   // Parse multiple phone numbers (same logic as email templates)
-  const parsePhoneNumbers = (raw: string | undefined) => {
-    if (!raw) return [];
-    return raw.split(/[,\/|;]/)
-      .map(num => num.trim())
-      .filter(num => num.length > 0);
-  };
+  const parsePhoneNumbers = (raw: string | undefined) => splitPhoneField(raw, center.region);
 
   // Format address like the main page
   const formatAddress = () => {

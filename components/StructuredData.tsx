@@ -111,7 +111,7 @@ export function LocalBusinessSchema({
       latitude: parseFloat(center.coords[0]),
       longitude: parseFloat(center.coords[1]),
     } : undefined,
-    telephone: center.contact || center.mobile || undefined,
+    telephone: center.mobile || center.contact || undefined,
     email: center.email || undefined,
     priceRange: 'Free',
     ...(omitOpeningHours
@@ -532,7 +532,7 @@ export function HowToSchema({ center, centerUrl }: HowToSchemaProps) {
     return [line1, line2, line3, city, pincode, center.state].filter(Boolean).join(', ');
   };
 
-  const contact = center.contact || center.mobile;
+  const contact = center.mobile || center.contact;
   const address = formatAddress();
 
   const steps: Array<Record<string, any>> = [

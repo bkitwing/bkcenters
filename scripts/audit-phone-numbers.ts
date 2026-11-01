@@ -16,6 +16,13 @@
  *                  site dials exactly what's shown — fix these in Strapi
  *   MISMATCH       site would dial a number different from libphonenumber's → bug
  *
+ * Numbers are read the way the site reads them (splitPhoneField), so a bare
+ * number that shares the STD code written before it — "079-23290533, 23294850"
+ * — is checked as the complete number the site dials ("079-23294850").
+ * When libphonenumber's reading of the text isn't valid, a valid reading the
+ * site also accepts is used instead: the country code written after a single 0
+ * ("0977-9847510925" → +977…), or an Indian mobile listed by a Nepal center.
+ *
  * Exits with code 1 on any MISMATCH, and writes scripts/phone-audit-report.csv
  * listing every number that needs attention.
  */
@@ -23,7 +30,7 @@ import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
-import { nationalNumber, phoneToTel } from '../lib/phone';
+import { internationalNumber, phoneToTel, splitPhoneField } from '../lib/phone';
 import { isNepalRegion } from '../lib/countryUtils';
 
 dotenv.config();
@@ -42,6 +49,8 @@ type Row = {
   region: string;
   field: 'mobile' | 'contact';
   number: string;
+  strapiValue: string;
+  stdAdded: boolean;
   verdict: 'ok' | 'check-number' | 'missed-valid' | 'dialled-as-is' | 'MISMATCH';
   siteDials: string;
   libphonenumber: string;
@@ -78,15 +87,31 @@ async function main() {
 
   for (const center of centers) {
     for (const field of ['mobile', 'contact'] as const) {
-      for (const raw of String(center[field]).split(',').map((n) => n.trim()).filter(Boolean)) {
+      const written = String(center[field]).split(',').map((n) => n.trim()).filter(Boolean);
+      const numbers = splitPhoneField(center[field], center.region);
+      for (let i = 0; i < numbers.length; i++) {
+        const raw = numbers[i];
+        const stdAdded = raw !== written[i];
         const digits = raw.replace(/\D/g, '');
         if (!digits) continue; // placeholders like "-"
         const country = isNepalRegion(center.region) ? 'NP' : 'IN';
-        const lib = parsePhoneNumberFromString(raw, country);
+        const asWritten = parsePhoneNumberFromString(raw, country);
+        const text = raw.trim();
+        const alternative = asWritten?.isValid()
+          ? undefined
+          : [
+              text.startsWith('0') ? parsePhoneNumberFromString(`+${text.slice(1)}`) : undefined,
+              country === 'NP' && !text.startsWith('+') ? parsePhoneNumberFromString(raw, 'IN') : undefined,
+            ].find(
+              (p) =>
+                p?.isValid() &&
+                (p.country === country || (country === 'NP' && p.country === 'IN' && /MOBILE/.test(p.getType() ?? '')))
+            );
+        const lib = alternative ?? asWritten;
         const libValid = Boolean(lib?.isValid());
         const libE164 = libValid ? lib!.number : '';
         const siteHref = phoneToTel(raw, center.region);
-        const siteRewrote = nationalNumber(raw, center.region) !== null;
+        const siteRewrote = internationalNumber(raw, center.region) !== null;
         const siteDials = siteHref.replace(/^tel:/, '');
 
         let verdict: Row['verdict'];
@@ -108,6 +133,7 @@ async function main() {
           verdict = 'dialled-as-is';
           note = 'not a complete number (e.g. missing STD code) — fix in Strapi';
         }
+        if (stdAdded) note = `written as ${written[i]}, STD code taken from the number before it${note ? `; ${note}` : ''}`;
 
         rows.push({
           branch_code: center.branch_code,
@@ -115,10 +141,12 @@ async function main() {
           region: center.region,
           field,
           number: raw,
+          strapiValue: String(center[field]),
+          stdAdded,
           verdict,
           siteDials,
           libphonenumber: libE164 || (lib ? `invalid (${lib.number})` : 'unparseable'),
-          oldSiteDialled: `+91${digits}`, // previous logic: "+91" in front of every number
+          oldSiteDialled: `+91${written[i].replace(/\D/g, '')}`, // previous logic: "+91" in front of every number
           note,
         });
       }
@@ -135,12 +163,14 @@ async function main() {
   console.log(`  missed-valid (valid, but dialled as shown): ${count('missed-valid')}`);
   console.log(`  dialled as shown (incomplete in Strapi):    ${count('dialled-as-is')}`);
   console.log(`  MISMATCH (would dial a different number):   ${count('MISMATCH')}`);
+  const stdAdded = rows.filter((r) => r.stdAdded);
+  console.log(`STD code carried over from the number before it: ${stdAdded.length} (${stdAdded.filter((r) => r.verdict === 'ok').length} now ok)`);
   console.log(`Previous "+91 for everything" logic dialled ${oldWrong} of ${libValidRows.length} valid numbers wrongly.`);
 
   const needsAttention = rows.filter((r) => r.verdict !== 'ok');
   const csvPath = path.join(__dirname, 'phone-audit-report.csv');
-  const esc = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
-  const header: (keyof Row)[] = ['verdict', 'branch_code', 'center', 'region', 'field', 'number', 'siteDials', 'libphonenumber', 'note'];
+  const esc = (v: string | boolean) => `"${String(v).replace(/"/g, '""')}"`;
+  const header: (keyof Row)[] = ['verdict', 'branch_code', 'center', 'region', 'field', 'number', 'siteDials', 'libphonenumber', 'note', 'strapiValue'];
   fs.writeFileSync(
     csvPath,
     [header.join(','), ...needsAttention.map((r) => header.map((h) => esc(r[h])).join(','))].join('\n') + '\n'
