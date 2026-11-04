@@ -1,82 +1,281 @@
 {
-  "timestamp": "2026-10-19T09:50:38.755Z",
+  "timestamp": "2026-11-04T03:04:17.091Z",
   "summary": {
-    "created": 0,
-    "updated": 3,
+    "created": 5,
+    "updated": 11,
     "deleted": 0
   },
-  "created": [],
+  "created": [
+    {
+      "branch_code": "05967",
+      "name": "Bhandara Vidya Nagar",
+      "district": "Bhandara",
+      "state": "Maharashtra",
+      "region": "India"
+    },
+    {
+      "branch_code": "05968",
+      "name": "Arrah Kanakpuri",
+      "district": "Bhojpur",
+      "state": "Bihar",
+      "region": "India"
+    },
+    {
+      "branch_code": "05969",
+      "name": "Chittorgarh Gandhinagar",
+      "district": "Chittorgarh",
+      "state": "Rajasthan",
+      "region": "India"
+    },
+    {
+      "branch_code": "05970",
+      "name": "Gannavaram",
+      "district": "Krishna",
+      "state": "Andhra Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05971",
+      "name": "Chaudakulat",
+      "district": "Kendrapara",
+      "state": "Odisha",
+      "region": "India"
+    }
+  ],
   "updated": [
     {
-      "branch_code": "03567",
-      "name": "Kaul (kaithal)",
+      "branch_code": "01352",
+      "name": "Guntur",
       "changes": [
-        {
-          "field": "mobile",
-          "from": "8901333837",
-          "to": "9996033995"
-        }
-      ]
-    },
-    {
-      "branch_code": "05162",
-      "name": "Khizarpura",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9996033995",
-          "to": "8901333837"
-        }
-      ]
-    },
-    {
-      "branch_code": "05177",
-      "name": "Ambala City Sector 1",
-      "changes": [
-        {
-          "field": "name",
-          "from": "Ambala City Sector 7",
-          "to": "Ambala City Sector 1"
-        },
-        {
-          "field": "slug",
-          "from": "ambala-city-sector-7",
-          "to": "ambala-city-sector-1"
-        },
         {
           "field": "address_line1",
-          "from": "H No: 296, Last Row",
-          "to": "House No: 301"
+          "from": "Rajyoga Bhawan, D.No: 5-92-42/9",
+          "to": "Vardani Bhawan, D.No: 5-60-1/39"
         },
         {
           "field": "address_line2",
-          "from": "Nilkanth Mandir Road",
-          "to": "Opp: Mind Tree School, Jairland"
+          "from": "Near Krishna Nagar Park",
+          "to": "5th Line, Ashok Nagar"
         },
         {
           "field": "address_line3",
-          "from": "Secote-7. Ambala City",
-          "to": "Sector - 1, Ambala City"
+          "from": "Devapuram 2nd Lane",
+          "to": ""
+        },
+        {
+          "field": "pincode",
+          "from": "522001",
+          "to": "522002"
+        },
+        {
+          "field": "latitude",
+          "from": 16.3084309,
+          "to": 16.310923
+        },
+        {
+          "field": "longitude",
+          "from": 80.4242857,
+          "to": 80.425328
+        }
+      ]
+    },
+    {
+      "branch_code": "02284",
+      "name": "Hyderabad Shanti Sarovar",
+      "changes": [
+        {
+          "field": "address_line2",
+          "from": "Behind P.Gopichand Badmentine Acadamy",
+          "to": "Beside Pullela Gopichand Acadamy"
+        },
+        {
+          "field": "address_line3",
+          "from": "Near Isb-infosys Rd, Sy.No: 91, Gacchibowli",
+          "to": "Near Isb-infosys Rd, Sy.No: 91, Gachibowli"
+        },
+        {
+          "field": "mobile",
+          "from": "9394333363, 8087411206",
+          "to": "9396503335, 8087411206"
+        }
+      ]
+    },
+    {
+      "branch_code": "02861",
+      "name": "Ghatal",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "Plot No: 318, Shanti Sudha Bhawan",
+          "to": "Plot No: 318, H No: 147, Shanti Sudha Bhawan"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Ghatal Central Bus Stand, Ward No-3",
+          "to": "Near Ghatal Central Bus Stand, Khirpai Road"
+        },
+        {
+          "field": "address_line3",
+          "from": "Krishna Nagar, Ghatal",
+          "to": "Ward No-3, Kushpata, Krishna Nagar, Ghatal"
+        },
+        {
+          "field": "section",
+          "from": "00194",
+          "to": "02861"
+        }
+      ]
+    },
+    {
+      "branch_code": "04115",
+      "name": "Panipat Shanti Nagar",
+      "changes": [
+        {
+          "field": "mobile",
+          "from": "9416985808",
+          "to": "9416985808, 9416206072"
+        }
+      ]
+    },
+    {
+      "branch_code": "04165",
+      "name": "Kirnapur",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 158, Ward No: 4",
+          "to": "H No: 370/1, Ward No: 10"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Maharastra Bank",
+          "to": "Durga Chowk"
+        },
+        {
+          "field": "address_line3",
+          "from": "Kirnai Mandir Road",
+          "to": "Kirnapur"
         },
         {
           "field": "email",
           "from": null,
-          "to": "sec7.amb@bkivv.org"
-        },
-        {
-          "field": "mobile",
-          "from": "7015422765, 8168394182",
-          "to": "8168394182, 7015422765"
+          "to": "kirnapur@bkivv.org"
         },
         {
           "field": "latitude",
-          "from": 30.37207,
-          "to": 30.36799
+          "from": 21.6269516,
+          "to": 21.626542
         },
         {
           "field": "longitude",
-          "from": 76.77828,
-          "to": 76.789524
+          "from": 80.3317181,
+          "to": 80.330612
+        }
+      ]
+    },
+    {
+      "branch_code": "04207",
+      "name": "Kakdwip",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H.No: 83, Arun Apartment",
+          "to": "Plot No: L.R.3549, Arun Apartment"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Kakdwip Court",
+          "to": "Near Kakdwip Court, Beside Dr. Sanatan Gayen's House"
+        },
+        {
+          "field": "address_line3",
+          "from": "Nh-117",
+          "to": ""
+        },
+        {
+          "field": "mobile",
+          "from": "9609588348, 8768316111, 9563731514",
+          "to": "9563731514"
+        },
+        {
+          "field": "section",
+          "from": "00194",
+          "to": "04207"
+        }
+      ]
+    },
+    {
+      "branch_code": "04483",
+      "name": "Salboni",
+      "changes": [
+        {
+          "field": "section",
+          "from": "00194",
+          "to": "02861"
+        }
+      ]
+    },
+    {
+      "branch_code": "04844",
+      "name": "Hathwala",
+      "changes": [
+        {
+          "field": "section",
+          "from": "00772",
+          "to": "05402"
+        }
+      ]
+    },
+    {
+      "branch_code": "05070",
+      "name": "Diamond Harbour",
+      "changes": [
+        {
+          "field": "section",
+          "from": "00194",
+          "to": "04207"
+        }
+      ]
+    },
+    {
+      "branch_code": "05402",
+      "name": "Samalkha Mata Puli Road",
+      "changes": [
+        {
+          "field": "section",
+          "from": "00772",
+          "to": "05402"
+        }
+      ]
+    },
+    {
+      "branch_code": "05620",
+      "name": "Jaipur Model Town",
+      "changes": [
+        {
+          "field": "address_line1",
+          "from": "H No: 110, Vinoba Vihar",
+          "to": "H No: C-287"
+        },
+        {
+          "field": "address_line2",
+          "from": "Near Trimurti Apartment",
+          "to": "Shiv Shakti Nagar"
+        },
+        {
+          "field": "mobile",
+          "from": "8290456502, 9116536130",
+          "to": "8290456502, 9653909447"
+        },
+        {
+          "field": "latitude",
+          "from": 26.844154,
+          "to": 26.841555
+        },
+        {
+          "field": "longitude",
+          "from": 75.822106,
+          "to": 75.827423
         }
       ]
     }
