@@ -15,12 +15,12 @@ export const SHK_RETREAT_NAME = 'Shanti Shikhar Retreat Center';
 
 /** Featured / Open Graph images (Strapi CDN). */
 export const SHK_OG_IMAGES = {
-  home: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Home_page_abeef16d7a.png',
+  home: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Home_page_e517034946.jpg',
   contact:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Contact_page_53600dd277.png',
+    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Contact_page_49e3182d64.jpg',
   galleries:
-    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Gallery_e55dc7134e.png',
-  news: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_News_page_ad6441f009.png',
+    'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_Gallery_9590f5152f.jpg',
+  news: 'https://bkstrapiapp.blob.core.windows.net/strapi-uploads/assets/Shanti_Shikhar_News_page_2251dc20d6.jpg',
 } as const;
 
 export const SHK_SEO = {
