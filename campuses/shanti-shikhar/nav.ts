@@ -28,7 +28,6 @@ export const SHK_NAV: readonly ShkNavItem[] = [
     href: SHK_ABOUT_HREF,
     children: [
       { label: 'About Shanti Shikhar', href: SHK_ABOUT_HREF },
-      { label: 'Services', href: SHK_SERVICES_HREF },
       { label: 'About Brahma Kumaris', href: BK_ABOUT_HREF, external: true },
     ],
   },
