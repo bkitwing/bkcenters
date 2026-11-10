@@ -4,6 +4,8 @@ export const SHK_SERVICES_HREF = `${SHK_HOME_HREF}#services`;
 export const SHK_GALLERIES_HREF = `${SHK_HOME_HREF}/galleries`;
 export const SHK_NEWS_HREF = `${SHK_HOME_HREF}/news`;
 export const SHK_CONTACT_HREF = `${SHK_HOME_HREF}/contact`;
+/** "Free 7-day Rajyoga" section on the contact page. */
+export const SHK_COURSE_HREF = `${SHK_CONTACT_HREF}#shk-course`;
 
 export const BK_ABOUT_HREF = 'https://www.brahmakumaris.com/about';
 

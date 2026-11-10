@@ -6091,3 +6091,287 @@ html.dark body.shk-campus-body {
     padding-inline: 1.5rem;
   }
 }
+
+/* ── Inauguration ticker (between About and Services) ───────────────── */
+.shk-inaug {
+  position: relative;
+  border-block: 1px solid color-mix(in srgb, var(--shk-gold) 18%, transparent);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--shk-gold) 9%, var(--background)) 0%,
+      color-mix(in srgb, var(--shk-forest-soft) 30%, var(--background)) 50%,
+      color-mix(in srgb, var(--shk-gold) 9%, var(--background)) 100%
+    );
+}
+
+.shk-inaug__band {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.5rem;
+  padding-block: 0.6rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shk-inaug__band:focus-visible {
+  outline: 2px solid var(--shk-gold);
+  outline-offset: -2px;
+  border-radius: 0.5rem;
+}
+
+.shk-inaug__cta {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.95rem 0.4rem 0.4rem;
+  border-radius: 999px;
+  background: var(--shk-gold-deep);
+  color: #fff;
+  font-size: var(--shk-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px -12px rgba(42, 18, 47, 0.55);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.shk-inaug__band:hover .shk-inaug__cta {
+  background: var(--shk-gold);
+  transform: translateY(-1px);
+}
+
+.shk-inaug__play {
+  display: inline-grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  padding-left: 1px;
+}
+
+.shk-inaug__marquee {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.shk-inaug__track {
+  display: flex;
+  width: max-content;
+  animation: shk-inaug-scroll 42s linear infinite;
+}
+
+.shk-inaug__band:hover .shk-inaug__track,
+.shk-inaug__band:focus-visible .shk-inaug__track {
+  animation-play-state: paused;
+}
+
+.shk-inaug__list {
+  display: flex;
+  gap: 2.75rem;
+  margin: 0;
+  padding: 0 2.75rem 0 0;
+  list-style: none;
+}
+
+.shk-inaug__item {
+  white-space: nowrap;
+  color: var(--shk-ink);
+  font-size: var(--shk-text-sm);
+  letter-spacing: 0.01em;
+}
+
+.shk-inaug__spark {
+  margin-right: 0.65rem;
+  color: var(--shk-gold);
+  font-size: 0.75em;
+}
+
+@keyframes shk-inaug-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shk-inaug__track {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .shk-inaug__band {
+    gap: 0.75rem;
+  }
+  .shk-inaug__cta {
+    font-size: 0.875rem;
+    padding-right: 0.8rem;
+  }
+}
+
+.dark .shk-inaug__cta,
+.dark .shk-inaug__band:hover .shk-inaug__cta {
+  color: var(--shk-charcoal);
+}
+
+.dark .shk-inaug__play {
+  background: rgba(12, 6, 14, 0.15);
+}
+
+/* ── Video modal ─────────────────────────────────────────────────────── */
+.shk-vmodal {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(12, 6, 14, 0.82);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: shk-gal-lb-in 0.2s ease;
+}
+
+.shk-vmodal__panel {
+  width: min(60rem, 100%);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  border-radius: var(--shk-radius);
+  background: var(--shk-surface);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.7);
+}
+
+.shk-vmodal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem 0.8rem 1.25rem;
+}
+
+.shk-vmodal__eyebrow {
+  margin: 0;
+  color: var(--shk-gold-deep);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dark .shk-vmodal__eyebrow {
+  color: var(--shk-gold);
+}
+
+.shk-vmodal__title {
+  margin: 0.15rem 0 0;
+  color: var(--shk-ink);
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.shk-vmodal__close {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--shk-ink) 8%, transparent);
+  color: var(--shk-ink);
+  cursor: pointer;
+}
+
+.shk-vmodal__close:hover {
+  background: color-mix(in srgb, var(--shk-ink) 14%, transparent);
+}
+
+.shk-vmodal__tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1.25rem 0.85rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.shk-vmodal__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.shk-vmodal__tab {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--shk-gold) 30%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--shk-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.shk-vmodal__tab:hover {
+  background: color-mix(in srgb, var(--shk-gold) 10%, transparent);
+}
+
+.shk-vmodal__tab.is-active {
+  border-color: var(--shk-gold-deep);
+  background: var(--shk-gold-deep);
+  color: #fff;
+}
+
+.dark .shk-vmodal__tab.is-active {
+  border-color: var(--shk-gold);
+  background: var(--shk-gold);
+  color: var(--shk-charcoal);
+}
+
+.shk-vmodal__tab:focus-visible {
+  outline: 2px solid var(--shk-gold);
+  outline-offset: 2px;
+}
+
+.shk-vmodal__frame {
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.shk-vmodal__frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.shk-vmodal__ext {
+  display: block;
+  padding: 0.7rem 1.25rem 0.85rem;
+  color: var(--shk-muted);
+  font-size: 0.875rem;
+  text-align: right;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.shk-vmodal__ext:hover {
+  color: var(--shk-gold-deep);
+}

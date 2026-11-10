@@ -114,8 +114,21 @@ export const SHK_MAP_EMBED_URL =
 
 export const SHK_YOUTUBE_HREF = 'https://www.youtube.com/@shantisarovarbrahmakumaris8283';
 export const SHK_MEDITATION_HREF = 'https://www.brahmakumaris.com/meditation/';
-export const SHK_INAUGURATION_HREF =
-  'https://www.youtube.com/live/ND8twQVtplw?si=g7IfTa6zXRYEriIk';
+export const SHK_INAUGURATION_VIDEO_ID = 'xzz3I5EEKzw';
+export const SHK_INAUGURATION_HREF = `https://www.youtube.com/live/${SHK_INAUGURATION_VIDEO_ID}`;
+
+export const SHK_JOURNEY_VIDEO_ID = 'Q5qh2cQmpt4';
+export const SHK_JOURNEY_HREF = `https://www.youtube.com/watch?v=${SHK_JOURNEY_VIDEO_ID}`;
+
+export type ShkVideo = {
+  id: string;
+  /** Short tab label in the video popup. */
+  label: string;
+  /** Heading shown above the player. */
+  title: string;
+  youtubeId: string;
+  href: string;
+};
 
 export type ShkImage = {
   id: string;
@@ -165,7 +178,30 @@ export const SHK_CONTENT = {
     eyebrow: 'A historic moment',
     title: 'A divine campus dedicated to world peace',
     subtitle: 'Inaugurated by the Hon’ble Prime Minister',
-    cta: 'Watch the full programme',
+    cta: 'Watch the videos',
+    /** Ticker popup — first video plays by default. */
+    videos: [
+      {
+        id: 'inauguration',
+        label: 'Inauguration',
+        title: 'Inaugurated by the Hon’ble Prime Minister',
+        youtubeId: SHK_INAUGURATION_VIDEO_ID,
+        href: SHK_INAUGURATION_HREF,
+      },
+      {
+        id: 'journey',
+        label: 'Journey of Shanti Shikhar',
+        title: 'The journey of Shanti Shikhar',
+        youtubeId: SHK_JOURNEY_VIDEO_ID,
+        href: SHK_JOURNEY_HREF,
+      },
+    ] satisfies ShkVideo[],
+    ticker: [
+      'Inaugurated by the Hon’ble Prime Minister',
+      'A divine campus dedicated to world peace',
+      'The journey of Shanti Shikhar',
+      'Nava Raipur, Chhattisgarh',
+    ],
     href: SHK_INAUGURATION_HREF,
     slides: [
       {

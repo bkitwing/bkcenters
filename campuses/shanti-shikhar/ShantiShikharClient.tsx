@@ -6,22 +6,26 @@ import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react'
 import { ArrowDown, ArrowRight, Navigation } from 'lucide-react';
 import {
   SHK_CONTENT,
-  SHK_INAUGURATION_HREF,
+  SHK_INAUGURATION_VIDEO_ID,
   SHK_MAP_EMBED_URL,
   SHK_MAPS_URL,
 } from './content';
-import { SHK_CONTACT_HREF, SHK_GALLERIES_HREF } from './nav';
+import { SHK_CONTACT_HREF, SHK_COURSE_HREF, SHK_GALLERIES_HREF } from './nav';
 import { HomeAmbientVideo } from './HomeAmbientVideo';
 import { HomeCoursesCarousel } from './HomeCoursesCarousel';
+import { HomeInaugurationTicker } from './HomeInaugurationTicker';
 import { HomeHeroParticles } from './HomeHeroParticles';
 import { HomeHeroSlideshow, type ShkHomeImage } from './HomeHeroSlideshow';
 import type { ShkGalleryThumb, ShkHeroSlide, ShkService } from './logo-data';
 
 const c = SHK_CONTENT;
-const INAUGURATION_EMBED = 'https://www.youtube.com/embed/ND8twQVtplw';
+const INAUGURATION_EMBED = `https://www.youtube.com/embed/${SHK_INAUGURATION_VIDEO_ID}`;
 
 /** Home facilities carousel. Turn this on when the section should show again. */
 const SHOW_HOME_FACILITIES = false;
+
+/** Full-width video band after About. Hidden until a better video is ready. */
+const SHOW_HOME_VIDEO = false;
 
 function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -178,9 +182,9 @@ export default function ShantiShikharClient({
               Contact us
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <button type="button" onClick={() => scrollToId('services')} className="shk-btn shk-btn--ghost">
+            <Link href={SHK_COURSE_HREF} className="shk-btn shk-btn--ghost">
               {c.hero.ctaSecondary}
-            </button>
+            </Link>
           </motion.div>
         </div>
 
@@ -237,17 +241,6 @@ export default function ShantiShikharClient({
                       <h3>{chapter.title}</h3>
                     </header>
                     <p>{chapter.body}</p>
-                    {index === CHAPTERS.length - 1 ? (
-                      <a
-                        href={SHK_INAUGURATION_HREF}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="shk-home-story-link"
-                      >
-                        {c.inauguration.cta}
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </a>
-                    ) : null}
                   </article>
                 </Reveal>
               ))}
@@ -256,10 +249,19 @@ export default function ShantiShikharClient({
         </div>
       </section>
 
-      <HomeAmbientVideo
-        embedUrl={INAUGURATION_EMBED}
+      {SHOW_HOME_VIDEO ? (
+        <HomeAmbientVideo
+          embedUrl={INAUGURATION_EMBED}
+          title={c.inauguration.title}
+          lede={c.inauguration.subtitle}
+        />
+      ) : null}
+
+      <HomeInaugurationTicker
+        videos={c.inauguration.videos}
+        cta={c.inauguration.cta}
+        items={c.inauguration.ticker}
         title={c.inauguration.title}
-        lede={c.inauguration.subtitle}
       />
 
       <section id="services" className="shk-section shk-section--alt shk-home-courses">
