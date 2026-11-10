@@ -40,6 +40,15 @@ const CAMPUS_SITES: {
       { path: '/contact', changefreq: 'weekly', priority: 0.85 },
     ],
   },
+  {
+    slug: 'shanti-shikhar',
+    pages: [
+      { path: '', changefreq: 'weekly', priority: 0.95 },
+      { path: '/galleries', changefreq: 'weekly', priority: 0.85 },
+      { path: '/news', changefreq: 'daily', priority: 0.85 },
+      { path: '/contact', changefreq: 'weekly', priority: 0.85 },
+    ],
+  },
 ];
 
 function slugify(value: string): string {
