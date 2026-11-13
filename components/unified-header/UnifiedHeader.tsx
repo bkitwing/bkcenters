@@ -546,7 +546,7 @@ function MobileQuickActions({
         <div className="h-px flex-1 ml-3 bg-neutral-100 dark:bg-neutral-800" />
       </div>
       <a
-        href="https://www.brahmakumaris.com/m"
+        href="https://www.brahmakumaris.com/meditation"
         target="_blank"
         rel="noopener noreferrer"
         onClick={onNavigate}

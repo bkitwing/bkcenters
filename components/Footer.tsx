@@ -211,7 +211,7 @@ export function Footer() {
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100">Begin Your Spiritual Journey</p>
               <div className="flex gap-2 mt-1.5">
-                <a href="https://www.brahmakumaris.com/m" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">Learn Meditation</a>
+                <a href="https://www.brahmakumaris.com/meditation" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">Learn Meditation</a>
                 <span className="text-neutral-400">•</span>
                 <a href="/wisdom/soul-sustenance" className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">Soul Sustenance</a>
               </div>
