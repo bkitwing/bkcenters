@@ -70,30 +70,66 @@ Strapi Base URL: `https://webapp.brahmakumaris.com/api`
 
 ---
 
-## How to Sync (Step by Step)
+## Quick Sync — two commands (recommended)
+
+**PAD (Mount Abu HQ) is the master.** Strapi mirrors whatever PAD has, using the India/Nepal rules below.
+
+```bash
+npm run sync:check     # download India + Nepal from PAD, show NEW / UPDATED / DELETED — writes nothing
+npm run sync:apply     # same check, asks once, applies India then Nepal, refreshes the website cache
+```
+
+That's it. `sync:apply` always shows the full plan first and changes nothing until you answer:
+`[y]` apply all · `[s]` only new + updated (skip deletes) · `[n]` abort.
+
+**One-time setup** — the PAD logins live in `.env` (git-ignored), not in this file:
+
+```
+PAD_INDIA_USER=...
+PAD_INDIA_PASS=...
+PAD_NEPAL_USER=...
+PAD_NEPAL_PASS=...
+```
+
+**Useful options** (add after `--`):
+
+| Command | What it does |
+|---|---|
+| `npm run sync:check -- --india` | Only India (or `--nepal`) |
+| `npm run sync:check -- --no-fetch` | Re-check using the raw files already on disk |
+| `npm run sync:apply -- --skip-deletes` | Apply only new + updated centers |
+| `npm run sync:apply -- --yes` | No questions (cron/unattended). Refuses if India would delete more than 50 centers (`--max-deletes=N` to change) |
+| `npm run sync:revalidate` | Refresh the live website cache again |
+| `npm run sync:fetch` | Only download the PAD files (no Strapi access) |
+
+**Safety built in:**
+
+- A PAD download only replaces `Centers_Raw.json` / `Centers_Nepal_Raw.json` after validation — the response must be complete (`total` = rows), every row needs a `branch_code`, and it can't shrink more than 5% vs. the last download (`--force-fetch` if that's genuine). The previous file is backed up.
+- The plan is always a dry run first. `--dry-run` never writes to Strapi (centers **and** orphan districts/states/regions are only listed).
+- When run unattended (`--yes`), more than 50 India deletes stops the run. Run by hand, it warns and lets you decide.
+- Every run is kept in `scripts/sync-history/<date>-check|apply/` (plan, applied report, full snapshot of every deleted center, raw-file backups).
+- Always targets **webapp.brahmakumaris.com** (fast). Portal is the same database, so there's no separate portal sync.
+
+After applying, commit `Centers_Raw.json` and `scripts/sync-report.json` to keep the data snapshot in git.
+
+---
+
+## How to Sync manually (Step by Step)
+
+The two commands above do all of this for you. Kept for reference / debugging.
 
 ### Step 0a: Fetch latest **India** data from PAD API
 
 ```bash
-curl -s -u "bkpad_bkc:merababa" \
-  "https://padds.bkivv.app/pad-data-services/locations/c/India" \
-  -o Centers_Raw.json
+npm run sync:fetch -- --india      # validated download into Centers_Raw.json
 ```
 
 > India sync **excludes** region `NEPAL` (`EXCLUDED_REGIONS` in `scripts/strapi-sync.js`). Nepal is imported separately below.
 
 ### Step 0b: Fetch latest **Nepal** data (separate API)
 
-Use env vars so credentials are not committed:
-
 ```bash
-# Optional: put these in .env.local (never commit)
-# PAD_NEPAL_USER=bkpadbkc_nepal
-# PAD_NEPAL_PASS=...
-
-curl -s -u "bkpadbkc_nepal:merababa" \
-  "https://padds.bkivv.app/pad-data-services/locations/c/Nepal" \
-  -o Centers_Nepal_Raw.json
+npm run sync:fetch -- --nepal      # validated download into Centers_Nepal_Raw.json
 ```
 
 ### When you get new India data:
@@ -129,13 +165,7 @@ India mode also **never deletes** centers with `country=Nepal`, and **ignores Ne
 
 **Nepal provinces:** PAD often stores districts/old zones as “state”. Nepal sync maps every center to one of the official 7 provinces (`Koshi`, `Madhesh`, `Bagmati`, `Gandaki`, `Lumbini`, `Karnali`, `Sudurpashchim`) via [`scripts/nepal-provinces.js`](scripts/nepal-provinces.js).
 
-**Portal / webapp:** After importing to webapp, verify portal with:
-
-```bash
-STRAPI_BASE_URL=https://portal.brahmakumaris.com/api npm run strapi-sync:nepal:dry
-```
-
-If create count is already `0`, portal already has Nepal (shared or mirrored data) — no second write needed. Only run `strapi-sync:nepal --yes` against portal when dry-run shows creates.
+**Portal / webapp:** Both hostnames serve the same Strapi database (verified Nov 2026), so always sync via **webapp** — it's much faster. There's no need to sync or verify portal separately.
 
 ---
 
@@ -192,6 +222,8 @@ If create count is already `0`, portal already has Nepal (shared or mirrored dat
 
 | Command | Description |
 |---------|-------------|
+| `npm run sync:check` | **Start here** — download PAD India + Nepal and show the plan (read-only) |
+| `npm run sync:apply` | Download, show plan, confirm once, apply India + Nepal, refresh website |
 | `npm run strapi-sync` | **India** — Syncs Centers_Raw.json → Strapi (add/update/delete; excludes Nepal) |
 | `npm run strapi-sync:dry` | India dry-run (no writes) |
 | `npm run strapi-sync:nepal` | **Nepal** — Syncs Centers_Nepal_Raw.json → Strapi (create/update only; never deletes) |
@@ -219,4 +251,5 @@ If create count is already `0`, portal already has Nepal (shared or mirrored dat
 - **Capitalization**: Countries and region/state/district names are title-cased during sync. Center **titles**, **address lines**, and **city** are title-cased and then the letter after each `.` is uppercased (`I.S.R.O`, `J.P.Nagar`, `H.No`) so dotted initials from PAD stay intact.
 - **Coordinates**: Stored as `latitude` (Decimal) and `longitude` (Decimal) — converted from the string array `coords` in raw data.
 - **Retreat centers**: Identified by `branch_code` in the hardcoded list (`90001`, `90007`, `90006`). The `is_retreat` boolean flag is set automatically.
+- **Madhuban sister concerns (HQ campuses)**: PAD lists Pandav Bhawan (`90001`), Gyan Sarovar (`90006`) and Shantivan (`90007`) under region `MADHUBAN SISTER CONCERNS`. The India sync maps that region to **India** automatically (`INDIA_REGION_ALIASES` in `scripts/strapi-sync.js`), so they stay under India → Rajasthan → Sirohi. This used to be a manual edit after every download — **no longer needed**. If PAD adds a new campus under that region, the sync prints a warning so you can add it to the retreat list.
 - **Relations**: Each center is linked to its district, which is linked to its state, which is linked to its region. This chain enables efficient queries like "get all centers in Madhya Pradesh" without loading all 5612 centers.

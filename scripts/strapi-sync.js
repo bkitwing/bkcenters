@@ -16,6 +16,12 @@
  *   node scripts/strapi-sync.js --nepal --dry-run
  *   node scripts/strapi-sync.js --nepal --yes
  *
+ * Safety flags (used by scripts/pad-sync.js — `npm run sync:check` / `sync:apply`):
+ *   --dry-run          Never writes anything (centers AND orphan hierarchy are only listed).
+ *   --no-delete        Create/update only: skip center deletes and orphan cleanup.
+ *   --max-deletes=N    Abort before any write if more than N centers would be deleted.
+ *   --report=<path>    Write the JSON report here instead of scripts/sync-report*.json.
+ *
  * Sitemap is generated dynamically by the Next.js app (app/sitemap.ts),
  * not by this script.
  */
@@ -39,6 +45,15 @@ const BATCH_SIZE = 20;
 const DELAY_MS = 200;
 const RETREAT_BRANCH_CODES = ['90001', '90007', '90006'];
 const EXCLUDED_REGIONS = ['NEPAL']; // India mode only — never sync Nepal from India API
+/**
+ * India mode: PAD region names that belong under another region on the website.
+ * PAD lists the Mount Abu HQ campuses (Pandav Bhawan 90001, Gyan Sarovar 90006,
+ * Shantivan 90007) under region "MADHUBAN SISTER CONCERNS"; on the site they live
+ * under India → Rajasthan → Sirohi. This used to be changed by hand after every
+ * PAD download (see old backup/branches_comparison_*.csv).
+ */
+const INDIA_REGION_ALIASES = { 'MADHUBAN SISTER CONCERNS': 'INDIA' };
+const HQ_CAMPUS_REGION = 'MADHUBAN SISTER CONCERNS';
 const NEPAL_REGION_PREFIXES = ['NEPAL']; // Nepal mode: accept regions starting with these
 /**
  * Conservative Nepal state spelling aliases only (clear duplicates from PAD).
@@ -50,13 +65,23 @@ const NEPAL_STATE_ALIASES = {
   MECHI: 'Mechi',            // case normalize
   MAKAWANPUR: 'Makwanpur',   // official district spelling
 };
-const REPORT_FILE = path.join(
-  __dirname,
-  NEPAL_MODE ? 'sync-report-nepal.json' : 'sync-report.json'
-);
+function argValue(name) {
+  const prefix = `--${name}=`;
+  const arg = process.argv.find(a => a.startsWith(prefix));
+  return arg ? arg.slice(prefix.length) : null;
+}
+const REPORT_FILE = argValue('report')
+  ? path.resolve(argValue('report'))
+  : path.join(__dirname, NEPAL_MODE ? 'sync-report-nepal.json' : 'sync-report.json');
 const DETAILED = process.argv.includes('--detailed') || process.argv.includes('-d');
 const AUTO_YES = process.argv.includes('--yes') || process.argv.includes('-y');
 const DRY_RUN = process.argv.includes('--dry-run');
+const NO_DELETE = process.argv.includes('--no-delete');
+const MAX_DELETES = argValue('max-deletes') != null ? parseInt(argValue('max-deletes'), 10) : null;
+if (MAX_DELETES != null && !(MAX_DELETES >= 0)) {
+  console.error(`Invalid --max-deletes value: ${argValue('max-deletes')}`);
+  process.exit(1);
+}
 
 const {
   resolveNepalProvince,
@@ -311,15 +336,28 @@ function askUser(question) {
   });
 }
 
-// Build report object for saving
-function buildReport(toCreate, toUpdate, toDelete) {
+// Build report object for saving.
+// `orphans` (India only) lists empty district/state/region entries; deleted
+// centers keep a full attribute snapshot so they can be recreated if needed.
+function buildReport(toCreate, toUpdate, toDelete, orphans) {
   return {
     timestamp: new Date().toISOString(),
+    mode: NEPAL_MODE ? 'nepal' : 'india',
+    dryRun: DRY_RUN,
+    strapi: STRAPI_BASE_URL,
     summary: {
       created: toCreate.length,
       updated: toUpdate.length,
-      deleted: toDelete.length
+      deleted: toDelete.length,
+      ...(orphans ? { orphans: orphans.total } : {}),
     },
+    ...(orphans ? {
+      orphans: {
+        districts: orphans.districts.map(d => d.attributes.name),
+        states: orphans.states.map(s => s.attributes.name),
+        regions: orphans.regions.map(r => r.attributes.name),
+      },
+    } : {}),
     created: toCreate.map(e => ({
       branch_code: e.branch_code,
       name: formatCenterName(e.name),
@@ -332,8 +370,84 @@ function buildReport(toCreate, toUpdate, toDelete) {
       name: formatCenterName(entry.name),
       changes: diffs.map(d => ({ field: d.field, from: d.from, to: d.to }))
     })),
-    deleted: toDelete.map(({ code, name }) => ({ branch_code: code, name }))
+    deleted: toDelete.map(({ code, name, snapshot }) => ({ branch_code: code, name, snapshot }))
   };
+}
+
+/**
+ * Find hierarchy entries (district → state → region) that no center uses any more.
+ * Read-only. Nepal hierarchy is never reported as orphaned (see collectNepalHierarchyIds).
+ */
+async function findOrphanHierarchy() {
+  const [currentCenters, currentDistricts, currentStates, currentRegions] = await Promise.all([
+    fetchAll('centers', 'district_center'),
+    fetchAll('district-centers', 'state_center'),
+    fetchAll('state-centers', 'region_center'),
+    fetchAll('region-centers'),
+  ]);
+
+  const { nepalRegionIds, nepalStateIds, nepalDistrictIds } = collectNepalHierarchyIds(
+    currentRegions,
+    currentStates,
+    currentDistricts
+  );
+
+  const usedDistrictIds = new Set();
+  for (const c of currentCenters) {
+    const distId = c.attributes.district_center?.data?.id;
+    if (distId) usedDistrictIds.add(distId);
+  }
+  const remainingDistricts = currentDistricts.filter(d => usedDistrictIds.has(d.id));
+  const usedStateIds = new Set();
+  for (const d of remainingDistricts) {
+    const stateId = d.attributes.state_center?.data?.id;
+    if (stateId) usedStateIds.add(stateId);
+  }
+  const remainingStates = currentStates.filter(s => usedStateIds.has(s.id));
+  const usedRegionIds = new Set();
+  for (const s of remainingStates) {
+    const regionId = s.attributes.region_center?.data?.id;
+    if (regionId) usedRegionIds.add(regionId);
+  }
+
+  const districts = currentDistricts.filter(d => !usedDistrictIds.has(d.id) && !nepalDistrictIds.has(d.id));
+  const states = currentStates.filter(s => !usedStateIds.has(s.id) && !nepalStateIds.has(s.id));
+  const regions = currentRegions.filter(r => !usedRegionIds.has(r.id) && !nepalRegionIds.has(r.id));
+  const skippedNepal = {
+    districts: currentDistricts.filter(d => !usedDistrictIds.has(d.id) && nepalDistrictIds.has(d.id)).length,
+    states: currentStates.filter(s => !usedStateIds.has(s.id) && nepalStateIds.has(s.id)).length,
+    regions: currentRegions.filter(r => !usedRegionIds.has(r.id) && nepalRegionIds.has(r.id)).length,
+  };
+
+  return {
+    districts,
+    states,
+    regions,
+    total: districts.length + states.length + regions.length,
+    skippedNepal,
+  };
+}
+
+function printOrphans(orphans) {
+  const nepalSkipped = orphans.skippedNepal.districts + orphans.skippedNepal.states + orphans.skippedNepal.regions;
+  if (nepalSkipped > 0) {
+    console.log(
+      `  Skipping ${nepalSkipped} Nepal hierarchy entries ` +
+      `(${orphans.skippedNepal.districts} districts, ${orphans.skippedNepal.states} states, ` +
+      `${orphans.skippedNepal.regions} regions) — India sync does not clean Nepal.\n`
+    );
+  }
+  if (orphans.total === 0) {
+    console.log('  No orphaned hierarchy entries found.\n');
+    return;
+  }
+  console.log('');
+  for (const [label, list] of [['DISTRICTS', orphans.districts], ['STATES', orphans.states], ['REGIONS', orphans.regions]]) {
+    if (list.length === 0) continue;
+    console.log(`┌─── ORPHANED ${label} ───`);
+    for (const item of list) console.log(`│  - ${item.attributes.name}`);
+    console.log('└──────────────────────────\n');
+  }
 }
 
 // --- Main Sync ---
@@ -390,6 +504,28 @@ async function sync() {
     const excludedCount = allRawEntries.length - rawEntries.length;
     if (excludedCount > 0) {
       console.log(`  Excluded ${excludedCount} entries from regions: ${EXCLUDED_REGIONS.join(', ')}`);
+    }
+
+    // HQ campuses: PAD region "MADHUBAN SISTER CONCERNS" → India (was a manual edit)
+    const remapped = {};
+    rawEntries = rawEntries.map(e => {
+      const padRegion = (e.region || '').toUpperCase().trim();
+      const alias = INDIA_REGION_ALIASES[padRegion];
+      if (!alias) return e;
+      remapped[padRegion] = (remapped[padRegion] || 0) + 1;
+      return { ...e, region: alias };
+    });
+    for (const [from, count] of Object.entries(remapped)) {
+      console.log(`  Mapped ${count} "${from}" rows → region ${capitalizeString(INDIA_REGION_ALIASES[from])}`);
+    }
+    const unlistedHq = allRawEntries.filter(e =>
+      (e.region || '').toUpperCase().trim() === HQ_CAMPUS_REGION && !RETREAT_BRANCH_CODES.includes(e.branch_code)
+    );
+    for (const e of unlistedHq) {
+      console.log(
+        `  ⚠ New HQ campus in PAD: [${e.branch_code}] ${formatCenterName(e.name)} — ` +
+        'add its code to RETREAT_BRANCH_CODES in scripts/strapi-sync.js if it should show as a retreat.'
+      );
     }
   }
   console.log(`  Entries to sync: ${rawEntries.length}\n`);
@@ -535,21 +671,23 @@ async function sync() {
 
   // Find deleted entries (in Strapi but not in raw file)
   // Nepal mode: never delete. India mode: never delete Nepal-country centers.
-  if (!NEPAL_MODE) {
+  // --no-delete: create/update only.
+  if (!NEPAL_MODE && !NO_DELETE) {
     for (const [code, existing] of Object.entries(centerByCode)) {
       if (!rawByCode[code]) {
         if (isNepalCountry(existing.attributes.country)) {
           continue; // Protect Nepal imports from India sync deletes
         }
-        toDelete.push({ code, id: existing.id, name: existing.attributes.name });
+        toDelete.push({ code, id: existing.id, name: existing.attributes.name, snapshot: existing.attributes });
       }
     }
   }
 
+  const deleteNote = NEPAL_MODE ? ' (disabled in Nepal mode)' : NO_DELETE ? ' (disabled by --no-delete)' : '';
   console.log('=== Sync Plan ===');
   console.log(`  New centers to create: ${toCreate.length}`);
   console.log(`  Centers to update: ${toUpdate.length}`);
-  console.log(`  Centers to delete: ${toDelete.length}${NEPAL_MODE ? ' (disabled in Nepal mode)' : ''}`);
+  console.log(`  Centers to delete: ${toDelete.length}${deleteNote}`);
   console.log('');
 
   // --- Detailed Report ---
@@ -581,18 +719,37 @@ async function sync() {
   }
 
   if (toCreate.length === 0 && toUpdate.length === 0 && toDelete.length === 0) {
-    console.log('✓ Centers are already in sync! Checking for orphaned hierarchy entries...\n');
+    console.log(NEPAL_MODE || NO_DELETE
+      ? '✓ Centers are already in sync!\n'
+      : '✓ Centers are already in sync! Checking for orphaned hierarchy entries...\n');
   }
 
   const hasCenterChanges = toCreate.length > 0 || toUpdate.length > 0 || toDelete.length > 0;
 
-  // --- Dry run mode ---
-  if (hasCenterChanges && DRY_RUN) {
+  // --- Dry run mode: list everything (including orphans), write NOTHING to Strapi ---
+  if (DRY_RUN) {
+    let orphans = null;
+    if (!NEPAL_MODE && !NO_DELETE) {
+      console.log('Checking for orphaned hierarchy entries (read-only)...');
+      orphans = await findOrphanHierarchy();
+      printOrphans(orphans);
+    }
     console.log('🔍 DRY RUN — No changes were made. Review the plan above.\n');
-    const report = buildReport(toCreate, toUpdate, toDelete);
+    const report = buildReport(toCreate, toUpdate, toDelete, orphans);
+    fs.mkdirSync(path.dirname(REPORT_FILE), { recursive: true });
     fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2), 'utf8');
     console.log(`  Report saved to: ${path.relative(path.join(__dirname, '..'), REPORT_FILE)}\n`);
     return;
+  }
+
+  // --- Mass-delete guard: a partial/broken HQ feed must never wipe centers ---
+  if (MAX_DELETES != null && toDelete.length > MAX_DELETES) {
+    console.error(
+      `\n⛔ ABORTED: ${toDelete.length} centers would be deleted, more than the limit of ${MAX_DELETES}.\n` +
+      `   This usually means the HQ feed was incomplete. No changes were made.\n` +
+      `   If these deletes are genuine, re-run with a higher --max-deletes value.\n`
+    );
+    process.exit(2);
   }
 
   // --- Confirmation Prompt ---
@@ -821,108 +978,21 @@ async function sync() {
 
   // Step 8: Clean up orphaned hierarchy entries (districts, states, regions with no centers)
   // Nepal mode skips this so India hierarchy is never touched by a Nepal run.
+  // --no-delete skips it too (create/update only).
+  let orphans = null;
   if (NEPAL_MODE) {
     console.log('Skipping orphan hierarchy cleanup (Nepal mode).\n');
+  } else if (NO_DELETE) {
+    console.log('Skipping orphan hierarchy cleanup (--no-delete).\n');
   } else {
     console.log('Checking for orphaned hierarchy entries...');
+    // Re-fetches all collections, so orphans left behind by the deletes above are included
+    orphans = await findOrphanHierarchy();
+    printOrphans(orphans);
+    const { districts: orphanedDistricts, states: orphanedStates, regions: orphanedRegions } = orphans;
+    const totalOrphans = orphans.total;
 
-    // Re-fetch current state of all collections after center deletions
-    const [currentCenters, currentDistricts, currentStates, currentRegions] = await Promise.all([
-      fetchAll('centers', 'district_center'),
-      fetchAll('district-centers', 'state_center'),
-      fetchAll('state-centers', 'region_center'),
-      fetchAll('region-centers'),
-    ]);
-
-    const { nepalRegionIds, nepalStateIds, nepalDistrictIds } = collectNepalHierarchyIds(
-      currentRegions,
-      currentStates,
-      currentDistricts
-    );
-
-    // Build sets of district/state/region IDs that are still referenced by centers
-    const usedDistrictIds = new Set();
-    for (const c of currentCenters) {
-      const distId = c.attributes.district_center?.data?.id;
-      if (distId) usedDistrictIds.add(distId);
-    }
-
-    const unusedNepalDistricts = currentDistricts.filter(
-      d => !usedDistrictIds.has(d.id) && nepalDistrictIds.has(d.id)
-    );
-    const orphanedDistricts = currentDistricts.filter(
-      d => !usedDistrictIds.has(d.id) && !nepalDistrictIds.has(d.id)
-    );
-
-    // Build set of state IDs still referenced by remaining districts
-    const remainingDistricts = currentDistricts.filter(d => usedDistrictIds.has(d.id));
-    const usedStateIds = new Set();
-    for (const d of remainingDistricts) {
-      const stateId = d.attributes.state_center?.data?.id;
-      if (stateId) usedStateIds.add(stateId);
-    }
-
-    const unusedNepalStates = currentStates.filter(
-      s => !usedStateIds.has(s.id) && nepalStateIds.has(s.id)
-    );
-    const orphanedStates = currentStates.filter(
-      s => !usedStateIds.has(s.id) && !nepalStateIds.has(s.id)
-    );
-
-    // Build set of region IDs still referenced by remaining states
-    const remainingStates = currentStates.filter(s => usedStateIds.has(s.id));
-    const usedRegionIds = new Set();
-    for (const s of remainingStates) {
-      const regionId = s.attributes.region_center?.data?.id;
-      if (regionId) usedRegionIds.add(regionId);
-    }
-
-    const unusedNepalRegions = currentRegions.filter(
-      r => !usedRegionIds.has(r.id) && nepalRegionIds.has(r.id)
-    );
-    const orphanedRegions = currentRegions.filter(
-      r => !usedRegionIds.has(r.id) && !nepalRegionIds.has(r.id)
-    );
-
-    const skippedNepalOrphans =
-      unusedNepalDistricts.length + unusedNepalStates.length + unusedNepalRegions.length;
-    if (skippedNepalOrphans > 0) {
-      console.log(
-        `  Skipping ${skippedNepalOrphans} Nepal hierarchy entries ` +
-        `(${unusedNepalDistricts.length} districts, ${unusedNepalStates.length} states, ` +
-        `${unusedNepalRegions.length} regions) — India sync does not clean Nepal.\n`
-      );
-    }
-
-    const totalOrphans = orphanedDistricts.length + orphanedStates.length + orphanedRegions.length;
-
-    if (totalOrphans === 0) {
-      console.log('  No orphaned hierarchy entries found.\n');
-    } else {
-      // Show what will be removed
-      console.log('');
-      if (orphanedDistricts.length > 0) {
-        console.log('┌─── ORPHANED DISTRICTS ───');
-        for (const d of orphanedDistricts) {
-          console.log(`│  - ${d.attributes.name}`);
-        }
-        console.log('└──────────────────────────\n');
-      }
-      if (orphanedStates.length > 0) {
-        console.log('┌─── ORPHANED STATES ───');
-        for (const s of orphanedStates) {
-          console.log(`│  - ${s.attributes.name}`);
-        }
-        console.log('└───────────────────────\n');
-      }
-      if (orphanedRegions.length > 0) {
-        console.log('┌─── ORPHANED REGIONS ───');
-        for (const r of orphanedRegions) {
-          console.log(`│  - ${r.attributes.name}`);
-        }
-        console.log('└────────────────────────\n');
-      }
-
+    if (totalOrphans > 0) {
       // Ask for confirmation
       let proceedOrphan = AUTO_YES;
       if (!AUTO_YES) {
@@ -948,52 +1018,33 @@ async function sync() {
       }
 
       if (proceedOrphan) {
-        // Delete orphaned districts
-        if (orphanedDistricts.length > 0) {
-          console.log(`  Removing ${orphanedDistricts.length} orphaned district(s)...`);
-          for (const d of orphanedDistricts) {
+        const groups = [
+          ['district', 'district-centers', orphanedDistricts],
+          ['state', 'state-centers', orphanedStates],
+          ['region', 'region-centers', orphanedRegions],
+        ];
+        for (const [label, collection, list] of groups) {
+          if (list.length === 0) continue;
+          console.log(`  Removing ${list.length} orphaned ${label}(s)...`);
+          for (const item of list) {
             try {
-              await strapiRequest('DELETE', `district-centers/${d.id}`);
-              console.log(`    - District: ${d.attributes.name}`);
+              await strapiRequest('DELETE', `${collection}/${item.id}`);
+              console.log(`    - ${label}: ${item.attributes.name}`);
             } catch (err) {
-              console.error(`    ✗ Failed to delete district ${d.attributes.name}: ${err.message}`);
+              console.error(`    ✗ Failed to delete ${label} ${item.attributes.name}: ${err.message}`);
             }
           }
         }
-
-        // Delete orphaned states
-        if (orphanedStates.length > 0) {
-          console.log(`  Removing ${orphanedStates.length} orphaned state(s)...`);
-          for (const s of orphanedStates) {
-            try {
-              await strapiRequest('DELETE', `state-centers/${s.id}`);
-              console.log(`    - State: ${s.attributes.name}`);
-            } catch (err) {
-              console.error(`    ✗ Failed to delete state ${s.attributes.name}: ${err.message}`);
-            }
-          }
-        }
-
-        // Delete orphaned regions
-        if (orphanedRegions.length > 0) {
-          console.log(`  Removing ${orphanedRegions.length} orphaned region(s)...`);
-          for (const r of orphanedRegions) {
-            try {
-              await strapiRequest('DELETE', `region-centers/${r.id}`);
-              console.log(`    - Region: ${r.attributes.name}`);
-            } catch (err) {
-              console.error(`    ✗ Failed to delete region ${r.attributes.name}: ${err.message}`);
-            }
-          }
-        }
-
         console.log(`  ✓ Cleaned up ${totalOrphans} orphaned entries.\n`);
+      } else {
+        orphans = null; // kept — don't report them as removed
       }
     }
   }
 
   // Summary & Report
-  const report = buildReport(toCreate, toUpdate, toDelete);
+  const report = buildReport(toCreate, toUpdate, toDelete, orphans);
+  fs.mkdirSync(path.dirname(REPORT_FILE), { recursive: true });
   fs.writeFileSync(REPORT_FILE, JSON.stringify(report, null, 2), 'utf8');
 
   console.log('=== Sync Complete ===');

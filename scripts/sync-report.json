@@ -1,281 +1,98 @@
 {
-  "timestamp": "2026-11-04T03:04:17.091Z",
+  "timestamp": "2026-11-18T13:20:59.262Z",
+  "mode": "india",
+  "dryRun": false,
+  "strapi": "https://webapp.brahmakumaris.com/api",
   "summary": {
     "created": 5,
-    "updated": 11,
-    "deleted": 0
+    "updated": 4,
+    "deleted": 0,
+    "orphans": 0
+  },
+  "orphans": {
+    "districts": [],
+    "states": [],
+    "regions": []
   },
   "created": [
     {
-      "branch_code": "05967",
-      "name": "Bhandara Vidya Nagar",
-      "district": "Bhandara",
-      "state": "Maharashtra",
+      "branch_code": "04169",
+      "name": "Sheorinarayan",
+      "district": "Janjgir-champa",
+      "state": "Chhattisgarh",
       "region": "India"
     },
     {
-      "branch_code": "05968",
-      "name": "Arrah Kanakpuri",
-      "district": "Bhojpur",
-      "state": "Bihar",
-      "region": "India"
-    },
-    {
-      "branch_code": "05969",
-      "name": "Chittorgarh Gandhinagar",
-      "district": "Chittorgarh",
-      "state": "Rajasthan",
-      "region": "India"
-    },
-    {
-      "branch_code": "05970",
-      "name": "Gannavaram",
-      "district": "Krishna",
+      "branch_code": "05972",
+      "name": "Kaviti Udyanam",
+      "district": "Srikakulam",
       "state": "Andhra Pradesh",
       "region": "India"
     },
     {
-      "branch_code": "05971",
-      "name": "Chaudakulat",
-      "district": "Kendrapara",
-      "state": "Odisha",
+      "branch_code": "05973",
+      "name": "Delhi Rana Pratap Bagh",
+      "district": "North Delhi",
+      "state": "Delhi",
+      "region": "India"
+    },
+    {
+      "branch_code": "05974",
+      "name": "Julwaniya",
+      "district": "Barwani",
+      "state": "Madhya Pradesh",
+      "region": "India"
+    },
+    {
+      "branch_code": "05975",
+      "name": "Harsola",
+      "district": "Indore",
+      "state": "Madhya Pradesh",
       "region": "India"
     }
   ],
   "updated": [
     {
-      "branch_code": "01352",
-      "name": "Guntur",
+      "branch_code": "00384",
+      "name": "Badvel",
       "changes": [
-        {
-          "field": "address_line1",
-          "from": "Rajyoga Bhawan, D.No: 5-92-42/9",
-          "to": "Vardani Bhawan, D.No: 5-60-1/39"
-        },
-        {
-          "field": "address_line2",
-          "from": "Near Krishna Nagar Park",
-          "to": "5th Line, Ashok Nagar"
-        },
-        {
-          "field": "address_line3",
-          "from": "Devapuram 2nd Lane",
-          "to": ""
-        },
-        {
-          "field": "pincode",
-          "from": "522001",
-          "to": "522002"
-        },
-        {
-          "field": "latitude",
-          "from": 16.3084309,
-          "to": 16.310923
-        },
-        {
-          "field": "longitude",
-          "from": 80.4242857,
-          "to": 80.425328
-        }
-      ]
-    },
-    {
-      "branch_code": "02284",
-      "name": "Hyderabad Shanti Sarovar",
-      "changes": [
-        {
-          "field": "address_line2",
-          "from": "Behind P.Gopichand Badmentine Acadamy",
-          "to": "Beside Pullela Gopichand Acadamy"
-        },
-        {
-          "field": "address_line3",
-          "from": "Near Isb-infosys Rd, Sy.No: 91, Gacchibowli",
-          "to": "Near Isb-infosys Rd, Sy.No: 91, Gachibowli"
-        },
-        {
-          "field": "mobile",
-          "from": "9394333363, 8087411206",
-          "to": "9396503335, 8087411206"
-        }
-      ]
-    },
-    {
-      "branch_code": "02861",
-      "name": "Ghatal",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "Plot No: 318, Shanti Sudha Bhawan",
-          "to": "Plot No: 318, H No: 147, Shanti Sudha Bhawan"
-        },
-        {
-          "field": "address_line2",
-          "from": "Near Ghatal Central Bus Stand, Ward No-3",
-          "to": "Near Ghatal Central Bus Stand, Khirpai Road"
-        },
-        {
-          "field": "address_line3",
-          "from": "Krishna Nagar, Ghatal",
-          "to": "Ward No-3, Kushpata, Krishna Nagar, Ghatal"
-        },
-        {
-          "field": "section",
-          "from": "00194",
-          "to": "02861"
-        }
-      ]
-    },
-    {
-      "branch_code": "04115",
-      "name": "Panipat Shanti Nagar",
-      "changes": [
-        {
-          "field": "mobile",
-          "from": "9416985808",
-          "to": "9416985808, 9416206072"
-        }
-      ]
-    },
-    {
-      "branch_code": "04165",
-      "name": "Kirnapur",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "H No: 158, Ward No: 4",
-          "to": "H No: 370/1, Ward No: 10"
-        },
-        {
-          "field": "address_line2",
-          "from": "Near Maharastra Bank",
-          "to": "Durga Chowk"
-        },
-        {
-          "field": "address_line3",
-          "from": "Kirnai Mandir Road",
-          "to": "Kirnapur"
-        },
         {
           "field": "email",
           "from": null,
-          "to": "kirnapur@bkivv.org"
-        },
-        {
-          "field": "latitude",
-          "from": 21.6269516,
-          "to": 21.626542
-        },
-        {
-          "field": "longitude",
-          "from": 80.3317181,
-          "to": 80.330612
+          "to": "badvel@bkivv.org"
         }
       ]
     },
     {
-      "branch_code": "04207",
-      "name": "Kakdwip",
+      "branch_code": "00543",
+      "name": "Ramanagara",
       "changes": [
-        {
-          "field": "address_line1",
-          "from": "H.No: 83, Arun Apartment",
-          "to": "Plot No: L.R.3549, Arun Apartment"
-        },
-        {
-          "field": "address_line2",
-          "from": "Near Kakdwip Court",
-          "to": "Near Kakdwip Court, Beside Dr. Sanatan Gayen's House"
-        },
-        {
-          "field": "address_line3",
-          "from": "Nh-117",
-          "to": ""
-        },
         {
           "field": "mobile",
-          "from": "9609588348, 8768316111, 9563731514",
-          "to": "9563731514"
-        },
-        {
-          "field": "section",
-          "from": "00194",
-          "to": "04207"
+          "from": "7353747963, 8073883814",
+          "to": "9535141355"
         }
       ]
     },
     {
-      "branch_code": "04483",
-      "name": "Salboni",
+      "branch_code": "01277",
+      "name": "Bengaluru Vidyaranyapura",
       "changes": [
-        {
-          "field": "section",
-          "from": "00194",
-          "to": "02861"
-        }
-      ]
-    },
-    {
-      "branch_code": "04844",
-      "name": "Hathwala",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00772",
-          "to": "05402"
-        }
-      ]
-    },
-    {
-      "branch_code": "05070",
-      "name": "Diamond Harbour",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00194",
-          "to": "04207"
-        }
-      ]
-    },
-    {
-      "branch_code": "05402",
-      "name": "Samalkha Mata Puli Road",
-      "changes": [
-        {
-          "field": "section",
-          "from": "00772",
-          "to": "05402"
-        }
-      ]
-    },
-    {
-      "branch_code": "05620",
-      "name": "Jaipur Model Town",
-      "changes": [
-        {
-          "field": "address_line1",
-          "from": "H No: 110, Vinoba Vihar",
-          "to": "H No: C-287"
-        },
-        {
-          "field": "address_line2",
-          "from": "Near Trimurti Apartment",
-          "to": "Shiv Shakti Nagar"
-        },
         {
           "field": "mobile",
-          "from": "8290456502, 9116536130",
-          "to": "8290456502, 9653909447"
-        },
+          "from": "9341242253, 9945480489",
+          "to": "7353747963"
+        }
+      ]
+    },
+    {
+      "branch_code": "01928",
+      "name": "Hari Puram",
+      "changes": [
         {
-          "field": "latitude",
-          "from": 26.844154,
-          "to": 26.841555
-        },
-        {
-          "field": "longitude",
-          "from": 75.822106,
-          "to": 75.827423
+          "field": "mobile",
+          "from": "9985659712",
+          "to": "9985659712, 8897657859"
         }
       ]
     }
