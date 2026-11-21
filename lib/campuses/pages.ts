@@ -48,6 +48,12 @@ const PAGE_LOADERS: Record<
     news: () => import('@/campuses/shanti-shikhar/routes/NewsPage'),
     galleries: () => import('@/campuses/shanti-shikhar/routes/GalleriesPage'),
   },
+  'shanti-sarovar-raipur': {
+    home: () => import('@/campuses/shanti-sarovar-raipur/routes/HomePage'),
+    contact: () => import('@/campuses/shanti-sarovar-raipur/routes/ContactPage'),
+    news: () => import('@/campuses/shanti-sarovar-raipur/routes/NewsPage'),
+    galleries: () => import('@/campuses/shanti-sarovar-raipur/routes/GalleriesPage'),
+  },
 };
 
 const LAYOUT_LOADERS: Record<string, () => Promise<CampusLayoutModule>> = {
@@ -55,6 +61,7 @@ const LAYOUT_LOADERS: Record<string, () => Promise<CampusLayoutModule>> = {
   'jagdamba-bhawan': () => import('@/campuses/jagdamba-bhawan/CampusLayout'),
   'sonipat-retreat-center': () => import('@/campuses/sonipat-retreat-center/CampusLayout'),
   'shanti-shikhar': () => import('@/campuses/shanti-shikhar/CampusLayout'),
+  'shanti-sarovar-raipur': () => import('@/campuses/shanti-sarovar-raipur/CampusLayout'),
 };
 
 export async function loadCampusLayout(slug: string) {

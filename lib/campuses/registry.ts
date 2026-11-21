@@ -65,6 +65,13 @@ export const CAMPUS_REGISTRY: Record<string, CampusDefinition> = {
     canonical: 'https://www.brahmakumaris.com/centers/shanti-shikhar',
     branchCode: '04376',
   },
+  'shanti-sarovar-raipur': {
+    slug: 'shanti-sarovar-raipur',
+    name: 'Shanti Sarovar Retreat Center, Raipur',
+    basePath: '/shanti-sarovar-raipur',
+    canonical: 'https://www.brahmakumaris.com/centers/shanti-sarovar-raipur',
+    branchCode: '00346',
+  },
 };
 
 /** When adding a campus, also update campus page lists in lib/sitemap.ts. */
