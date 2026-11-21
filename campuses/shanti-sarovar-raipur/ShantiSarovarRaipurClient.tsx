@@ -247,7 +247,7 @@ export default function ShantiSarovarRaipurClient({
               </Link>
             </div>
           </Reveal>
-          <p className="srp-lede !max-w-3xl">{c.services.intro}</p>
+          <p className="srp-lede srp-home-courses__intro !max-w-3xl">{c.services.intro}</p>
           <HomeCoursesCarousel
             ariaLabel="Services offered"
             items={
@@ -339,7 +339,7 @@ export default function ShantiSarovarRaipurClient({
               </Link>
             </div>
           </Reveal>
-          <p className="srp-lede !max-w-3xl">{c.gallery.intro}</p>
+          <p className="srp-lede srp-home-gallery__intro !max-w-3xl">{c.gallery.intro}</p>
           <HomeCoursesCarousel
             ariaLabel="Photo gallery"
             peek="roomy"

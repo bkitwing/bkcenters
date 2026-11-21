@@ -1358,6 +1358,11 @@ html.dark body.srp-campus-body {
   line-height: var(--srp-text-lh);
 }
 
+.srp-home-gallery__intro,
+.srp-home-courses__intro {
+  margin-bottom: 1.5rem;
+}
+
 .srp-home-courses__all,
 .srp-home-gallery__all {
   display: inline-flex;
@@ -6485,8 +6490,6 @@ html.dark body.srp-campus-body {
   background: rgba(74, 42, 14, 0.3);
   border-color: rgba(255, 247, 239, 0.55);
 }
-
-
 
 
 
