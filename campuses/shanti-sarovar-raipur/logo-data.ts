@@ -1,13 +1,14 @@
 /**
- * Shanti Sarovar Raipur — Strapi website-section (id pending).
- * Set SRP_SECTION_ID once the section exists; until then the home page uses placeholders.
- * logo | Hero Section (web carousel) | About Section | Services offered Section | Photo Gallery Section
+ * Shanti Sarovar Raipur — Strapi website-section #80.
+ * logo | Hero Section (web carousel) | About Section | Courses offered Section | Photo Gallery Section
+ *
+ * https://webapp.brahmakumaris.com/admin/content-manager/collection-types/api::website-section.website-section/80
  */
 
 import { cache } from 'react';
 import { SRP_CONTENT } from './content';
 
-export const SRP_SECTION_ID: number | null = null;
+export const SRP_SECTION_ID = 80;
 const ISR = 14400;
 
 const IS_PROD = process.env.NODE_ENV === 'production';
@@ -43,7 +44,7 @@ type ImageFormats = {
   FullHD?: { url: string };
 };
 
-/** Card from the "Services offered Section" gallery. */
+/** Card from the "Courses offered Section" gallery. */
 export type SrpService = {
   id: string;
   title: string;
@@ -303,7 +304,7 @@ const getSrpSection = cache(async (): Promise<SrpSection> => {
       .map((file, index) => mapHeroSlide(file, index))
       .filter((slide): slide is SrpHeroSlide => Boolean(slide))[0] ?? null;
 
-  const services = findGallery(sectionType, /^services offered section$/i)
+  const services = findGallery(sectionType, /^courses offered section$/i)
     .map((file, index) => mapService(file, index))
     .filter((service): service is SrpService => Boolean(service));
 
@@ -331,7 +332,7 @@ export const getSrpHeroSlides = cache(async (): Promise<SrpHeroSlide[]> => {
   return section.heroSlides;
 });
 
-/** Cards from the component titled "Services offered Section". */
+/** Cards from the component titled "Courses offered Section". */
 export const getSrpServices = cache(async (): Promise<SrpService[]> => {
   const section = await getSrpSection();
   return section.services;

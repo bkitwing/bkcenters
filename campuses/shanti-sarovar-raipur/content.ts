@@ -7,7 +7,7 @@ import { Center } from '@/lib/types';
  * https://www.brahmakumaris.com/raipur/shanti-sarovar/).
  * Image `src` stays null until Strapi replaces the placeholders.
  *
- * Theme color: amber #EFA365, with gold #f2c66d as the accent.
+ * Theme color: teal #22816F.
  */
 
 export const SRP_SLUG = 'shanti-sarovar-raipur';
@@ -180,7 +180,7 @@ export const SRP_CONTENT = {
     title: 'Services',
     intro:
       'Courses and workshops at Shanti Sarovar draw on Rajyoga meditation and spiritual values, for a calmer, stronger and more balanced life.',
-    /** Card titles for the "Services offered Section" images, keyed by filename. */
+    /** Card titles for the "Courses offered Section" images, keyed by filename. */
     labels: {
       'rajyoga-meditation': { title: 'Rajyoga Meditation', blurb: '' },
       'self-esteem': { title: 'Self Esteem', blurb: '' },

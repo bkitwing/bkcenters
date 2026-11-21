@@ -377,7 +377,7 @@ export default function ShantiSarovarRaipurClient({
                     href={SRP_MAPS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="srp-btn srp-btn--ink !min-h-10 !text-sm"
+                    className="srp-btn srp-btn--ghost !min-h-10 !text-sm"
                   >
                     <Navigation className="w-4 h-4" />
                     Open in Maps
