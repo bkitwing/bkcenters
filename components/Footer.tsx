@@ -39,6 +39,8 @@ const initiativeLinks = [
   { href: "/initiatives/health", label: "Health" },
   { href: "/initiatives/nmba", label: "Nasha Mukt Bharat Abhiyaan" },
   { href: "/initiatives/blood-donation", label: "Blood Donation Drive" },
+  { href: "/initiatives/globalsummit", label: "Global Summit" },
+  { href: "/initiatives/cop", label: "COP – UN Climate Conferences" },
 ];
 
 const contactLinks = [

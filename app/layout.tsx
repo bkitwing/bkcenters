@@ -7,6 +7,7 @@ import { OrganizationSchema, WebSiteSchema, DatasetSchema } from "../components/
 import { getMetadataBase, generateOgImageUrl } from "@/lib/ogUtils";
 import { fetchCenterCount, fetchStatAndDistrictCounts } from "@/lib/strapiClient";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { BK_THEME_STORAGE_KEY, themeMigrationScript } from "@/lib/theme-key";
 import { Footer } from "@/components/Footer";
 import { CentersChrome } from "@/components/CentersChrome";
 import { notoSans } from "@/lib/fonts";
@@ -104,9 +105,11 @@ export default async function RootLayout({
         <OrganizationSchema />
         <WebSiteSchema />
         <DatasetSchema totalCenters={totalCenters} />
+        {/* One theme key for every brahmakumaris.com app; carry over the old one once */}
+        <script dangerouslySetInnerHTML={{ __html: themeMigrationScript("bk-centers-theme") }} />
       </head>
       <body className={`${notoSans.className} ${notoSans.variable} bg-neutral-50 dark:bg-neutral-900 transition-colors duration-300`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="bk-centers-theme">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey={BK_THEME_STORAGE_KEY}>
           <CentersChrome
             header={<UnifiedHeader />}
             footer={<Footer />}

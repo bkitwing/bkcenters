@@ -15,6 +15,10 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HeaderThemeButton, DrawerThemeSwitch } from "./ThemeSwitch";
+import { LiveSessionCard, SS_LIVE_HREF } from "./LiveSession";
+import { SectionMenu, isMegaSection } from "./SectionMenus";
+import { TodaysMessageCard } from "./TodaysMessage";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { lockBodyScroll } from "@/lib/scroll-lock";
 import {
@@ -32,6 +36,8 @@ const CURRENT_APP: AppId = "centers";
 const BASE_PATH = "/centers";
 const HOVER_DELAY_IN = 80;
 const HOVER_DELAY_OUT = 200;
+// Sections near the right end of the pill open their menu leftwards
+const RIGHT_ALIGNED_SECTIONS = ["updates", "aboutus", "initiative", "contact"];
 
 // ---------------------------------------------------------------------------
 // Mobile section metadata — curiosity-driven taglines
@@ -95,19 +101,6 @@ const OTHER_APP_META: Record<string, { hook: string; gradient: string }> = {
 };
 
 // ---------------------------------------------------------------------------
-// Desktop: Gradient color map for SimpleDropdown hero headers
-// ---------------------------------------------------------------------------
-const SIMPLE_DROPDOWN_GRADIENTS: Record<string, string> = {
-  sky: "from-sky-500/10 via-sky-500/8 to-cyan-500/5 dark:from-sky-500/20 dark:via-sky-500/15 dark:to-cyan-500/10",
-  emerald: "from-emerald-500/10 via-emerald-500/8 to-teal-500/5 dark:from-emerald-500/20 dark:via-emerald-500/15 dark:to-teal-500/10",
-  rose: "from-rose-500/10 via-rose-500/8 to-pink-500/5 dark:from-rose-500/20 dark:via-rose-500/15 dark:to-pink-500/10",
-  amber: "from-amber-500/10 via-amber-500/8 to-orange-500/5 dark:from-amber-500/20 dark:via-amber-500/15 dark:to-orange-500/10",
-  indigo: "from-indigo-500/10 via-indigo-500/8 to-blue-500/5 dark:from-indigo-500/20 dark:via-indigo-500/15 dark:to-blue-500/10",
-  slate: "from-slate-500/10 via-slate-500/8 to-gray-500/5 dark:from-slate-500/20 dark:via-slate-500/15 dark:to-gray-500/10",
-  violet: "from-violet-500/10 via-violet-500/8 to-purple-500/5 dark:from-violet-500/20 dark:via-violet-500/15 dark:to-purple-500/10",
-};
-
-// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 function isInternalHref(href: string): boolean {
@@ -148,179 +141,6 @@ function SmartLink({
     <a href={href} className={className} onClick={onClick} title={title} aria-current={ariaCurrent}>
       {children}
     </a>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Desktop: Centers Mega Dropdown (current app — with gradient hero header)
-// ---------------------------------------------------------------------------
-function CentersMegaDropdown({
-  section,
-  onClose,
-  pathname,
-  onNearbyClick,
-}: {
-  section: NavSection;
-  onClose: () => void;
-  pathname: string;
-  onNearbyClick: () => void;
-}) {
-  const colors = ACCENT_COLORS[section.accentColor];
-  const Icon = section.icon;
-
-  return (
-    <div className="absolute top-full right-0 mt-1.5 w-[340px] bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-2xl shadow-emerald-500/8 dark:shadow-emerald-900/30 overflow-hidden animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-150 z-50">
-      {/* Gradient hero header — soft */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500/10 via-emerald-500/8 to-teal-500/5 dark:from-emerald-500/20 dark:via-emerald-500/15 dark:to-teal-500/10 px-4 py-3.5">
-        <div className="absolute top-0 right-0 w-28 h-28 bg-emerald-400/10 dark:bg-emerald-400/10 rounded-full -translate-y-12 translate-x-12" />
-        <div className="relative z-10">
-          <SmartLink href={section.href} onClick={onClose} className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-lg ${colors.bgSubtle} flex items-center justify-center`}>
-              <Icon className={`w-4 h-4 ${colors.text}`} />
-            </div>
-            <div>
-              <span className={`block text-[14px] font-bold ${colors.text}`}>{section.label}</span>
-              <span className="block text-[11px] text-neutral-500 dark:text-neutral-400 font-medium leading-snug">{section.description}</span>
-            </div>
-          </SmartLink>
-        </div>
-      </div>
-      <div className="p-1.5">
-        {section.subItems.map((item, index) => {
-          const ItemIcon = item.icon;
-          const internalHref = toInternalHref(item.href);
-          const isNearby = item.href === "/centers?nearby=true";
-          const isExternal = item.href.startsWith("http");
-          const isActive =
-            !isNearby &&
-            !isExternal &&
-            (pathname === internalHref || (internalHref !== "/" && pathname.startsWith(internalHref)));
-          const prevGroup = index > 0 ? section.subItems[index - 1]?.group : undefined;
-          const showGroup = Boolean(item.group && item.group !== prevGroup);
-
-          const linkClass = `flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 ${
-            isActive
-              ? `${colors.bgSubtle} ${colors.text} font-semibold`
-              : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 hover:translate-x-0.5"
-          }`;
-
-          return (
-            <div key={item.id ?? item.href}>
-              {showGroup && (
-                <div
-                  className={`mx-2 mb-1 pt-2 ${
-                    index === 0
-                      ? ""
-                      : "mt-1.5 border-t border-neutral-100 dark:border-neutral-800"
-                  }`}
-                >
-                  <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500">
-                    {item.group}
-                  </span>
-                </div>
-              )}
-
-              {isNearby ? (
-                <button
-                  onClick={() => { onClose(); onNearbyClick(); }}
-                  className={`w-full ${linkClass} ${colors.text} font-medium`}
-                >
-                  <ItemIcon className="w-4 h-4" />
-                  {item.label}
-                  <MapPin className="w-3.5 h-3.5 ml-auto opacity-50" />
-                </button>
-              ) : isExternal ? (
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={onClose}
-                  className={linkClass}
-                >
-                  <ItemIcon className="w-4 h-4 opacity-60" />
-                  {item.label}
-                  <ExternalLink className="w-3.5 h-3.5 ml-auto opacity-40" />
-                </a>
-              ) : (
-                <SmartLink href={item.href} onClick={onClose} className={linkClass}>
-                  <ItemIcon className="w-4 h-4 opacity-60" />
-                  {item.label}
-                </SmartLink>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Desktop: Simple Dropdown (for other apps — with gradient hero header)
-// ---------------------------------------------------------------------------
-function SimpleDropdown({
-  section,
-  onClose,
-  align = "left",
-}: {
-  section: NavSection;
-  onClose: () => void;
-  align?: "left" | "right";
-}) {
-  const colors = ACCENT_COLORS[section.accentColor];
-  const gradient = SIMPLE_DROPDOWN_GRADIENTS[section.accentColor] || SIMPLE_DROPDOWN_GRADIENTS.slate;
-  const Icon = section.icon;
-
-  return (
-    <div className={`absolute top-full mt-1.5 w-72 bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-xl shadow-black/8 dark:shadow-black/30 overflow-hidden animate-in fade-in-0 zoom-in-[0.98] slide-in-from-top-1 duration-150 z-50 ${align === "right" ? "right-0" : "left-0"}`}>
-      {/* Gradient hero header — soft */}
-      <div className={`relative overflow-hidden bg-gradient-to-br ${gradient} px-4 py-3.5`}>
-        <div className="absolute top-0 right-0 w-24 h-24 bg-current opacity-[0.04] rounded-full -translate-y-10 translate-x-10" />
-        <div className="relative z-10">
-          <SmartLink href={section.href} onClick={onClose} className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-lg ${colors.bgSubtle} flex items-center justify-center`}>
-              <Icon className={`w-4 h-4 ${colors.text}`} />
-            </div>
-            <div>
-              <span className={`block text-[14px] font-bold ${colors.text}`}>{section.label}</span>
-              <span className="block text-[11px] text-neutral-500 dark:text-neutral-400 font-medium leading-snug">{section.description}</span>
-            </div>
-          </SmartLink>
-        </div>
-      </div>
-      <div className="p-1.5">
-        {section.subItems.map((item, index) => {
-          const ItemIcon = item.icon;
-          const prevGroup = index > 0 ? section.subItems[index - 1]?.group : undefined;
-          const showGroup = Boolean(item.group && item.group !== prevGroup);
-          return (
-            <div key={item.id ?? item.href}>
-              {showGroup && (
-                <div
-                  className={`mx-2 mb-1 pt-2 ${
-                    index === 0
-                      ? ""
-                      : "mt-1.5 border-t border-neutral-100 dark:border-neutral-800"
-                  }`}
-                >
-                  <span className="px-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-400 dark:text-neutral-500">
-                    {item.group}
-                  </span>
-                </div>
-              )}
-              <SmartLink
-                href={item.href}
-                onClick={onClose}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 hover:translate-x-0.5"
-              >
-                <ItemIcon className="w-4 h-4 opacity-60" />
-                {item.label}
-              </SmartLink>
-            </div>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
@@ -637,6 +457,15 @@ export function UnifiedHeader() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const pathname = usePathname();
+  // Highlights the page being viewed in the menus (only links into this app can match)
+  const isActiveHref = useCallback(
+    (href: string) => {
+      if (!isInternalHref(href)) return false;
+      const target = toInternalHref(href);
+      return pathname === target || (target !== "/" && pathname.startsWith(`${target}/`));
+    },
+    [pathname],
+  );
   const router = useRouter();
   const navRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -798,14 +627,14 @@ export function UnifiedHeader() {
                   return (
                     <div
                       key={section.id}
-                      className="relative"
+                      className={isMegaSection(section) ? undefined : "relative"}
                       onMouseEnter={() => handleMouseEnter(section.id)}
                       onMouseLeave={handleMouseLeave}
                     >
                       <button
                           onClick={() => setActiveDropdown(isDropdownOpen ? null : section.id)}
                           className={`uh-pill-nav__btn ${
-                            isCurrentSection ? "is-active px-2.5 xl:px-3" : "px-2 xl:px-2.5"
+                            isCurrentSection ? "is-active px-2 xl:px-3" : "px-1.5 xl:px-2.5"
                           } py-1.5 xl:py-2 text-[11px] xl:text-xs ${
                             isDropdownOpen && !isCurrentSection ? "uh-pill-nav__btn--open" : ""
                           }`}
@@ -819,20 +648,14 @@ export function UnifiedHeader() {
                           <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                         </button>
 
-                      {isDropdownOpen && isCurrentSection && (
-                        <CentersMegaDropdown
+                      {isDropdownOpen && (
+                        <SectionMenu
                           section={section}
                           onClose={closeDropdown}
-                          pathname={pathname}
-                          onNearbyClick={handleUseMyLocation}
-                        />
-                      )}
-
-                      {isDropdownOpen && !isCurrentSection && (
-                        <SimpleDropdown
-                          section={section}
-                          onClose={closeDropdown}
-                          align={["updates", "aboutus", "initiative", "contact"].includes(section.id) ? "right" : "left"}
+                          Link={SmartLink}
+                          isActive={isActiveHref}
+                          align={RIGHT_ALIGNED_SECTIONS.includes(section.id) ? "right" : "left"}
+                          onNearby={isCurrentSection ? handleUseMyLocation : undefined}
                         />
                       )}
                     </div>
@@ -910,6 +733,7 @@ export function UnifiedHeader() {
                     </div>
                   )}
                 </div>
+                <HeaderThemeButton />
               </div>
             </nav>
 
@@ -1003,7 +827,16 @@ export function UnifiedHeader() {
             className="absolute uh-pill-menu-panel animate-in slide-in-from-top-2 fade-in duration-200"
           >
             {/* 1. Current App Hero */}
+            <DrawerThemeSwitch />
             <MobileCurrentAppHero onNavigate={closeMobileMenu} />
+            <div className="px-4 pt-1">
+              <a href={SS_LIVE_HREF} onClick={closeMobileMenu} className="block">
+                <LiveSessionCard />
+              </a>
+            </div>
+            <div className="px-4 pt-2">
+              <TodaysMessageCard Link={SmartLink} onNavigate={closeMobileMenu} compact />
+            </div>
 
             {/* 2. Centers Content Cards */}
             <MobileCentersContentCards pathname={pathname} onNavigate={closeMobileMenu} onNearbyClick={handleUseMyLocation} />

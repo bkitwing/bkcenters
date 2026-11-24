@@ -43,6 +43,24 @@ import {
   HelpCircle,
   HeartHandshake,
   Globe,
+  Earth,
+  Brain,
+  Lightbulb,
+  Puzzle,
+  Smartphone,
+  BatteryLow,
+  Clock,
+  CloudRain,
+  Feather,
+  Flame,
+  HeartCrack,
+  Moon,
+  Mountain,
+  Smile,
+  Sunrise,
+  Waves,
+  Wind,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -60,6 +78,8 @@ export interface NavSubChild {
   label: string;
   href: string;
   icon: LucideIcon;
+  /** Monthly live session: menus show a pulsing LIVE marker next to it. */
+  live?: boolean;
 }
 
 export interface NavSubItem {
@@ -71,6 +91,10 @@ export interface NavSubItem {
   children?: NavSubChild[];
   /** Non-clickable group header rendered above this item as a visual separator. */
   group?: string;
+  /** Monthly live session: menus show a pulsing LIVE marker next to it. */
+  live?: boolean;
+  /** Highlighted as a full-width section in menus that support it (e.g. Activities). */
+  featured?: boolean;
 }
 
 export interface NavSection {
@@ -85,21 +109,81 @@ export interface NavSection {
 
 // All hrefs are FULL paths (with basePath prefix) so cross-app links work as <a> tags
 // Order: Meditation, Centers, Wisdom, Events, News, About Us
+// Shared menu: keep this NAVIGATION array identical in every app that uses the header.
+// Links into the current app open with Next navigation; others are full-page links.
 export const NAVIGATION: NavSection[] = [
   {
     id: "meditation",
     label: "Meditation",
     href: "/meditation",
     icon: Flower2,
-    description: "Learn and practice Rajyoga meditation",
+    description: "Guided meditations for every feeling and need",
     accentColor: "sky",
     subItems: [
-      { label: "Children", href: "/meditation/age/children", icon: Baby },
-      { label: "Youth", href: "/meditation/age/youth", icon: GraduationCap },
-      { label: "Young Adults", href: "/meditation/age/young-adults", icon: User },
-      { label: "Middle Age", href: "/meditation/age/middle-age", icon: User },
-      { label: "Elderly", href: "/meditation/age/elderly", icon: UserRound },
-      { label: "Topics", href: "/meditation/topics", icon: LayoutGrid },
+      {
+        label: "Explore",
+        href: "/meditation/explore",
+        icon: Compass,
+        children: [
+          { label: "All meditations", href: "/meditation/explore", icon: LayoutGrid },
+          { label: "By theme", href: "/meditation/topics", icon: Tag },
+          { label: "By teacher", href: "/meditation/teacher", icon: Users },
+          { label: "Learn Rajyoga (7 days)", href: "/meditation/rajyoga-course", icon: GraduationCap },
+        ],
+      },
+      {
+        label: "How you want to feel",
+        href: "/meditation/experience",
+        icon: Heart,
+        children: [
+          { label: "Peace", href: "/meditation/experience/peace", icon: Feather },
+          { label: "Love", href: "/meditation/experience/love", icon: Heart },
+          { label: "Happiness", href: "/meditation/experience/happiness", icon: Smile },
+          { label: "Power", href: "/meditation/experience/power", icon: Mountain },
+          { label: "Soul Awareness", href: "/meditation/experience/soul-awareness", icon: Sparkles },
+          { label: "All feelings", href: "/meditation/experience", icon: LayoutGrid },
+        ],
+      },
+      {
+        label: "By life stage",
+        href: "/meditation/age",
+        icon: Users,
+        children: [
+          { label: "Children", href: "/meditation/age/children", icon: Baby },
+          { label: "Youth", href: "/meditation/age/youth", icon: GraduationCap },
+          { label: "Young Adults", href: "/meditation/age/young-adults", icon: User },
+          { label: "Middle Age", href: "/meditation/age/middle-age", icon: User },
+          { label: "Elderly", href: "/meditation/age/elderly", icon: UserRound },
+        ],
+      },
+      {
+        label: "Meditation music",
+        href: "/meditation/meditation-music",
+        icon: Music,
+        children: [
+          { label: "All music", href: "/meditation/meditation-music", icon: Music },
+          { label: "Amritvela music", href: "/meditation/meditation-music/category/amritvela-music", icon: Sunrise },
+          { label: "Long duration", href: "/meditation/meditation-music/category/long-duration", icon: Clock },
+        ],
+      },
+      {
+        label: "Meditation for",
+        href: "/meditation",
+        icon: Leaf,
+        featured: true,
+        children: [
+          { label: "Stress", href: "/meditation/for/stress", icon: Waves },
+          { label: "Anxiety", href: "/meditation/for/anxiety", icon: Wind },
+          { label: "Sleep", href: "/meditation/for/sleep", icon: Moon },
+          { label: "Overthinking", href: "/meditation/for/overthinking", icon: Brain },
+          { label: "Anger", href: "/meditation/for/anger", icon: Flame },
+          { label: "Worry", href: "/meditation/for/worry", icon: CloudRain },
+          { label: "Burnout", href: "/meditation/for/burnout", icon: BatteryLow },
+          { label: "Grief", href: "/meditation/for/grief", icon: HeartCrack },
+          { label: "Loneliness", href: "/meditation/for/loneliness", icon: UserRound },
+          { label: "Motivation", href: "/meditation/for/motivation", icon: Zap },
+        ],
+      },
     ],
   },
   {
@@ -110,8 +194,11 @@ export const NAVIGATION: NavSection[] = [
     description: "Rajyoga meditation courses",
     accentColor: "indigo",
     subItems: [
-      { label: "7 Day Course (Hindi)", href: "https://courses.brahmakumaris.com/sahaj-rajyog", icon: Languages },
-      { label: "7 Day Course (English)", href: "https://courses.brahmakumaris.com/a-personal-journey-for-transformation", icon: Languages },
+      { id: "courses-home", label: "All courses", href: "https://courses.brahmakumaris.com/", icon: Home, group: "Learn online" },
+      { id: "courses-explore", label: "Explore", href: "https://courses.brahmakumaris.com/explore", icon: Compass },
+      { id: "courses-categories", label: "Categories", href: "https://courses.brahmakumaris.com/categories", icon: LayoutGrid },
+      { id: "courses-7day-hi", label: "7 Day Course (Hindi)", href: "https://courses.brahmakumaris.com/sahaj-rajyog", icon: Languages, group: "Start here" },
+      { id: "courses-7day-en", label: "7 Day Course (English)", href: "https://courses.brahmakumaris.com/a-personal-journey-for-transformation", icon: Languages },
     ],
   },
   {
@@ -153,8 +240,11 @@ export const NAVIGATION: NavSection[] = [
           { label: "Hindi", href: "/wisdom/soul-sustenance/hin", icon: Languages },
           { label: "Categories", href: "/wisdom/soul-sustenance/categories", icon: FolderOpen },
           { label: "Archive", href: "/wisdom/soul-sustenance/archive", icon: Calendar },
+          { label: "LIVE · monthly conversation", href: "/wisdom/soul-sustenance/live", icon: CalendarDays, live: true },
+          { label: "Questions & answers", href: "/wisdom/soul-sustenance/questions", icon: FolderOpen },
         ],
       },
+      { label: "Soul Sustenance LIVE", href: "/wisdom/soul-sustenance/live", icon: CalendarDays, live: true },
       {
         label: "Blogs",
         href: "/wisdom/blog",
@@ -174,6 +264,19 @@ export const NAVIGATION: NavSection[] = [
           { label: "Songs", href: "/wisdom/audio/songs", icon: Music },
           { label: "Podcast", href: "/wisdom/audio/podcast", icon: Radio },
           { label: "Classes", href: "/wisdom/audio/classes", icon: GraduationCap },
+        ],
+      },
+      {
+        label: "Activities",
+        href: "/wisdom/activities",
+        icon: Gamepad2,
+        featured: true,
+        children: [
+          { label: "Inner Compass", href: "/wisdom/activities/inner-compass", icon: Compass },
+          { label: "8 Powers Puzzle", href: "/wisdom/activities/eight-powers", icon: Puzzle },
+          { label: "Memory Match", href: "/wisdom/activities/virtue-match", icon: Brain },
+          { label: "Belief Clarity", href: "/wisdom/activities/belief-clarity", icon: Lightbulb },
+          { label: "Digital Wellness", href: "/wisdom/activities/digital-wellness-assessment", icon: Smartphone },
         ],
       },
       {
@@ -213,7 +316,6 @@ export const NAVIGATION: NavSection[] = [
           { label: "Categories", href: "/wisdom/anubhavgatha/categories", icon: FolderOpen },
         ],
       },
-      { label: "Activities", href: "/wisdom/activities", icon: Gamepad2 },
     ],
   },
   {
@@ -227,6 +329,7 @@ export const NAVIGATION: NavSection[] = [
     accentColor: "rose",
     subItems: [
       { id: "all-events", label: "All Events", href: "/events", icon: Home, group: "Events" },
+      { id: "ss-live", label: "Soul Sustenance LIVE", href: "/wisdom/soul-sustenance/live", icon: CalendarDays, live: true },
       { id: "event-venues", label: "Venues", href: "/events/venues", icon: MapPin },
       { id: "event-organizers", label: "Organizers", href: "/events/organizers", icon: Users },
       { id: "event-categories", label: "Categories", href: "/events/categories", icon: Tag },
@@ -234,6 +337,8 @@ export const NAVIGATION: NavSection[] = [
       { id: "news-categories", label: "Categories", href: "/news/category", icon: LayoutGrid },
       { id: "news-cities", label: "Cities", href: "/news/city", icon: Building2 },
       { id: "news-states", label: "States", href: "/news/state", icon: Map },
+      { id: "news-occasions", label: "Occasions", href: "/news/occasion", icon: Calendar },
+      { id: "news-tags", label: "Tags", href: "/news/tag", icon: Tag },
       { id: "news-submit", label: "Submit News", href: "/news/submit-news", icon: PenSquare },
     ],
   },
@@ -277,6 +382,20 @@ export const NAVIGATION: NavSection[] = [
         href: "/initiatives/blood-donation",
         icon: Droplets,
         group: "Projects",
+      },
+      {
+        id: "globalsummit",
+        label: "Global Summit",
+        href: "/initiatives/globalsummit",
+        icon: Globe,
+        group: "Mega Events",
+      },
+      {
+        id: "cop",
+        label: "COP – UN Climate Conferences",
+        href: "/initiatives/cop",
+        icon: Earth,
+        group: "Global Engagement",
       },
     ],
   },
