@@ -64,7 +64,6 @@ export type SrpGalleryThumb = {
 type SrpSection = {
   logo: SrpLogo | null;
   heroSlides: SrpHeroSlide[];
-  aboutImage: SrpHeroSlide | null;
   services: SrpService[];
   gallery: SrpGalleryThumb[];
 };
@@ -269,7 +268,6 @@ async function strapiGet(path: string): Promise<unknown | null> {
 const EMPTY_SECTION: SrpSection = {
   logo: null,
   heroSlides: [],
-  aboutImage: null,
   services: [],
   gallery: [],
 };
@@ -299,11 +297,6 @@ const getSrpSection = cache(async (): Promise<SrpSection> => {
     .map((file, index) => mapHeroSlide(file, index))
     .filter((slide): slide is SrpHeroSlide => Boolean(slide));
 
-  const aboutImage =
-    findGallery(sectionType, /^about section$/i)
-      .map((file, index) => mapHeroSlide(file, index))
-      .filter((slide): slide is SrpHeroSlide => Boolean(slide))[0] ?? null;
-
   const services = findGallery(sectionType, /^courses offered section$/i)
     .map((file, index) => mapService(file, index))
     .filter((service): service is SrpService => Boolean(service));
@@ -312,18 +305,12 @@ const getSrpSection = cache(async (): Promise<SrpSection> => {
     .map((file, index) => mapGalleryThumb(file, index))
     .filter((thumb): thumb is SrpGalleryThumb => Boolean(thumb));
 
-  return { logo: findLogo(sectionType), heroSlides, aboutImage, services, gallery };
+  return { logo: findLogo(sectionType), heroSlides, services, gallery };
 });
 
 export const getSrpLogo = cache(async (): Promise<SrpLogo | null> => {
   const section = await getSrpSection();
   return section.logo;
-});
-
-/** Portrait beside the home story, from the component titled "About Section". */
-export const getSrpAboutImage = cache(async (): Promise<SrpHeroSlide | null> => {
-  const section = await getSrpSection();
-  return section.aboutImage;
 });
 
 /** Desktop / web carousel from the component titled "Hero Section". */

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { BreadcrumbSchema, LocalBusinessSchema } from '@/components/StructuredData';
 import { HomeNewsTeaser } from '../HomeMediaTeasers';
 import ShantiSarovarRaipurClient from '../ShantiSarovarRaipurClient';
-import { getSrpAboutImage, getSrpGallery, getSrpHeroSlides, getSrpServices } from '../logo-data';
+import { getSrpGallery, getSrpHeroSlides, getSrpServices } from '../logo-data';
 import { getSrpNews } from '../news-data';
 import {
   SRP_CANONICAL,
@@ -44,10 +44,9 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function ShantiSarovarRaipurHomePage() {
-  const [news, heroSlides, aboutImage, services, gallery] = await Promise.all([
+  const [news, heroSlides, services, gallery] = await Promise.all([
     getSrpNews(),
     getSrpHeroSlides(),
-    getSrpAboutImage(),
     getSrpServices(),
     getSrpGallery(),
   ]);
@@ -70,7 +69,6 @@ export default async function ShantiSarovarRaipurHomePage() {
       />
       <ShantiSarovarRaipurClient
         heroSlides={heroSlides}
-        aboutImage={aboutImage}
         services={services}
         gallery={gallery}
         newsTeaser={<HomeNewsTeaser news={news.latest} />}

@@ -158,12 +158,6 @@ export const SRP_CONTENT = {
       { value: 'First', label: 'Retreat centre' },
       { value: 'MHRD', label: 'Resource Centre' },
     ],
-    media: {
-      id: 'about',
-      src: null,
-      alt: 'Shanti Sarovar retreat centre, Raipur',
-      label: 'A view of the campus',
-    } satisfies SrpImage,
   },
   programmes: {
     eyebrow: 'Upcoming programmes',

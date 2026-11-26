@@ -3,7 +3,17 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
-import { ArrowDown, ArrowRight, CalendarDays, Navigation, Youtube } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowRight,
+  BookOpen,
+  CalendarDays,
+  Heart,
+  Navigation,
+  Sparkles,
+  Sunrise,
+  Youtube,
+} from 'lucide-react';
 import { SRP_CONTENT, SRP_MAP_EMBED_URL, SRP_MAPS_URL } from './content';
 import { SRP_CONTACT_HREF, SRP_COURSE_HREF, SRP_GALLERIES_HREF } from './nav';
 import { HomeCoursesCarousel } from './HomeCoursesCarousel';
@@ -19,37 +29,6 @@ const SHOW_HOME_VIDEOS = false;
 
 function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function MediaPlaceholder({
-  alt,
-  label,
-  src,
-  className = '',
-}: {
-  alt: string;
-  label: string;
-  src?: string | null;
-  className?: string;
-}) {
-  if (src) {
-    return (
-      <div className={`srp-media ${className}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={alt} />
-      </div>
-    );
-  }
-
-  return (
-    <div className={`srp-media ${className}`} role="img" aria-label={alt}>
-      <div className="absolute inset-0 srp-placeholder-bg" />
-      <div className="absolute inset-0 srp-placeholder-sheen" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-5 text-center">
-        <p className="text-sm md:text-base font-semibold text-[var(--srp-ink)]/85">{label}</p>
-      </div>
-    </div>
-  );
 }
 
 function Reveal({
@@ -84,15 +63,12 @@ const CHAPTERS = c.about.paragraphs.map((body, index) => ({
 export default function ShantiSarovarRaipurClient({
   newsTeaser,
   heroSlides = [],
-  aboutImage = null,
   services = [],
   gallery = [],
 }: {
   newsTeaser?: React.ReactNode;
   /** Web carousel from Strapi "Hero Section". */
   heroSlides?: SrpHomeImage[];
-  /** Photo beside the story, from Strapi "About Section". */
-  aboutImage?: SrpHeroSlide | null;
   /** Cards from Strapi "Services offered Section". */
   services?: SrpService[];
   /** Campus pictures from Strapi "Photo Gallery Section". */
@@ -185,13 +161,86 @@ export default function ShantiSarovarRaipurClient({
         <div className="srp-container">
           <div className="srp-campus">
             <Reveal className="srp-campus__visual">
-              <div className="srp-campus__sticky">
-                <MediaPlaceholder
-                  src={aboutImage?.srcDesktop || aboutImage?.src}
-                  alt={aboutImage?.alt || c.about.media.alt}
-                  label={c.about.media.label}
-                  className="srp-campus__photo"
-                />
+              <div className="srp-campus__day" aria-labelledby="srp-campus-day-title">
+                <div className="srp-campus__day-orbit" aria-hidden="true">
+                  <motion.span
+                    className="srp-campus__orbit-ring srp-campus__orbit-ring--outer"
+                    animate={reduce ? undefined : { rotate: 360 }}
+                    transition={{ duration: 36, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <motion.span
+                    className="srp-campus__orbit-ring srp-campus__orbit-ring--inner"
+                    animate={reduce ? undefined : { rotate: -360 }}
+                    transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <motion.span
+                    className="srp-campus__orbit-core"
+                    animate={reduce ? undefined : { scale: [1, 1.08, 1], opacity: [0.8, 1, 0.8] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <motion.span
+                    className="srp-campus__orbit-icon"
+                    animate={reduce ? undefined : { scale: [1, 1.08, 1], opacity: [1, 0.75, 1] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <Heart />
+                  </motion.span>
+                </div>
+                <p className="srp-campus__day-eyebrow">A day at Shanti Sarovar</p>
+                <h3 id="srp-campus-day-title" className="srp-campus__day-title">
+                  Make space for what matters.
+                </h3>
+                <p className="srp-campus__day-intro">An inward journey from noise to clarity</p>
+                <ol className="srp-campus__timeline">
+                  <motion.li
+                    initial={reduce ? false : { opacity: 0, x: -12 }}
+                    whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.5, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <span className="srp-campus__moment-icon"><Sunrise aria-hidden="true" /></span>
+                    <div>
+                      <span className="srp-campus__moment-label">Arrive</span>
+                      <p>Quiet the noise of the outside world and arrive in the present.</p>
+                    </div>
+                  </motion.li>
+                  <motion.li
+                    initial={reduce ? false : { opacity: 0, x: -12 }}
+                    whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.5, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <span className="srp-campus__moment-icon"><Sparkles aria-hidden="true" /></span>
+                    <div>
+                      <span className="srp-campus__moment-label">Find stillness</span>
+                      <p>Turn inward through Rajyoga meditation and meet your inner peace.</p>
+                    </div>
+                  </motion.li>
+                  <motion.li
+                    initial={reduce ? false : { opacity: 0, x: -12 }}
+                    whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.5, delay: 0.27, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <span className="srp-campus__moment-icon"><BookOpen aria-hidden="true" /></span>
+                    <div>
+                      <span className="srp-campus__moment-label">Discover</span>
+                      <p>Explore new perspectives and the quiet wisdom within.</p>
+                    </div>
+                  </motion.li>
+                  <motion.li
+                    initial={reduce ? false : { opacity: 0, x: -12 }}
+                    whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.5, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <span className="srp-campus__moment-icon"><Heart aria-hidden="true" /></span>
+                    <div>
+                      <span className="srp-campus__moment-label">Carry the calm</span>
+                      <p>Return to the world with clarity, balance and renewed purpose.</p>
+                    </div>
+                  </motion.li>
+                </ol>
               </div>
             </Reveal>
 

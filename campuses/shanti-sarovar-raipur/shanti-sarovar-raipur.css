@@ -1,4 +1,4 @@
-﻿/* ============================================================================
+/* ============================================================================
    Shanti Sarovar Raipur — campus micro-site
    Theme: #3d3128 with warm neutral shades scoped to `.srp-oasis`.
 
@@ -20,6 +20,7 @@ html.dark body.srp-campus-body {
 }
 
 .srp-oasis {
+  --srp-nav-active-bg: rgba(239, 163, 101, 0.32);
   --background: #f7f4f1;
   --foreground: var(--srp-theme-500);
   --card: var(--srp-theme-50);
@@ -517,7 +518,7 @@ html.dark body.srp-campus-body {
 
 .srp-pill-nav__item.is-active {
   color: var(--srp-theme-50);
-  background: rgba(239, 163, 101, 0.32);
+  background: var(--srp-nav-active-bg);
 }
 
 .srp-pill-header__controls {
@@ -1051,27 +1052,276 @@ html.dark body.srp-campus-body {
   }
 }
 
-/* ---- Campus story (sticky visual + chapters) ---- */
+/* ---- Campus story (day timeline + chapters) ---- */
 .srp-campus {
-  /* svh stays stable when the mobile browser chrome collapses (dvh does not) */
-  --srp-campus-photo-max-h: calc(95svh - var(--srp-header-h) - 2rem);
   display: grid;
   gap: 1.75rem;
 }
 
-.srp-campus__sticky {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.srp-campus__photo {
-  border-radius: 1rem !important;
+.srp-campus__day {
+  position: relative;
+  isolation: isolate;
   overflow: hidden;
-  max-width: 100%;
+  min-height: 100%;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border: 1px solid rgba(125, 72, 39, 0.3);
+  border-radius: 1.5rem;
+  background: var(--srp-nav-active-bg);
+  box-shadow:
+    0 32px 70px -32px rgba(75, 55, 35, 0.38),
+    0 12px 28px -16px rgba(75, 55, 35, 0.28),
+    0 0 0 5px rgba(255, 253, 248, 0.7);
+  color: var(--srp-theme-600);
 }
 
-/* Mobile: text first, image second — full-width photo, no crop */
+.srp-campus__day::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0.55rem;
+  border: 1px solid rgba(139, 105, 20, 0.18);
+  border-radius: inherit;
+  opacity: 0.75;
+  pointer-events: none;
+  animation: srp-campus-border-glow 5s ease-in-out infinite;
+}
+
+@keyframes srp-campus-border-glow {
+  50% {
+    opacity: 1;
+    border-color: rgba(184, 134, 11, 0.24);
+    box-shadow: inset 0 0 22px rgba(184, 134, 11, 0.04);
+  }
+}
+
+.dark .srp-oasis .srp-campus__day {
+  background:
+    radial-gradient(ellipse at 88% 8%, rgba(218, 165, 32, 0.12), transparent 34%),
+    radial-gradient(ellipse at 12% 92%, rgba(183, 167, 154, 0.06), transparent 42%),
+    linear-gradient(145deg, #302820 0%, #3d3128 58%, #4a4035 100%);
+  border-color: rgba(244, 203, 128, 0.18);
+  color: #fffaf2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .srp-campus__day::after {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+.srp-campus__day-orbit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 8.75rem;
+  aspect-ratio: 1;
+  margin: 0.15rem auto 1.5rem;
+  color: var(--srp-theme-600);
+}
+
+.srp-campus__day-orbit::before,
+.srp-campus__day-orbit::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 50%;
+  background: #f1cf8a;
+  box-shadow: 0 0 14px rgba(244, 203, 128, 0.72);
+}
+
+.srp-campus__day-orbit::before {
+  top: 0.85rem;
+  right: 1.15rem;
+}
+
+.srp-campus__day-orbit::after {
+  bottom: 1rem;
+  left: 0.95rem;
+}
+
+.srp-campus__orbit-ring {
+  position: absolute;
+  border: 1px solid rgba(112, 66, 31, 0.42);
+  border-radius: 50%;
+}
+
+.srp-campus__orbit-ring--outer {
+  inset: 0;
+}
+
+.srp-campus__orbit-ring--inner {
+  inset: 0.95rem;
+  border-style: solid;
+  border-color: rgba(112, 66, 31, 0.28);
+}
+
+.srp-campus__orbit-core {
+  position: absolute;
+  inset: 1.65rem;
+  border: 1px solid rgba(112, 66, 31, 0.28);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 248, 232, 0.76), rgba(218, 165, 32, 0.14) 42%, rgba(184, 134, 11, 0.04) 68%);
+  box-shadow:
+    0 0 28px rgba(244, 203, 128, 0.18),
+    inset 0 0 18px rgba(255, 247, 235, 0.08);
+}
+
+.srp-campus__orbit-icon {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.srp-campus__orbit-icon svg {
+  z-index: 1;
+  width: 1.8rem;
+  height: 1.8rem;
+  stroke-width: 1.5;
+}
+
+.srp-campus__day-eyebrow,
+.srp-campus__moment-label {
+  display: block;
+  margin: 0;
+  color: #70421f;
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.srp-campus__day-eyebrow {
+  text-align: center;
+}
+
+.srp-oasis .srp-campus__day-title {
+  position: relative;
+  z-index: 3;
+  max-width: 16ch;
+  margin: 0.45rem auto 0.55rem;
+  color: var(--srp-theme-700) !important;
+  font-family: Georgia, serif;
+  font-size: clamp(1.55rem, 2.5vw, 2.15rem);
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: none;
+}
+
+.dark .srp-oasis .srp-campus__day-title {
+  color: #fffaf2 !important;
+  text-shadow: 0 2px 16px rgba(20, 12, 8, 0.5);
+}
+
+.dark .srp-oasis .srp-campus__day-intro,
+.dark .srp-oasis .srp-campus__timeline li p {
+  color: rgba(255, 250, 242, 0.72);
+}
+
+.dark .srp-oasis .srp-campus__day-eyebrow,
+.dark .srp-oasis .srp-campus__moment-label,
+.dark .srp-oasis .srp-campus__moment-icon {
+  color: #f1cf8a;
+}
+
+.dark .srp-oasis .srp-campus__moment-icon {
+  border-color: rgba(244, 203, 128, 0.38);
+  background: rgba(255, 250, 242, 0.07);
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.7);
+}
+
+.srp-campus__day-intro {
+  position: relative;
+  z-index: 3;
+  max-width: 24rem;
+  margin: 0 auto 1.35rem;
+  color: #644a3a;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.srp-campus__timeline {
+  position: relative;
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.srp-campus__timeline::before {
+  content: "";
+  position: absolute;
+  top: 1.8rem;
+  bottom: 1.8rem;
+  left: 1.2rem;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(112, 66, 31, 0.42) 12%, rgba(112, 66, 31, 0.42) 88%, transparent);
+}
+
+.srp-campus__timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.85rem;
+  margin: 0.12rem 0;
+  padding: 0.75rem 0.8rem 0.75rem 0;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    background 220ms ease;
+}
+
+.srp-campus__timeline li:hover {
+  transform: translateX(0.25rem);
+  border-color: rgba(112, 66, 31, 0.2);
+  background: rgba(255, 250, 242, 0.26);
+}
+
+.srp-campus__moment-icon {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  border: 1px solid rgba(112, 66, 31, 0.32);
+  border-radius: 50%;
+  background: rgba(255, 253, 250, 0.82);
+  color: #70421f;
+  box-shadow: 0 8px 18px -10px rgba(75, 55, 35, 0.32);
+}
+
+.srp-campus__moment-icon svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.7;
+}
+
+.srp-campus__moment-label {
+  margin: 0.1rem 0 0.25rem;
+  color: #3d3128;
+  letter-spacing: 0.08em;
+}
+
+.srp-campus__timeline li p {
+  margin: 0;
+  color: #644a3a;
+  font-size: var(--srp-text-sm);
+  line-height: 1.55;
+}
+
+/* Mobile: story first, timeline second. */
 @media (max-width: 899px) {
   .srp-campus__story {
     order: 1;
@@ -1081,62 +1331,15 @@ html.dark body.srp-campus-body {
     order: 2;
     width: 100%;
   }
-
-  .srp-campus__sticky {
-    width: 100%;
-  }
-
-  .srp-campus__photo {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    margin-inline: 0;
-    /* Let the collage keep its natural proportions (no 4:5 crop) */
-    aspect-ratio: auto;
-    height: auto;
-    max-height: none;
-  }
-
-  .srp-campus__photo img {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: none;
-    object-fit: contain;
-    object-position: center top;
-  }
 }
 
 @media (min-width: 900px) {
   .srp-campus {
-    /* Narrower image column so the collage fits in ~80vh at full aspect */
     grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
     gap: 2.5rem 2.85rem;
     align-items: center;
   }
 
-  .srp-campus__sticky {
-    position: sticky;
-    top: calc(var(--srp-header-h) + 1rem);
-  }
-
-  /* Same frame as the Shanti Sarovar about photo (887Ã—1661): fill the column
-     width so a taller collage doesn't shrink into a narrow strip. */
-  .srp-campus__photo {
-    aspect-ratio: 887 / 1661;
-    width: 100%;
-    height: auto;
-    max-height: var(--srp-campus-photo-max-h);
-    margin-inline: auto 0;
-  }
-
-  .srp-campus__photo img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
 }
 
 /* Metrics — mobile: one compact row; desktop: editorial fact rail */
@@ -6490,7 +6693,3 @@ html.dark body.srp-campus-body {
   background: rgba(74, 42, 14, 0.3);
   border-color: rgba(255, 247, 239, 0.55);
 }
-
-
-
-
