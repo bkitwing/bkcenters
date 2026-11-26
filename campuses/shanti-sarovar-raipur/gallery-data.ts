@@ -1,16 +1,14 @@
 /**
- * Shanti Sarovar Raipur galleries — Strapi website-section (id pending).
+ * Shanti Sarovar Raipur galleries — Strapi website-section #81.
  * Each `wisdom.post-gallery` component becomes one album.
- *
- * Until SRP_GALLERY_SECTION_ID is set, the page shows placeholder albums
- * named after the photo collections on the source page.
+ * https://webapp.brahmakumaris.com/admin/content-manager/collection-types/api::website-section.website-section/81
  */
 
 import { cache } from 'react';
 import { SRP_CONTENT, SRP_GALLERY_TITLES } from './content';
 import { srpPlaceholderSrc } from './placeholder';
 
-export const SRP_GALLERY_SECTION_ID: number | null = null;
+export const SRP_GALLERY_SECTION_ID = 81;
 const ISR = 86400;
 
 const IS_PROD = process.env.NODE_ENV === 'production';
