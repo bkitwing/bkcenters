@@ -1,4 +1,3 @@
-import { generateOgImageUrl } from '@/lib/ogUtils';
 import { Center } from '@/lib/types';
 
 /**
@@ -15,16 +14,13 @@ export const SRP_CANONICAL = 'https://www.brahmakumaris.com/centers/shanti-sarov
 export const SRP_RETREAT_NAME = 'Shanti Sarovar Retreat Center, Raipur';
 
 /**
- * Featured / Open Graph images. Generated cards until the Strapi assets
- * arrive — swap each value for its Strapi CDN link.
+ * Page-specific Open Graph images from the shared media assets.
  */
-const ogCard = (title: string) =>
-  generateOgImageUrl({ title, subtitle: 'Shanti Sarovar · Raipur', type: 'home' });
 export const SRP_OG_IMAGES = {
-  home: ogCard('Shanti Sarovar Retreat Center'),
-  contact: ogCard('Contact Shanti Sarovar'),
-  galleries: ogCard('Shanti Sarovar Gallery'),
-  news: ogCard('Shanti Sarovar News'),
+  home: 'https://media.brahmakumaris.com/assets/Shanti_Sarovar_Home_page_fa974b2279.png',
+  contact: 'https://media.brahmakumaris.com/assets/Shanti_Sarovar_Contact_page_8cd839e6db.png',
+  news: 'https://media.brahmakumaris.com/assets/Shanti_Sarovar_News_page_d4de794658.png',
+  galleries: 'https://media.brahmakumaris.com/assets/Shanti_Sarovar_Gallery_51fbcd7732.png',
 };
 
 export const SRP_SEO = {

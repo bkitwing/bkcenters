@@ -76,7 +76,7 @@ export function generateMetadata(): Metadata {
       url: pageUrl,
       siteName: 'Brahma Kumaris Centers',
       locale: 'en_IN',
-      images: [{ url: ogImage, width: 1200, height: 630, alt: ogAlt }],
+      images: [{ url: ogImage, width: 1280, height: 720, alt: ogAlt }],
     },
     twitter: {
       card: 'summary_large_image',
