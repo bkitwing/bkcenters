@@ -55,7 +55,6 @@ function Reveal({
 }
 
 const CHAPTERS = c.about.paragraphs.map((body, index) => ({
-  n: String(index + 1).padStart(2, '0'),
   title: c.about.chapters[index],
   body,
 }));
@@ -263,12 +262,9 @@ export default function ShantiSarovarRaipurClient({
               </Reveal>
 
               {CHAPTERS.map((chapter, index) => (
-                <Reveal key={chapter.n} delay={0.08 + index * 0.04}>
+                <Reveal key={chapter.title} delay={0.08 + index * 0.04}>
                   <article className="srp-campus__chapter">
                     <header className="srp-campus__chapter-head">
-                      <span className="srp-campus__chapter-n" aria-hidden>
-                        {chapter.n}
-                      </span>
                       <h3>{chapter.title}</h3>
                     </header>
                     <p>{chapter.body}</p>

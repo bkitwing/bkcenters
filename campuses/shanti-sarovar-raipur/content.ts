@@ -127,7 +127,7 @@ export const SRP_GALLERY_TITLES = [
 export const SRP_CONTENT = {
   brand: 'Shanti Sarovar',
   brandEn: 'Shanti Sarovar',
-  tagline: 'Spiritual Retreat Centre · Raipur',
+  tagline: 'Rajyoga meditation Centre · Raipur',
   eyebrow: 'Brahma Kumaris · Raipur',
   location: 'Vidhan Sabha Marg, Raipur, Chhattisgarh',
   hero: {
@@ -147,7 +147,7 @@ export const SRP_CONTENT = {
     eyebrow: 'About Shanti Sarovar',
     title: 'A retreat centre with a history of its own',
     paragraphs: [
-      'Shanti Sarovar is the spiritual retreat centre of the Prajapita Brahma Kumaris Ishwariya Vishwa Vidyalaya on Vidhan Sabha Marg in Raipur — the capital of Chhattisgarh, known at home and abroad as the “rice bowl” of India. For many reasons, it holds a special place in history.',
+      'Shanti Sarovar is the Rajyoga meditation centre of the Prajapita Brahma Kumaris Ishwariya Vishwa Vidyalaya on Vidhan Sabha Marg in Raipur — the capital of Chhattisgarh, known at home and abroad as the “rice bowl” of India. For many reasons, it holds a special place in history.',
       'It has the honour of being the first retreat centre. Its foundation stone was laid by Rajyogini Dadi Janki Ji, then Joint Chief Administrator, and by senior brother Brahma Kumar Jagdish Chander Ji, the chief spokesperson.',
       'The Chhattisgarh Legislative Assembly stands right beside it. The Ministry of Human Resource Development, Government of India, recognises Shanti Sarovar as the authorised Resource Centre for central India, for teaching moral and spiritual values to teachers and students.',
       'It is the only retreat centre where, on the first day of the budget session, the ministers, MLAs and senior officers come to accept pure, sattvic Brahma Bhojan — and, through Rajyoga meditation, experience the calm and purity of this place.',
@@ -205,7 +205,7 @@ export const SRP_CONTENT = {
     eyebrow: 'Photo collection',
     title: 'Campus in pictures',
     intro:
-      'Every picture of Shanti Sarovar tells a story — of service, dedication and spiritual peace. From the visits of the Dadis to leaders, teachers and students, this place gives everyone an experience of divine peace.',
+      'Every picture of Shanti Sarovar tells a story — of cherished memories, selfless service, and the serene beauty of its campus.',
     cta: 'Photo gallery of Shanti Sarovar',
     items: SRP_GALLERY_TITLES.map(
       (title, index): SrpImage => ({

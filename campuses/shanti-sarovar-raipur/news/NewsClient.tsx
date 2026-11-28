@@ -263,7 +263,7 @@ export default function NewsClient({ data }: { data: SrpNewsPageData }) {
           </>
         }
         title="Service News"
-        lede="Retreats, conferences, seva and campus highlights from Shanti Sarovar — stories from the Brahma Kumaris news desk."
+        lede="Inspiring stories of selfless service, along with the latest news, highlights and activities from Shanti Sarovar."
         animation={<NewsMapAnimation />}
         actions={
           <a href={`#${ARCHIVE_ID}`} className="srp-media-hero__btn srp-media-hero__btn--ghost">
